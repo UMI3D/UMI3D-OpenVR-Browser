@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: dc67125ce466d8a4592b1e52840be7ea
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Decker
+  fontNames:
+  - Decker
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 9c6000499b9199643a5cef3396babbf3, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

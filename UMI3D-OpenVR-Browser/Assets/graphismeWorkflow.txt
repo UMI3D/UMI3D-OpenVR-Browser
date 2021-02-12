@@ -1,0 +1,6 @@
+Images couleur unies 2048 --> Sprite
+Images simples --> Sprite Editor
+Sprite Renderer --> Canvas
+Faciliter le tiling (Manage Library)
+Text --> plutôt dans Unity
+Materials en Unlit pour les menus

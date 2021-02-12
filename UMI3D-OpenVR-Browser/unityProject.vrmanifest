@@ -1,0 +1,16 @@
+{
+  "source": "Unity",
+  "applications": [
+    {
+      "app_key": "application.generated.unity.umi3dbrowserv2.0.exe",
+      "launch_type": "url",
+      "url": "steam://launch/",
+      "action_manifest_path": "C:\\Users\\Mamadou\\Documents\\Pro\\repos\\UMI3D-OpenVR-Browser\\UMI3D-OpenVR-Browser\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "strings": {
+        "en_us": {
+          "name": "UMI3D Browser v2.0 [Testing]"
+        }
+      }
+    }
+  ]
+}
