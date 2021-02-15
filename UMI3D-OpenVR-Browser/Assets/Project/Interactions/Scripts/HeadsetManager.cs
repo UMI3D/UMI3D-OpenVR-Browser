@@ -93,20 +93,27 @@ public class HeadsetManager : Singleton<HeadsetManager>
     {
         SteamVR manager = SteamVR.instance;
 
-        string deviceName = (SteamVR.instance.hmd_TrackingSystemName + " " + SteamVR.instance.hmd_ModelNumber).ToLower();
+        string deviceName = (manager.hmd_TrackingSystemName + " " + manager.hmd_ModelNumber).ToLower().Trim();
 
         Debug.Log("<color=cyan>This app is running on " + deviceName + "</color>");
 
-        switch (deviceName)
+        if (deviceName.Contains("quest"))
         {
-            case "oculus quest":
-                CurrentHeadSetType = HeadsetType.Default;
-                break;
-            default:
-                CurrentHeadSetType = HeadsetType.Default;
-                break;
+            CurrentHeadSetType = HeadsetType.Default;
         }
-        CurrentHeadSetType = HeadsetType.HtcVive;
+        else if (deviceName.Contains("vive_pro"))
+        {
+            CurrentHeadSetType = HeadsetType.HtcVive;
+        }
+        else if (deviceName.Contains("rift"))
+        {
+            CurrentHeadSetType = HeadsetType.OculusRift;
+        }
+        else
+        {
+            CurrentHeadSetType = HeadsetType.Default;
+        }
+
         DisplayControllers();
     }
 

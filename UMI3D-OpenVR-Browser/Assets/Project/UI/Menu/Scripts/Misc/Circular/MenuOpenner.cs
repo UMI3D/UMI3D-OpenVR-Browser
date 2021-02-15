@@ -16,7 +16,7 @@ using Valve.VR;
 
 public class MenuOpenner : MonoBehaviour
 {
-    public SteamVR_Action_Boolean button = SteamVR_Actions.uMI3D_JoystickButton;
+    public SteamVR_Action_Boolean button;
     public SteamVR_Input_Sources controller;
 
     public PlayerMenuManager playerMenuManager;
