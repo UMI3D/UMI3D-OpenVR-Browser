@@ -24,17 +24,19 @@ public class ControllerHintDisplayer : Singleton<ControllerHintDisplayer>
 
     [Space]
 
-    public List<InputHintParameters> rightInputParameters;
-    public List<InputHintParameters> leftInputParameters;
+    public List<HeadsetHintParameters> rightInputParameters;
+    public List<HeadsetHintParameters> leftInputParameters;
 
 
     void Start()
     {
-        foreach (var inputParam in rightInputParameters)
-            inputParam.ghostRenderer.gameObject.SetActive(false);
+        foreach(var headsetParam in rightInputParameters)
+            foreach (var inputParam in headsetParam.parameters)
+                inputParam.ghostRenderer.gameObject.SetActive(false);
 
-        foreach (var inputParam in leftInputParameters)
-            inputParam.ghostRenderer.gameObject.SetActive(false);
+        foreach (var headsetParam in leftInputParameters)
+            foreach (var inputParam in headsetParam.parameters)
+                inputParam.ghostRenderer.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -96,15 +98,20 @@ public class ControllerHintDisplayer : Singleton<ControllerHintDisplayer>
 
     private InputHintParameters FindAssociatedInputHintParamaters(SteamVR_Action button, SteamVR_Input_Sources controller)
     {
+        HeadsetHintParameters headset;
         InputHintParameters inputParam = null;
+
         switch (controller)
         {
-
             case SteamVR_Input_Sources.LeftHand:
-                inputParam = Instance.leftInputParameters.Find(i => i.button == button);
+                headset = Instance.leftInputParameters.Find(i => i.type == HeadsetManager.Instance.CurrentHeadSetType);
+                if (headset != null)
+                    inputParam = headset.parameters.Find(i => i.button == button);
                 break;
             case SteamVR_Input_Sources.RightHand:
-                inputParam = Instance.rightInputParameters.Find(i => i.button == button);
+                headset = Instance.rightInputParameters.Find(i => i.type == HeadsetManager.Instance.CurrentHeadSetType);
+                if (headset != null)
+                    inputParam = headset.parameters.Find(i => i.button == button);
                 break;
             default:
                 throw new System.ArgumentException("This controller " + controller + " is not supported by the controller hint displayer");
@@ -123,5 +130,13 @@ public class ControllerHintDisplayer : Singleton<ControllerHintDisplayer>
 
         [HideInInspector]
         public Material[] defaultMaterials;
+    }
+
+    [System.Serializable]
+    public class HeadsetHintParameters
+    {
+        public HeadsetManager.HeadsetType type;
+
+        public List<InputHintParameters> parameters;
     }
 }

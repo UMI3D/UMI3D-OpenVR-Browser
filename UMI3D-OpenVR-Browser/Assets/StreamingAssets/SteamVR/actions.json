@@ -100,7 +100,7 @@
     {
       "name": "/actions/UMI3D/in/PrimaryButton",
       "type": "boolean",
-      "requirement": "mandatory"
+      "requirement": "suggested"
     },
     {
       "name": "/actions/UMI3D/in/JoystickButton",

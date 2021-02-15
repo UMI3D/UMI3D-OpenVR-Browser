@@ -1,14 +1,5 @@
 {
   "dependencies": {
-    "com.gfi-innovaton.umi3d.cdk.collaboration": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/ClientDevelopmentKit/Collaboration#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.cdk.core": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/ClientDevelopmentKit/Core#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.cdk.interaction-system": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/ClientDevelopmentKit/InteractionSystem#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.cdk.user-capture": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/ClientDevelopmentKit/UserCapture#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.common.collaboration": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/Common/Collaboration#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.common.core": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/Common/Core#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.common.interaction-system": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/Common/InteractionSystem#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.common.user-capture": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/Common/UserCapture#2.2.b.210208",
-    "com.gfi-innovaton.umi3d.dependencies": "https://github.com/Gfi-Innovation/UMI3D-SDK.git?path=/UMI3D-SDK/Assets/Dependencies#2.2.b.210208",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.addressables": "1.8.5",
     "com.unity.collab-proxy": "1.2.16",
