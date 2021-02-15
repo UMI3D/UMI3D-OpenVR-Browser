@@ -182,6 +182,10 @@ public class Connecting : Singleton<Connecting>
     {
         DialogBox.Instance.Display($"Connection to the server lost", "Leave to the connection menu or try again ?", "Try again", "Leave", (b) => {
             callback.Invoke(b);
+            if (b)
+                LoadingScreen.Instance.Display("Connecting ...");
+            else
+                LoadingScreen.Instance.Display("Loading ...");
             DialogBox.Instance.Hide();
         });
     }

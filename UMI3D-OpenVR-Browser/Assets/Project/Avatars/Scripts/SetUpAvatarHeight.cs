@@ -40,6 +40,11 @@ public class SetUpAvatarHeight : MonoBehaviour
     /// </summary>
     static bool isSetup = false;
 
+    /// <summary>
+    /// Avatar height stored if a player leave an environement to connect to another.
+    /// </summary>
+    static float avatarHeight = -1;
+
     public Transform neckPivot;
 
     /// <summary>
@@ -64,7 +69,8 @@ public class SetUpAvatarHeight : MonoBehaviour
         if (!isSetup)
         {
             DialogBox.Instance.Display("Set up height", "Please, stand up and press ok when you are ready.", "OK", SetUpAvatar);
-        } else
+        }
+        else
         {
             SetUpAvatar();
         }
@@ -73,8 +79,18 @@ public class SetUpAvatarHeight : MonoBehaviour
 
     void SetUpAvatar()
     {
+        float height;
+
+        if (isSetup)
+            height = avatarHeight;
+        else
+        {
+            height = anchor.localPosition.y;
+            avatarHeight = height;
+        }
+
         if (sessionScaleFactor == default)
-            sessionScaleFactor = Vector3.one * anchor.localPosition.y * 1.064f;
+            sessionScaleFactor = Vector3.one * height * 1.064f;
 
         skeletonContainer.localScale = sessionScaleFactor;
         headBone.localScale = sessionScaleFactor;
