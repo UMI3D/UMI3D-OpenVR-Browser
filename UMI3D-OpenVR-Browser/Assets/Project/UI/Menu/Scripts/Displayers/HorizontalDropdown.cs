@@ -117,8 +117,10 @@ public class HorizontalDropdown : MonoBehaviour
                 
                 if (currentChoice != null)
                 {
-                    currentChoice.label.color = unselectedFontColor;
-                    currentChoice.backgroundImage.color = unselectedBackgroundColor;
+                    if (currentChoice.label != null)
+                        currentChoice.label.color = unselectedFontColor;
+                    if (currentChoice.backgroundImage != null)
+                        currentChoice.backgroundImage.color = unselectedBackgroundColor;
                 }
                 currentChoice = choiceItems.Find(i => i.label.text == _value);
                 if (currentChoice == null)
