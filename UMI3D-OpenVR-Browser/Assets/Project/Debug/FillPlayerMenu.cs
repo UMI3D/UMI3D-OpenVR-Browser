@@ -37,10 +37,6 @@ public class FillPlayerMenu : MonoBehaviour
         });*/
     }
 
-    public void Debug()
-    {
-        UnityEngine.Debug.Log("Pomme");
-    }
     void FillMenu()
     {
         ToolboxSubMenu toolboxSubMenu = new ToolboxSubMenu()

@@ -108,8 +108,8 @@ MonoBehaviour:
     controllerModels:
     - {fileID: 4599745392573331205}
     - {fileID: 5831029360325378041}
-    leftHandMenuOffset: {x: -0.0148, y: 0.0312, z: -0.1145}
-    rightHandMenuOffset: {x: 0.0148, y: 0.0312, z: -0.1145}
+    leftHandMenuOffset: {x: -0.0148, y: 0.0323, z: -0.1145}
+    rightHandMenuOffset: {x: 0.0148, y: 0.0323, z: -0.1145}
   controllers:
   - {fileID: 2875774585706896021}
   - {fileID: 2875774584766971819}
@@ -762,7 +762,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1097187839608619106}
-  m_LocalRotation: {x: 0.091521464, y: -0.47078332, z: 0.8745721, w: 0.07148865}
+  m_LocalRotation: {x: 0.091521256, y: -0.47078344, z: 0.87457204, w: 0.07148857}
   m_LocalPosition: {x: 0.054, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -9001,7 +9001,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2990501633677453192}
-  m_LocalRotation: {x: 0.6064922, y: -0.33576682, z: 0.33691874, w: -0.6371136}
+  m_LocalRotation: {x: 0.60649186, y: -0.33576733, z: 0.3369182, w: -0.6371139}
   m_LocalPosition: {x: 0.12896729, y: 0.000020068139, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -10561,7 +10561,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6032080220193869622}
-  m_LocalRotation: {x: -0.5497469, y: 0.44475445, z: -0.4447139, w: 0.5497285}
+  m_LocalRotation: {x: -0.5497465, y: 0.44475505, z: -0.44471452, w: 0.54972786}
   m_LocalPosition: {x: 0.136, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:

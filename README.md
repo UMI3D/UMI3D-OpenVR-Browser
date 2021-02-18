@@ -16,15 +16,15 @@ The documentation can be found [here](https://umi3d.github.io/UMI3D-SDK/index.ht
 ## Installation :
 
 1. Clone this repository on your desktop.
-2. This Unity project requires the Steam VR Plugin. So after opening the project within Unity install it from the [Asset Store](https://assetstore.unity.com/packages/tools/integration/steamvr-plugin-32647). After its installation, if you are asked to install OpenVR (or the legacy VR plugin), click on "Cancel".
-3. Move the “SteamVR” folder in another folder named “Assets/AssetStoreTools”.  
+2. This Unity project requires the Steam VR Plugin. So after opening the project within Unity install it from the [Asset Store](https://assetstore.unity.com/packages/tools/integration/steamvr-plugin-32647). After its installation, if you are asked to install the legacy VR mode or the Unity XR plugin, click on "Cancel".
+3. Next, move the “SteamVR” folder in another folder named “Assets/AssetStoreTools”.  
 4. Then go to Windows -> SteamVR Input. Click on “Save and generates”.
 5. Restart Unity.
+6. Go to Edit -> Project Settings -> Open VR and make sure that "Stereo rendering mode" is set to "Multi Pass".
 6. You are now ready to use this project !
 
 ## Getting Started
 
-* This Unity Project requires the SteamVR plugin you can find on the Asset Store (https://assetstore.unity.com/packages/tools/integration/steamvr-plugin-32647)
 * Launch a Server (Server sample scenes can be found [here](https://github.com/UMI3D/UMI3D-Samples))
 * The Ip and HttpPort of the server can be found on the "UMI3DCollaborationServer" script (usualy on the "Server" node)
 * Launch the Browser Unity Project.
