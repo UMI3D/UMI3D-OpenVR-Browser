@@ -92,14 +92,6 @@ public class JoystickSelector : MonoBehaviour
     public Vector2 GetJoystickValue()
     {
         return joystick.GetAxis(controller);
-
-#if UNITY_EDITOR
-        Color.RGBToHSV(joystickDebug, out float H, out float S, out float V);
-        return new Vector2(Mathf.Cos(H * 360 * Mathf.Deg2Rad), Mathf.Sin(H * 360 * Mathf.Deg2Rad));
-#else
-        Debug.Log(OVRInput.Get(joystick, controller));
-        return OVRInput.Get(joystick, controller);
-#endif
     }
 
 
