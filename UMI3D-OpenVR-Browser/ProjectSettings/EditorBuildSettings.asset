@@ -14,9 +14,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Project/Common/Scenes/MainImmersive.unity
     guid: 936718483f9434345b2567228f0162c6
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 3c913eb686950a940b80bf23f7120c5d,
       type: 2}
