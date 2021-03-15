@@ -762,7 +762,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1097187839608619106}
-  m_LocalRotation: {x: 0.091521256, y: -0.47078344, z: 0.87457204, w: 0.07148857}
+  m_LocalRotation: {x: 0.091521546, y: -0.47078332, z: 0.87457204, w: 0.07148864}
   m_LocalPosition: {x: 0.054, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -1944,7 +1944,7 @@ MonoBehaviour:
   viewpoint: {fileID: 8312342796223894566}
   viewpointBonetype: head
   sendTracking: 1
-  targetTrackingFPS: 30
+  targetTrackingFPS: 15
   skeletonParsedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -9016,7 +9016,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2990501633677453192}
-  m_LocalRotation: {x: 0.60649186, y: -0.33576733, z: 0.3369182, w: -0.6371139}
+  m_LocalRotation: {x: 0.60649216, y: -0.33576685, z: 0.3369187, w: -0.6371136}
   m_LocalPosition: {x: 0.12896729, y: 0.000020068139, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -10576,7 +10576,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6032080220193869622}
-  m_LocalRotation: {x: -0.5497465, y: 0.44475505, z: -0.44471452, w: 0.54972786}
+  m_LocalRotation: {x: -0.54974693, y: 0.44475442, z: -0.44471392, w: 0.5497285}
   m_LocalPosition: {x: 0.136, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
