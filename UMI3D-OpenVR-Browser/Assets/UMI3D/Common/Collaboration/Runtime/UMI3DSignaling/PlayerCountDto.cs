@@ -14,15 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-namespace umi3d
-{
-    static public class UMI3DVersion
-    {
-        public static string version { get { return major + "." + minor + "." + status + "." + date; } }
-        public readonly static string major = "2";
-        public readonly static string minor = "2";
-        public readonly static string status = "b";
-        public readonly static string date = "210318";
+using System.Collections.Generic;
+using umi3d.common.userCapture;
 
+namespace umi3d.common.collaboration
+{
+    public class PlayerCountDto : UMI3DDto
+    {
+        /// <summary>
+        /// Connected player count
+        /// </summary>
+        public int count;
+
+        /// <summary>
+        /// Last change date with format "MM:dd:yyyy:HH:mm:ss";
+        /// </summary>
+        public string lastUpdate; 
     }
 }
