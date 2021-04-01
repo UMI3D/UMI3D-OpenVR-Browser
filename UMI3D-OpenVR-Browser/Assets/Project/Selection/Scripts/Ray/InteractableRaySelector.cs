@@ -163,7 +163,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             }
             var currentHoveredId = string.Empty;
 
-            if (interactableContainer != null && interactableContainer.Interactable != null)
+            if (interactableContainer != null && interactableContainer.Interactable != null && interactableContainer.Interactable.Active)
             {
                 Interactable interactable = interactableContainer.Interactable;
                 currentHoveredId = UMI3DEnvironmentLoader.GetNodeID(hit.Value.collider);
@@ -190,6 +190,10 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                 shouldHover = true;
                 if (!laser.hovering)
                     laser.OnHoverEnter(this.gameObject.GetInstanceID());
+
+
+                lastHoveredInteractable = interactableContainer;
+                lastHoveredInteractableId = currentHoveredId;
             }
             else if (lastHoveredInteractable != null)
             {
@@ -200,9 +204,6 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             }
             else if (laser.hovering)
                 laser.OnHoverExit(this.gameObject.GetInstanceID());
-
-            lastHoveredInteractable = interactableContainer;
-            lastHoveredInteractableId = currentHoveredId;
 
             (controller as OpenVRController).hoveredObjectId = lastHoveredInteractableId;
         }

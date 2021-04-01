@@ -147,7 +147,7 @@ public class InteractableProximitySelector : ProximitySelector<InteractableConta
         }            
 
         Interactable interactable = closest.component.Interactable;
-        if (interactable != null)
+        if (interactable != null && interactable.Active)
         {
             if (interactable != lastHoveredInteractable)
             {
