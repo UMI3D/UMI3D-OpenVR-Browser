@@ -142,7 +142,7 @@ public class BooleanInput : AbstractUMI3DInput
                             hoveredObjectId = hoveredObjectId
                         }, true);
                     }
-
+                    player.controller.IsInputPressed = true;
                     onInputDown.Invoke();
                 } else
                 {
@@ -161,7 +161,7 @@ public class BooleanInput : AbstractUMI3DInput
                             risingEdgeEventSent = false;
                         }
                     }
-
+                    player.controller.IsInputPressed = false;
                     onInputUp.Invoke();
                 }
             };
@@ -186,7 +186,7 @@ public class BooleanInput : AbstractUMI3DInput
     /// <param name="associatedColor"></param>
     private void DisplayBindingInMenu(AbstractInteractionDto interaction, string toolId, string hoveredObjectId, PlayerMenuManager player, UnityAction<bool> action)
     {
-        Debug.Log("<color=orange>Work on icon</color>");
+        //Debug.Log("<color=orange>Work on icon</color>");
         menuItem = new BindingMenuItem {
             Name = interaction.name,
             associatedMaterial = highlightMat,

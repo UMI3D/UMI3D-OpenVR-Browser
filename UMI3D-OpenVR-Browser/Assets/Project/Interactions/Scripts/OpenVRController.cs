@@ -130,6 +130,7 @@ public class OpenVRController : AbstractController
     /// <see cref="FindInput(AbstractParameterDto, bool)"/>
     protected List<StringEnumParameterInput> stringEnumParameterInputs = new List<StringEnumParameterInput>();
 
+    public bool IsInputPressed = false;
 
     #endregion
 

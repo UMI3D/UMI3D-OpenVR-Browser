@@ -21,7 +21,7 @@ public class OpenVRInteractableProximitySelector : InteractableProximitySelector
     
     protected override void Update()
     {
-        if (playerMenu.IsDisplayingToolParameters)
+        if (playerMenu.IsDisplayingToolParameters || (controller as OpenVRController).IsInputPressed)
             return;
 
         base.Update();

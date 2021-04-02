@@ -37,7 +37,7 @@ public class OpenVRInteractableRaySelector : InteractableRaySelector
 
     protected override void Update()
     {
-        if (playerMenu.IsDisplaying)
+        if (playerMenu.IsDisplaying || (controller as OpenVRController).IsInputPressed)
             return;
 
         base.Update();
