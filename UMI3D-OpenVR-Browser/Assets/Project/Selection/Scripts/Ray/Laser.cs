@@ -82,6 +82,11 @@ public class Laser : MonoBehaviour
             impactPointRenderer.material.color = defaultColor;
         if (laserObjectRenderer != null)
             laserObjectRenderer.material.color = defaultColor;
+        SetInfinitePoint();
+    }
+
+    public void SetInfinitePoint()
+    {
         SetImpactPoint(this.transform.position + this.transform.forward * 500, false);
     }
 

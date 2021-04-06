@@ -43,8 +43,8 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
     private Vector3 lastHoveredPos;
     private Vector3 lastHoveredNormal;
     private Vector3 lastHoveredDirection;
-    private InteractableContainer lastHoveredInteractable = null;
-    private string lastHoveredInteractableId;
+    private InteractableContainer lastActiveHoveredInteractable = null;
+    private string lastActiveHoveredInteractableId;
     private bool shouldHover = false;
 
     private Interactable.Event onHoverExit = new Interactable.Event();
@@ -63,8 +63,8 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             if (shouldHover)
             {
                 shouldHover = false;
-                if (lastHoveredInteractable != null)
-                    lastHoveredInteractable.Interactable.Hovered(boneId, lastHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
+                if (lastActiveHoveredInteractable != null)
+                    lastActiveHoveredInteractable.Interactable.Hovered(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
             }
             if (hoveredFPS == 0f)
                 yield return new WaitForSeconds(1f / 60f);
@@ -105,7 +105,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                         if (interactable.dto.interactions.TrueForAll(x => x is EventDto) && (interactable.dto.interactions.Count < 3))
                             return;
 
-                        interactableProjector.Project(interactable, lastHoveredInteractableId, new RequestedUsingSelector<InteractableRaySelector>() { controller = this.controller });
+                        interactableProjector.Project(interactable, lastActiveHoveredInteractableId, new RequestedUsingSelector<InteractableRaySelector>() { controller = this.controller });
                     }
                 }
 
@@ -130,15 +130,15 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
     {
         base.DeactivateInternal();
 
-        if (lastHoveredInteractable != null)
+        if (lastActiveHoveredInteractable != null)
         {
 
-            lastHoveredInteractable.Interactable.HoverExit(boneId, lastHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
-            onHoverExit.Invoke(lastHoveredInteractable.Interactable);
+            lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
+            onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
 
-            SelectionHighlight.Instance.DisableHoverHighlight(lastHoveredInteractable.gameObject);
-            lastHoveredInteractable = null;
-            lastHoveredInteractableId = "";
+            SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
+            lastActiveHoveredInteractable = null;
+            lastActiveHoveredInteractableId = "";
             laser.OnHoverExit(this.gameObject.GetInstanceID());
         }
 
@@ -168,7 +168,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                 Interactable interactable = interactableContainer.Interactable;
                 currentHoveredId = UMI3DEnvironmentLoader.GetNodeID(hit.Value.collider);
 
-                if (interactableContainer != lastHoveredInteractable)
+                if (interactableContainer != lastActiveHoveredInteractable)
                 {
                     if ((interactable.dto.interactions != null) && (interactable.dto.interactions.Count > 0))
                     {
@@ -176,11 +176,11 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                     }
                     interactable.HoverEnter(boneId, currentHoveredId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                     Pulse();
-                    if (lastHoveredInteractable != null)
+                    if (lastActiveHoveredInteractable != null)
                     {
-                        lastHoveredInteractable.Interactable.HoverExit(boneId, lastHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
-                        onHoverExit.Invoke(lastHoveredInteractable.Interactable);
-                        SelectionHighlight.Instance.DisableHoverHighlight(lastHoveredInteractable.gameObject);
+                        lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
+                        onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+                        SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
                     }
                 }
 
@@ -192,29 +192,29 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                     laser.OnHoverEnter(this.gameObject.GetInstanceID());
 
 
-                lastHoveredInteractable = interactableContainer;
-                lastHoveredInteractableId = currentHoveredId;
+                lastActiveHoveredInteractable = interactableContainer;
+                lastActiveHoveredInteractableId = currentHoveredId;
             }
-            else if (lastHoveredInteractable != null)
+            else if (lastActiveHoveredInteractable != null)
             {
-                lastHoveredInteractable.Interactable.HoverExit(boneId, lastHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
-                onHoverExit.Invoke(lastHoveredInteractable.Interactable);
-                SelectionHighlight.Instance.DisableHoverHighlight(lastHoveredInteractable.gameObject);
+                lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
+                onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+                SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
                 laser.OnHoverExit(this.gameObject.GetInstanceID());
             }
             else if (laser.hovering)
                 laser.OnHoverExit(this.gameObject.GetInstanceID());
 
-            (controller as OpenVRController).hoveredObjectId = lastHoveredInteractableId;
+            (controller as OpenVRController).hoveredObjectId = lastActiveHoveredInteractableId;
         }
-        else if (lastHoveredInteractable != null)
+        else if (lastActiveHoveredInteractable != null)
         {
-            lastHoveredInteractable.Interactable.HoverExit(boneId, lastHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
-            onHoverExit.Invoke(lastHoveredInteractable.Interactable);
-            SelectionHighlight.Instance.DisableHoverHighlight(lastHoveredInteractable.gameObject);
+            lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
+            onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+            SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
             laser.OnHoverExit(this.gameObject.GetInstanceID());
-            lastHoveredInteractable = null;
-            lastHoveredInteractableId = "";
+            lastActiveHoveredInteractable = null;
+            lastActiveHoveredInteractableId = "";
             (controller as OpenVRController).hoveredObjectId = "";
         }
         else if (laser.hovering)
@@ -227,6 +227,10 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
         if (hit != null)
         {
             laser.SetImpactPoint(hit.Value.point, false);
+        }
+        else
+        {
+            laser.SetInfinitePoint();
         }
     }
 
@@ -242,7 +246,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
 
     public string GetLastHoveredInteractableId()
     {
-        return lastHoveredInteractableId;
+        return lastActiveHoveredInteractableId;
     }
     
 }
