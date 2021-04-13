@@ -70,6 +70,10 @@ public class BooleanInput : AbstractUMI3DInput
     /// </summary>
     public bool isInputBeeingModified = false;
 
+    private bool isDown = false;
+
+    private OpenVRController openVrController;
+
     /// <summary>
     /// Callback called on oculus input up.
     /// </summary>
@@ -116,6 +120,8 @@ public class BooleanInput : AbstractUMI3DInput
             if (player == null)
                 Debug.LogError("Player menu manager should no be null");
 
+            openVrController = player.controller;
+
             UnityAction<bool> action = (bool pressDown) =>
             {
                 if (pressDown)
@@ -142,7 +148,8 @@ public class BooleanInput : AbstractUMI3DInput
                             hoveredObjectId = hoveredObjectId
                         }, true);
                     }
-                    player.controller.IsInputPressed = true;
+                    openVrController.IsInputPressed = true;
+                    isDown = true;
                     onInputDown.Invoke();
                 } else
                 {
@@ -161,7 +168,8 @@ public class BooleanInput : AbstractUMI3DInput
                             risingEdgeEventSent = false;
                         }
                     }
-                    player.controller.IsInputPressed = false;
+                    openVrController.IsInputPressed = false;
+                    isDown = false;
                     onInputUp.Invoke();
                 }
             };
@@ -257,6 +265,12 @@ public class BooleanInput : AbstractUMI3DInput
         ControllerHintDisplayer.HideHint(inputObserver);
         HideBindingInMenu();
         associatedInteraction = null;
+
+        if (isDown)
+        {
+            openVrController.IsInputPressed = false;
+            isDown = false;
+        }
     }
 
     public override bool IsCompatibleWith(AbstractInteractionDto interaction)
