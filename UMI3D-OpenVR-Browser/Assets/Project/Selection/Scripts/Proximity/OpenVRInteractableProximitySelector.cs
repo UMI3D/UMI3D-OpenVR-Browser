@@ -25,10 +25,5 @@ public class OpenVRInteractableProximitySelector : InteractableProximitySelector
             return;
 
         base.Update();
-        if (button.GetState(vrController))
-        {
-            if (activated)
-                Select();
-        }
     }
 }
