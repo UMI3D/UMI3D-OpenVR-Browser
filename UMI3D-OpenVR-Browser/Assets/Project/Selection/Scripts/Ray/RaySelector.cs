@@ -14,6 +14,7 @@ using UnityEngine;
 using System;
 using umi3d.cdk;
 using umi3d.cdk.interaction;
+using System.Collections.Generic;
 
 /// <summary>
 /// Parametric class for object ray selection.
@@ -56,6 +57,10 @@ public abstract class RaySelector<T> : RaySelector
     protected RaycastHit? GetClosestPointedObject(bool checkInParent = false)
     {
         RaycastHit[] hits = GetPointedObjects(checkInParent);
+        if (typeof(T) == typeof(Interactable))
+        {
+            hits = SortInteractable(hits);
+        }
         if (hits.Length > 0)
         {
             return hits[0];
@@ -73,6 +78,10 @@ public abstract class RaySelector<T> : RaySelector
     protected RaycastHit? GetClosestOfAllPointedObject()
     {
         RaycastHit[] hits = GetAllPointedObjects();
+        if (typeof(T) == typeof(Interactable))
+        {
+            hits = SortInteractable(hits);
+        }
         if (hits.Length > 0)
         {
             return hits[0];
@@ -94,6 +103,53 @@ public abstract class RaySelector<T> : RaySelector
         return c.HasValue ? (c.Value.transform.GetComponent<T>() != null) : false;
     }
 
+    private RaycastHit[] SortInteractable(RaycastHit[] source)
+    {
+        List<RaycastHit> hitsList = new List<RaycastHit>(source);
+        List<(RaycastHit, Interactable)> interactables = new List<(RaycastHit, Interactable)>();
+
+        foreach (RaycastHit hit in source)
+        {
+            InteractableContainer container = hit.transform.GetComponent<InteractableContainer>();
+
+            if (container == null)
+            {
+                container = hit.transform.GetComponentInParent<InteractableContainer>();
+            }
+
+            if (container != null)
+            {
+                interactables.Add((hit, container.Interactable));
+            }
+        }
+
+        Transform t = Camera.main.transform;
+
+        interactables.Sort(delegate ((RaycastHit, Interactable) x, (RaycastHit, Interactable) y)
+        {
+            if (x.Item2.Active && !y.Item2.Active)
+                return -1;
+            else if (!x.Item2.Active && y.Item2.Active)
+                return 1;
+            else if (x.Item2.HasPriority && !y.Item2.HasPriority)
+                return -1;
+            else if (!x.Item2.HasPriority && y.Item2.HasPriority)
+                return 1;
+            else
+            {
+                if (Vector3.Distance(t.position, x.Item1.point) >= Vector3.Distance(t.position, y.Item1.point))
+                    return 1;
+                else
+                    return -1;
+            }
+        });
+
+        List<RaycastHit> res = new List<RaycastHit>();
+        foreach (var e in interactables)
+            res.Add(e.Item1);
+
+        return res.ToArray();
+    }
 
     /// <summary>
     /// Update the ray displayer depending on the object pointed.
