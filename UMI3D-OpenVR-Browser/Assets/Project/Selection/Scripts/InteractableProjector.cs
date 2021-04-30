@@ -45,7 +45,7 @@ public class InteractableProjector : MonoBehaviour
     {
         autoSelect = StartCoroutine(AutoSelect(hoveredObject, hoveredObjectId, onHoverExit, controller));
 
-        SelectionHighlight.Instance.HighlightHover(hoveredObject.gameObject);
+        //SelectionHighlight.Instance.HighlightHover(hoveredObject.gameObject);
         void cancelSelection(Interactable x)
         {
             if (autoSelect != null)
