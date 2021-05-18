@@ -14,10 +14,10 @@ OcclusionCullingSettings:
 RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
-  m_Fog: 0
-  m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  m_FogMode: 3
-  m_FogDensity: 0.01
+  m_Fog: 1
+  m_FogColor: {r: 0.1882353, g: 0.5, b: 0.50980395, a: 1}
+  m_FogMode: 2
+  m_FogDensity: 0.005
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
   m_AmbientSkyColor: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 1}
@@ -151,12 +151,12 @@ PrefabInstance:
     - target: {fileID: 1060346590124769673, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.09152129
+      value: 0.091521546
       objectReference: {fileID: 0}
     - target: {fileID: 1060346590124769673, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.47078338
+      value: -0.47078332
       objectReference: {fileID: 0}
     - target: {fileID: 1060346590124769673, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
@@ -166,47 +166,47 @@ PrefabInstance:
     - target: {fileID: 1060346590124769673, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.071488455
+      value: 0.07148864
       objectReference: {fileID: 0}
     - target: {fileID: 1192696145502313882, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.54974675
+      value: -0.54974693
       objectReference: {fileID: 0}
     - target: {fileID: 1192696145502313882, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.44475478
+      value: 0.44475442
       objectReference: {fileID: 0}
     - target: {fileID: 1192696145502313882, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.44471422
+      value: -0.44471392
       objectReference: {fileID: 0}
     - target: {fileID: 1192696145502313882, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.54972816
+      value: 0.5497285
       objectReference: {fileID: 0}
     - target: {fileID: 2190471490554607527, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.6064921
+      value: 0.60649216
       objectReference: {fileID: 0}
     - target: {fileID: 2190471490554607527, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.335767
+      value: -0.33576685
       objectReference: {fileID: 0}
     - target: {fileID: 2190471490554607527, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.33691853
+      value: 0.3369187
       objectReference: {fileID: 0}
     - target: {fileID: 2190471490554607527, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: -0.6371137
+      value: -0.6371136
       objectReference: {fileID: 0}
     - target: {fileID: 2875774584476396580, guid: be6423aabe064824995f62f82bf0e609,
         type: 3}
@@ -487,6 +487,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   components:
   - {fileID: 236089374}
+--- !u!1 &310715391
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 310715393}
+  - component: {fileID: 310715392}
+  m_Layer: 0
+  m_Name: SceneLightningSettings
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &310715392
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310715391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b1c58f8e6cfe7348987df480a1138f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultSkyboxMat: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  connectionSkyboxMat: {fileID: 2100000, guid: 38b9a229d7e84af4f807ecdb278ecb6b, type: 2}
+  connectionAmbientColor: {r: 0.62352943, g: 0.62352943, b: 0.62352943, a: 1}
+--- !u!4 &310715393
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310715391}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.3881836, y: 3.1364746, z: -0.09716797}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &479716531
 GameObject:
   m_ObjectHideFlags: 0

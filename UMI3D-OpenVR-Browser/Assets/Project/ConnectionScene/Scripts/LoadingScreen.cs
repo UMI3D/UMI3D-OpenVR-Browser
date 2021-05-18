@@ -64,6 +64,7 @@ public class LoadingScreen : Singleton<LoadingScreen>
 
     public void SetLoadingScreen()
     {
+        SetLightningSettings.ResetLightningSettings();
         loadingSphere.SetActive(true);
         foreach (var o in objectsToHide)
             o.SetActive(false);
