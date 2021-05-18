@@ -121,6 +121,7 @@ public class JoystickSelector : MonoBehaviour
             isActivated = false;
             lastHoveredTarget?.NotifyHoverExit();
             currentSelectedTarget?.NotifyHoverExit();
+            canSelect = true;
         }
     }
 

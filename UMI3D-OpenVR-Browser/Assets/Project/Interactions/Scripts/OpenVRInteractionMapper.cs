@@ -188,12 +188,43 @@ namespace QuestBrowser.Interactions
             return res;
         }
 
-        public override void ReleaseTool(string toolId, InteractionMappingReason reason = null)
+        /// <inheritdoc/>
+        public override bool SwitchTools(string select, string release, bool releasable, string hoveredObjectId, InteractionMappingReason reason = null)
         {
-            if (IsToolReleasable(toolId))
-                base.ReleaseTool(toolId, reason);
+            if (toolIdToController.ContainsKey(release))
+            {
+                AbstractController controller = toolIdToController[release];
+                ReleaseTool(release);
+                if (!SelectTool(select, releasable, controller, hoveredObjectId, reason))
+                {
+                    if (SelectTool(release, releasable, controller, hoveredObjectId))
+                        return false;
+                    else
+                        throw new Exception("Internal error");
+                }
+            }
             else
-                Debug.LogWarning(toolId + " can not be released by a user");
+            {
+                foreach (var c in Controllers)
+                {
+                    var menu = PlayerMenuManager.FindInstanceAssociatedToController(c);
+                    var tool = menu?.currentToolMenu?.tool;
+                    if (tool != null && tool.id == release)
+                    {
+                        if (SelectTool(select, releasable, hoveredObjectId, new AutoProjectOnHover { controller = c }))
+                        {
+                            menu.Hide();
+                            return true;
+                        }
+                    }
+                }
+
+                if (!SelectTool(select, releasable, hoveredObjectId, reason))
+                {
+                    throw new Exception("Internal error");
+                }
+            }
+            return true;
         }
 
         #region CRUD
