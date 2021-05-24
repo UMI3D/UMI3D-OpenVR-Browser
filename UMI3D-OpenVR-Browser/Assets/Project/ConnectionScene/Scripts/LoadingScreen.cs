@@ -64,6 +64,9 @@ public class LoadingScreen : Singleton<LoadingScreen>
 
     public void SetLoadingScreen()
     {
+        ConnectionMenuManager.instance.HideNextNavigationButton();
+        ConnectionMenuManager.instance.HidePreviousNavigationButton();
+
         SetLightningSettings.ResetLightningSettings();
         loadingSphere.SetActive(true);
         foreach (var o in objectsToHide)
@@ -96,3 +99,4 @@ public class LoadingScreen : Singleton<LoadingScreen>
 
 
 }
+

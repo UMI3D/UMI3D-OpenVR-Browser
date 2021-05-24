@@ -86,10 +86,10 @@ public class LibraryManager : MonoBehaviour
                 //Could be done with lib.path if needed
 
                 //4.Bind the button to unistall this lib
-                entry.deleteButton.onClick.AddListener( () => {
+                entry.deleteButton.onClick.AddListener(() => {
                     if (DialogBox.Instance.IsDisplayed)
                         return;
-                    DialogBox.Instance.Display("Are you sure ... ?", "This library is required for environment " + app.Key, "Yes", "No", (b) => {
+                    DialogBox.Instance.Display("Are you sure ... ?", "This library is required for environment " + app.Key, "Yes", (b) => {
                         if (b)
                         {
                             lib.applications.Remove(app.Key);
@@ -145,3 +145,4 @@ public class LibraryManager : MonoBehaviour
 
     #endregion
 }
+
