@@ -133,6 +133,10 @@ public class FormAsker : Singleton<FormAsker>
                 Hide();
                 ConnectionMenuManager.instance.DisplayHome();
             });
+            ConnectionMenuManager.instance.ShowNextNavigationButton(() =>
+            {
+                action(true);
+            });
         }
     }
 

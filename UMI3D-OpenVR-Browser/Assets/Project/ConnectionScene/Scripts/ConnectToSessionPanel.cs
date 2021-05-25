@@ -226,6 +226,7 @@ public class ConnectToSessionPanel : MonoBehaviour
             ConnectionMenuManager.instance.ShowNextNavigationButton(() =>
             {
                 ConnectionMenuManager.instance.ConnectToUmi3DEnvironement(currentSelectedEntry.SessionIp, currentSelectedEntry.SessionPort);
+                ConnectionMenuManager.instance.HideNextNavigationButton();
                 mainPanel.SetActive(false);
             });
             currentSelectedEntry = entry;
