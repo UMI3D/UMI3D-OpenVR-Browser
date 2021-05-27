@@ -95,13 +95,24 @@ namespace QuestBrowser.Interactions
                 else
                     releasableTools.Add(tool.id, releasable);
 
-                return SelectTool(tool.id, releasable, controller, hoveredObjectId, reason);
+                bool res = SelectTool(tool.id, releasable, controller, hoveredObjectId, reason);
+                if (res)
+                    lastReason = reason;
+                return res;
             }
             else
             {
                 throw new Exception("No controller is compatible with this tool");
             }
         }
+
+        public override void ReleaseTool(string toolId, InteractionMappingReason reason = null)
+        {
+            base.ReleaseTool(toolId, reason);
+            lastReason = null;
+        }
+
+        InteractionMappingReason lastReason = null;
 
         /// <summary>
         /// To remove in the future, made because InteractionMapper.ShouldForceProjection(AbstractController, AbstractTool, Reason) can be overriden
@@ -114,6 +125,8 @@ namespace QuestBrowser.Interactions
             if(oculusController != null)
             {
                 if (oculusController.controllersMenu.WasHiddenLastFrame && reason is AutoProjectOnHover)
+                    res = true;
+                else if (lastReason is AutoProjectOnHover && reason is AutoProjectOnHover)
                     res = true;
 
             } else
@@ -198,22 +211,30 @@ namespace QuestBrowser.Interactions
                 if (!SelectTool(select, releasable, controller, hoveredObjectId, reason))
                 {
                     if (SelectTool(release, releasable, controller, hoveredObjectId))
+                    {
+                        lastReason = reason;
                         return false;
+                    }
                     else
                         throw new Exception("Internal error");
+                }
+                else
+                {
+                    lastReason = reason;
                 }
             }
             else
             {
                 foreach (var c in Controllers)
                 {
-                    var menu = PlayerMenuManager.FindInstanceAssociatedToController(c);
-                    var tool = menu?.currentToolMenu?.tool;
+                    var menu = MenuOpenner.FindInstanceAssociatedToController(c);
+                    var tool = menu?.playerMenuManager.currentToolMenu?.tool;
                     if (tool != null && tool.id == release)
                     {
-                        if (SelectTool(select, releasable, hoveredObjectId, new AutoProjectOnHover { controller = c }))
+                        if (SelectTool(select, releasable, hoveredObjectId, new RequestedUsingSelector { controller = c }))
                         {
-                            menu.Hide();
+                            menu.Close();
+                            lastReason = new RequestedFromMenu();
                             return true;
                         }
                     }

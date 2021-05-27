@@ -11,9 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 /// <summary>
 /// Sets up the avatar when users set their height and manages its display.
@@ -36,11 +34,6 @@ public class SetUpAvatarHeight : MonoBehaviour
     public Vector3 neckOffset;
 
     /// <summary>
-    /// Has user set his height.
-    /// </summary>
-    static bool isSetup = false;
-
-    /// <summary>
     /// Avatar height stored if a player leave an environement to connect to another.
     /// </summary>
     static float avatarHeight = -1;
@@ -61,27 +54,22 @@ public class SetUpAvatarHeight : MonoBehaviour
 
     public Transform headBone;
 
-    /// <summary>
-    /// Asks users for their height.
-    /// </summary>
-    void Start()
+    private void Start()
     {
-        if (!isSetup)
-        {
-            DialogBox.Instance.Display("Set up height", "Please, stand up and press ok when you are ready.", "OK", SetUpAvatar);
-        }
-        else
-        {
+        if (AvatarHeightPanel.isSetup)
             SetUpAvatar();
-        }
-
     }
 
-    void SetUpAvatar()
+    bool isSetup = false;
+
+    /// <summary>
+    /// Check user's height to change avatar size.
+    /// </summary>
+    public void SetUpAvatar()
     {
         float height;
 
-        if (isSetup)
+        if (AvatarHeightPanel.isSetup)
             height = avatarHeight;
         else
         {
@@ -98,6 +86,7 @@ public class SetUpAvatarHeight : MonoBehaviour
         leftInverseKinematics.target = leftController;
 
         neckOffset = new Vector3(0, -0.066f * anchor.localPosition.y, -0.07f);
+
         isSetup = true;
     }
 
@@ -137,3 +126,4 @@ public class SetUpAvatarHeight : MonoBehaviour
         }
     }
 }
+

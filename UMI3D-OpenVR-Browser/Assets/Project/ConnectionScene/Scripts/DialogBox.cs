@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 using System;
 using UnityEngine.UI;
 using UnityEngine;
@@ -47,16 +48,13 @@ public class DialogBox : Singleton<DialogBox>
     /// <param name="optionA"></param>
     /// <param name="optionB"></param>
     /// <param name="callback"></param>
-    public void Display(string title,string info,string optionA,string optionB,Action<bool> callback)
+    public void Display(string title, string info, string optionA, Action<bool> callback)
     {
         dialogueBoxPopUp.SetActive(true);
-        this.optionA.gameObject.SetActive(true);
-        this.optionB.gameObject.SetActive(true);
 
         this.optionA.onClick.AddListener(() => { callback(true); Hide(); });
         this.optionB.onClick.AddListener(() => { callback(false); Hide(); });
         this.optionA.GetComponentInChildren<Text>().text = optionA;
-        this.optionB.GetComponentInChildren<Text>().text = optionB;
         this.title.text = title;
         this.info.text = info;
         IsDisplayed = true;
@@ -106,3 +104,4 @@ public class DialogBox : Singleton<DialogBox>
         transform.Rotate(0, 180, 0, Space.Self);
     }
 }
+

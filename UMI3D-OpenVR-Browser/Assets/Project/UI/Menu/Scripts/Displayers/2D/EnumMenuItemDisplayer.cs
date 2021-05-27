@@ -23,11 +23,9 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
     public int displayedAmount = 4;
     public GameObject itemTemplate;
     public GameObject viewport;
-    public Vector3 minPos;
-    public Vector3 maxPos;
 
-    public Color selectedColor;
-    public Color unselectedColor;
+    public Sprite selectedSprite;
+    public Sprite unselectedSprite;
 
     private bool isDisplayed = false;
     private List<GameObject> itemDisplayers = new List<GameObject>();
@@ -38,19 +36,17 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
         public Image image;
         public Text text;
 
-        public Color selectedColor;
-        public Color unSelectedColor;
+        public Sprite selectedSprite;
+        public Sprite unselectedSprite;
 
         public void Select()
         {
-            image.color = selectedColor;
-            text.color = selectedColor;
+            image.sprite = selectedSprite;
         }
 
         public void UnSelect()
         {
-            image.color = unSelectedColor;
-            text.color = unSelectedColor;
+            image.sprite = unselectedSprite;
         }
     }
 
@@ -63,7 +59,7 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
 
         if (!isDisplayed)
         {
-            foreach(string s in menuItem.options)
+            foreach (string s in menuItem.options)
             {
                 GameObject item = Instantiate(itemTemplate, viewport.transform);
                 item.SetActive(true);
@@ -76,16 +72,16 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
                         menuItem.NotifyValueChange(s);
 
                         currentSelectedChoice?.UnSelect();
-                        currentSelectedChoice = new EnumItem { image = item.GetComponentInChildren<Image>(), text = text, selectedColor = selectedColor, unSelectedColor = unselectedColor };
+                        currentSelectedChoice = new EnumItem { image = item.GetComponentInChildren<Image>(), text = text, selectedSprite = selectedSprite, unselectedSprite = unselectedSprite };
                         currentSelectedChoice.Select();
                     }
-                }); 
+                });
 
                 itemDisplayers.Add(item);
 
                 if (s == menuItem.GetValue())
                 {
-                    currentSelectedChoice = new EnumItem { image = item.GetComponentInChildren<Image>(), text = text, selectedColor = selectedColor, unSelectedColor = unselectedColor };
+                    currentSelectedChoice = new EnumItem { image = item.GetComponentInChildren<Image>(), text = text, selectedSprite = selectedSprite, unselectedSprite = unselectedSprite };
                     currentSelectedChoice.Select();
                 }
             }
@@ -116,22 +112,8 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
         for (int i = 0; i < itemDisplayers.Count; i++)
         {
             GameObject item = itemDisplayers[i];
-            if (i < cursor)
-            {
-                //left
-                item.SetActive(false);
-            }
-            else if (i <= cursor + displayedAmount)
-            {
-                //middle
-                item.SetActive(true);
-                item.transform.localPosition = Vector3.Lerp(minPos, maxPos, Mathf.InverseLerp(cursor, cursor + displayedAmount, i));
-            }
-            else
-            {
-                //right
-                item.SetActive(false);
-            }
+            bool display = i >= cursor && i < cursor + displayedAmount;
+            item.SetActive(display);
         }
     }
 
@@ -147,12 +129,5 @@ public class EnumMenuItemDisplayer : AbstractDropDownInputDisplayer
     public override int IsSuitableFor(AbstractMenuItem menu)
     {
         return (menu is AbstractEnumInputMenuItem<string>) ? 2 : 0;
-    }
-
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(viewport.transform.TransformPoint(minPos), viewport.transform.TransformPoint(maxPos));
     }
 }

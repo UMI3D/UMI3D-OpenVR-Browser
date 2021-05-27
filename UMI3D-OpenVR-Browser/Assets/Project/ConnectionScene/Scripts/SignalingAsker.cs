@@ -10,19 +10,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-using System.Collections;
-using System.Collections.Generic;
-using umi3d.cdk;
-using umi3d.cdk.collaboration;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>
+/// Manages the advanced connection panel.
+/// </summary>
 public class SignalingAsker : MonoBehaviour
 {
-    public string environmentLoadingScene;
-    public string thisScene;
-
     public GameObject panel;
     public InputField ip;
     public InputField port;
@@ -35,10 +30,10 @@ public class SignalingAsker : MonoBehaviour
 
     private void Awake()
     {
-        if (PlayerPrefs.HasKey("umi3dip"))
-            ip.text = PlayerPrefs.GetString("umi3dip");
-        if (PlayerPrefs.HasKey("umi3dport"))
-            port.text = PlayerPrefs.GetString("umi3dport");
+        ip.text = PlayerPrefsManager.GetUmi3dIp();
+        port.text = PlayerPrefsManager.GetUmi3DPort();
+
+        Hide();
     }
 
 
@@ -48,28 +43,25 @@ public class SignalingAsker : MonoBehaviour
 
         if ((ip != null) && (ip.text != null) && (ip.text != ""))
         {
-            PlayerPrefs.SetString("umi3dip", ip.text);
+            PlayerPrefsManager.SaveUmi3dIp(ip.text);
         }
         if ((port != null) && (port.text != null) && (port.text != ""))
         {
-            PlayerPrefs.SetString("umi3dport", port.text);
+            PlayerPrefsManager.SaveUmi3dPort(port.text);
         }
 
-        panel.SetActive(false);
-        
-        StartCoroutine(WaitReady(new Data() { ip = ip.text, port = port.text }));
+        Hide();
+
+        ConnectionMenuManager.instance.ConnectToUmi3DEnvironement(ip.text, port.text);
     }
 
-    IEnumerator WaitReady(Data data)
+    public void Display()
     {
-        //SceneManager.LoadScene(environmentLoadingScene, LoadSceneMode.Additive);
-        while (!Connecting.Exists && !UMI3DEnvironmentLoader.Exists)
-            yield return new WaitForEndOfFrame();
+        panel.SetActive(true);
+    }
 
-        Connecting.Instance.Connect(data);
-
-        while (!UMI3DEnvironmentLoader.Exists)
-            yield return new WaitForEndOfFrame();
-        UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(() => SceneManager.UnloadSceneAsync(thisScene));
+    public void Hide()
+    {
+        panel.SetActive(false);
     }
 }

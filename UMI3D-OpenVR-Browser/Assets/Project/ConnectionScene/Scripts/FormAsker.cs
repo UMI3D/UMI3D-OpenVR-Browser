@@ -99,6 +99,7 @@ public class FormAsker : Singleton<FormAsker>
             LoadingScreen.Instance.SetLoadingScreen();
             LoadingScreen.Instance.Display("Loading environment ...");
             HideObjects();
+            Hide();
         }
         else
         {
@@ -121,10 +122,21 @@ public class FormAsker : Singleton<FormAsker>
                 LoadingScreen.Instance.SetLoadingScreen();
                 LoadingScreen.Instance.Display("Loading environment ...");
                 HideObjects();
+                Hide();
             };
             send.Subscribe(action);
             menu.menu.Add(send);
             menuDisplayer.Display(true);
+
+            ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
+            {
+                Hide();
+                ConnectionMenuManager.instance.DisplayHome();
+            });
+            ConnectionMenuManager.instance.ShowNextNavigationButton(() =>
+            {
+                action(true);
+            });
         }
     }
 
@@ -171,3 +183,4 @@ public class FormAsker : Singleton<FormAsker>
     }
 
 }
+
