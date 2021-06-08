@@ -40,15 +40,9 @@ public class OpenVRController : AbstractController
 
     #region Inputs Fields
 
-    [Header("Translation")]
-    public List<Vector3TranslationInput> vector3TranslationInputs = new List<Vector3TranslationInput>();
-    public List<Vector2TranslationInput> vector2TranslationInputs = new List<Vector2TranslationInput>();
-    public List<Vector1TranslationInput> vector1TranslationInputs = new List<Vector1TranslationInput>();
+    [Header("Manipulations")]
 
-    [Header("Rotation")]
-    public List<Vector3RotationInput> vector3RotationInputs = new List<Vector3RotationInput>();
-    public List<Vector2RotationInput> vector2RotationInputs = new List<Vector2RotationInput>();
-    public List<Vector1RotationInput> vector1RotationInputs = new List<Vector1RotationInput>();
+    public List<ManipulationInput> manipulationInputs = new List<ManipulationInput>();
 
     [Header("Other")]
     public List<BooleanInput> booleanInputs = new List<BooleanInput>();
@@ -63,12 +57,7 @@ public class OpenVRController : AbstractController
     {
         get
         {
-            int newHash = vector3TranslationInputs.GetHashCode() +
-                            vector2TranslationInputs.GetHashCode() +
-                            vector1TranslationInputs.GetHashCode() +
-                            vector3RotationInputs.GetHashCode() +
-                            vector2RotationInputs.GetHashCode() +
-                            vector1RotationInputs.GetHashCode() +
+            int newHash = manipulationInputs.GetHashCode() +
                             booleanInputs.GetHashCode();
             if ((lastComputedInputs != null) && (newHash == inputhash))
             {
@@ -77,12 +66,7 @@ public class OpenVRController : AbstractController
             else
             {
                 List<AbstractUMI3DInput> buffer = new List<AbstractUMI3DInput>();
-                buffer.AddRange(vector3TranslationInputs);
-                buffer.AddRange(vector2TranslationInputs);
-                buffer.AddRange(vector1TranslationInputs);
-                buffer.AddRange(vector3RotationInputs);
-                buffer.AddRange(vector2RotationInputs);
-                buffer.AddRange(vector1RotationInputs);
+                buffer.AddRange(manipulationInputs);
                 buffer.AddRange(booleanInputs);
                 buffer.AddRange(menuInputs);
                 buffer.AddRange(formInputs);
@@ -147,17 +131,7 @@ public class OpenVRController : AbstractController
 
     protected virtual void Awake()
     {
-        foreach (AbstractUMI3DInput input in vector3TranslationInputs)
-            input.Init(this);
-        foreach (AbstractUMI3DInput input in vector2TranslationInputs)
-            input.Init(this);
-        foreach (AbstractUMI3DInput input in vector1TranslationInputs)
-            input.Init(this);
-        foreach (AbstractUMI3DInput input in vector3RotationInputs)
-            input.Init(this);
-        foreach (AbstractUMI3DInput input in vector2RotationInputs)
-            input.Init(this);
-        foreach (AbstractUMI3DInput input in vector1RotationInputs)
+        foreach (AbstractUMI3DInput input in manipulationInputs)
             input.Init(this);
         foreach (AbstractUMI3DInput input in booleanInputs)
             input.Init(this);
@@ -186,32 +160,7 @@ public class OpenVRController : AbstractController
             if (!input.IsAvailable())
                 input.Dissociate();
         }
-        foreach (Vector1RotationInput input in vector1RotationInputs)
-        {
-            if (!input.IsAvailable())
-                input.Dissociate();
-        }
-        foreach (Vector2RotationInput input in vector2RotationInputs)
-        {
-            if (!input.IsAvailable())
-                input.Dissociate();
-        }
-        foreach (Vector3RotationInput input in vector3RotationInputs)
-        {
-            if (!input.IsAvailable())
-                input.Dissociate();
-        }
-        foreach (Vector1TranslationInput input in vector1TranslationInputs)
-        {
-            if (!input.IsAvailable())
-                input.Dissociate();
-        }
-        foreach (Vector2TranslationInput input in vector2TranslationInputs)
-        {
-            if (!input.IsAvailable())
-                input.Dissociate();
-        }
-        foreach (Vector3TranslationInput input in vector3TranslationInputs)
+        foreach (ManipulationInput input in manipulationInputs)
         {
             if (!input.IsAvailable())
                 input.Dissociate();
@@ -246,6 +195,7 @@ public class OpenVRController : AbstractController
         return options[0];
     }
 
+
     /// <summary>
     /// Find the best free input for a given manipulation dof.
     /// </summary>
@@ -254,83 +204,34 @@ public class OpenVRController : AbstractController
     /// <returns></returns>
     public override AbstractUMI3DInput FindInput(ManipulationDto manip, DofGroupDto dof, bool unused = true)
     {
-        switch (dof.dofs)
+        return FindInput(manip, dof.dofs, unused);
+    }
+
+    public AbstractUMI3DInput FindInput(ManipulationDto manip, DofGroupEnum dofs, bool unused = true)
+    {
+        AbstractUMI3DInput result = null;
+
+        foreach (ManipulationInput input in manipulationInputs)
         {
-            case DofGroupEnum.ALL:
-            case DofGroupEnum.X:
-            case DofGroupEnum.Y:
-            case DofGroupEnum.Z:
-                foreach (Vector1TranslationInput v1input in vector1TranslationInputs)
+            if (input.IsCompatibleWith(manip))
+            {
+                if (input.IsAvailable() || !unused)
                 {
-                    if (v1input.IsCompatibleWith(manip))
-                    {
-                        if (v1input.IsAvailable() || !unused)
-                            return v1input;
-                    }
+                    result = input;
+                    break;
                 }
-                return null;
-            case DofGroupEnum.RX:
-            case DofGroupEnum.RY:
-            case DofGroupEnum.RZ:
-                foreach (Vector1RotationInput v1input in vector1RotationInputs)
-                {
-                    if (v1input.IsCompatibleWith(manip))
-                    {
-                        if (v1input.IsAvailable() || !unused)
-                            return v1input;
-                    }
-                }
-                return null;
-
-            case DofGroupEnum.XY:
-            case DofGroupEnum.XZ:
-            case DofGroupEnum.YZ:
-                foreach (Vector2TranslationInput v2input in vector2TranslationInputs)
-                {
-                    if (v2input.IsCompatibleWith(manip))
-                    {
-                        if (v2input.IsAvailable() || !unused)
-                            return v2input;
-                    }
-                }
-                return null;
-            case DofGroupEnum.RX_RY:
-            case DofGroupEnum.RX_RZ:
-            case DofGroupEnum.RY_RZ:
-                foreach (Vector2RotationInput v2input in vector2RotationInputs)
-                {
-                    if (v2input.IsCompatibleWith(manip))
-                    {
-                        if (v2input.IsAvailable() || !unused)
-                            return v2input;
-                    }
-                }
-                return null;
-
-            case DofGroupEnum.RX_RY_RZ:
-                foreach (Vector3RotationInput v3input in vector3RotationInputs)
-                {
-                    if (v3input.IsCompatibleWith(manip))
-                    {
-                        if (v3input.IsAvailable() || !unused)
-                            return v3input;
-                    }
-                }
-                return null;
-            case DofGroupEnum.XYZ:
-                foreach (Vector3TranslationInput v3input in vector3TranslationInputs)
-                {
-                    if (v3input.IsCompatibleWith(manip))
-                    {
-                        if (v3input.IsAvailable() || !unused)
-                            return v3input;
-                    }
-                }
-                return null;
-
-            default:
-                return null;
+            }
         }
+
+        if (result != null)
+            return result;
+
+        //if no input was found
+        MenuInput menuInput = this.gameObject.AddComponent<MenuInput>();
+        menuInput.oculusInput = this;
+        menuInput.bone = bone.boneType;
+        menuInputs.Add(menuInput);
+        return menuInput;
     }
 
     public override AbstractUMI3DInput FindInput(EventDto evt, bool unused = true)
@@ -469,6 +370,8 @@ public class OpenVRController : AbstractController
 
     List<System.Action> chooseNewInputCallbacks = new List<System.Action>();
 
+    List<AbstractUMI3DInput> otherInputs;
+
     public bool isListeningToInput { get; private set; } = false;
 
     public bool WasInputSet { get => (newInput != null); }
@@ -487,28 +390,47 @@ public class OpenVRController : AbstractController
 
         isListeningToInput = true;
 
-        foreach (var boolInput in booleanInputs)
+        //1.Find the right alternative inputs for menuItem;
+        otherInputs = null;
+
+        if (menuItem.associatedInteractionDto is EventDto)
+            otherInputs = booleanInputs.ConvertAll(b => b as AbstractUMI3DInput);
+        else if (menuItem.associatedInteractionDto is ManipulationDto)
+        {
+            otherInputs = manipulationInputs.ConvertAll(m => m as AbstractUMI3DInput);
+        }
+        else
+        {
+            Debug.LogError("Impossible to change the binding of this interaction " + menuItem.associatedInteractionDto?.GetType());
+        }
+
+        //2.Make them listen to users' trigger
+        foreach (var otherIput in otherInputs)
         {
             System.Action callBack = () => {
 
                 if (newInput != null)
                     return;
 
-                newInput = boolInput;
+                newInput = otherIput;
                 if (newInput == previousInput)
                 {
                     informationText.text = "This is the same binding, please choose another button or validate to cancel.";
                     newInput = null;
                 }
                 else if (!newInput.IsAvailable())
-                    informationText.text = boolInput.inputObserver.button + " is already used for " + newInput.CurrentInteraction().name + ". Are you sure ?";
+                {
+                    informationText.text = (otherIput as IModifiableBindingInput).GetCurrentButtonName() + " is already used for " + newInput.CurrentInteraction().name + ". Are you sure ?";
+                }
                 else
-                    informationText.text = boolInput.inputObserver.button + ".Are you sure ?";
+                {
+                    informationText.text = (otherIput as IModifiableBindingInput).GetCurrentButtonName() + ".Are you sure ?";
+                }
             };
             chooseNewInputCallbacks.Add(callBack);
 
-            boolInput.isInputBeeingModified = true;
-            boolInput.inputObserver.AddOnStateDownListener(callBack);
+            (otherIput as IModifiableBindingInput).IsInputBeeingModified = true;
+            (otherIput as IModifiableBindingInput).GetOpenVRObserverObersver().AddOnStateDownListener(callBack);
         }
 
         holdableButtonWhichWantsToBeBinded = menuItem;
@@ -526,11 +448,15 @@ public class OpenVRController : AbstractController
         }
         isListeningToInput = false;
 
-        for (int i = 0; i < booleanInputs.Count; i++)
+        if (otherInputs != null)
         {
-            booleanInputs[i].isInputBeeingModified = false;
-            booleanInputs[i].inputObserver.RemoveOnStateDownListener(chooseNewInputCallbacks[i]);
+            for (int i = 0; i < otherInputs.Count; i++)
+            {
+                (otherInputs[i] as IModifiableBindingInput).IsInputBeeingModified = false;
+                (otherInputs[i] as IModifiableBindingInput).GetOpenVRObserverObersver().RemoveOnStateDownListener(chooseNewInputCallbacks[i]);
+            }
         }
+
         chooseNewInputCallbacks.Clear();
     }
 
@@ -562,19 +488,19 @@ public class OpenVRController : AbstractController
         {
             Debug.LogError(holdableButtonWhichWantsToBeBinded.Name + " would like to be binded on a new input but no one was set.");
             return;
-        }  
+        }
 
         //1. If an interaction was already binded on newInput, unbind it.
         bool assignPreviousInput = false;
         HoldableButtonMenuItem itemToReAssign = null;
         if (!newInput.IsAvailable())
         {
-            itemToReAssign = (newInput as BooleanInput).menuItem;
+            itemToReAssign = (newInput as IModifiableBindingInput).GetBindingMenuItem();
             RemoveFromAssociatedInputs(itemToReAssign.toolId, newInput);
             assignPreviousInput = true;
             newInput.Dissociate();
         }
-        
+
 
         //2. If the interaction associated to menuItem already had an input, unbind it.
         if (previousInput != null)
@@ -583,24 +509,33 @@ public class OpenVRController : AbstractController
             RemoveFromAssociatedInputs(toolId, previousInput);
             previousInput.Dissociate();
         }
-        
+
 
         //3.Associate the interaction to the newInput. 
         newInput.Associate(holdableButtonWhichWantsToBeBinded.associatedInteractionDto,
             holdableButtonWhichWantsToBeBinded.toolId, holdableButtonWhichWantsToBeBinded.hoveredObjectId);
         AddToAssociateInputs(holdableButtonWhichWantsToBeBinded.toolId, newInput);
 
-        Debug.Log("<color=cyan>" + holdableButtonWhichWantsToBeBinded.associatedInteractionDto.name + " is now binded on " + (newInput as BooleanInput).inputObserver.button + " before " + (previousInput as BooleanInput)?.inputObserver.button + "</color>");
+        Debug.Log("<color=cyan>" + holdableButtonWhichWantsToBeBinded.associatedInteractionDto.name + " is now binded on " + (newInput as IModifiableBindingInput).GetCurrentButtonName() + " before " + (newInput as IModifiableBindingInput)?.GetCurrentButtonName() + "</color>");
 
         //4. If newInput had an interaction previously binded, we have to find it a new input.
         if (assignPreviousInput)
         {
-            AbstractUMI3DInput input = FindInput(itemToReAssign.associatedInteractionDto, true);
+            AbstractUMI3DInput input = null;
+            if (itemToReAssign.associatedInteractionDto is EventDto evt)
+            {
+                input = FindInput(evt, true);
+            }
+            else if (itemToReAssign.associatedInteractionDto is ManipulationDto manip)
+            {
+                input = FindInput(manip, itemToReAssign.dofs);
+            }
+
             if (input != null)
             {
                 input.Associate(itemToReAssign.associatedInteractionDto, itemToReAssign.toolId, itemToReAssign.hoveredObjectId);
                 AddToAssociateInputs(itemToReAssign.toolId, input);
-            }  
+            }
         }
 
         ResetBindingModification();

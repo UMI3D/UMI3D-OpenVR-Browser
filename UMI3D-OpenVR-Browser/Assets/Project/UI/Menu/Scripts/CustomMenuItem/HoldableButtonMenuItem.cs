@@ -28,7 +28,7 @@ public class HoldableButtonMenuItem : MenuItem, IObservable<bool>
     /// <summary>
     /// This menu item can store an interaction.
     /// </summary>
-    public EventDto associatedInteractionDto;
+    public AbstractInteractionDto associatedInteractionDto;
 
     /// <summary>
     /// If associatedIntearctionDto is not null stores the associated tool id.
@@ -57,6 +57,10 @@ public class HoldableButtonMenuItem : MenuItem, IObservable<bool>
     /// </summary>
     private List<UnityAction<bool>> subscribers = new List<UnityAction<bool>>();
 
+    /// <summary>
+    /// Relevant only if <see cref="associatedInteractionDto"/> is a ManipulationDto.
+    /// </summary>
+    public DofGroupEnum dofs;
 
 
     /// <summary>

@@ -29,6 +29,8 @@ public class SelectorManager : MonoBehaviour
 
     protected virtual void Update()
     {
+        return; 
+
         if (raySelectorsActivated && proximitySelector.isHoveringSomething())
         {
             foreach (RaySelector raySelector in raySelectors)
