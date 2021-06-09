@@ -43,23 +43,21 @@ public class ServerSessionEntry : MonoBehaviour
 
         button.onClick.AddListener(() =>
         {
-            ToggleSelect();
-
             panel.OnSelectionChanged(this);
         });
     }
 
-    public void ToggleSelect()
+    public void Select()
     {
-        isSelected = !isSelected;
+        isSelected = true;
 
-        if (isSelected)
-        {
-            background.sprite = selectedBackground;
-        }
-        else
-        {
-            background.sprite = defaultBackground;
-        }
+        background.sprite = selectedBackground;
+    }
+
+    public void UnSelect()
+    {
+        isSelected = false;
+
+        background.sprite = defaultBackground;
     }
 }

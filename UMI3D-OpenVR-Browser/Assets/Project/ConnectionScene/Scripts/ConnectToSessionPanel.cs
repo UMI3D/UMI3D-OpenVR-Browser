@@ -213,10 +213,6 @@ public class ConnectToSessionPanel : MonoBehaviour
         sessionListSlider.AddElement(go);
     }
 
-    /// <summary>
-    /// Called when users change their session selection.
-    /// </summary>
-    /// <param name="entry"></param>
     public void OnSelectionChanged(ServerSessionEntry entry)
     {
         LoadingScreen.Instance.Hide();
@@ -230,10 +226,11 @@ public class ConnectToSessionPanel : MonoBehaviour
                 mainPanel.SetActive(false);
             });
             currentSelectedEntry = entry;
+            entry.Select();
         }
         else
         {
-            currentSelectedEntry.ToggleSelect();
+            currentSelectedEntry.UnSelect();
             if (currentSelectedEntry == entry)
             {
                 ConnectionMenuManager.instance.HideNextNavigationButton();
@@ -242,9 +239,9 @@ public class ConnectToSessionPanel : MonoBehaviour
             else
             {
                 currentSelectedEntry = entry;
+                entry.Select();
             }
         }
-
     }
 
     #endregion
