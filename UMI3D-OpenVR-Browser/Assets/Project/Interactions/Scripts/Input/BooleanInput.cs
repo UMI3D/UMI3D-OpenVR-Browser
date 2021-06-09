@@ -20,7 +20,7 @@ using umi3d.cdk.interaction;
 using umi3d.cdk.userCapture;
 
 [System.Serializable]
-public class BooleanInput : AbstractUMI3DInput
+public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
 {
     /// <summary>
     /// Oculus input observer binded to this input.
@@ -73,6 +73,8 @@ public class BooleanInput : AbstractUMI3DInput
     private bool isDown = false;
 
     private OpenVRController openVrController;
+
+    public bool IsInputBeeingModified { get => isInputBeeingModified; set => isInputBeeingModified = value; }
 
     /// <summary>
     /// Callback called on oculus input up.
@@ -287,5 +289,23 @@ public class BooleanInput : AbstractUMI3DInput
     public override void UpdateHoveredObjectId(string hoveredObjectId)
     {
         throw new System.NotImplementedException();
+    }
+
+
+    public string GetCurrentButtonName()
+    {
+        if (inputObserver != null)
+            return inputObserver.button.ToString();
+        else
+            return string.Empty;
+    }
+
+    public OpenVRInputObserver GetOpenVRObserverObersver()
+    {
+        return inputObserver;
+    }
+    public BindingMenuItem GetBindingMenuItem()
+    {
+        return menuItem;
     }
 }

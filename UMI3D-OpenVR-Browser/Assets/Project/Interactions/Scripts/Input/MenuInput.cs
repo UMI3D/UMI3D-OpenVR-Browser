@@ -35,7 +35,7 @@ public class MenuInput : AbstractUMI3DInput
     /// <summary>
     /// Associtated interaction (if any).
     /// </summary>
-    public EventDto associatedInteraction { get; protected set; }
+    public AbstractInteractionDto associatedInteraction { get; protected set; }
     /// <summary>
     /// Avatar bone linked to this input.
     /// </summary>
@@ -63,16 +63,16 @@ public class MenuInput : AbstractUMI3DInput
             throw new System.Exception("This input is already binded to a interaction ! (" + associatedInteraction + ")");
         }
 
-        if (IsCompatibleWith(interaction))
+        if (IsCompatibleWith(interaction) && interaction is EventDto ev)
         {
             this.hoveredObjectId = hoveredObjectId;
             this.toolId = toolId;
-            associatedInteraction = interaction as EventDto;
+            associatedInteraction = interaction;
             menuItem = new HoldableButtonMenuItem
             {
                 Name = associatedInteraction.name,
-                Holdable = associatedInteraction.hold,
-                associatedInteractionDto = associatedInteraction,
+                Holdable = ev.hold,
+                associatedInteractionDto = interaction,
                 toolId = toolId,
                 hoveredObjectId = hoveredObjectId,
                 associatedInput = this
@@ -90,7 +90,35 @@ public class MenuInput : AbstractUMI3DInput
 
     public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
     {
-        throw new System.Exception("This input is can not be associated with a manipulation");
+        if (associatedInteraction != null)
+        {
+            throw new System.Exception("This input is already binded to a interaction ! (" + associatedInteraction + ")");
+        }
+
+        if (IsCompatibleWith(manipulation))
+        {
+
+            this.hoveredObjectId = hoveredObjectId;
+            this.toolId = toolId;
+            associatedInteraction = manipulation;
+            menuItem = new HoldableButtonMenuItem
+            {
+                Name = dofs.ToString(),
+                Holdable = true,
+                associatedInteractionDto = associatedInteraction,
+                toolId = toolId,
+                hoveredObjectId = hoveredObjectId,
+                associatedInput = this,
+                dofs = dofs
+            };
+
+            PlayerMenuManager player = PlayerMenuManager.FindInstanceAssociatedToController(oculusInput);
+            player.AddMenuItemToParamatersMenu(menuItem);
+        }
+        else
+        {
+
+        }
     }
 
     public override AbstractInteractionDto CurrentInteraction()
@@ -114,12 +142,12 @@ public class MenuInput : AbstractUMI3DInput
 
     public override bool IsCompatibleWith(AbstractInteractionDto interaction)
     {
-        return interaction is EventDto;
+        return interaction is EventDto || interaction is ManipulationDto;
     }
 
     void Pressed(bool down)
     {
-        if (boneDto == null)
+        /*if (boneDto == null)
             boneDto = new BoneDto() { boneType = BoneType.RightHand };
 
         if (down)
@@ -169,7 +197,7 @@ public class MenuInput : AbstractUMI3DInput
                     risingEdgeEventSent = false;
                 }
             }
-        }
+        }*/
     }
 
     public override void UpdateHoveredObjectId(string hoveredObjectId)
