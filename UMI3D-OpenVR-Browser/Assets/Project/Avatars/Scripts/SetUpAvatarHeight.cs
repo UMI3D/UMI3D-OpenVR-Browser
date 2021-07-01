@@ -76,7 +76,7 @@ public class SetUpAvatarHeight : MonoBehaviour
         }
 
         if (sessionScaleFactor == default)
-            sessionScaleFactor = Vector3.one * height * 1.05f;
+            sessionScaleFactor = Vector3.one * height * 1.08f;
 
         skeletonContainer.localScale = sessionScaleFactor;
         //rightInverseKinematics.target = rightController;

@@ -77,10 +77,20 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.5555556
       objectReference: {fileID: 0}
+    - target: {fileID: -7813590141776298306, guid: da6770c40c5dded4a94522b1d0ad2d86,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 06b5a9e74f5ce654caa494383d3c19d4, type: 2}
     - target: {fileID: 919132149155446097, guid: da6770c40c5dded4a94522b1d0ad2d86,
         type: 3}
       propertyPath: m_Name
       value: Unit ybot
       objectReference: {fileID: 0}
+    - target: {fileID: 5822821947120931875, guid: da6770c40c5dded4a94522b1d0ad2d86,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fafc59cf20855b84a9990fa4cb283d9e, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: da6770c40c5dded4a94522b1d0ad2d86, type: 3}
