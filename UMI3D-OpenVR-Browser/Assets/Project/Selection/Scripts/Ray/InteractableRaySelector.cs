@@ -121,7 +121,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
     protected override void ActivateInternal()
     {
         base.ActivateInternal();
-        boneId = boneType.ToDto(viewport).boneType;
+        boneId = boneType.ToDto().boneType;
         hoverCoroutine = StartCoroutine(UpdateHovered());
     }
     

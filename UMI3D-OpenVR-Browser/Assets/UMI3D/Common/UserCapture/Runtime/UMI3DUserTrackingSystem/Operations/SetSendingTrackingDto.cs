@@ -16,24 +16,10 @@ limitations under the License.
 
 using System;
 
-namespace umi3d.common.userCapture
+namespace umi3d.common
 {
-    /// <summary>
-    /// Class to describe a bone's 6-D pose in the frame of reference of a user.
-    /// </summary>
-    [Serializable]
-    public class BoneDto : UMI3DDto
+    public class SetSendingTrackingDto : AbstractOperationDto
     {
-        /// <summary>
-        /// Defines the type of the bone.
-        /// </summary>
-        public string boneType;
-
-        public SerializableVector3 position;
-
-        public SerializableVector4 rotation;
-
-        public SerializableVector3 scale;
-
+        public bool activeSending;
     }
 }

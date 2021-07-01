@@ -47,6 +47,8 @@ public class OpenVRController : AbstractController
     [Header("Other")]
     public List<BooleanInput> booleanInputs = new List<BooleanInput>();
 
+    public BooleanInput HoldInput;
+
     private int inputhash = 0;
 
     private List<AbstractUMI3DInput> lastComputedInputs = null;
@@ -234,8 +236,11 @@ public class OpenVRController : AbstractController
         return menuInput;
     }
 
-    public override AbstractUMI3DInput FindInput(EventDto evt, bool unused = true)
+    public override AbstractUMI3DInput FindInput(EventDto evt, bool unused = true, bool tryToFindInputForHoldableEvent = false)
     {
+        if (HoldInput != null && tryToFindInputForHoldableEvent && HoldInput.IsAvailable())
+            return HoldInput;
+
         foreach (BooleanInput input in booleanInputs)
         {
             if (input.IsAvailable() || !unused)

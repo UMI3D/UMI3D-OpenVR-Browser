@@ -1,16 +1,4 @@
-﻿/*
-Copyright 2019 - 2021 Inetum
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -18,27 +6,31 @@ using UnityEngine;
 /// </summary>
 public class SetUpAvatarHeight : MonoBehaviour
 {
-    public Transform anchor;
+    public Transform VRAnchor;
 
     public Transform skeletonContainer;
 
-    public Transform rightController;
-    public Transform leftController;
+    public FootTargetBehavior FootTargetBehavior;
+    public IKControl IKControl;
 
-    public InverseKinematics rightInverseKinematics;
-    public InverseKinematics leftInverseKinematics;
+    //public Transform rightController;
+    //public Transform leftController;
+
+    //public InverseKinematics rightInverseKinematics;
+    //public InverseKinematics leftInverseKinematics;
 
     /// <summary>
     /// Offset between anchor and the real neck position
     /// </summary>
-    public Vector3 neckOffset;
+    Vector3 neckOffset;
 
     /// <summary>
     /// Avatar height stored if a player leave an environement to connect to another.
     /// </summary>
     static float avatarHeight = -1;
 
-    public Transform neckPivot;
+    //public Transform NeckPivot;
+    public Transform Neck;
 
     /// <summary>
     /// Factor to smooth body rotation.
@@ -52,62 +44,90 @@ public class SetUpAvatarHeight : MonoBehaviour
 
     static Vector3 sessionScaleFactor = default;
 
-    public Transform headBone;
-
     private void Start()
     {
         if (AvatarHeightPanel.isSetup)
-            SetUpAvatar();
+            StartCoroutine(SetUpAvatar());
     }
 
     bool isSetup = false;
 
+    Vector3 startingVirtualNeckPosition;
+    float diffY;
+
     /// <summary>
     /// Check user's height to change avatar size.
     /// </summary>
-    public void SetUpAvatar()
+    public IEnumerator SetUpAvatar()
     {
         float height;
 
         if (AvatarHeightPanel.isSetup)
+        {
             height = avatarHeight;
+
+            while (VRAnchor.localPosition.y == 0)
+                yield return null;
+        }
         else
         {
-            height = anchor.localPosition.y;
+            height = VRAnchor.localPosition.y;
             avatarHeight = height;
         }
 
         if (sessionScaleFactor == default)
-            sessionScaleFactor = Vector3.one * height * 1.064f;
+            sessionScaleFactor = Vector3.one * height * 1.08f;
 
         skeletonContainer.localScale = sessionScaleFactor;
-        headBone.localScale = sessionScaleFactor;
-        rightInverseKinematics.target = rightController;
-        leftInverseKinematics.target = leftController;
+        //rightInverseKinematics.target = rightController;
+        //leftInverseKinematics.target = leftController;
 
-        neckOffset = new Vector3(0, -0.066f * anchor.localPosition.y, -0.07f);
+        neckOffset = new Vector3(0, -0.060f * VRAnchor.localPosition.y, -0.07f);
+
+        startingVirtualNeckPosition = VRAnchor.TransformPoint(neckOffset);
+        diffY = startingVirtualNeckPosition.y - skeletonContainer.position.y;
+
+        // IKControl.headIkActive = true;
+        IKControl.controllerIkActive = true;
+
+        FootTargetBehavior.SetFootTargets();
 
         isSetup = true;
+    }
+
+    private void Update()
+    {
+        //Debug.Log(OVRAnchor.localRotation.y);
+        //Debug.Log(OVRAnchor.rotation.y);
     }
 
     /// <summary>
     /// Sets the position and rotation of the avatar according to users movments.
     /// </summary>
-    void Update()
+    void LateUpdate()
     {
         if (isSetup)
         {
-            Vector3 anchorForwardProjected = Vector3.ProjectOnPlane(anchor.forward, Vector3.up);
+            //Vector3 anchorForwardProjected = Vector3.ProjectOnPlane(transform.worldToLocalMatrix.MultiplyVector(OVRAnchor.forward), Vector3.up);
 
-            float diffAngle = Vector3.Angle(Vector3.ProjectOnPlane(anchor.forward, Vector3.up), this.transform.forward);
+            float diffAngle = Vector3.Angle(Vector3.ProjectOnPlane(VRAnchor.forward, Vector3.up), this.transform.forward);
             /*if (diffAngle > maxAngleBeforeRotating)
             {
                 Debug.Log("<color=cyan>JE ME LANCE </color>");
                 StartCoroutine(ResetCoroutine());
             }*/
-            this.transform.localRotation = Quaternion.Euler(transform.localEulerAngles.x, anchor.localEulerAngles.y, transform.localEulerAngles.z);
-            transform.position = anchor.TransformPoint(neckOffset);
-            neckPivot.rotation = anchor.rotation;
+
+
+            float rotX = VRAnchor.localRotation.eulerAngles.x > 180 ? VRAnchor.localRotation.eulerAngles.x - 360 : VRAnchor.localRotation.eulerAngles.x;
+
+            Neck.localRotation = Quaternion.Euler(Mathf.Clamp(rotX, -60, 60), 0, 0);
+
+            Vector3 virtualNeckPosition = VRAnchor.TransformPoint(neckOffset);
+
+            transform.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
+
+            Vector3 anchorForwardProjected = Vector3.Cross(VRAnchor.right, Vector3.up).normalized;
+            transform.rotation = Quaternion.LookRotation(anchorForwardProjected, Vector3.up);
         }
     }
 
@@ -117,7 +137,7 @@ public class SetUpAvatarHeight : MonoBehaviour
     /// <returns></returns>
     IEnumerator ResetCoroutine()
     {
-        Quaternion targetRotation = Quaternion.Euler(transform.localEulerAngles.x, anchor.localEulerAngles.y, transform.localEulerAngles.z);
+        Quaternion targetRotation = Quaternion.Euler(transform.localEulerAngles.x, VRAnchor.localEulerAngles.y, transform.localEulerAngles.z);
         while (Quaternion.Angle(transform.localRotation, targetRotation) > 5)
         {
             var smoothRot = Quaternion.Lerp(transform.localRotation, targetRotation, smoothRotationSpeed);
@@ -126,4 +146,3 @@ public class SetUpAvatarHeight : MonoBehaviour
         }
     }
 }
-

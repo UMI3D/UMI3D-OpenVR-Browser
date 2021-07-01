@@ -38,7 +38,7 @@ public class AvatarHeightPanel : MonoBehaviour
         {
             var setUp = GameObject.FindObjectOfType<SetUpAvatarHeight>();
             Debug.Assert(setUp != null, "No avatar found to set up height. Should not happen");
-            setUp.SetUpAvatar();
+            StartCoroutine(setUp.SetUpAvatar());
             Hide();
             validationCallBack?.Invoke();
             isSetup = true;
