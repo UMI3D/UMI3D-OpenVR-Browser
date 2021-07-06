@@ -29,8 +29,8 @@ namespace umi3d.cdk.userCapture
     {
         public Transform skeletonContainer;
         public Transform viewpoint;
-        [ConstStringEnum(typeof(BoneType))]
-        public string viewpointBonetype;
+        [ConstEnum(typeof(BoneType), typeof(uint))]
+        public uint viewpointBonetype;
 
         [SerializeField]
         protected bool sendTracking = true;
@@ -38,9 +38,9 @@ namespace umi3d.cdk.userCapture
         [SerializeField]
         protected float targetTrackingFPS = 15;
 
-        List<string> streamedBonetypes = new List<string>();
+        List<uint> streamedBonetypes = new List<uint>();
 
-        public Dictionary<string, UserAvatar> embodimentDict = new Dictionary<string, UserAvatar>();
+        public Dictionary<ulong, UserAvatar> embodimentDict = new Dictionary<ulong, UserAvatar>();
 
         [HideInInspector]
         [Tooltip("This event is raised after each analysis of the skeleton.")]
@@ -54,7 +54,7 @@ namespace umi3d.cdk.userCapture
         [Tooltip("This event has to be raised to start sending tracking data. The sending will stop if the Boolean \"sendTracking\" is false. By default, it is raised at the beginning of Play Mode.")]
         public UnityEvent startingSendingTracking;
 
-        public class AvatarEvent : UnityEvent<string> { };
+        public class AvatarEvent : UnityEvent<ulong> { };
 
         public AvatarEvent avatarEvent = new AvatarEvent();
 
@@ -89,11 +89,11 @@ namespace umi3d.cdk.userCapture
                 {
                     BonesIterator();
 
-                    if (UMI3DClientServer.Exists && UMI3DClientServer.Instance.GetId() != null)
+                    if (UMI3DClientServer.Exists && UMI3DClientServer.Instance.GetId() != 0)
                         UMI3DClientServer.SendTracking(LastFrameDto);
 
-                    if (embodimentDict.TryGetValue(UMI3DClientServer.Instance.GetId(), out UserAvatar userAvatar))
-                        userAvatar.UpdateAvatarPosition(LastFrameDto, Convert.ToUInt64(Time.time));
+                    //if (embodimentDict.TryGetValue(UMI3DClientServer.Instance.GetId(), out UserAvatar userAvatar))
+                        //userAvatar.UpdateAvatarPosition(LastFrameDto, Convert.ToUInt64(Time.time * 1000));
 
                     if (sendCameraProperties)
                         sendingCameraProperties.Invoke();
@@ -111,7 +111,7 @@ namespace umi3d.cdk.userCapture
         /// <returns></returns>
         protected virtual IEnumerator DispatchCamera()
         {
-            while (UMI3DClientServer.Instance.GetId() == null)
+            while (UMI3DClientServer.Instance.GetId() == 0)
             {
                 yield return null;
             }
@@ -168,7 +168,7 @@ namespace umi3d.cdk.userCapture
         /// <param name="id">the id of the user</param>
         /// <param name="u">the UserAvatar instance to register</param>
         /// <returns>A bool indicating if the UserAvatar has been registered</returns>
-        public virtual bool RegisterEmbd(string id, UserAvatar u)
+        public virtual bool RegisterEmbd(ulong id, UserAvatar u)
         {
             if (embodimentDict.ContainsKey(id))
                 return false;
@@ -185,7 +185,7 @@ namespace umi3d.cdk.userCapture
         /// </summary>
         /// <param name="id">the id of the user</param>
         /// <returns>A bool indicating if the UserAvatar has been unregistered</returns>
-        public virtual bool UnregisterEmbd(string id)
+        public virtual bool UnregisterEmbd(ulong id)
         {
             return embodimentDict.Remove(id);
         }
@@ -196,7 +196,7 @@ namespace umi3d.cdk.userCapture
         /// <param name="id">the id of the user</param>
         /// <param name="embd">the UserAvatar instance if found</param>
         /// <returns>A bool indicating if the UserAvatar has been found</returns>
-        public virtual bool TryGetValue(string id, out UserAvatar embd)
+        public virtual bool TryGetValue(ulong id, out UserAvatar embd)
         {
             return embodimentDict.TryGetValue(id, out embd);
         }
@@ -206,7 +206,7 @@ namespace umi3d.cdk.userCapture
             targetTrackingFPS = newFPSTarget;
         }
 
-        public void setStreamedBones(List<string> bonesToStream)
+        public void setStreamedBones(List<uint> bonesToStream)
         {
             this.streamedBonetypes = bonesToStream;
         }

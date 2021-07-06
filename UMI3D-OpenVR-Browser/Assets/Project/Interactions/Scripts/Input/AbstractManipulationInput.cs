@@ -92,9 +92,9 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput, IModifiabl
 
     bool isDown = false;
 
-    string associatedToolId;
+    ulong associatedToolId;
 
-    string currentHoveredObjectId;
+    ulong currentHoveredObjectId;
 
     public bool IsInputBeeingModified { get; set; }
 
@@ -130,7 +130,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput, IModifiabl
         }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedManipulation != null)
         {
@@ -169,7 +169,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput, IModifiabl
         }
     }
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedManipulation != null)
         {
@@ -268,7 +268,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput, IModifiabl
     /// Displays the current binding in the menu of the associated controller.
     /// </summary>
     /// <param name="associatedColor"></param>
-    private void DisplayBindingInMenu(ManipulationDto manipulation, string toolId, string hoveredObjectId, PlayerMenuManager player)
+    private void DisplayBindingInMenu(ManipulationDto manipulation, ulong toolId, ulong hoveredObjectId, PlayerMenuManager player)
     {
         menuItem = new BindingMenuItem
         {

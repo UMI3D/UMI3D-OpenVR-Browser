@@ -105,7 +105,7 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
     }
 
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedInteraction != null)
         {
@@ -194,7 +194,7 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
     /// </summary>
     /// <param name="interaction"></param>
     /// <param name="associatedColor"></param>
-    private void DisplayBindingInMenu(AbstractInteractionDto interaction, string toolId, string hoveredObjectId, PlayerMenuManager player, UnityAction<bool> action)
+    private void DisplayBindingInMenu(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId, PlayerMenuManager player, UnityAction<bool> action)
     {
         //Debug.Log("<color=orange>Work on icon</color>");
         menuItem = new BindingMenuItem {
@@ -225,7 +225,7 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
        }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         throw new System.Exception("Boolean input is not compatible with manipulation");
     }
@@ -286,7 +286,7 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
     }
     
 
-    public override void UpdateHoveredObjectId(string hoveredObjectId)
+    public override void UpdateHoveredObjectId(ulong hoveredObjectId)
     {
         throw new System.NotImplementedException();
     }

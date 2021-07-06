@@ -39,10 +39,10 @@ public class MenuInput : AbstractUMI3DInput
     /// <summary>
     /// Avatar bone linked to this input.
     /// </summary>
-    public string bone = BoneType.RightHand;
+    public uint bone = BoneType.RightHand;
 
-    string toolId;
-    string hoveredObjectId;
+    ulong toolId;
+    ulong hoveredObjectId;
 
     protected BoneDto boneDto;
     bool risingEdgeEventSent;
@@ -56,7 +56,7 @@ public class MenuInput : AbstractUMI3DInput
 
     #region Methods
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedInteraction != null)
         {
@@ -88,7 +88,7 @@ public class MenuInput : AbstractUMI3DInput
         }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedInteraction != null)
         {
@@ -200,7 +200,7 @@ public class MenuInput : AbstractUMI3DInput
         }*/
     }
 
-    public override void UpdateHoveredObjectId(string hoveredObjectId)
+    public override void UpdateHoveredObjectId(ulong hoveredObjectId)
     {
         this.hoveredObjectId = hoveredObjectId;
     }

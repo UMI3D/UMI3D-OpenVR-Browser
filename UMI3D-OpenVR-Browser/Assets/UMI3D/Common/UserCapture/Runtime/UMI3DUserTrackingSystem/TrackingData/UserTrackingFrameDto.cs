@@ -25,7 +25,7 @@ namespace umi3d.common.userCapture
     [Serializable]
     public class UserTrackingFrameDto : AbstractBrowserRequestDto
     {
-        public string userId;
+        public ulong userId;
 
         public List<BoneDto> bones;
 
@@ -34,5 +34,17 @@ namespace umi3d.common.userCapture
         public SerializableVector4 rotation;
 
         public float refreshFrequency;
+
+        protected override uint GetOperationId() { return UMI3DOperationKeys.UserTrackingFrame; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(userId)
+                + UMI3DNetworkingHelper.Write(position)
+                + UMI3DNetworkingHelper.Write(rotation)
+                + UMI3DNetworkingHelper.Write(refreshFrequency)
+                + UMI3DNetworkingHelper.WriteIBytableCollection(bones);
+        }
     }
 }

@@ -32,5 +32,18 @@ namespace umi3d.common.interaction
         /// </summary>
         public SerializableVector4 rotation;
 
+        protected override uint GetOperationId() { return UMI3DOperationKeys.ManipulationRequest; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            if (translation == null)
+                translation = new SerializableVector3();
+            if (rotation == null)
+                rotation = new SerializableVector4();
+
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(translation)
+                + UMI3DNetworkingHelper.Write(rotation);
+        }
     }
 }

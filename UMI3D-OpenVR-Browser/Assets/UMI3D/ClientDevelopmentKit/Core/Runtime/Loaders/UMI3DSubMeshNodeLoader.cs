@@ -1,4 +1,20 @@
-﻿using System;
+﻿/*
+Copyright 2019 - 2021 Inetum
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.common;
@@ -33,8 +49,7 @@ namespace umi3d.cdk
 
                     try
                     {
-                        string sub = nodeDto.id.Split(new string[] { "==_[" }, StringSplitOptions.RemoveEmptyEntries)[1];
-                        sub = sub.Remove(sub.Length - 1);
+                        string sub = nodeDto.subModelName;
                         if (UMI3DResourcesManager.Instance.subModelsCache.ContainsKey(modelInCache))
                         {
                             instance = GameObject.Instantiate(UMI3DResourcesManager.Instance.subModelsCache[modelInCache][sub].gameObject, node.gameObject.transform);
@@ -61,7 +76,7 @@ namespace umi3d.cdk
                                 renderer.receiveShadows = nodeDto.receiveShadow;
                             }
 
-                            SetCollider(UMI3DEnvironmentLoader.GetNode(nodeDto.id), ((UMI3DNodeDto)dto).colliderDto);
+                            SetCollider(nodeDto.id, UMI3DEnvironmentLoader.GetNode(nodeDto.id), ((UMI3DNodeDto)dto).colliderDto);
                         }
                         else
                         {
@@ -78,7 +93,7 @@ namespace umi3d.cdk
                                 /*         instance.transform.localPosition = Vector3.zero;
                                          instance.transform.localEulerAngles = Vector3.zero; //new Vector3(0, 180, 0);
                                          instance.transform.localScale = Vector3.one;*/
-                                SetCollider(UMI3DEnvironmentLoader.GetNode(nodeDto.id), ((UMI3DNodeDto)dto).colliderDto);
+                                SetCollider(nodeDto.id, UMI3DEnvironmentLoader.GetNode(nodeDto.id), ((UMI3DNodeDto)dto).colliderDto);
 
                                 UMI3DEnvironmentLoader.GetNode(nodeDto.modelId).subNodeInstances.Add(nodeInstance);
                                 var renderers = instance.GetComponentsInChildren<Renderer>();
@@ -110,7 +125,7 @@ namespace umi3d.cdk
                     catch (Exception e)
                     {
                         Debug.LogError(e);
-                        Debug.LogError("SubModels names of " + rootDto.id + " are different from environment names. " +nodeDto.id + " not found");
+                        Debug.LogError("SubModels names of " + rootDto.id + " are different from environment names. " + nodeDto.id + " not found");
                     }
                     finished?.Invoke();
                 }
@@ -193,6 +208,39 @@ namespace umi3d.cdk
                 return false;
         }
 
+        public override bool SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        {
+            if ((entity?.dto as GlTFNodeDto)?.extensions?.umi3d is SubModelDto)
+            {
+                if (base.SetUMI3DProperty(entity, operationId, propertyKey, container)) return true;
+                var extension = ((GlTFNodeDto)entity?.dto)?.extensions?.umi3d as SubModelDto;
+                if (extension == null) return false;
+                switch (propertyKey)
+                {
+                    case UMI3DPropertyKeys.IgnoreModelMaterialOverride:
+                        extension.ignoreModelMaterialOverride = UMI3DNetworkingHelper.Read<bool>(container);
+                        if (extension.ignoreModelMaterialOverride) //revert model override and apply only subModel overriders 
+                        {
+                            RevertToOriginalMaterial((UMI3DNodeInstance)entity);
+                            SetMaterialOverided(extension, (UMI3DNodeInstance)entity);
+                        }
+                        else
+                        {
+                            RevertToOriginalMaterial((UMI3DNodeInstance)entity);
+                            UMI3DMeshNodeDto parentDto = (UMI3DMeshNodeDto)((GlTFNodeDto)UMI3DEnvironmentLoader.GetNode(extension.modelId).dto).extensions.umi3d;
+                            SetMaterialOverided(parentDto, (UMI3DNodeInstance)entity);
+                            SetMaterialOverided(extension, (UMI3DNodeInstance)entity);
+                        }
+                        break;
 
+                    default:
+                        return false;
+                }
+                return true;
+
+            }
+            else
+                return false;
+        }
     }
 }

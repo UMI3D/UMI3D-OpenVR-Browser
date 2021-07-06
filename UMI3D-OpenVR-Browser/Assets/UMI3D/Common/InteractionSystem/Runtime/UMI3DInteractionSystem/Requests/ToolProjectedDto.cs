@@ -19,9 +19,17 @@ namespace umi3d.common.interaction
     public class ToolProjectedDto : AbstractBrowserRequestDto
     {
 
-        public string toolId;
+        public ulong toolId;
+        public uint boneType;
 
-        public string boneType;
+        protected override uint GetOperationId() { return UMI3DOperationKeys.ToolProjected; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(toolId)
+                + UMI3DNetworkingHelper.Write(boneType);
+        }
 
     }
 }

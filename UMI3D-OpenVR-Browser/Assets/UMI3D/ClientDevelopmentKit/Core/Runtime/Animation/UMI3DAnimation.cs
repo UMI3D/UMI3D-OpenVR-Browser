@@ -25,7 +25,7 @@ namespace umi3d.cdk
 {
     public class UMI3DAnimation : UMI3DAbstractAnimation
     {
-        new public static UMI3DAnimation Get(string id) { return UMI3DAbstractAnimation.Get(id) as UMI3DAnimation; }
+        new public static UMI3DAnimation Get(ulong id) { return UMI3DAbstractAnimation.Get(id) as UMI3DAnimation; }
         protected new UMI3DAnimationDto dto { get => base.dto as UMI3DAnimationDto; set => base.dto = value; }
 
         List<Coroutine> Coroutines = new List<Coroutine>();
@@ -118,6 +118,39 @@ namespace umi3d.cdk
             return true;
         }
 
+        public override bool SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        {
+            if (base.SetUMI3DProperty(entity, operationId, propertyKey, container)) return true;
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.AnimationDuration:
+                    dto.duration = UMI3DNetworkingHelper.Read<float>(container);
+                    break;
+                case UMI3DPropertyKeys.AnimationChain:
+                    return UpdateChain(operationId, propertyKey, container);
+                default:
+                    return false;
+            }
+
+            return true;
+        }
+
+        static public bool ReadMyUMI3DProperty(ref object value, uint propertyKey, ByteContainer container)
+        {
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.AnimationDuration:
+                    value = UMI3DNetworkingHelper.Read<float>(container);
+                    break;
+                case UMI3DPropertyKeys.AnimationChain:
+                    return UpdateChain(ref value, propertyKey, container);
+                default:
+                    return false;
+            }
+
+            return true;
+        }
+
         bool UpdateChain(SetEntityPropertyDto property)
         {
             switch (property)
@@ -135,6 +168,35 @@ namespace umi3d.cdk
                     dto.animationChain = ((List<object>)property.value).Select(o => o as UMI3DAnimationDto.AnimationChainDto).ToList();
                     break;
             }
+            return true;
+        }
+
+        bool UpdateChain(uint operationId, uint propertyKey, ByteContainer container)
+        {
+            switch (operationId)
+            {
+                case UMI3DOperationKeys.SetEntityListAddProperty:
+                    var value = UMI3DNetworkingHelper.Read<UMI3DAnimationDto.AnimationChainDto>(container);
+                    dto.animationChain.Add(value);
+                    break;
+                case UMI3DOperationKeys.SetEntityListRemoveProperty:
+                    dto.animationChain.RemoveAt(UMI3DNetworkingHelper.Read<int>(container));
+                    break;
+                case UMI3DOperationKeys.SetEntityListProperty:
+                    var index = UMI3DNetworkingHelper.Read<int>(container);
+                    var v = UMI3DNetworkingHelper.Read<UMI3DAnimationDto.AnimationChainDto>(container);
+                    dto.animationChain[index] = v;
+                    break;
+                default:
+                    dto.animationChain = UMI3DNetworkingHelper.ReadList<UMI3DAnimationDto.AnimationChainDto>(container);
+                    break;
+            }
+            return true;
+        }
+
+        static bool UpdateChain(ref object value, uint propertyKey, ByteContainer container)
+        {
+            value = UMI3DNetworkingHelper.ReadList<UMI3DAnimationDto.AnimationChainDto>(container);
             return true;
         }
 

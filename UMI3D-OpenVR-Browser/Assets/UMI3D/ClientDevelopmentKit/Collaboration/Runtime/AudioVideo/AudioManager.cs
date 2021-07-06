@@ -16,7 +16,6 @@ limitations under the License.
 
 using System.Collections.Generic;
 using umi3d.common;
-using umi3d.common.collaboration;
 using UnityEngine;
 
 namespace umi3d.cdk.collaboration
@@ -27,8 +26,8 @@ namespace umi3d.cdk.collaboration
     /// </summary>
     public class AudioManager : Singleton<AudioManager>
     {
-        Dictionary<string, AudioReader> GlobalReader = new Dictionary<string, AudioReader>();
-        Dictionary<string, AudioReader> SpacialReader = new Dictionary<string, AudioReader>();
+        Dictionary<ulong, AudioReader> GlobalReader = new Dictionary<ulong, AudioReader>();
+        Dictionary<ulong, AudioReader> SpacialReader = new Dictionary<ulong, AudioReader>();
 
         private void Start()
         {
@@ -42,7 +41,7 @@ namespace umi3d.cdk.collaboration
         /// </summary>
         /// <param name="userId"> the speaking user</param>
         /// <param name="sample"> the voice dto</param>
-        public void Read(string userId, byte[] sample, ulong timestep)
+        public void Read(ulong userId, byte[] sample, ulong timestep)
         {
             if (SpacialReader.ContainsKey(userId))
                 SpacialReader[userId].Read(sample, timestep);
@@ -90,8 +89,8 @@ namespace umi3d.cdk.collaboration
                     SpacialReader.Remove(user.id);
                 if (!GlobalReader.ContainsKey(user.id))
                 {
-                    var g = new GameObject($"Audio Reader {user.id}");
-                    g.name = user.id;
+                    var g = new GameObject();
+                    g.name = $"user_{user.id}_audio_reader";
                     GlobalReader[user.id] = g.AddComponent<AudioReader>();
                 }
             }

@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
 using System.Collections;
 using umi3d.common;
 using UnityEngine;
@@ -27,8 +26,8 @@ namespace umi3d.cdk
         VideoPlayer videoPlayer;
         Material mat;
         RenderTexture renderTexture;
-        bool started = false;
-        new public static UMI3DVideoPlayer Get(string id) { return UMI3DAbstractAnimation.Get(id) as UMI3DVideoPlayer; }
+
+        new public static UMI3DVideoPlayer Get(ulong id) { return UMI3DAbstractAnimation.Get(id) as UMI3DVideoPlayer; }
 
         public UMI3DVideoPlayer(UMI3DVideoPlayerDto dto) : base(dto)
         {
@@ -76,14 +75,14 @@ namespace umi3d.cdk
             }
 
             //audio
-            if (!String.IsNullOrEmpty(dto.audioId))
+            if (dto.audioId != 0)
             {
                 videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
                 UMI3DAnimationManager.Instance.StartCoroutine(SetAudioSource(dto.audioId));
             }
         }
 
-        private IEnumerator SetAudioSource(string audioId)
+        private IEnumerator SetAudioSource(ulong audioId)
         {
             var delay = new WaitForSeconds(1f);
             while (UMI3DEnvironmentLoader.GetEntity(audioId) == null)
@@ -146,7 +145,6 @@ namespace umi3d.cdk
             if (videoPlayer != null)
             {
                 videoPlayer.Pause();
-                started = false;
             }
         }
 

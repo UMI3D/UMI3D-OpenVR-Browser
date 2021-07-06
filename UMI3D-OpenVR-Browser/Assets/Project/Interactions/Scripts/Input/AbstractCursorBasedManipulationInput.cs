@@ -38,7 +38,7 @@ public abstract class AbstractCursorBasedManipulationInput : AbstractManipulatio
         base.ActivationButton_onStateDown();
     }
 
-    public override void UpdateHoveredObjectId(string hoveredObjectId)
+    public override void UpdateHoveredObjectId(ulong hoveredObjectId)
     {
         throw new System.NotImplementedException();
     }

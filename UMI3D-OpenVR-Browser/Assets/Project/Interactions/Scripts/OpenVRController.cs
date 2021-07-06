@@ -26,7 +26,7 @@ public class OpenVRController : AbstractController
     #region Fields
 
     public PlayerMenuManager controllersMenu;
-    public string hoveredObjectId;
+    public ulong hoveredObjectId;
     public InteractableRaySelector interactableRaySelector;
 
     public Valve.VR.SteamVR_Input_Sources controllerType;
@@ -510,7 +510,7 @@ public class OpenVRController : AbstractController
         //2. If the interaction associated to menuItem already had an input, unbind it.
         if (previousInput != null)
         {
-            string toolId = holdableButtonWhichWantsToBeBinded.toolId;
+            ulong toolId = holdableButtonWhichWantsToBeBinded.toolId;
             RemoveFromAssociatedInputs(toolId, previousInput);
             previousInput.Dissociate();
         }
@@ -548,7 +548,7 @@ public class OpenVRController : AbstractController
         controllersMenu.DisplayToolParamatersMenu(true);
     }
 
-    void RemoveFromAssociatedInputs(string toolId, AbstractUMI3DInput input)
+    void RemoveFromAssociatedInputs(ulong toolId, AbstractUMI3DInput input)
     {
         if (associatedInputs.ContainsKey(toolId))
         {
@@ -558,7 +558,7 @@ public class OpenVRController : AbstractController
         }
     }
 
-    void AddToAssociateInputs(string toolId, AbstractUMI3DInput input)
+    void AddToAssociateInputs(ulong toolId, AbstractUMI3DInput input)
     {
         if (associatedInputs.ContainsKey(toolId))
         {
@@ -617,7 +617,7 @@ public class OpenVRController : AbstractController
         return ((manips.Count > 1) || (events.Count > 3) || (param.Count > 0));
     }
 
-    public override void Project(AbstractTool tool, bool releasable, InteractionMappingReason reason, string hoveredObjectId)
+    public override void Project(AbstractTool tool, bool releasable, InteractionMappingReason reason, ulong hoveredObjectId)
     {
         //controllersMenu.currentToolMenu.RemoveAll();
         base.Project(tool, releasable, reason, hoveredObjectId);
@@ -743,7 +743,7 @@ public class OpenVRController : AbstractController
 
         //HDResourceCache.Download(tool.icon2D, texture => controllersMenu.currentToolMenu.icon2D = texture);
     }
-    private void ProjectParameters(AbstractTool tool, List<AbstractInteractionDto> interactions, string hoveredObjectId)
+    private void ProjectParameters(AbstractTool tool, List<AbstractInteractionDto> interactions, ulong hoveredObjectId)
     {
         AbstractUMI3DInput[] inputs = projectionMemory.Project(this, interactions.FindAll(inter => inter is AbstractParameterDto).ToArray(), tool.id, hoveredObjectId);
         List<AbstractUMI3DInput> toolInputs = new List<AbstractUMI3DInput>();
@@ -788,7 +788,7 @@ public class OpenVRController : AbstractController
 
     #endregion
 
-    protected override string GetCurrentHoveredId()
+    protected override ulong GetCurrentHoveredId()
     {
         return interactableRaySelector.GetLastHoveredInteractableId();
     }

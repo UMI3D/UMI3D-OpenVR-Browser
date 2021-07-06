@@ -57,6 +57,8 @@ namespace umi3d.cdk.collaboration
             HttpClient = new HttpClient(this);
             connected = false;
             joinning = false;
+            UMI3DNetworkingHelper.AddModule(new UMI3DCollaborationNetworkingModule());
+            UMI3DNetworkingHelper.AddModule(new common.collaboration.UMI3DCollaborationNetworkingModule());
         }
 
         public void Init()
@@ -206,7 +208,7 @@ namespace umi3d.cdk.collaboration
                     }, (error) => { Debug.Log("error on get id :" + error); });
                     break;
                 case StatusType.READY:
-                    if (Identity.userId == null)
+                    if (Identity.userId == 0)
                         Instance.HttpClient.SendGetIdentity((user) =>
                         {
                             UserDto = user;
@@ -280,7 +282,7 @@ namespace umi3d.cdk.collaboration
                             }, (error) => { Debug.Log("error on get id :" + error); });
                             break;
                         case StatusType.READY:
-                            if (Identity.userId == null)
+                            if (Identity.userId == 0)
                                 Instance.HttpClient.SendGetIdentity((user) =>
                                 {
                                     UserDto = user;
@@ -307,7 +309,7 @@ namespace umi3d.cdk.collaboration
 
             JoinDto joinDto = new JoinDto()
             {
-                trackedBonetypes = UMI3DClientUserTrackingBone.instances.Values.Select(trackingBone => new KeyValuePair<string, bool>(trackingBone.boneType, trackingBone.isTracked)).ToDictionary(x => x.Key, x => x.Value),
+                trackedBonetypes = UMI3DClientUserTrackingBone.instances.Values.Select(trackingBone => new KeyValuePair<uint, bool>(trackingBone.boneType, trackingBone.isTracked)).ToDictionary(x => x.Key, x => x.Value),
                 userSize = UMI3DClientUserTracking.Instance.skeletonContainer.localScale,
             };
 
@@ -399,7 +401,14 @@ namespace umi3d.cdk.collaboration
         }
 
         ///<inheritdoc/>
-        public override string GetId() { return Identity.userId; }
+        protected override void _GetEntity(ulong id, Action<LoadEntityDto> callback, Action<string> onError)
+        {
+            var dto = new EntityRequestDto() { entityId = id };
+            HttpClient.SendPostEntity(dto, callback, onError);
+        }
+
+        ///<inheritdoc/>
+        public override ulong GetId() { return Identity.userId; }
 
         ///<inheritdoc/>
         public override ulong GetTime()
@@ -407,6 +416,7 @@ namespace umi3d.cdk.collaboration
             return ForgeClient.GetNetWorker().Time.Timestep;
         }
 
+        ///<inheritdoc/>
         protected override string _getAuthorization() { return HttpClient.ComputedToken; }
 
         /// <summary>

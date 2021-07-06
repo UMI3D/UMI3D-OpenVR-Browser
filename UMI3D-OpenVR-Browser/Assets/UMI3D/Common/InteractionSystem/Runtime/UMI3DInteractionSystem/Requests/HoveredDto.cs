@@ -36,5 +36,15 @@ namespace umi3d.common.interaction
         /// The direction of the browser's selection tool in the Interactable associated object's local frame.
         /// </summary>
         public SerializableVector3 direction;
+
+        protected override uint GetOperationId() { return UMI3DOperationKeys.Hoverred; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(position)
+                + UMI3DNetworkingHelper.Write(normal)
+                + UMI3DNetworkingHelper.Write(direction);
+        }
     }
 }
