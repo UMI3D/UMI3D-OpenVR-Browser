@@ -27,8 +27,18 @@ public class LocalInfoInputDisplayer : AbstractLocalInfoRequestInputDisplayer
 
     public override void Display(bool forceUpdate = false)
     {
+        if (GetValue() == (false, false))
+            return;
         this.gameObject.SetActive(true);
         (toggleRead.isOn, toggleWrite.isOn) = GetValue();
+        if(!toggleRead.isOn)
+        {
+            toggleRead.gameObject.SetActive(false);
+        }
+        if (!toggleWrite.isOn)
+        {
+            toggleWrite.gameObject.SetActive(false);
+        }
         toggleRead.onValueChanged.AddListener(ReadValueChange);
         toggleWrite.onValueChanged.AddListener(WriteValueChange);
         label.text = "Server " + ((LocalInfoRequestParameterDto)menuItem.dto).serverName + " requests acces to local data : " + ((LocalInfoRequestParameterDto)menuItem.dto).key;
