@@ -22,13 +22,25 @@ namespace umi3d.common.userCapture
     /// Class to describe a bone's 6-D pose in the frame of reference of a user.
     /// </summary>
     [Serializable]
-    public class BoneDto : UMI3DDto
+    public class BoneDto : UMI3DDto, IBytable
     {
         /// <summary>
         /// Defines the type of the bone.
         /// </summary>
-        public string boneType;
+        public uint boneType;
 
         public SerializableVector4 rotation;
+
+        bool IBytable.IsCountable()
+        {
+            return true;
+        }
+
+        Bytable IBytable.ToBytableArray(params object[] parameters)
+        {
+            return
+                UMI3DNetworkingHelper.Write(boneType)
+                + UMI3DNetworkingHelper.Write(rotation);
+        }
     }
 }

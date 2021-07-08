@@ -20,13 +20,13 @@ using UnityEngine;
 namespace umi3d.common
 {
     [System.Serializable]
-    public class UMI3DLocalAssetDirectory
+    public class UMI3DLocalAssetDirectory : IBytable
     {
         public string name = "new variant";
         public string path;
         [SerializeField]
         public AssetMetricDto metrics = new AssetMetricDto();
-        [ConstStringEnum(typeof(UMI3DAssetFormat))]
+        [ConstEnum(typeof(UMI3DAssetFormat), typeof(string))]
         public List<string> formats = new List<string>();
 
         public UMI3DLocalAssetDirectory()
@@ -39,6 +39,21 @@ namespace umi3d.common
             this.path = other.path;
             this.metrics = other.metrics;
             this.formats = other.formats;
+        }
+
+        bool IBytable.IsCountable()
+        {
+            return true;
+        }
+
+        Bytable IBytable.ToBytableArray(params object[] parameters)
+        {
+            return
+                UMI3DNetworkingHelper.Write(name)
+                + UMI3DNetworkingHelper.Write(path)
+                + UMI3DNetworkingHelper.Write(metrics.resolution)
+                + UMI3DNetworkingHelper.Write(metrics.size)
+                + UMI3DNetworkingHelper.WriteCollection(formats);
         }
         //public List<string> dependencies = new List<string>();
     }

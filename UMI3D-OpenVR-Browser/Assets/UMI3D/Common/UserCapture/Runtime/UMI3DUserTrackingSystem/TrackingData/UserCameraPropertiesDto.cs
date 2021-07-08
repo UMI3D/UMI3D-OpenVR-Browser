@@ -38,6 +38,18 @@ namespace umi3d.common.userCapture
         /// <summary>
         /// the bone corresponding to the camera's position
         /// </summary>
-        public string boneType;
+        public uint boneType;
+
+        protected override uint GetOperationId() { return UMI3DOperationKeys.UserCameraProperties; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(scale)
+                + UMI3DNetworkingHelper.Write(projectionMatrix)
+                + UMI3DNetworkingHelper.Write(boneType);
+
+        }
+
     }
 }

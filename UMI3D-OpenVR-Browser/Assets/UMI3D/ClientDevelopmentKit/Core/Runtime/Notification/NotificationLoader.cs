@@ -62,7 +62,73 @@ namespace umi3d.cdk
                 case UMI3DPropertyKeys.NotificationObjectId:
                     var Odto = dto as NotificationOnObjectDto;
                     if (Odto == null) return false;
-                    Odto.objectId = (string)property.value;
+                    Odto.objectId = (ulong)property.value;
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+        public bool ReadUMI3DProperty(ref object value, uint propertyKey, ByteContainer container)
+        {
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.NotificationTitle:
+                    value = UMI3DNetworkingHelper.Read<string>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationContent:
+                    value = UMI3DNetworkingHelper.Read<string>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationDuration:
+                    value = UMI3DNetworkingHelper.Read<float>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationIcon2D:
+                    value = UMI3DNetworkingHelper.Read<ResourceDto>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationIcon3D:
+                    value = UMI3DNetworkingHelper.Read<ResourceDto>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationObjectId:
+                    value = UMI3DNetworkingHelper.Read<ulong>(container);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Update a property.
+        /// </summary>
+        /// <param name="entity">entity to be updated.</param>
+        /// <param name="property">property containing the new value.</param>
+        /// <returns></returns>
+        public virtual bool SetUMI3DPorperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        {
+            var dto = entity.dto as NotificationDto;
+            if (dto == null) return false;
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.NotificationTitle:
+                    dto.title = UMI3DNetworkingHelper.Read<string>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationContent:
+                    dto.content = UMI3DNetworkingHelper.Read<string>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationDuration:
+                    dto.duration = UMI3DNetworkingHelper.Read<float>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationIcon2D:
+                    dto.icon2D = UMI3DNetworkingHelper.Read<ResourceDto>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationIcon3D:
+                    dto.icon3D = UMI3DNetworkingHelper.Read<ResourceDto>(container);
+                    break;
+                case UMI3DPropertyKeys.NotificationObjectId:
+                    var Odto = dto as NotificationOnObjectDto;
+                    if (Odto == null) return false;
+                    Odto.objectId = UMI3DNetworkingHelper.Read<ulong>(container);
                     break;
                 default:
                     return false;

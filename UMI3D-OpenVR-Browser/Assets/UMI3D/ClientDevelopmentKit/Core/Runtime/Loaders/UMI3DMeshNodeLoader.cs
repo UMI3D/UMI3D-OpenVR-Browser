@@ -80,7 +80,7 @@ namespace umi3d.cdk
                             }
                             else
                                 failed?.Invoke($"Cast not valid for {o.GetType()} into GameObject or {dto.GetType()} into UMI3DMeshNodeDto");
-                            
+
                         },
                         failed,
                         loader.DeleteObject
@@ -129,7 +129,7 @@ namespace umi3d.cdk
             GameObject root = null;
             if (dto.areSubobjectsTracked)
             {
-                root = SetSubObjectsReferences(go, dto,  rotationOffsetByLoader );
+                root = SetSubObjectsReferences(go, dto, rotationOffsetByLoader);
             }
             else
             {
@@ -151,7 +151,7 @@ namespace umi3d.cdk
             instance.transform.localScale = root.transform.localScale;
             instance.transform.localEulerAngles = root.transform.localEulerAngles;
             ColliderDto colliderDto = (dto).colliderDto;
-            SetCollider(nodeInstance, colliderDto);
+            SetCollider(dto.id, nodeInstance, colliderDto);
             SetMaterialOverided(dto, nodeInstance);
 
         }

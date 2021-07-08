@@ -25,7 +25,7 @@ namespace umi3d.cdk.collaboration
 {
     public class UMI3DCollaborativeUserAvatar : UserAvatar
     {
-        Dictionary<string, KalmanRotation> boneRotationFilters = new Dictionary<string, KalmanRotation>();
+        Dictionary<uint, KalmanRotation> boneRotationFilters = new Dictionary<uint, KalmanRotation>();
         GameObject skeleton;
 
         private void Update()
@@ -38,11 +38,11 @@ namespace umi3d.cdk.collaboration
 
             Animator userAnimator = skeleton.GetComponentInChildren<Animator>();
 
-            foreach (string boneType in boneRotationFilters.Keys)
+            foreach (uint boneType in boneRotationFilters.Keys)
             {
                 RegressionRotation(boneRotationFilters[boneType]);
 
-                Transform boneTransform = userAnimator.GetBoneTransform(BoneTypeConverter.Convert(boneType).GetValueOrDefault());
+                Transform boneTransform = userAnimator.GetBoneTransform(boneType.ConvertToBoneType().GetValueOrDefault());
                 boneTransform.localRotation = boneRotationFilters[boneType].regressed_rotation;
 
                 List<BoneBindingDto> bindings = userBindings.FindAll(binding => binding.boneType == boneType);
@@ -62,7 +62,7 @@ namespace umi3d.cdk.collaboration
         /// Skeleton instanciation for a specific user
         /// </summary>
         /// <param name="id">the user id</param>
-        public static void SkeletonCreation(string id)
+        public static void SkeletonCreation(ulong id)
         {
             if (id != UMI3DClientServer.Instance.GetId())
             {

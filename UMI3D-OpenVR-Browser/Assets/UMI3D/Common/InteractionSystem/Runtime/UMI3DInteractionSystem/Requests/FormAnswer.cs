@@ -19,5 +19,13 @@ namespace umi3d.common.interaction
     public class FormAnswer : InteractionRequestDto
     {
         public FormDto form;
+
+        protected override uint GetOperationId() { return UMI3DOperationKeys.FormAnswer; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(form);
+        }
     }
 }

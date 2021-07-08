@@ -25,5 +25,12 @@ namespace umi3d.common.interaction
         /// The parameter with the requested value.
         /// </summary>
         public AbstractParameterDto parameter;
+
+        protected override uint GetOperationId() { return UMI3DOperationKeys.ParameterSettingRequest; }
+
+        public override Bytable ToBytableArray(params object[] parameters)
+        {
+            return base.ToBytableArray(parameters) + UMI3DNetworkingHelper.Write(parameter);
+        }
     }
 }

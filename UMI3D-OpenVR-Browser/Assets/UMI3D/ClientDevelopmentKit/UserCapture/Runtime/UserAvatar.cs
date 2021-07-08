@@ -38,20 +38,20 @@ namespace umi3d.cdk.userCapture
 
         protected struct BoundObject
         {
-            public string objectId;
+            public ulong objectId;
             public string rigname;
         }
 
         protected struct Bound
         {
-            public string bonetype;
+            public uint bonetype;
             public Transform obj;
             public Vector3 offsetPosition;
             public Quaternion offsetRotation;
         }
 
         public List<Transform> boundRigs = new List<Transform>();
-        public string userId { get; protected set; }
+        public ulong userId { get; protected set; }
         public Vector3 userSize { get; protected set; }
         public bool activeUserBindings { get; protected set; }
         public List<BoneBindingDto> userBindings { get; protected set; }
@@ -66,8 +66,8 @@ namespace umi3d.cdk.userCapture
             {
                 if (item.obj != null)
                 {
-                    item.obj.position = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(BoneTypeConverter.Convert(item.bonetype).GetValueOrDefault()).TransformPoint(item.offsetPosition);
-                    item.obj.rotation = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(BoneTypeConverter.Convert(item.bonetype).GetValueOrDefault()).rotation * item.offsetRotation;
+                    item.obj.position = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).TransformPoint(item.offsetPosition);
+                    item.obj.rotation = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).rotation * item.offsetRotation;
                 }
             }
 
@@ -519,7 +519,7 @@ namespace umi3d.cdk.userCapture
 
             NodeKalmanUpdate(trackingFrameDto.position, trackingFrameDto.rotation);
 
-            yield return null; 
+            yield return null;
         }
     }
 }

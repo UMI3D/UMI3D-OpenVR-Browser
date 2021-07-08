@@ -20,7 +20,7 @@ namespace umi3d.common.userCapture
 {
     static public class BoneTypeConverter
     {
-        public static string Convert(this HumanBodyBones HumanBodyBones)
+        public static uint Convert(this HumanBodyBones HumanBodyBones)
         {
             switch (HumanBodyBones)
             {
@@ -141,7 +141,7 @@ namespace umi3d.common.userCapture
             }
         }
 
-        public static HumanBodyBones? Convert(this string boneType)
+        public static HumanBodyBones? ConvertToBoneType(this uint boneType)
         {
             switch (boneType)
             {

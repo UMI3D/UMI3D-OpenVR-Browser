@@ -33,12 +33,12 @@ public class HoldableButtonMenuItem : MenuItem, IObservable<bool>
     /// <summary>
     /// If associatedIntearctionDto is not null stores the associated tool id.
     /// </summary>
-    public string toolId;
+    public ulong toolId;
 
     /// <summary>
     /// If associatedIntearctionDto is not null stores the hovered object id.
     /// </summary>
-    public string hoveredObjectId;
+    public ulong hoveredObjectId;
 
     /// <summary>
     /// UMI3DInput associated.

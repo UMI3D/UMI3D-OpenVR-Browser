@@ -41,6 +41,21 @@ namespace umi3d.cdk
             }
         }
 
+        public static IEnumerator PerformTransaction(ByteContainer container)
+        {
+            yield return new WaitForEndOfFrame();
+            foreach (var c in UMI3DNetworkingHelper.ReadIndexesList(container))
+            {
+                bool performed = false;
+                PerformOperation(c, () => performed = true);
+                if (performed != true)
+                    yield return new WaitUntil(() => performed);
+            }
+        }
+
+
+
+
         static public void PerformOperation(AbstractOperationDto operation, Action performed)
         {
             if (performed == null) performed = () => { };
@@ -74,5 +89,52 @@ namespace umi3d.cdk
                     break;
             }
         }
+
+        static public void PerformOperation(ByteContainer container, Action performed)
+        {
+            if (performed == null) performed = () => { };
+
+            var operationId = UMI3DNetworkingHelper.Read<uint>(container);
+            switch (operationId)
+            {
+                case UMI3DOperationKeys.LoadEntity:
+                    UMI3DEnvironmentLoader.LoadEntity(container, performed);
+                    break;
+                case UMI3DOperationKeys.DeleteEntity:
+                    {
+                        var entityId = UMI3DNetworkingHelper.Read<ulong>(container);
+                        UMI3DEnvironmentLoader.DeleteEntity(entityId, performed);
+                        break;
+                    }
+                case UMI3DOperationKeys.MultiSetEntityProperty:
+                    UMI3DEnvironmentLoader.SetMultiEntity(container);
+                    performed.Invoke();
+                    break;
+                case UMI3DOperationKeys.StartInterpolationProperty:
+                    UMI3DEnvironmentLoader.StartInterpolation(container);
+                    performed.Invoke();
+                    break;
+                case UMI3DOperationKeys.StopInterpolationProperty:
+                    UMI3DEnvironmentLoader.StopInterpolation(container);
+                    performed.Invoke();
+                    break;
+
+                default:
+                    if (UMI3DOperationKeys.SetEntityProperty <= operationId && operationId <= UMI3DOperationKeys.SetEntityMatrixProperty)
+                    {
+                        var entityId = UMI3DNetworkingHelper.Read<ulong>(container);
+                        var propertyKey = UMI3DNetworkingHelper.Read<uint>(container);
+                        UMI3DEnvironmentLoader.SetEntity(operationId, entityId, propertyKey, container);
+                        performed.Invoke();
+                    }
+                    else
+                    {
+                        UMI3DEnvironmentLoader.Parameters.UnknownOperationHandler(operationId, container, performed);
+                    }
+                    break;
+            }
+
+        }
+
     }
 }

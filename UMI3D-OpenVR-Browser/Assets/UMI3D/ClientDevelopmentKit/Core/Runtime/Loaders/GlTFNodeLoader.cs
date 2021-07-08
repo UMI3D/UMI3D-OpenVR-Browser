@@ -136,5 +136,58 @@ namespace umi3d.cdk
             }
             return true;
         }
+
+
+        /// <summary>
+        /// Update Umi3dProperty.
+        /// </summary>
+        /// <param name="entity">entity to update.</param>
+        /// <param name="property">property containing the new value.</param>
+        /// <returns>state if the property was handled</returns>
+        static public bool SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        {
+            if (UMI3DEnvironmentLoader.Parameters.khr_lights_punctualLoader.SetLightPorperty(entity, operationId, propertyKey, container))
+                return true;
+            var node = entity as UMI3DNodeInstance;
+            if (node == null) return false;
+            GlTFNodeDto dto = (node.dto as GlTFNodeDto);
+            if (dto == null) return false;
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.Position:
+                    dto.position = node.transform.localPosition = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                    break;
+                case UMI3DPropertyKeys.Rotation:
+                    node.transform.localRotation = dto.rotation = UMI3DNetworkingHelper.Read<SerializableVector4>(container); ;
+                    break;
+                case UMI3DPropertyKeys.Scale:
+                    dto.scale = node.transform.localScale = UMI3DNetworkingHelper.Read<Vector3>(container);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
+
+        static public bool ReadUMI3DProperty(ref object value, uint propertyKey, ByteContainer container)
+        {
+            if (UMI3DEnvironmentLoader.Parameters.khr_lights_punctualLoader.ReadLightPorperty(ref value, propertyKey, container))
+                return true;
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.Position:
+                    value = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                    break;
+                case UMI3DPropertyKeys.Rotation:
+                    value = UMI3DNetworkingHelper.Read<SerializableVector4>(container); ;
+                    break;
+                case UMI3DPropertyKeys.Scale:
+                    value = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+        }
     }
 }

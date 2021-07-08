@@ -40,7 +40,7 @@ namespace umi3d.cdk.interaction
         /// <summary>
         /// Inputs associated to a given tool (keys are tools' ids).
         /// </summary>
-        protected Dictionary<string, AbstractUMI3DInput[]> associatedInputs = new Dictionary<string, AbstractUMI3DInput[]>();
+        protected Dictionary<ulong, AbstractUMI3DInput[]> associatedInputs = new Dictionary<ulong, AbstractUMI3DInput[]>();
 
         public ProjectionMemory projectionMemory;
 
@@ -161,7 +161,7 @@ namespace umi3d.cdk.interaction
         /// </summary>
         /// <param name="tool"> The ToolDto to be projected.</param>
         /// <see cref="Release(AbstractTool)"/>
-        public virtual void Project(AbstractTool tool, bool releasable, InteractionMappingReason reason, string hoveredObjectId)
+        public virtual void Project(AbstractTool tool, bool releasable, InteractionMappingReason reason, ulong hoveredObjectId)
         {
             if (!IsCompatibleWith(tool))
                 throw new System.Exception("Trying to project an uncompatible tool !");
@@ -196,7 +196,7 @@ namespace umi3d.cdk.interaction
             Project(tool, releasable, reason, GetCurrentHoveredId());
         }
 
-        protected abstract string GetCurrentHoveredId();
+        protected abstract ulong GetCurrentHoveredId();
 
 
         /// <summary>

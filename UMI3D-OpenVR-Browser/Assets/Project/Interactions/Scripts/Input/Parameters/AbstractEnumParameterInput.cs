@@ -15,12 +15,13 @@ using umi3d.cdk;
 using umi3d.cdk.menu;
 using umi3d.common;
 using umi3d.common.interaction;
+using umi3d.common.userCapture;
 using UnityEngine.Events;
 
 public abstract class AbstractEnumParameterInput<InputMenuItem, ValueType> : AbstractParameterInput<InputMenuItem, EnumParameterDto<ValueType>, ValueType>
     where InputMenuItem : AbstractEnumInputMenuItem<ValueType>, new()
 {
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (currentInteraction != null)
         {
@@ -47,7 +48,7 @@ public abstract class AbstractEnumParameterInput<InputMenuItem, ValueType> : Abs
                         name = stringEnum.name,
                         possibleValues = stringEnum.possibleValues
                     },
-                    boneType = bone?.boneType
+                    boneType = bone == null ? BoneType.None : bone.boneType,
                 }, true);
             };
 

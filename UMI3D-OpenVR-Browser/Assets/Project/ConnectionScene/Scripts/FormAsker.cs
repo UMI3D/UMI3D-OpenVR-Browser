@@ -16,6 +16,7 @@ using umi3d.cdk.menu;
 using umi3d.cdk.menu.view;
 using umi3d.common.interaction;
 using UnityEngine.Events;
+using umi3d.cdk.collaboration;
 
 /// <summary>
 /// This class manages the display of a FormDto.
@@ -76,6 +77,15 @@ public class FormAsker : Singleton<FormAsker>
                 });
                 result = s;
                 break;
+            case LocalInfoRequestParameterDto localRequestDto:
+                var LIRIMI = new LocalInfoRequestInputMenuItem() {dto = localRequestDto } ;
+                LIRIMI.NotifyValueChange(localRequestDto.value);
+                LIRIMI.Subscribe((x) =>
+                {
+                    localRequestDto.value = x;
+                });
+                result = LIRIMI;
+                break;
             default:
                 result = new MenuItem();
                 result.Subscribe(() => Debug.Log("hellooo 2"));
@@ -123,6 +133,7 @@ public class FormAsker : Singleton<FormAsker>
                 LoadingScreen.Instance.Display("Loading environment ...");
                 HideObjects();
                 Hide();
+                LocalInfoSender.CheckFormToUpdateAuthorizations(form);
             };
             send.Subscribe(action);
             menu.menu.Add(send);
