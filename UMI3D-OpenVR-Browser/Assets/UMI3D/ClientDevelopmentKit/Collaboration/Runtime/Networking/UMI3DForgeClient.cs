@@ -306,11 +306,14 @@ namespace umi3d.cdk.collaboration
 
                     case UMI3DOperationKeys.GetLocalInfoRequest:
                         var key = UMI3DNetworkingHelper.Read<string>(container);
-                        UMI3DCollaborationClientServer.Instance.HttpClient.SendGetLocalInfo(
+                        MainThreadManager.Run(() =>
+                        {
+                            UMI3DCollaborationClientServer.Instance.HttpClient.SendGetLocalInfo(
                             key,
                             (bytes) => LocalInfoSender.SetLocalInfo(key, bytes),
                             (error) => { Debug.Log("error on get local info : " + key); }
-                        );   
+                        );
+                        });
                         break;
                     default:
                         MainThreadManager.Run(() =>
