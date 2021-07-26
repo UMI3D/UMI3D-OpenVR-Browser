@@ -262,7 +262,7 @@ namespace umi3d.cdk.collaboration
                             StartCoroutine(UMI3DNavigation.Navigate(navigate));
 
                             break;
-                        case RequestHttpGetDto requestGet:
+                        case GetLocalInfoRequestDto requestGet:
                             UMI3DCollaborationClientServer.Instance.HttpClient.SendGetLocalInfo(
                                 requestGet.key,
                                 (bytes) => LocalInfoSender.SetLocalInfo(requestGet.key, bytes),
@@ -292,7 +292,10 @@ namespace umi3d.cdk.collaboration
                         {
                             var pos = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
                             var nav = new NavigateDto() { position = pos };
-                            StartCoroutine(UMI3DNavigation.Navigate(nav));
+                            MainThreadManager.Run(() =>
+                            {
+                                StartCoroutine(UMI3DNavigation.Navigate(nav));
+                            });
                         }
                         break;
                     case UMI3DOperationKeys.TeleportationRequest:
@@ -300,7 +303,10 @@ namespace umi3d.cdk.collaboration
                             var pos = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
                             var rot = UMI3DNetworkingHelper.Read<SerializableVector4>(container);
                             var nav = new TeleportDto() { position = pos, rotation = rot };
-                            StartCoroutine(UMI3DNavigation.Navigate(nav));
+                            MainThreadManager.Run(() =>
+                            {
+                                StartCoroutine(UMI3DNavigation.Navigate(nav));
+                            });
                         }
                         break;
 
@@ -312,7 +318,7 @@ namespace umi3d.cdk.collaboration
                             key,
                             (bytes) => LocalInfoSender.SetLocalInfo(key, bytes),
                             (error) => { Debug.Log("error on get local info : " + key); }
-                        );
+                            );
                         });
                         break;
                     default:
