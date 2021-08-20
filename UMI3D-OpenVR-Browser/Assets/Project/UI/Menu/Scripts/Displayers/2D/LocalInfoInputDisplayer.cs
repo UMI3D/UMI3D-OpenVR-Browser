@@ -27,10 +27,10 @@ public class LocalInfoInputDisplayer : AbstractLocalInfoRequestInputDisplayer
 
     public override void Display(bool forceUpdate = false)
     {
-        if (GetValue() == (false, false))
+        if (GetValue() == new LocalInfoRequestParameterValue(false, false))
             return;
         this.gameObject.SetActive(true);
-        (toggleRead.isOn, toggleWrite.isOn) = GetValue();
+        (toggleRead.isOn, toggleWrite.isOn) = (GetValue().read, GetValue().write);
         if(!toggleRead.isOn)
         {
             toggleRead.gameObject.SetActive(false);
@@ -46,11 +46,11 @@ public class LocalInfoInputDisplayer : AbstractLocalInfoRequestInputDisplayer
 
     void ReadValueChange(bool read)
     {
-        NotifyValueChange((read, toggleWrite.isOn));
+        NotifyValueChange(new LocalInfoRequestParameterValue(read, toggleWrite.isOn));
     }
     void WriteValueChange(bool write)
     {
-        NotifyValueChange((toggleRead.isOn, write));
+        NotifyValueChange(new LocalInfoRequestParameterValue(toggleRead.isOn, write));
     }
 
     public override void Hide()

@@ -81,7 +81,7 @@ public class Connecting : Singleton<Connecting>
     /// </summary>
     /// <param name="form"></param>
     /// <param name="callback"></param>
-    void GetParameterDtos(FormDto form, Action<FormDto> callback)
+    void GetParameterDtos(FormDto form, Action<FormAnswerDto> callback)
     {
         FormAsker.Instance.Display(form, callback);
     }

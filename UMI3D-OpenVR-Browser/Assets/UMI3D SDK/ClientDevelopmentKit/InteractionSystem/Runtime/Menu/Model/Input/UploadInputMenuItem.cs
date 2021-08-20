@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2019 - 2021 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+using System.Collections.Generic;
+using UnityEngine.Events;
 
-namespace umi3d.common.interaction
+namespace umi3d.cdk.menu
 {
-    /// <summary>
-    /// Dto to request the setting of one parameter.
-    /// </summary>
-    public class ParameterSettingRequestDto : InteractionRequestDto
+    public class UploadInputMenuItem : TextInputMenuItem
     {
         /// <summary>
-        /// The parameter with the requested value.
+        /// Only these extensions could be upload by the client. Enpty list = allow all, the extensions contain a dot (".obj" for exemple)
         /// </summary>
-        public object parameter;
+        public List<string> authorizedExtensions = new List<string>();
 
-        protected override uint GetOperationId() { return UMI3DOperationKeys.ParameterSettingRequest; }
-
-        public override Bytable ToBytableArray(params object[] parameters)
-        {
-            return base.ToBytableArray(parameters) + UMI3DNetworkingHelper.Write(parameter);
-        }
     }
 }

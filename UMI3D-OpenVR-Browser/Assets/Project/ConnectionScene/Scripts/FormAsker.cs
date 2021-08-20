@@ -17,6 +17,7 @@ using umi3d.cdk.menu.view;
 using umi3d.common.interaction;
 using UnityEngine.Events;
 using umi3d.cdk.collaboration;
+using System.Linq;
 
 /// <summary>
 /// This class manages the display of a FormDto.
@@ -101,11 +102,11 @@ public class FormAsker : Singleton<FormAsker>
     /// </summary>
     /// <param name="form"></param>
     /// <param name="callback"></param>
-    public void Display(FormDto form, System.Action<FormDto> callback)
+    public void Display(FormDto form, System.Action<FormAnswerDto> callback)
     {
         if (form == null)
         {
-            callback.Invoke(form);
+            callback.Invoke(null);
             LoadingScreen.Instance.SetLoadingScreen();
             LoadingScreen.Instance.Display("Loading environment ...");
             HideObjects();
@@ -128,7 +129,16 @@ public class FormAsker : Singleton<FormAsker>
 
                 //DebugForm(form);
 
-                callback.Invoke(form);
+                FormAnswerDto answer = new FormAnswerDto()
+                {
+                    boneType = 0,
+                    hoveredObjectId = 0,
+                    id = form.id,
+                    toolId = 0,
+                    answers = form.fields.Select(f => GetInteractionItem(f)).Where(i => i is AbstractInputMenuItem).Select(i => (i as AbstractInputMenuItem).GetParameter()).ToList(),
+                };
+
+                callback.Invoke(answer);
                 LoadingScreen.Instance.SetLoadingScreen();
                 LoadingScreen.Instance.Display("Loading environment ...");
                 HideObjects();
