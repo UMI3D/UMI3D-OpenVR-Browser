@@ -14,23 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
+
 namespace umi3d.common.interaction
 {
-    /// <summary>
-    /// Dto to request the setting of one parameter.
-    /// </summary>
-    public class ParameterSettingRequestDto : InteractionRequestDto
+    public class FormAnswerDto : InteractionRequestDto
     {
-        /// <summary>
-        /// The parameter with the requested value.
-        /// </summary>
-        public object parameter;
+        public List<ParameterSettingRequestDto> answers;
 
-        protected override uint GetOperationId() { return UMI3DOperationKeys.ParameterSettingRequest; }
+        protected override uint GetOperationId() { return UMI3DOperationKeys.FormAnswer; }
 
         public override Bytable ToBytableArray(params object[] parameters)
         {
-            return base.ToBytableArray(parameters) + UMI3DNetworkingHelper.Write(parameter);
+            return base.ToBytableArray(parameters)
+                + UMI3DNetworkingHelper.Write(answers);
         }
     }
 }

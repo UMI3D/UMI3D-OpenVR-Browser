@@ -16,21 +16,18 @@ limitations under the License.
 
 namespace umi3d.common.interaction
 {
+    [System.Serializable]
     /// <summary>
-    /// Dto to request the setting of one parameter.
+    /// A class to describe the response from the client to the server when it wants to upload a file.
     /// </summary>
-    public class ParameterSettingRequestDto : InteractionRequestDto
+    public class UploadFileRequestDto : ParameterSettingRequestDto
     {
-        /// <summary>
-        /// The parameter with the requested value.
-        /// </summary>
-        public object parameter;
-
-        protected override uint GetOperationId() { return UMI3DOperationKeys.ParameterSettingRequest; }
+        public string fileId;
 
         public override Bytable ToBytableArray(params object[] parameters)
         {
-            return base.ToBytableArray(parameters) + UMI3DNetworkingHelper.Write(parameter);
+             return base.ToBytableArray(parameters)
+                 + UMI3DNetworkingHelper.Write(fileId); 
         }
     }
 }

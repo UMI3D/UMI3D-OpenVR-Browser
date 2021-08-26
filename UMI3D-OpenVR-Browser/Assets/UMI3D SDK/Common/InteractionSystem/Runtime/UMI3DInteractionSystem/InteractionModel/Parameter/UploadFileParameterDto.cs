@@ -14,23 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
+
 namespace umi3d.common.interaction
 {
     /// <summary>
-    /// Dto to request the setting of one parameter.
+    /// Upload file parameter dto
     /// </summary>
-    public class ParameterSettingRequestDto : InteractionRequestDto
+    public class UploadFileParameterDto : AbstractParameterDto<string>
     {
+        public UploadFileParameterDto() : base() { }
+
         /// <summary>
-        /// The parameter with the requested value.
+        /// Only these extensions could be upload by the client. Enpty list = allow all, the extensions contain a dot (".obj" for exemple)
         /// </summary>
-        public object parameter;
-
-        protected override uint GetOperationId() { return UMI3DOperationKeys.ParameterSettingRequest; }
-
-        public override Bytable ToBytableArray(params object[] parameters)
-        {
-            return base.ToBytableArray(parameters) + UMI3DNetworkingHelper.Write(parameter);
-        }
+        public List<string> authorizedExtensions = new List<string>();
     }
 }

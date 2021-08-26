@@ -23,9 +23,9 @@ public class OculusQuestBrowserIdentifier : ClientIdentifierApi
     public Action<Action<string, string>> GetIdentityAction;
     public Action<Action<string>> GetPinAction;
     public Action<List<string>,Action<bool>> ShouldDownloadLib;
-    public Action<FormDto,Action<FormDto>> GetParameters;
+    public Action<FormDto,Action<FormAnswerDto>> GetParameters;
 
-    public override void GetParameterDtos(FormDto parameter, Action<FormDto> callback)
+    public override void GetParameterDtos(FormDto parameter, Action<FormAnswerDto> callback)
     {
         GetParameters.Invoke(parameter, callback);
     }

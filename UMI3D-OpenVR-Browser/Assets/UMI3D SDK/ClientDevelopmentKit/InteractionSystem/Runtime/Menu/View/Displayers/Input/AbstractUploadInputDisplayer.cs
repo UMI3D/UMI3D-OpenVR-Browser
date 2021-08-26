@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2019 - 2021 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,31 +15,35 @@ limitations under the License.
 */
 using System.Collections.Generic;
 using umi3d.common;
-using umi3d.common.interaction;
 using UnityEngine.Events;
 
 namespace umi3d.cdk.menu.view
 {
     /// <summary>
-    /// Base class for boolean input display.
+    /// Base class for upload file input display.
     /// </summary>
-    public abstract class AbstractLocalInfoRequestInputDisplayer : AbstractInputMenuItemDisplayer<LocalInfoRequestParameterValue>, IObservable<LocalInfoRequestParameterValue>
+    public abstract class AbstractUploadInputDisplayer : AbstractInputMenuItemDisplayer<string>, IObservable<string>
     {
         /// <summary>
         /// Menu item to display.
         /// </summary>
-        protected LocalInfoRequestInputMenuItem menuItem;
+        protected UploadInputMenuItem menuItem;
+
+        /// <summary>
+        ///  Only these extensions could be upload by the client. Enpty list = allow all, the extensions contain a dot (".obj" for exemple)
+        /// </summary>
+        public List<string> authorizedExtensions = new List<string>();
 
         /// <summary>
         /// IObservable subscribers.
         /// </summary>
         /// <see cref="IObservable{T}"/>
-        private List<UnityAction<LocalInfoRequestParameterValue>> subscribers = new List<UnityAction<LocalInfoRequestParameterValue>>();
+        private List<UnityAction<string>> subscribers = new List<UnityAction<string>>();
 
         /// <summary>
         /// Get displayed value.
         /// </summary>
-        public LocalInfoRequestParameterValue GetValue()
+        public string GetValue()
         {
             return menuItem.GetValue();
         }
@@ -48,10 +52,10 @@ namespace umi3d.cdk.menu.view
         /// Notify a value change.
         /// </summary>
         /// <param name="newValue">New value</param>
-        public void NotifyValueChange(LocalInfoRequestParameterValue newValue)
+        public void NotifyValueChange(string newValue)
         {
             menuItem.NotifyValueChange(newValue);
-            foreach (UnityAction<LocalInfoRequestParameterValue> sub in subscribers)
+            foreach (UnityAction<string> sub in subscribers)
             {
                 sub.Invoke(newValue);
             }
@@ -61,8 +65,8 @@ namespace umi3d.cdk.menu.view
         /// Subscribe a callback to the value change.
         /// </summary>
         /// <param name="callback">Callback to raise on a value change (argument is the new value)</param>
-        /// <see cref="UnSubscribe(UnityAction{bool})"/>
-        public void Subscribe(UnityAction<LocalInfoRequestParameterValue> callback)
+        /// <see cref="UnSubscribe(UnityAction{string})"/>
+        public void Subscribe(UnityAction<string> callback)
         {
             if (!subscribers.Contains(callback))
             {
@@ -74,12 +78,11 @@ namespace umi3d.cdk.menu.view
         /// Unsubscribe a callback from the value change.
         /// </summary>
         /// <param name="callback">Callback to unsubscribe</param>
-        /// <see cref="Subscribe(UnityAction{bool})"/>
-        public void UnSubscribe(UnityAction<LocalInfoRequestParameterValue> callback)
+        /// <see cref="Subscribe(UnityAction{string})"/>
+        public void UnSubscribe(UnityAction<string> callback)
         {
             subscribers.Remove(callback);
         }
-
 
         /// <summary>
         /// Set menu item to display and initialise the display.
@@ -88,12 +91,12 @@ namespace umi3d.cdk.menu.view
         /// <returns></returns>
         public override void SetMenuItem(AbstractMenuItem item)
         {
-            if (item is LocalInfoRequestInputMenuItem)
+            if (item is UploadInputMenuItem)
             {
-                menuItem = item as LocalInfoRequestInputMenuItem;
+                menuItem = item as UploadInputMenuItem;
             }
             else
-                throw new System.Exception("MenuItem must be a LocalRequestInput");
+                throw new System.Exception("MenuItem must be an UploadInput");
         }
 
     }
