@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class FootTargetBehavior : MonoBehaviour
 {
-    public Transform FollowedNode;
+    public Transform FollowedAvatarNode;
+    public Transform VRRig;
+
     public Animator SkeletonAnimator;
 
     public VirtualObjectBodyInteraction LeftTarget;
@@ -14,8 +16,8 @@ public class FootTargetBehavior : MonoBehaviour
 
     void Update()
     {
-        this.transform.position = new Vector3(FollowedNode.position.x, 0, FollowedNode.position.z);
-        this.transform.rotation = FollowedNode.rotation;
+        this.transform.position = new Vector3(FollowedAvatarNode.position.x, VRRig.position.y, FollowedAvatarNode.position.z);
+        this.transform.rotation = FollowedAvatarNode.rotation;
     }
 
     public void SetFootTargets()
