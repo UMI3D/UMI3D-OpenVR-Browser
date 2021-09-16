@@ -666,7 +666,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 91e529daf256d964ab0f322cadf440e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  FollowedNode: {fileID: 5800807714921446512}
+  FollowedAvatarNode: {fileID: 5800807714921446512}
+  VRRig: {fileID: 8312342796415411657}
   SkeletonAnimator: {fileID: 405715254}
   LeftTarget: {fileID: 632871225}
   RightTarget: {fileID: 290798500}
