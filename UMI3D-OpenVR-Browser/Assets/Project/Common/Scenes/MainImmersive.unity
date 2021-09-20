@@ -400,6 +400,14 @@ PrefabInstance:
       propertyPath: RightBodyRestPose
       value: 
       objectReference: {fileID: 405715257}
+    - target: {fileID: 405715253, guid: c95999b4e970d984db2324d70298aff0, type: 3}
+      propertyPath: LeftBodyInteraction
+      value: 
+      objectReference: {fileID: 1903313990}
+    - target: {fileID: 405715253, guid: c95999b4e970d984db2324d70298aff0, type: 3}
+      propertyPath: RightBodyInteraction
+      value: 
+      objectReference: {fileID: 1568473456}
     - target: {fileID: 6681781696345832566, guid: c95999b4e970d984db2324d70298aff0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1116,6 +1124,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1568473454}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1568473456 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3918671841000344347, guid: 5cdbdb4bd5785634c92e41a6a35d3cba,
+    type: 3}
+  m_PrefabInstance: {fileID: 1568473454}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 312994988544e9549a46b379bfeb873b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1722032680
 GameObject:
   m_ObjectHideFlags: 0
@@ -1340,6 +1360,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1903313988}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1903313990 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4349066038017203482, guid: 98de5b76e5e56e84eacd63cf4f7e0c0d,
+    type: 3}
+  m_PrefabInstance: {fileID: 1903313988}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 312994988544e9549a46b379bfeb873b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2095213531
 GameObject:
   m_ObjectHideFlags: 0
@@ -2840,8 +2872,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   IKControl: {fileID: 405715253}
-  RightHand: {fileID: 0}
-  LeftHand: {fileID: 0}
+  RightHand: {fileID: 1568473456}
+  LeftHand: {fileID: 1903313990}
 --- !u!224 &2661239394883286333
 RectTransform:
   m_ObjectHideFlags: 0
