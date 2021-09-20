@@ -76,6 +76,11 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
 
     public bool IsInputBeeingModified { get => isInputBeeingModified; set => isInputBeeingModified = value; }
 
+    public class InputInteractionEvent : UnityEvent<uint> { };
+
+    [HideInInspector]
+    static public InputInteractionEvent BooleanEvent = new InputInteractionEvent();
+
     /// <summary>
     /// Callback called on oculus input up.
     /// </summary>
@@ -152,6 +157,16 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
                     }
                     openVrController.IsInputPressed = true;
                     isDown = true;
+
+                    BooleanEvent.Invoke(bone.boneType);
+
+                    if ((interaction as EventDto).TriggerAnimationId != 0)
+                    {
+                        UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get((interaction as EventDto).TriggerAnimationId);
+                        if (anim != null)
+                            anim.Start();
+                    }
+
                     onInputDown.Invoke();
                 } else
                 {
@@ -173,6 +188,15 @@ public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
                     openVrController.IsInputPressed = false;
                     isDown = false;
                     onInputUp.Invoke();
+
+                    BooleanEvent.Invoke(bone.boneType);
+
+                    if ((interaction as EventDto).ReleaseAnimationId != 0)
+                    {
+                        UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get((interaction as EventDto).ReleaseAnimationId);
+                        if (anim != null)
+                            anim.Start();
+                    }
                 }
             };
 
