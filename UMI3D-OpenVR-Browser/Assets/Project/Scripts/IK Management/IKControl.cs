@@ -11,8 +11,8 @@ public class IKControl : MonoBehaviour
 {
     protected Animator animator;
 
-    //public bool leftIkActive = false;
-    //public bool rightIkActive = false;
+    public bool leftIkActive = false;
+    public bool rightIkActive = false;
 
     public bool controllerIkActive = false;
     //public bool headIkActive = false;
@@ -21,10 +21,10 @@ public class IKControl : MonoBehaviour
     //public Transform lookObj = null;
 
     public float animationSpeed = 1f;
-    //public VirtualObjectBodyInteraction LeftBodyRestPose;
-    //public VirtualObjectBodyInteraction LeftBodyInteraction;
-    //public VirtualObjectBodyInteraction RightBodyRestPose;
-    //public VirtualObjectBodyInteraction RightBodyInteraction;
+    public VirtualObjectBodyInteraction LeftBodyRestPose;
+    public VirtualObjectBodyInteraction LeftBodyInteraction;
+    public VirtualObjectBodyInteraction RightBodyRestPose;
+    public VirtualObjectBodyInteraction RightBodyInteraction;
 
     public VirtualObjectBodyInteraction LeftHand;
     public VirtualObjectBodyInteraction RightHand;
@@ -32,10 +32,10 @@ public class IKControl : MonoBehaviour
     public VirtualObjectBodyInteraction LeftFoot;
     public VirtualObjectBodyInteraction RightFoot;
 
-    //private BodyInteractionHelper rightRestPoseHelper;
-    //private BodyInteractionHelper rightBodyInteractionHelper;
-    //private BodyInteractionHelper leftRestPoseHelper;
-    //private BodyInteractionHelper leftBodyInteractionHelper;
+    private BodyInteractionHelper rightRestPoseHelper;
+    private BodyInteractionHelper rightBodyInteractionHelper;
+    private BodyInteractionHelper leftRestPoseHelper;
+    private BodyInteractionHelper leftBodyInteractionHelper;
 
     private float rightAnimationDuration = 1f;
     private float leftAnimationDuration = 1f;
@@ -216,21 +216,21 @@ public class IKControl : MonoBehaviour
 
         //MouseAndKeyboardController.HoverExit.AddListener(() => rightIkActive = false);
 
-        //rightRestPoseHelper = new BodyInteractionHelper(RightBodyRestPose, animator);
-        //rightBodyInteractionHelper = new BodyInteractionHelper(RightBodyInteraction, animator);
+        rightRestPoseHelper = new BodyInteractionHelper(RightBodyRestPose, animator);
+        rightBodyInteractionHelper = new BodyInteractionHelper(RightBodyInteraction, animator);
         //rightRestPoseHelper.origin = RightBodyInteraction;
         //rightBodyInteractionHelper.origin = RightBodyRestPose;
-        //rightRestPoseHelper.originalPoses = rightBodyInteractionHelper.poses;
-        //rightBodyInteractionHelper.originalPoses = rightRestPoseHelper.poses;
-        //rightAnimationDuration = Vector3.Distance(RightBodyRestPose.transform.position, RightBodyInteraction.transform.position)/animationSpeed;
+        rightRestPoseHelper.originalPoses = rightBodyInteractionHelper.poses;
+        rightBodyInteractionHelper.originalPoses = rightRestPoseHelper.poses;
+        rightAnimationDuration = Vector3.Distance(RightBodyRestPose.transform.position, RightBodyInteraction.transform.position) / animationSpeed;
 
-        //leftRestPoseHelper = new BodyInteractionHelper(LeftBodyRestPose, animator);
-        //leftBodyInteractionHelper = new BodyInteractionHelper(LeftBodyInteraction, animator);
+        leftRestPoseHelper = new BodyInteractionHelper(LeftBodyRestPose, animator);
+        leftBodyInteractionHelper = new BodyInteractionHelper(LeftBodyInteraction, animator);
         //leftRestPoseHelper.origin = LeftBodyInteraction;
         //leftBodyInteractionHelper.origin = LeftBodyRestPose;
-        //leftRestPoseHelper.originalPoses = leftBodyInteractionHelper.poses;
-        //leftBodyInteractionHelper.originalPoses = leftRestPoseHelper.poses;
-        //leftAnimationDuration = Vector3.Distance(LeftBodyRestPose.transform.position, LeftBodyInteraction.transform.position) / animationSpeed;
+        leftRestPoseHelper.originalPoses = leftBodyInteractionHelper.poses;
+        leftBodyInteractionHelper.originalPoses = leftRestPoseHelper.poses;
+        leftAnimationDuration = Vector3.Distance(LeftBodyRestPose.transform.position, LeftBodyInteraction.transform.position) / animationSpeed;
     }
 
 
@@ -239,31 +239,31 @@ public class IKControl : MonoBehaviour
         if (animator)
         {
             //if the IK is active, set the position and rotation directly to the goal. 
-            //if (rightIkActive || rightAnimation > 0f)
-            //{
-            //    float rightDelta = Time.deltaTime / rightAnimationDuration;
+            if (rightIkActive || rightAnimation > 0f)
+            {
+                float rightDelta = Time.deltaTime / rightAnimationDuration;
 
-            //    if (!rightIkActive && rightAnimation > 0f)
-            //        rightDelta *= -1f;
+                if (!rightIkActive && rightAnimation > 0f)
+                    rightDelta *= -1f;
 
-            //    rightAnimation += rightDelta;
-            //    rightAnimation = Mathf.Clamp01(rightAnimation);
+                rightAnimation += rightDelta;
+                rightAnimation = Mathf.Clamp01(rightAnimation);
 
-            //    // Set the look target position, if one has been assigned
+                // Set the look target position, if one has been assigned
 
-            //    // other method depending on the grabbing hand
-            //}
+                // other method depending on the grabbing hand
+            }
 
-            //if (leftIkActive || leftAnimation > 0f)
-            //{
-            //    float leftDelta = Time.deltaTime / leftAnimationDuration;
+            if (leftIkActive || leftAnimation > 0f)
+            {
+                float leftDelta = Time.deltaTime / leftAnimationDuration;
 
-            //    if (!leftIkActive && leftAnimation > 0f)
-            //        leftDelta *= -1f;
+                if (!leftIkActive && leftAnimation > 0f)
+                    leftDelta *= -1f;
 
-            //    leftAnimation += leftDelta;
-            //    leftAnimation = Mathf.Clamp01(leftAnimation);
-            //}
+                leftAnimation += leftDelta;
+                leftAnimation = Mathf.Clamp01(leftAnimation);
+            }
 
             //if (lookObj != null && lookObj)
             //{
@@ -271,28 +271,28 @@ public class IKControl : MonoBehaviour
             //    animator.SetLookAtPosition(lookObj.position);
             //}
 
-            //if (rightIkActive)
-            //{
-            //    rightRestPoseHelper.UnsyncPoses(false);
-            //    rightBodyInteractionHelper.SyncRightIk(rightAnimation);
-            //}
-            //else
-            //{
-            //    rightBodyInteractionHelper.UnsyncPoses(false);
-            //    rightRestPoseHelper.SyncRightIk(1f-rightAnimation);
-            //}
+            if (rightIkActive)
+            {
+                rightRestPoseHelper.UnsyncPoses(false);
+                rightBodyInteractionHelper.SyncRightIk(rightAnimation);
+            }
+            else
+            {
+                rightBodyInteractionHelper.UnsyncPoses(false);
+                rightRestPoseHelper.SyncRightIk(1f - rightAnimation);
+            }
 
 
-            //if (leftIkActive)
-            //{
-            //    leftRestPoseHelper.UnsyncPoses(false);
-            //    leftBodyInteractionHelper.SyncLeftIk(leftAnimation);
-            //}
-            //else
-            //{
-            //    leftBodyInteractionHelper.UnsyncPoses(false);
-            //    leftRestPoseHelper.SyncLeftIk(1f - leftAnimation);
-            //}
+            if (leftIkActive)
+            {
+                leftRestPoseHelper.UnsyncPoses(false);
+                leftBodyInteractionHelper.SyncLeftIk(leftAnimation);
+            }
+            else
+            {
+                leftBodyInteractionHelper.UnsyncPoses(false);
+                leftRestPoseHelper.SyncLeftIk(1f - leftAnimation);
+            }
 
             if (controllerIkActive)
             {
@@ -345,30 +345,30 @@ public class IKControl : MonoBehaviour
             leftKnee.localRotation = rightKnee.localRotation;
         }
 
-        //if (animator)
-        //{
-        //    if (rightIkActive)
-        //    {
-        //        rightRestPoseHelper.UnsyncPoses(false);
-        //        rightBodyInteractionHelper.SyncPoses(rightAnimation);
-        //    }
-        //    else
-        //    {
-        //        rightBodyInteractionHelper.UnsyncPoses(false);
-        //        rightRestPoseHelper.SyncPoses(1f - rightAnimation);
-        //    }
+        if (animator)
+        {
+            if (rightIkActive)
+            {
+                rightRestPoseHelper.UnsyncPoses(false);
+                rightBodyInteractionHelper.SyncPoses(rightAnimation);
+            }
+            else
+            {
+                rightBodyInteractionHelper.UnsyncPoses(false);
+                rightRestPoseHelper.SyncPoses(1f - rightAnimation);
+            }
 
-        //    if (leftIkActive)
-        //    {
-        //        leftRestPoseHelper.UnsyncPoses(false);
-        //        leftBodyInteractionHelper.SyncPoses(leftAnimation);
-        //    }
-        //    else
-        //    {
-        //        leftBodyInteractionHelper.UnsyncPoses(false);
-        //        leftRestPoseHelper.SyncPoses(1f - leftAnimation);
-        //    }
-        //}
+            if (leftIkActive)
+            {
+                leftRestPoseHelper.UnsyncPoses(false);
+                leftBodyInteractionHelper.SyncPoses(leftAnimation);
+            }
+            else
+            {
+                leftBodyInteractionHelper.UnsyncPoses(false);
+                leftRestPoseHelper.SyncPoses(1f - leftAnimation);
+            }
+        }
     }
 
 
