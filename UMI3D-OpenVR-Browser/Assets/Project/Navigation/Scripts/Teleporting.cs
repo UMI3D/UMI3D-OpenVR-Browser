@@ -17,6 +17,7 @@ using UnityEngine;
 public class Teleporting : MonoBehaviour
 {
     public GameObject teleportingObject;
+    public GameObject vrCamera;
     public TeleportArc arc;
 
     [ContextMenu("Teleport")]
@@ -26,7 +27,9 @@ public class Teleporting : MonoBehaviour
 
         if (position.HasValue)
         {
-            teleportingObject.transform.position = position.Value;
+            teleportingObject.transform.position = new Vector3(position.Value.x - vrCamera.transform.localPosition.x, 
+                                                                position.Value.y, 
+                                                                position.Value.z - vrCamera.transform.localPosition.z);
         }
     }
 
