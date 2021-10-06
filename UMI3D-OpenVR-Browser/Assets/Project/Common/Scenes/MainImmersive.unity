@@ -5688,6 +5688,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teleportingObject: {fileID: 2875774584620259967}
+  vrCamera: {fileID: 8312342796415026099}
   arc: {fileID: 2875774586578622634}
 --- !u!114 &2875774585527792678
 MonoBehaviour:
@@ -6071,6 +6072,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   teleportingObject: {fileID: 2875774584620259967}
+  vrCamera: {fileID: 8312342796415026099}
   arc: {fileID: 2875774586111603481}
 --- !u!4 &2875774585548403990
 Transform:
