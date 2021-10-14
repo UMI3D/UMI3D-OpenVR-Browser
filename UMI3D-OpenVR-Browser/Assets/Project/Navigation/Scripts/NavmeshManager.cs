@@ -46,7 +46,10 @@ namespace BrowserQuest.Navigation
             {
                 if (entity is UMI3DNodeInstance nodeInstance)
                 {
-                    InitModel(nodeInstance);
+                    UMI3DDto dto = (nodeInstance.dto as GlTFNodeDto)?.extensions.umi3d;
+
+                    if (dto is UMI3DMeshNodeDto && !(dto is SubModelDto)) //subModels will be initialized with their associated UMI3DModel.
+                        InitModel(nodeInstance);
                 }
             }
         }
