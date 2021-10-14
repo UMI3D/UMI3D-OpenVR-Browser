@@ -13,6 +13,7 @@ limitations under the License.
 using umi3d.cdk;
 using umi3d.common;
 using UnityEngine;
+using umi3d.cdk.volumes;
 
 namespace BrowserQuest.Navigation
 {
@@ -26,6 +27,8 @@ namespace BrowserQuest.Navigation
         /// </summary>
        
         public string navmeshLayerName = "Navmesh";
+
+        public float slopeAngleLimit = 50;
 
         private LayerMask layer;
 
@@ -52,7 +55,20 @@ namespace BrowserQuest.Navigation
                         InitModel(nodeInstance);
                 }
             }
+            foreach(AbstractVolumeCell cell in VolumePrimitiveManager.GetPrimitives())
+            {
+                cell.GetBase(mesh =>
+                {
+                    GameObject navmeshPart = new GameObject("TPArea for " + cell.ToString());
+                    navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
+                    navmeshPart.AddComponent<MeshCollider>();
+                    navmeshPart.AddComponent<TeleportArea>();
+                    navmeshPart.layer = layer;
+                }, slopeAngleLimit); //mesh here
+            }
         }
+
+        
 
         /// <summary>
         /// Inits navmesh according to the data stored by nodeInstance and its children.
@@ -121,8 +137,7 @@ namespace BrowserQuest.Navigation
                     if (isPartOfNavmesh)
                     {
                         r.gameObject.AddComponent<TeleportArea>();
-                    }
-                       
+                    }                       
                 }
             }
         }
