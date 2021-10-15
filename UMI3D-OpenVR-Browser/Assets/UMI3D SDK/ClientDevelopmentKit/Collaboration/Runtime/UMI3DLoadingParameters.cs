@@ -20,9 +20,11 @@ using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.interaction;
 using umi3d.cdk.userCapture;
+using umi3d.cdk.volumes;
 using umi3d.common;
 using umi3d.common.interaction;
 using umi3d.common.userCapture;
+using umi3d.common.volume;
 using UnityEngine;
 
 namespace umi3d.cdk
@@ -79,6 +81,9 @@ namespace umi3d.cdk
                     break;
                 case ToolboxDto t:
                     UMI3DToolBoxLoader.ReadUMI3DExtension(t, node, finished, failed);
+                    break;
+                case AbstractVolumeDescriptorDto v:
+                    UMI3DVolumeLoader.ReadUMI3DExtension(v, callback, failed);
                     break;
                 case ToolDto t:
                     UMI3DToolLoader.ReadUMI3DExtension(t);
