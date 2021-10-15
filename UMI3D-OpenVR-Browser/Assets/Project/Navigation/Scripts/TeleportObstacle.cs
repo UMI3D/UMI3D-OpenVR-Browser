@@ -13,8 +13,7 @@ limitations under the License.
 
 using UnityEngine;
 
-
-public class TeleportArea : MonoBehaviour
+public class TeleportObstacle : MonoBehaviour
 {
-    
+
 }

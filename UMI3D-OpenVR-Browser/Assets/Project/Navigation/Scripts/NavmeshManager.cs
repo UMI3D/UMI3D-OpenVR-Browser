@@ -14,6 +14,8 @@ using umi3d.cdk;
 using umi3d.common;
 using UnityEngine;
 using umi3d.cdk.volumes;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace BrowserQuest.Navigation
 {
@@ -55,16 +57,32 @@ namespace BrowserQuest.Navigation
                         InitModel(nodeInstance);
                 }
             }
-            foreach(AbstractVolumeCell cell in VolumePrimitiveManager.GetPrimitives())
+            List<AbstractVolumeCell> cells = VolumePrimitiveManager.GetPrimitives().ToList<AbstractVolumeCell>();
+            cells.AddRange(ExternalVolumeDataManager.GetCells());
+            foreach (AbstractVolumeCell cell in cells)
             {
-                cell.GetBase(mesh =>
+                if (cell.isTraversable)
                 {
-                    GameObject navmeshPart = new GameObject("TPArea for " + cell.ToString());
-                    navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
-                    navmeshPart.AddComponent<MeshCollider>();
-                    navmeshPart.AddComponent<TeleportArea>();
-                    navmeshPart.layer = layer;
-                }, slopeAngleLimit); //mesh here
+                    cell.GetBase(mesh =>
+                    {
+                        GameObject navmeshPart = new GameObject("TPArea for " + cell.ToString());
+                        navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
+                        navmeshPart.AddComponent<MeshCollider>();
+                        navmeshPart.AddComponent<TeleportArea>();
+                        navmeshPart.layer = layer;
+                    }, slopeAngleLimit); 
+                }
+                else
+                {
+                    GameObject obstacle = new GameObject("obstacle for " + cell.GetType());
+                    obstacle.transform.position = Vector3.zero;
+                    obstacle.transform.rotation = Quaternion.identity;
+                    obstacle.transform.localScale = Vector3.one;
+                    obstacle.AddComponent<MeshFilter>().mesh = cell.GetMesh();
+                    obstacle.AddComponent<MeshCollider>();
+                    obstacle.AddComponent<TeleportObstacle>();
+                    obstacle.layer = layer;
+                }
             }
         }
 

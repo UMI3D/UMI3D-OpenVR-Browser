@@ -109,8 +109,8 @@ public class TeleportArc : MonoBehaviour
                 Vector3 nextPoint = GetArcPoint((stepCount + 1) * stepLength);
 
                 RaycastHit hit;
-                if (Physics.Raycast(previousArcPoint, point - previousArcPoint, out hit, (nextPoint - point).magnitude, navmeshLayer)){
-
+                if (Physics.Raycast(previousArcPoint, point - previousArcPoint, out hit, (nextPoint - point).magnitude, navmeshLayer))
+                {
                     TeleportArea area = hit.transform.GetComponent<TeleportArea>();
                     if (area != null)
                     {
