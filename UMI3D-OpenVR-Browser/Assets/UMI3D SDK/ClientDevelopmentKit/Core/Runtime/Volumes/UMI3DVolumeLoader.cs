@@ -27,7 +27,7 @@ namespace umi3d.cdk.volumes
     /// </summary>
 	static public class UMI3DVolumeLoader 
 	{
-        static public void ReadUMI3DExtension(AbstractVolumeDescriptorDto dto, Action finished, Action<string> failed)
+        static public void ReadUMI3DExtension(AbstractVolumeDescriptorDto dto, Action finished, Action<Umi3dExecption> failed)
         {
             switch (dto)
             {
@@ -47,7 +47,7 @@ namespace umi3d.cdk.volumes
 
                     break;
                 default:
-                    failed("Unknown dto type");
+                    failed(new Umi3dExecption("Unknown dto type"));
                     break;
             }
         }
