@@ -14,12 +14,16 @@ using BrowserQuest.Navigation;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class TeleportArc : MonoBehaviour
 {
     public GameObject stepDisplayerPrefab;
     public GameObject impactPoint;
     public GameObject errorPoint;
+    public Material defaultMaterial;
+    public Material pointingAtTpArea;
+    public Material pointingAtObstacle;
 
     public Transform rayStartPoint;
     public float raySpeed = 6;
@@ -103,6 +107,13 @@ public class TeleportArc : MonoBehaviour
         {
             Vector3 previousArcPoint = rayStartPoint.position;
             int stepCount;
+
+            /* 
+             * 0:found nothing, 
+             * 1:found tp area, 
+             * 2:found obstacle
+             */
+            int state = 0;
             for (stepCount = 1; stepCount < arcMaxLength / stepLength; stepCount++)
             {
                 Vector3 point = GetArcPoint(stepCount * stepLength);
@@ -119,19 +130,22 @@ public class TeleportArc : MonoBehaviour
                         impactPoint.transform.position = hit.point;
                         impactPoint.transform.LookAt(hit.point + hit.normal);
                         errorPoint.SetActive(false);
-                        TeleportArea.Instances.ForEach(area => area.Highlight());
+                        TeleportArea.Instances.ForEach(a => a.Highlight());
+                        state = 1;
                     } 
                     else if (obstacle != null)
                     {
-                        impactPoint.SetActive(false);
                         errorPoint.SetActive(true);
                         errorPoint.transform.position = hit.point;
                         errorPoint.transform.LookAt(hit.point + hit.normal);
-                        TeleportArea.Instances.ForEach(area => area.DisableHighlight());
+                        impactPoint.SetActive(false);
+                        TeleportArea.Instances.ForEach(a => a.DisableHighlight());
+                        state = 2;
                     }
                     else
                     {
-                        TeleportArea.Instances.ForEach(area => area.DisableHighlight());
+                        TeleportArea.Instances.ForEach(a => a.DisableHighlight());
+                        state = 0;
                         Debug.LogWarning("Teleport arc hit something that is neither a TeleportArea nor an TeleportObstacle, check your layers' physics.");
                     }
                     break;
@@ -141,16 +155,19 @@ public class TeleportArc : MonoBehaviour
                     impactPoint.SetActive(false);
                     errorPoint.SetActive(false);
                     TeleportArea.Instances.ForEach(area => area.DisableHighlight());
+                    state = 0;
                 }
 
                 GameObject disp = displayers[stepCount];
                 disp.transform.position = point;
                 if (!disp.activeSelf)
+                {
                     disp.SetActive(true);
+                }
                 previousArcPoint = point;                
             }
 
-            if (stepCount < arcMaxLength / stepLength)
+            if (state > 0)
             {
                 for (int i = stepCount; i < arcMaxLength / stepLength; i++)
                 {
@@ -162,6 +179,15 @@ public class TeleportArc : MonoBehaviour
                 impactPoint.SetActive(false);
                 errorPoint.SetActive(false);
             }
+            displayers.ForEach(
+                disp => disp.GetComponentsInChildren<MeshRenderer>().ToList().ForEach(
+                    rnd => rnd.material =
+                        (state == 0) ?
+                        defaultMaterial :
+                        (state == 1) ?
+                        pointingAtTpArea :
+                        pointingAtObstacle
+                    ));
 
             yield return new WaitForSeconds(updateRate);
         }

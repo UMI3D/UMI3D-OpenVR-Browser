@@ -166,7 +166,7 @@ PrefabInstance:
     - target: {fileID: 1515663280564762480, guid: 7a9d7d8ac74298c4ba681eeea97d6d30,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1515663280564762480, guid: 7a9d7d8ac74298c4ba681eeea97d6d30,
         type: 3}
@@ -322,7 +322,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &315329268
 GameObject:
@@ -618,7 +618,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &479716534
 MonoBehaviour:
@@ -728,72 +728,6 @@ MonoBehaviour:
   LeftTarget: {fileID: 632871225}
   RightTarget: {fileID: 290798500}
   IKControl: {fileID: 405715253}
---- !u!1 &920738034
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 920738039}
-  - component: {fileID: 920738038}
-  - component: {fileID: 920738036}
-  - component: {fileID: 920738035}
-  m_Layer: 10
-  m_Name: TPPlane
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &920738035
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920738034}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c580ee2ef82fa554bae1cfff3fa895e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!65 &920738036
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920738034}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 10, y: 0.001, z: 10}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!33 &920738038
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920738034}
-  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!4 &920738039
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 920738034}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -696, y: 0, z: -6}
-  m_LocalScale: {x: 2.15, y: 0.14579, z: 2.15}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &947021463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1166,6 +1100,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navmeshLayerName: Navmesh
+  slopeAngleLimit: 50
+  tpAreaHighlight: {fileID: 0}
+  tpAreaDefault: {fileID: 0}
 --- !u!4 &1722032682
 Transform:
   m_ObjectHideFlags: 0
@@ -1178,7 +1115,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1903313988
 PrefabInstance:
@@ -3421,7 +3358,7 @@ Transform:
   - {fileID: 2875774585527792679}
   - {fileID: 5791807874270380704}
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2875774584620259965
 MonoBehaviour:
@@ -8501,6 +8438,9 @@ MonoBehaviour:
     type: 3}
   impactPoint: {fileID: 2875774585274211374}
   errorPoint: {fileID: 2875774585202408514}
+  defaultMaterial: {fileID: 2100000, guid: 826f8e5943e6cea44a838c2899796a6b, type: 2}
+  pointingAtTpArea: {fileID: 2100000, guid: 4496d9f7570e485499d507cbab535858, type: 2}
+  pointingAtObstacle: {fileID: 2100000, guid: 67949eaff7d770146b093cb3c82b8a81, type: 2}
   rayStartPoint: {fileID: 2875774586111603480}
   raySpeed: 8
   maxVerticalAngle: 0
@@ -10432,6 +10372,9 @@ MonoBehaviour:
     type: 3}
   impactPoint: {fileID: 2875774585957690914}
   errorPoint: {fileID: 2875774585559530388}
+  defaultMaterial: {fileID: 0}
+  pointingAtTpArea: {fileID: 0}
+  pointingAtObstacle: {fileID: 0}
   rayStartPoint: {fileID: 2875774586578622633}
   raySpeed: 8
   maxVerticalAngle: 0
