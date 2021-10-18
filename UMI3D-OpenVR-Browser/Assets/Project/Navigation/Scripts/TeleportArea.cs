@@ -34,5 +34,16 @@ namespace BrowserQuest.Navigation
         {
             this.GetComponentsInChildren<MeshRenderer>().ToList().ForEach(rnd => rnd.material = NavmeshManager.Instance.tpAreaDefault);
         }
+
+        public void Hide()
+        {
+            this.gameObject.SetActive(false);
+        }
+
+        public void Display()
+        {
+            DisableHighlight();
+            this.gameObject.SetActive(true);
+        }
     }
 }

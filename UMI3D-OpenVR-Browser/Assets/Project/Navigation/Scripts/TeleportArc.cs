@@ -63,8 +63,8 @@ public class TeleportArc : MonoBehaviour
         if (updateRoutine != null)
             return;
 
+        TeleportArea.Instances.ForEach(tp => tp.Display());
         updateRoutine = StartCoroutine(UpdateArc());
-
     }
 
     [ContextMenu("Hide")]
@@ -80,6 +80,8 @@ public class TeleportArc : MonoBehaviour
 
         StopCoroutine(updateRoutine);
         updateRoutine = null;
+
+        TeleportArea.Instances.ForEach(tp => tp.Hide());
     }
 
     public Vector3? GetPointedPoint()
@@ -130,7 +132,7 @@ public class TeleportArc : MonoBehaviour
                         impactPoint.transform.position = hit.point;
                         impactPoint.transform.LookAt(hit.point + hit.normal);
                         errorPoint.SetActive(false);
-                        TeleportArea.Instances.ForEach(a => a.Highlight());
+                        area.Highlight();
                         state = 1;
                     } 
                     else if (obstacle != null)
