@@ -41,6 +41,8 @@ namespace umi3d.cdk.volumes
                 case OBJVolumeDto obj:
                     ExternalVolumeDataManager.Instance.CreateOBJVolume(obj, objVolume =>
                     {
+
+                        Debug.Log("External");
                         UMI3DEnvironmentLoader.RegisterEntityInstance(dto.id, dto, objVolume, () => ExternalVolumeDataManager.Instance.DeleteOBJVolume(dto.id));
                         finished.Invoke();
                     });

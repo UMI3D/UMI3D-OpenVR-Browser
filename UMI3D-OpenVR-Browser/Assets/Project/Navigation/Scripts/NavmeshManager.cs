@@ -60,36 +60,36 @@ namespace BrowserQuest.Navigation
                         InitModel(nodeInstance);
                 }
             }
-            List<AbstractVolumeCell> cells = VolumePrimitiveManager.GetPrimitives().ToList<AbstractVolumeCell>();
-            cells.AddRange(ExternalVolumeDataManager.GetCells());
-            foreach (AbstractVolumeCell cell in cells)
-            {
-                if (cell.isTraversable)
-                {
-                    cell.GetBase(mesh =>
-                    {
-                        GameObject navmeshPart = new GameObject("TPArea for " + cell.ToString());
-                        navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
-                        navmeshPart.AddComponent<MeshCollider>();
-                        navmeshPart.AddComponent<TeleportArea>();
-                        navmeshPart.AddComponent<MeshRenderer>().material = tpAreaDefault;
-                        navmeshPart.layer = layer;
-                    }, slopeAngleLimit); 
-                }
-                else
-                {
-                    GameObject obstacle = new GameObject("obstacle for " + cell.GetType());
-                    obstacle.transform.position = Vector3.zero;
-                    obstacle.transform.rotation = Quaternion.identity;
-                    obstacle.transform.localScale = Vector3.one;
-                    obstacle.AddComponent<MeshFilter>().mesh = cell.GetMesh();
-                    obstacle.AddComponent<MeshCollider>();
-                    obstacle.AddComponent<TeleportObstacle>();
-                    obstacle.layer = layer;
-                }
-            }
+            VolumePrimitiveManager.SubscribeToPrimitiveCreation(InitCell, true);
+            ExternalVolumeDataManager.SubscribeToExternalVolumeCreation(InitCell, true);
         }
 
+        private void InitCell(AbstractVolumeCell cell)
+        {
+            if (cell.isTraversable)
+            {
+                cell.GetBase(mesh =>
+                {
+                    GameObject navmeshPart = new GameObject("TPArea for " + cell.ToString());
+                    navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
+                    navmeshPart.AddComponent<MeshCollider>();
+                    navmeshPart.AddComponent<TeleportArea>();
+                    navmeshPart.AddComponent<MeshRenderer>().material = tpAreaDefault;
+                    navmeshPart.layer = layer;
+                }, slopeAngleLimit);
+            }
+            else
+            {
+                GameObject obstacle = new GameObject("obstacle for " + cell.GetType());
+                obstacle.transform.position = Vector3.zero;
+                obstacle.transform.rotation = Quaternion.identity;
+                obstacle.transform.localScale = Vector3.one;
+                obstacle.AddComponent<MeshFilter>().mesh = cell.GetMesh();
+                obstacle.AddComponent<MeshCollider>();
+                obstacle.AddComponent<TeleportObstacle>();
+                obstacle.layer = layer;
+            }            
+        }
         
 
         /// <summary>
