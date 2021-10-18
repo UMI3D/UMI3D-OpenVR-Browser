@@ -11,9 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TeleportObstacle : MonoBehaviour
 {
+    public static List<TeleportObstacle> Instances = new List<TeleportObstacle>();
+
+    protected virtual void Awake() => Instances.Add(this);
+    protected virtual void OnDestroy() => Instances.Remove(this);
 
 }

@@ -22,7 +22,7 @@ namespace BrowserQuest.Navigation
     /// <summary>
     /// This class handles the generation of the navemesh.
     /// </summary>
-    public class NavmeshManager : MonoBehaviour
+    public class NavmeshManager : Singleton<NavmeshManager>
     {
         /// <summary>
         ///LayerMask name used by the navigation system.
@@ -31,6 +31,9 @@ namespace BrowserQuest.Navigation
         public string navmeshLayerName = "Navmesh";
 
         public float slopeAngleLimit = 50;
+
+        public Material tpAreaHighlight;
+        public Material tpAreaDefault;
 
         private LayerMask layer;
 

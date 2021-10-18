@@ -11,10 +11,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 
-public class TeleportArea : MonoBehaviour
+namespace BrowserQuest.Navigation
 {
-    
+    public class TeleportArea : MonoBehaviour
+    {
+        public static List<TeleportArea> Instances = new List<TeleportArea>();
+
+        protected virtual void Awake() => Instances.Add(this);
+        protected virtual void OnDestroy() => Instances.Remove(this);
+
+        public void Highlight()
+        {
+            this.GetComponentsInChildren<MeshRenderer>().ToList().ForEach(rnd => rnd.material = NavmeshManager.Instance.tpAreaHighlight);
+        }
+
+        public void DisableHighlight()
+        {
+            this.GetComponentsInChildren<MeshRenderer>().ToList().ForEach(rnd => rnd.material = NavmeshManager.Instance.tpAreaDefault);
+        }
+    }
 }

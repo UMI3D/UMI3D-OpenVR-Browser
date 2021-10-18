@@ -102,7 +102,7 @@ public class TeleportArc : MonoBehaviour
         while (true)
         {
             Vector3 previousArcPoint = rayStartPoint.position;
-            int stepCount = 0;
+            int stepCount;
             for (stepCount = 1; stepCount < arcMaxLength / stepLength; stepCount++)
             {
                 Vector3 point = GetArcPoint(stepCount * stepLength);
@@ -112,26 +112,35 @@ public class TeleportArc : MonoBehaviour
                 if (Physics.Raycast(previousArcPoint, point - previousArcPoint, out hit, (nextPoint - point).magnitude, navmeshLayer))
                 {
                     TeleportArea area = hit.transform.GetComponent<TeleportArea>();
+                    TeleportObstacle obstacle = hit.transform.GetComponent<TeleportObstacle>();
                     if (area != null)
                     {
                         impactPoint.SetActive(true);
                         impactPoint.transform.position = hit.point;
                         impactPoint.transform.LookAt(hit.point + hit.normal);
                         errorPoint.SetActive(false);
-                    } else
+                        TeleportArea.Instances.ForEach(area => area.Highlight());
+                    } 
+                    else if (obstacle != null)
                     {
-                        Debug.DrawRay(previousArcPoint, point - previousArcPoint, Color.red, 10);
-
                         impactPoint.SetActive(false);
                         errorPoint.SetActive(true);
                         errorPoint.transform.position = hit.point;
                         errorPoint.transform.LookAt(hit.point + hit.normal);
+                        TeleportArea.Instances.ForEach(area => area.DisableHighlight());
+                    }
+                    else
+                    {
+                        TeleportArea.Instances.ForEach(area => area.DisableHighlight());
+                        Debug.LogWarning("Teleport arc hit something that is neither a TeleportArea nor an TeleportObstacle, check your layers' physics.");
                     }
                     break;
-                } else
+                } 
+                else
                 {
                     impactPoint.SetActive(false);
                     errorPoint.SetActive(false);
+                    TeleportArea.Instances.ForEach(area => area.DisableHighlight());
                 }
 
                 GameObject disp = displayers[stepCount];
