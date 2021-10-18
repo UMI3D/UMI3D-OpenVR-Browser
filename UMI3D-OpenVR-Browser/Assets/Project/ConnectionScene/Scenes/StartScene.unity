@@ -224,6 +224,7 @@ GameObject:
   - component: {fileID: 1536569664}
   - component: {fileID: 1536569665}
   - component: {fileID: 1536569663}
+  - component: {fileID: 1536569666}
   m_Layer: 0
   m_Name: MainThreadDispatcher
   m_TagString: Untagged
@@ -272,6 +273,18 @@ MonoBehaviour:
   sceneToLoad: ConnectionSceneV2
   loadSceneMode: 0
   setNewSceneAsActive: 0
+--- !u!114 &1536569666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1536569662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f54ca5c685f241845a0bda21375eccdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1735175259
 GameObject:
   m_ObjectHideFlags: 0

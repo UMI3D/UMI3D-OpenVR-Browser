@@ -72,6 +72,7 @@ namespace BrowserQuest.Navigation
                         navmeshPart.AddComponent<MeshFilter>().mesh = mesh;
                         navmeshPart.AddComponent<MeshCollider>();
                         navmeshPart.AddComponent<TeleportArea>();
+                        navmeshPart.AddComponent<MeshRenderer>().material = tpAreaDefault;
                         navmeshPart.layer = layer;
                     }, slopeAngleLimit); 
                 }

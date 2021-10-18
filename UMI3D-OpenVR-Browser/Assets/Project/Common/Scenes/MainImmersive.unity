@@ -1101,8 +1101,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   navmeshLayerName: Navmesh
   slopeAngleLimit: 50
-  tpAreaHighlight: {fileID: 0}
-  tpAreaDefault: {fileID: 0}
+  tpAreaHighlight: {fileID: 2100000, guid: 4345bc64ba4e2334eac54bbbf6fd1d29, type: 2}
+  tpAreaDefault: {fileID: 2100000, guid: 826f8e5943e6cea44a838c2899796a6b, type: 2}
 --- !u!4 &1722032682
 Transform:
   m_ObjectHideFlags: 0
@@ -8438,14 +8438,14 @@ MonoBehaviour:
     type: 3}
   impactPoint: {fileID: 2875774585274211374}
   errorPoint: {fileID: 2875774585202408514}
-  defaultMaterial: {fileID: 2100000, guid: 826f8e5943e6cea44a838c2899796a6b, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: 15ee8bb3c7b7a294eaecc1aa6d5987c9, type: 2}
   pointingAtTpArea: {fileID: 2100000, guid: 4496d9f7570e485499d507cbab535858, type: 2}
   pointingAtObstacle: {fileID: 2100000, guid: 67949eaff7d770146b093cb3c82b8a81, type: 2}
   rayStartPoint: {fileID: 2875774586111603480}
-  raySpeed: 8
+  raySpeed: 17.33
   maxVerticalAngle: 0
   stepLength: 0.02
-  arcMaxLength: 100
+  arcMaxLength: 10
   updateRate: 0.02
   navmeshLayer:
     serializedVersion: 2
@@ -10372,14 +10372,14 @@ MonoBehaviour:
     type: 3}
   impactPoint: {fileID: 2875774585957690914}
   errorPoint: {fileID: 2875774585559530388}
-  defaultMaterial: {fileID: 0}
-  pointingAtTpArea: {fileID: 0}
-  pointingAtObstacle: {fileID: 0}
+  defaultMaterial: {fileID: 2100000, guid: 15ee8bb3c7b7a294eaecc1aa6d5987c9, type: 2}
+  pointingAtTpArea: {fileID: 2100000, guid: 4496d9f7570e485499d507cbab535858, type: 2}
+  pointingAtObstacle: {fileID: 2100000, guid: 67949eaff7d770146b093cb3c82b8a81, type: 2}
   rayStartPoint: {fileID: 2875774586578622633}
-  raySpeed: 8
+  raySpeed: 17.33
   maxVerticalAngle: 0
   stepLength: 0.02
-  arcMaxLength: 100
+  arcMaxLength: 10
   updateRate: 0.02
   navmeshLayer:
     serializedVersion: 2
