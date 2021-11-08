@@ -67,7 +67,7 @@ public class AdaptHandPose : MonoBehaviour
     {
         float elapsedTime = startTime;
 
-        while (elapsedTime < 1)
+        while (transform != null)
         {
             elapsedTime = elapsedTime + Time.deltaTime;
 
@@ -76,13 +76,16 @@ public class AdaptHandPose : MonoBehaviour
 
             yield return null;
         }
+
+        currentLeftPose = null;
+        IKControl.leftIkActive = false;
     }
 
     IEnumerator LerpLeftPhalanxQuaternion(float startTime, Transform transform = null)
     {
         float elapsedTime = startTime;
 
-        while (elapsedTime < 1)
+        while (transform != null)
         {
             elapsedTime = elapsedTime + Time.deltaTime;
 
@@ -91,6 +94,9 @@ public class AdaptHandPose : MonoBehaviour
 
             yield return null;
         }
+
+        currentRightPose = null;
+        IKControl.rightIkActive = false;
     }
 
     public void SetupHandPose(UMI3DHandPoseDto dto, uint boneId)
