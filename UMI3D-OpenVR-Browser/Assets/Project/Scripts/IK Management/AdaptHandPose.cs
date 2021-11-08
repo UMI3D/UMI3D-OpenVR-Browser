@@ -77,8 +77,8 @@ public class AdaptHandPose : MonoBehaviour
             yield return null;
         }
 
-        currentLeftPose = null;
-        IKControl.leftIkActive = false;
+        currentRightPose = null;
+        IKControl.rightIkActive = false;
     }
 
     IEnumerator LerpLeftPhalanxQuaternion(float startTime, Transform transform = null)
@@ -95,8 +95,8 @@ public class AdaptHandPose : MonoBehaviour
             yield return null;
         }
 
-        currentRightPose = null;
-        IKControl.rightIkActive = false;
+        currentLeftPose = null;
+        IKControl.leftIkActive = false;
     }
 
     public void SetupHandPose(UMI3DHandPoseDto dto, uint boneId)
