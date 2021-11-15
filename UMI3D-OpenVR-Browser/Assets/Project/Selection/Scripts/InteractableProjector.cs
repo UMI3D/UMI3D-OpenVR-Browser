@@ -41,7 +41,7 @@ public class InteractableProjector : MonoBehaviour
     }
 
 
-    public void OnHover(InteractableContainer hoveredObject, string hoveredObjectId, Interactable.Event onHoverExit, AbstractController controller)
+    public void OnHover(InteractableContainer hoveredObject, ulong hoveredObjectId, Interactable.Event onHoverExit, AbstractController controller)
     {
         autoSelect = StartCoroutine(AutoSelect(hoveredObject, hoveredObjectId, onHoverExit, controller));
 
@@ -56,7 +56,7 @@ public class InteractableProjector : MonoBehaviour
         onHoverExit.AddListener(cancelSelection);
     }
 
-    IEnumerator AutoSelect(InteractableContainer hoveredObject, string hoveredObjectId, Interactable.Event onHoverExit, AbstractController controller)
+    IEnumerator AutoSelect(InteractableContainer hoveredObject, ulong hoveredObjectId, Interactable.Event onHoverExit, AbstractController controller)
     {
         Interactable hoveredInter = hoveredObject.Interactable;
         if (hoveredInter.dto.interactions == null)
@@ -129,7 +129,7 @@ public class InteractableProjector : MonoBehaviour
     }
 
 
-    public void Project(Interactable interactable, string hoveredObjectId, InteractionMappingReason reason)
+    public void Project(Interactable interactable, ulong hoveredObjectId, InteractionMappingReason reason)
     {
         if (autoSelect != null)
             StopCoroutine(autoSelect);

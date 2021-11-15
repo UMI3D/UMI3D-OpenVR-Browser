@@ -13,13 +13,15 @@ limitations under the License.
 using System.Collections;
 using umi3d.cdk;
 using umi3d.cdk.interaction;
+using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
+using umi3d.common.userCapture;
 using UnityEngine;
 using UnityEngine.Events;
 
 
 [System.Serializable]
-public abstract class AbstractManipulationInput : AbstractUMI3DInput
+public abstract class AbstractManipulationInput : AbstractUMI3DInput, IModifiableBindingInput
 {
     /// <summary>
     /// Boolean input to trigger to activate this input.
@@ -28,14 +30,24 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
     public OpenVRInputObserver activationButton;
 
     /// <summary>
+    /// Avatar bone linked to this input.
+    /// </summary>
+    public UMI3DClientUserTrackingBone bone;
+
+    /// <summary>
     /// Frame rate applied to message emission through network (high values can cause network flood).
     /// </summary>
-    public float networkFrameRate = 30;
+    public float networkFrameRate = 1;
 
     /// <summary>
     /// Input multiplicative strength.
     /// </summary>
-    public float strength = 1;
+    public float translationStrenght = 1;
+
+    /// <summary>
+    /// Input multiplicative strength.
+    /// </summary>
+    public float rotationStrenght = 200;
 
     /// <summary>
     /// First argument is the frame of reference, the second is the dof.
@@ -71,6 +83,21 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
     [Tooltip("This material which will be used on the controller and in the menu to show that this input is associated to an interaction")]
     public Material highlightMat;
 
+    /// <summary>
+    /// Menu item displayed in the controller menu.
+    /// </summary>
+    public BindingMenuItem menuItem;
+
+    private OpenVRController openVRController;
+
+    bool isDown = false;
+
+    ulong associatedToolId;
+
+    ulong currentHoveredObjectId;
+
+    public bool IsInputBeeingModified { get; set; }
+
 
     public abstract bool IsCompatibleWith(DofGroupEnum dofs);
 
@@ -82,7 +109,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
 
     public override bool IsAvailable()
     {
-        return (associatedManipulation == null) && !activationButton.isUsed();
+        return (associatedManipulation == null) && !isDown;
     }
 
     public override AbstractInteractionDto CurrentInteraction()
@@ -103,7 +130,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
         }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedManipulation != null)
         {
@@ -114,6 +141,8 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
         {
             associatedManipulation = manipulation;
             associatedManipulationDof = dofs;
+            associatedToolId = toolId;
+            currentHoveredObjectId = hoveredObjectId;
 
             GameObject frame = UMI3DEnvironmentLoader.GetNode(manipulation.frameOfReference).gameObject;
             if (frame == null)
@@ -123,16 +152,24 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
 
             activationButton.AddOnStateDownListener(ActivationButton_onStateDown);
             activationButton.AddOnStateUpListener(ActivationButton_onStateUp);
-            ControllerHintDisplayer.DisplayHint(activationButton.button, activationButton.controller, highlightMat, manipulation.name);
             onActivation.Invoke(frameOfReference, dofs);
+
+            PlayerMenuManager player = PlayerMenuManager.FindInstanceAssociatedToController(activationButton.controller);
+
+            if (player == null)
+                Debug.LogError("Player menu manager should no be null");
+
+            ControllerHintDisplayer.DisplayHint(activationButton.button, activationButton.controller, highlightMat, manipulation.name);
+            DisplayBindingInMenu(manipulation, toolId, hoveredObjectId, player);
+            openVRController = player.controller;
         }
         else
         {
-            throw new System.Exception("Trying to associate an uncompatible interaction !");
+            throw new System.Exception("Trying to associate an uncompatible interaction !" + dofs);
         }
     }
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedManipulation != null)
         {
@@ -158,7 +195,7 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
             throw new System.Exception("Trying to associate an uncompatible interaction !");
         }
     }
-   
+
     public override void Dissociate()
     {
         if (messageSenderCoroutine != null)
@@ -172,7 +209,14 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
         activationButton.RemoveOnStateDownListener(ActivationButton_onStateDown);
         activationButton.RemoveOnStateUpListener(ActivationButton_onStateUp);
         ControllerHintDisplayer.HideHint(activationButton.button, activationButton.controller);
+        HideBindingInMenu();
         onDesactivation.Invoke();
+
+        if (isDown)
+        {
+            openVRController.IsInputPressed = false;
+            isDown = false;
+        }
     }
 
     protected virtual void ActivationButton_onStateUp()
@@ -183,6 +227,8 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
             onInputUp.Invoke();
             messageSenderCoroutine = null;
         }
+        openVRController.IsInputPressed = false;
+        isDown = false;
     }
 
     protected virtual void ActivationButton_onStateDown()
@@ -191,11 +237,13 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
             StopCoroutine(messageSenderCoroutine);
 
         messageSenderCoroutine = StartCoroutine(NetworkMessageSender());
-        onInputDown.Invoke();        
+        onInputDown.Invoke();
+        openVRController.IsInputPressed = true;
+        isDown = true;
     }
 
-   
-    
+
+
     protected abstract ManipulationRequestDto ComputeManipulationArgument(DofGroupEnum dofs);
 
     protected IEnumerator NetworkMessageSender()
@@ -205,11 +253,67 @@ public abstract class AbstractManipulationInput : AbstractUMI3DInput
             if (true)//!PlayerMenuManager.IsDisplaying())
             {
                 ManipulationRequestDto arg = ComputeManipulationArgument(associatedManipulationDof);
+
+                arg.boneType = bone.boneType;
+                arg.id = associatedManipulation.id;
+                arg.toolId = associatedToolId;
+                arg.hoveredObjectId = currentHoveredObjectId;
                 UMI3DClientServer.SendData(arg, true);
             }
-
             yield return new WaitForSeconds(1f / networkFrameRate);
         }
     }
 
+    /// <summary>
+    /// Displays the current binding in the menu of the associated controller.
+    /// </summary>
+    /// <param name="associatedColor"></param>
+    private void DisplayBindingInMenu(ManipulationDto manipulation, ulong toolId, ulong hoveredObjectId, PlayerMenuManager player)
+    {
+        menuItem = new BindingMenuItem
+        {
+            Name = associatedManipulationDof.ToString(),
+            associatedMaterial = highlightMat,
+            Holdable = true,
+            toolId = toolId,
+            hoveredObjectId = hoveredObjectId,
+            associatedInteractionDto = manipulation,
+            associatedInput = this,
+            dofs = associatedManipulationDof
+        };
+        player.AddMenuItemToParamatersMenu(menuItem);
+    }
+
+    /// <summary>
+    /// Hides the current binding in the menu of the associated controller.
+    /// </summary>
+    private void HideBindingInMenu()
+    {
+        if (menuItem != null)
+        {
+            PlayerMenuManager player = PlayerMenuManager.FindInstanceAssociatedToController(activationButton.controller);
+
+            if (player == null)
+                return;
+            player.RemoveItemFromParametersMenu(menuItem);
+        }
+    }
+
+    public string GetCurrentButtonName()
+    {
+        if (activationButton != null)
+            return activationButton.button.ToString();
+        else
+            return string.Empty;
+    }
+
+    public OpenVRInputObserver GetOpenVRObserverObersver()
+    {
+        return activationButton;
+    }
+
+    public BindingMenuItem GetBindingMenuItem()
+    {
+        return menuItem;
+    }
 }

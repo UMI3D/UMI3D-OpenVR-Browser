@@ -20,7 +20,7 @@ using umi3d.cdk.interaction;
 using umi3d.cdk.userCapture;
 
 [System.Serializable]
-public class BooleanInput : AbstractUMI3DInput
+public class BooleanInput : AbstractUMI3DInput, IModifiableBindingInput
 {
     /// <summary>
     /// Oculus input observer binded to this input.
@@ -74,6 +74,13 @@ public class BooleanInput : AbstractUMI3DInput
 
     private OpenVRController openVrController;
 
+    public bool IsInputBeeingModified { get => isInputBeeingModified; set => isInputBeeingModified = value; }
+
+    public class InputInteractionEvent : UnityEvent<uint> { };
+
+    [HideInInspector]
+    static public InputInteractionEvent BooleanEvent = new InputInteractionEvent();
+
     /// <summary>
     /// Callback called on oculus input up.
     /// </summary>
@@ -103,7 +110,7 @@ public class BooleanInput : AbstractUMI3DInput
     }
 
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (associatedInteraction != null)
         {
@@ -150,6 +157,16 @@ public class BooleanInput : AbstractUMI3DInput
                     }
                     openVrController.IsInputPressed = true;
                     isDown = true;
+
+                    BooleanEvent.Invoke(bone.boneType);
+
+                    if ((interaction as EventDto).TriggerAnimationId != 0)
+                    {
+                        UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get((interaction as EventDto).TriggerAnimationId);
+                        if (anim != null)
+                            anim.Start();
+                    }
+
                     onInputDown.Invoke();
                 } else
                 {
@@ -171,6 +188,15 @@ public class BooleanInput : AbstractUMI3DInput
                     openVrController.IsInputPressed = false;
                     isDown = false;
                     onInputUp.Invoke();
+
+                    BooleanEvent.Invoke(bone.boneType);
+
+                    if ((interaction as EventDto).ReleaseAnimationId != 0)
+                    {
+                        UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get((interaction as EventDto).ReleaseAnimationId);
+                        if (anim != null)
+                            anim.Start();
+                    }
                 }
             };
 
@@ -192,7 +218,7 @@ public class BooleanInput : AbstractUMI3DInput
     /// </summary>
     /// <param name="interaction"></param>
     /// <param name="associatedColor"></param>
-    private void DisplayBindingInMenu(AbstractInteractionDto interaction, string toolId, string hoveredObjectId, PlayerMenuManager player, UnityAction<bool> action)
+    private void DisplayBindingInMenu(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId, PlayerMenuManager player, UnityAction<bool> action)
     {
         //Debug.Log("<color=orange>Work on icon</color>");
         menuItem = new BindingMenuItem {
@@ -223,7 +249,7 @@ public class BooleanInput : AbstractUMI3DInput
        }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         throw new System.Exception("Boolean input is not compatible with manipulation");
     }
@@ -284,8 +310,26 @@ public class BooleanInput : AbstractUMI3DInput
     }
     
 
-    public override void UpdateHoveredObjectId(string hoveredObjectId)
+    public override void UpdateHoveredObjectId(ulong hoveredObjectId)
     {
         throw new System.NotImplementedException();
+    }
+
+
+    public string GetCurrentButtonName()
+    {
+        if (inputObserver != null)
+            return inputObserver.button.ToString();
+        else
+            return string.Empty;
+    }
+
+    public OpenVRInputObserver GetOpenVRObserverObersver()
+    {
+        return inputObserver;
+    }
+    public BindingMenuItem GetBindingMenuItem()
+    {
+        return menuItem;
     }
 }

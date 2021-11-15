@@ -21,7 +21,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Manages the connection to the environment.
+/// Manages the connection to the UMI3D environment.
 /// </summary>
 public class Connecting : Singleton<Connecting>
 {
@@ -64,7 +64,7 @@ public class Connecting : Singleton<Connecting>
     /// </summary>
     /// <param name="ids"></param>
     /// <param name="callback"></param>
-    void ShouldDlLibraries(List<string> ids,Action<bool> callback)
+    void ShouldDlLibraries(List<string> ids, Action<bool> callback)
     {
         LoadingScreen.Instance.Hide();
 
@@ -81,7 +81,7 @@ public class Connecting : Singleton<Connecting>
     /// </summary>
     /// <param name="form"></param>
     /// <param name="callback"></param>
-    void GetParameterDtos(FormDto form,Action<FormDto> callback)
+    void GetParameterDtos(FormDto form, Action<FormAnswerDto> callback)
     {
         FormAsker.Instance.Display(form, callback);
     }
@@ -103,7 +103,7 @@ public class Connecting : Singleton<Connecting>
     /// Called if the connection failed.
     /// </summary>
     /// <param name="error"></param>
-    void GetMediaFailed(string error) 
+    void GetMediaFailed(string error)
     {
         DialogBox.Instance.Display($"Server Unreachable", error, "Leave", () => {
             Leave();
@@ -116,7 +116,6 @@ public class Connecting : Singleton<Connecting>
     /// </summary>
     void GetMediaSucces(MediaDto media)
     {
-        LoadingScreen.Instance.Hide();
         UMI3DCollaborationClientServer.Connect();
     }
 
@@ -130,9 +129,15 @@ public class Connecting : Singleton<Connecting>
         LoginPasswordAsker.Instance.Display();
         LoginPasswordAsker.Instance.UnregisterAll();
 
+        ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
+        {
+            LoginPasswordAsker.Instance.Hide();
+            ConnectionMenuManager.instance.DisplayHome();
+        });
+
         if (callback != null)
         {
-            LoginPasswordAsker.Instance.Register((log,pwd) =>
+            LoginPasswordAsker.Instance.Register((log, pwd) =>
             {
                 LoginPasswordAsker.Instance.Hide();
                 callback(log, pwd);
@@ -149,6 +154,12 @@ public class Connecting : Singleton<Connecting>
 
         LoginPasswordAsker.Instance.Display(false);
         LoginPasswordAsker.Instance.UnregisterAll();
+
+        ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
+        {
+            LoginPasswordAsker.Instance.Hide();
+            ConnectionMenuManager.instance.DisplayHome();
+        });
 
         if (callback != null)
         {
@@ -170,7 +181,8 @@ public class Connecting : Singleton<Connecting>
         });
     }
 
-    void OnConnectionLost() {
+    void OnConnectionLost()
+    {
         Action<bool> callback = (b) => {
             if (b) Connect(data);
             else Leave();
@@ -180,7 +192,7 @@ public class Connecting : Singleton<Connecting>
 
     void OnConnectionLost(Action<bool> callback)
     {
-        DialogBox.Instance.Display($"Connection to the server lost", "Leave to the connection menu or try again ?", "Try again", "Leave", (b) => {
+        DialogBox.Instance.Display($"Connection to the server lost", "Leave to the connection menu or try again ?", "Try again", (b) => {
             callback.Invoke(b);
             if (b)
                 LoadingScreen.Instance.Display("Connecting ...");
@@ -205,7 +217,7 @@ public class Connecting : Singleton<Connecting>
 
         UMI3DEnvironmentLoader.Clear();
         UMI3DResourcesManager.Instance.ClearCache();
-        UMI3DCollaborationClientServer.Logout(()=> { Destroy(UMI3DClientServer.Instance.gameObject); },null);
+        UMI3DCollaborationClientServer.Logout(() => { Destroy(UMI3DClientServer.Instance.gameObject); }, null);
         QuestBrowser.Helper.DontDestroyOnLoad.DestroyAllInstances();
 
         StartCoroutine(LoadConnectionScene());

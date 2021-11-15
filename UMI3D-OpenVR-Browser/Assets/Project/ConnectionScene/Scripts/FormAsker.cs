@@ -10,12 +10,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 using UnityEngine;
 using umi3d.common;
 using umi3d.cdk.menu;
 using umi3d.cdk.menu.view;
 using umi3d.common.interaction;
 using UnityEngine.Events;
+using umi3d.cdk.collaboration;
+using System.Linq;
+using System.Collections.Generic;
 
 /// <summary>
 /// This class manages the display of a FormDto.
@@ -36,54 +40,105 @@ public class FormAsker : Singleton<FormAsker>
     /// </summary>
     /// <param name="dto"></param>
     /// <returns></returns>
-    static MenuItem GetInteractionItem(AbstractInteractionDto dto)
+    static (MenuItem, ParameterSettingRequestDto) GetInteractionItem(AbstractInteractionDto dto)
     {
         MenuItem result = null;
+        ParameterSettingRequestDto requestDto = null;
         switch (dto)
         {
             case BooleanParameterDto booleanParameterDto:
                 var b = new BooleanInputMenuItem() { dto = booleanParameterDto };
                 b.NotifyValueChange(booleanParameterDto.value);
+                requestDto = new ParameterSettingRequestDto()
+                {
+                    toolId = dto.id,
+                    id = booleanParameterDto.id,
+                    parameter = booleanParameterDto.value,
+                    hoveredObjectId = 0
+                };
                 b.Subscribe((x) =>
                 {
                     booleanParameterDto.value = x;
+                    requestDto.parameter = x;
                 });
                 result = b;
                 break;
             case FloatRangeParameterDto floatRangeParameterDto:
                 var f = new FloatRangeInputMenuItem() { dto = floatRangeParameterDto, max = floatRangeParameterDto.max, min = floatRangeParameterDto.min, value = floatRangeParameterDto.value, increment = floatRangeParameterDto.increment };
+                requestDto = new ParameterSettingRequestDto()
+                {
+                    toolId = dto.id,
+                    id = floatRangeParameterDto.id,
+                    parameter = floatRangeParameterDto.value,
+                    hoveredObjectId = 0
+                };
                 f.Subscribe((x) =>
                 {
                     floatRangeParameterDto.value = x;
+                    requestDto.parameter = x;
                 });
                 result = f;
                 break;
             case EnumParameterDto<string> enumParameterDto:
                 var en = new DropDownInputMenuItem() { dto = enumParameterDto, options = enumParameterDto.possibleValues };
                 en.NotifyValueChange(enumParameterDto.value);
+                requestDto = new ParameterSettingRequestDto()
+                {
+                    toolId = dto.id,
+                    id = enumParameterDto.id,
+                    parameter = enumParameterDto.value,
+                    hoveredObjectId = 0
+                };
                 en.Subscribe((x) =>
                 {
                     enumParameterDto.value = x;
+                    requestDto.parameter = x;
                 });
                 result = en;
                 break;
             case StringParameterDto stringParameterDto:
                 var s = new TextInputMenuItem() { dto = stringParameterDto };
                 s.NotifyValueChange(stringParameterDto.value);
+                requestDto = new ParameterSettingRequestDto()
+                {
+                    toolId = dto.id,
+                    id = stringParameterDto.id,
+                    parameter = stringParameterDto.value,
+                    hoveredObjectId = 0
+                };
                 s.Subscribe((x) =>
                 {
                     stringParameterDto.value = x;
+                    requestDto.parameter = x;
                 });
                 result = s;
                 break;
+            case LocalInfoRequestParameterDto localInfoRequestParameterDto:
+                LocalInfoRequestInputMenuItem localReq = new LocalInfoRequestInputMenuItem() { dto = localInfoRequestParameterDto };
+                localReq.NotifyValueChange(localInfoRequestParameterDto.value);
+                requestDto = new ParameterSettingRequestDto()
+                {
+                    toolId = dto.id,
+                    id = localInfoRequestParameterDto.id,
+                    parameter = localInfoRequestParameterDto.value,
+                    hoveredObjectId = 0
+                };
+                localReq.Subscribe((x) =>
+                {
+                    localInfoRequestParameterDto.value = x;
+                    requestDto.parameter = x;
+                }
+                );
+                result = localReq;
+                break;
             default:
                 result = new MenuItem();
-                result.Subscribe(() => Debug.Log("hellooo 2"));
+                result.Subscribe(() => Debug.Log($"Missing case for {dto?.GetType()}"));
                 break;
         }
         result.Name = dto.name;
         //icon;
-        return result;
+        return (result, requestDto);
     }
 
     /// <summary>
@@ -91,24 +146,38 @@ public class FormAsker : Singleton<FormAsker>
     /// </summary>
     /// <param name="form"></param>
     /// <param name="callback"></param>
-    public void Display(FormDto form, System.Action<FormDto> callback)
+    public void Display(FormDto form, System.Action<FormAnswerDto> callback)
     {
         if (form == null)
         {
-            callback.Invoke(form);
+            callback.Invoke(null);
             LoadingScreen.Instance.SetLoadingScreen();
             LoadingScreen.Instance.Display("Loading environment ...");
             HideObjects();
+            Hide();
         }
         else
         {
+            FormAnswerDto answer = new FormAnswerDto()
+            {
+                boneType = 0,
+                hoveredObjectId = 0,
+                id = form.id,
+                toolId = 0,
+                answers = new List<ParameterSettingRequestDto>()
+            };
+
             LoadingScreen.Instance.Hide();
             this.gameObject.SetActive(true);
             menu.menu.RemoveAll();
+
             foreach (var param in form.fields)
             {
-                menu.menu.Add(GetInteractionItem(param));
+                var c = GetInteractionItem(param);
+                menu.menu.Add(c.Item1);
+                answer.answers.Add(c.Item2);
             }
+
             ButtonMenuItem send = new ButtonMenuItem() { Name = "Join", toggle = false };
             UnityAction<bool> action = (bool b) =>
             {
@@ -117,14 +186,27 @@ public class FormAsker : Singleton<FormAsker>
 
                 //DebugForm(form);
 
-                callback.Invoke(form);
+                callback.Invoke(answer);
                 LoadingScreen.Instance.SetLoadingScreen();
                 LoadingScreen.Instance.Display("Loading environment ...");
                 HideObjects();
+                Hide();
+                LocalInfoSender.CheckFormToUpdateAuthorizations(form);
             };
             send.Subscribe(action);
             menu.menu.Add(send);
             menuDisplayer.Display(true);
+
+            ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
+            {
+                Hide();
+                ConnectionMenuManager.instance.DisplayHome();
+            });
+
+            ConnectionMenuManager.instance.ShowNextNavigationButton(() =>
+            {
+                action(true);
+            });
         }
     }
 

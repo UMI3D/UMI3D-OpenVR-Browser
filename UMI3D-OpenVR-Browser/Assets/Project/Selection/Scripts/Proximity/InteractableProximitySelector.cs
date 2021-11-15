@@ -35,14 +35,14 @@ public class InteractableProximitySelector : ProximitySelector<InteractableConta
 
 
     public UMI3DClientUserTrackingBone boneType;
-    private string boneId; //bonetype
+    private uint boneId; //bonetype
 
     private Coroutine hoverCoroutine;
     private Vector3 lastHoveredPos;
     private Vector3 lastHoveredNormal;
     private Vector3 lastHoveredDirection;
     private Interactable lastHoveredInteractable = null;
-    private string lastHoveredInteractableObjectId;
+    private ulong lastHoveredInteractableObjectId;
     private bool shouldHover = false;
 
     private Interactable.Event onHoverExit = new Interactable.Event();
@@ -77,7 +77,7 @@ public class InteractableProximitySelector : ProximitySelector<InteractableConta
     protected override void ActivateInternal()
     {
         base.ActivateInternal();
-        boneId = boneType.ToDto(viewport).boneType;
+        boneId = boneType.boneType;// ToDto().boneType;
         hoverCoroutine = StartCoroutine(UpdateHovered());
     }
 
@@ -92,7 +92,7 @@ public class InteractableProximitySelector : ProximitySelector<InteractableConta
             onHoverExit.Invoke(lastHoveredInteractable);
             SelectionHighlight.Instance.DisableHoverHighlight(UMI3DEnvironmentLoader.GetNode(lastHoveredInteractableObjectId).gameObject);
             lastHoveredInteractable = null;
-            lastHoveredInteractableObjectId = "";
+            lastHoveredInteractableObjectId = 0;
         }
 
         StopCoroutine(hoverCoroutine);
@@ -141,7 +141,7 @@ public class InteractableProximitySelector : ProximitySelector<InteractableConta
                 SelectionHighlight.Instance.DisableHoverHighlight(UMI3DEnvironmentLoader.GetNode(lastHoveredInteractableObjectId).gameObject);
                 onHoverExit.Invoke(lastHoveredInteractable);
                 lastHoveredInteractable = null;
-                lastHoveredInteractableObjectId = "";
+                lastHoveredInteractableObjectId = 0;
             }
             return;
         }            

@@ -10,6 +10,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+using System.Collections.Generic;
+using umi3d.cdk.interaction;
 using UnityEngine;
 using UnityEngine.Events;
 using Valve.VR;
@@ -25,6 +27,27 @@ public class MenuOpenner : MonoBehaviour
 
     public UnityEvent onMenuOpenned;
     public UnityEvent onMenuClosed;
+
+    public static List<MenuOpenner> instances { get; protected set; } = new List<MenuOpenner>();
+    public static MenuOpenner FindInstanceAssociatedToController(AbstractController controller)
+    {
+        foreach (var i in instances)
+        {
+            if (i.playerMenuManager.controller == controller)
+                return i;
+        }
+        return null;
+    }
+
+    private void Awake()
+    {
+        instances.Add(this);
+    }
+
+    private void OnDestroy()
+    {
+        instances.Remove(this);
+    }
 
     void Start()
     {

@@ -15,6 +15,7 @@ using umi3d.cdk.interaction;
 using umi3d.cdk.menu;
 using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
+using umi3d.common.userCapture;
 using UnityEngine.Events;
 
 public abstract class AbstractParameterInput<InputMenuItem, ParameterType, ValueType> : AbstractUMI3DInput 
@@ -51,12 +52,12 @@ public abstract class AbstractParameterInput<InputMenuItem, ParameterType, Value
     protected UnityAction<ValueType> callback;
 
 
-    public override void UpdateHoveredObjectId(string hoveredObjectId)
+    public override void UpdateHoveredObjectId(ulong hoveredObjectId)
     {
         throw new System.NotImplementedException();
     }
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (currentInteraction != null)
         {
@@ -80,7 +81,7 @@ public abstract class AbstractParameterInput<InputMenuItem, ParameterType, Value
 
             callback = x => UMI3DClientServer.SendData(new ParameterSettingRequestDto()
             {
-                boneType = bone?.boneType,
+                boneType = bone==null ? BoneType.None : bone.boneType,
                 toolId = toolId,
                 parameter = new ParameterType()
                 {
@@ -103,7 +104,7 @@ public abstract class AbstractParameterInput<InputMenuItem, ParameterType, Value
         }
     }
 
-    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, string toolId, string hoveredObjectId)
+    public override void Associate(ManipulationDto manipulation, DofGroupEnum dofs, ulong toolId, ulong hoveredObjectId)
     {
         throw new System.Exception("Incompatible interaction");
     }

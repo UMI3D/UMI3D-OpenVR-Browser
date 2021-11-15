@@ -532,7 +532,7 @@ public class PlayerMenuManager : MonoBehaviour
         };
 
         string title = areSettingButtonsEnabled ? "Go back to main menu" : "Close application";
-        DialogBox.Instance.Display(title, "Are you sure you want to leave ?", "Yes", "No", leaveCallback);
+        DialogBox.Instance.Display(title, "Are you sure you want to leave ?", "Yes", leaveCallback);
     }
 
     #endregion

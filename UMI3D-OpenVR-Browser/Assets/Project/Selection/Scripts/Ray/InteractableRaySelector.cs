@@ -37,17 +37,28 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
 
 
     public UMI3DClientUserTrackingBone boneType;
-    private string boneId;
+    private uint boneId;
 
     private Coroutine hoverCoroutine;
     private Vector3 lastHoveredPos;
     private Vector3 lastHoveredNormal;
     private Vector3 lastHoveredDirection;
     private InteractableContainer lastActiveHoveredInteractable = null;
-    private string lastActiveHoveredInteractableId;
+    private ulong lastActiveHoveredInteractableId;
     private bool shouldHover = false;
 
     private Interactable.Event onHoverExit = new Interactable.Event();
+
+    public class HoverEvent : UnityEvent<ulong, uint> { };
+
+    [HideInInspector]
+    static public HoverEvent HoverEnter = new HoverEvent();
+
+    [HideInInspector]
+    static public HoverEvent HoverUpdate = new HoverEvent();
+
+    [HideInInspector]
+    static public HoverEvent HoverExit = new HoverEvent();
 
     [Header("Vibration")]
     public SteamVR_Action_Vibration hapticAction;
@@ -121,7 +132,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
     protected override void ActivateInternal()
     {
         base.ActivateInternal();
-        boneId = boneType.ToDto(viewport).boneType;
+        boneId = boneType.boneType;// ToDto().boneType;
         hoverCoroutine = StartCoroutine(UpdateHovered());
     }
     
@@ -136,9 +147,17 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
             onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
 
+            if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
+            {
+                UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get(lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId);
+                HoverExit.Invoke(lastActiveHoveredInteractableId, boneId);
+                if (anim != null)
+                    anim.Start();
+            }
+
             SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
             lastActiveHoveredInteractable = null;
-            lastActiveHoveredInteractableId = "";
+            lastActiveHoveredInteractableId = 0;
             laser.OnHoverExit(this.gameObject.GetInstanceID());
         }
 
@@ -161,7 +180,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             {
                 interactableContainer = hit.Value.transform.GetComponentInParent<InteractableContainer>();
             }
-            var currentHoveredId = string.Empty;
+            ulong currentHoveredId;
 
             if (interactableContainer != null && interactableContainer.Interactable != null && interactableContainer.Interactable.Active)
             {
@@ -176,10 +195,28 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
                     }
                     interactable.HoverEnter(boneId, currentHoveredId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                     Pulse();
+
+                    if (interactable.dto.HoverEnterAnimationId != 0)
+                    {
+                        UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get(interactable.dto.HoverEnterAnimationId);
+                        HoverEnter.Invoke(currentHoveredId, boneId);
+                        if (anim != null)
+                            anim.Start();
+                    }
+
                     if (lastActiveHoveredInteractable != null)
                     {
                         lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                         onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+
+                        if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
+                        {
+                            UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get(lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId);
+                            HoverExit.Invoke(lastActiveHoveredInteractableId, boneId);
+                            if (anim != null)
+                                anim.Start();
+                        }
+
                         SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
                     }
                 }
@@ -199,6 +236,15 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
             {
                 lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                 onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+
+                if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
+                {
+                    UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get(lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId);
+                    HoverExit.Invoke(lastActiveHoveredInteractableId, boneId);
+                    if (anim != null)
+                        anim.Start();
+                }
+
                 SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
                 laser.OnHoverExit(this.gameObject.GetInstanceID());
             }
@@ -211,11 +257,20 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
         {
             lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
             onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
+
+            if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
+            {
+                UMI3DNodeAnimation anim = UMI3DNodeAnimation.Get(lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId);
+                HoverExit.Invoke(lastActiveHoveredInteractableId, boneId);
+                if (anim != null)
+                    anim.Start();
+            }
+
             SelectionHighlight.Instance.DisableHoverHighlight(lastActiveHoveredInteractable.gameObject);
             laser.OnHoverExit(this.gameObject.GetInstanceID());
             lastActiveHoveredInteractable = null;
-            lastActiveHoveredInteractableId = "";
-            (controller as OpenVRController).hoveredObjectId = "";
+            lastActiveHoveredInteractableId = 0;
+            (controller as OpenVRController).hoveredObjectId = 0;
         }
         else if (laser.hovering)
             laser.OnHoverExit(this.gameObject.GetInstanceID());
@@ -244,7 +299,7 @@ public class InteractableRaySelector : RaySelector<InteractableContainer>
         }
     }
 
-    public string GetLastHoveredInteractableId()
+    public ulong GetLastHoveredInteractableId()
     {
         return lastActiveHoveredInteractableId;
     }

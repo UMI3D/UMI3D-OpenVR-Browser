@@ -14,6 +14,7 @@ using umi3d.cdk;
 using umi3d.cdk.menu;
 using umi3d.common;
 using umi3d.common.interaction;
+using umi3d.common.userCapture;
 using UnityEngine.Events;
 
 public abstract class AbstractRangeParameterInput<InputMenuItem, ParameterType, ValueType> : AbstractParameterInput<InputMenuItem, ParameterType, ValueType>
@@ -22,7 +23,7 @@ public abstract class AbstractRangeParameterInput<InputMenuItem, ParameterType, 
     where ParameterType : AbstractRangeParameterDto<ValueType>, new()
 {
 
-    public override void Associate(AbstractInteractionDto interaction, string toolId, string hoveredObjectId)
+    public override void Associate(AbstractInteractionDto interaction, ulong toolId, ulong hoveredObjectId)
     {
         if (currentInteraction != null)
         {
@@ -48,7 +49,7 @@ public abstract class AbstractRangeParameterInput<InputMenuItem, ParameterType, 
                     UMI3DClientServer.SendData(new ParameterSettingRequestDto()
                     {
                         id = param.id,
-                        boneType = bone?.boneType,
+                        boneType = bone==null ? BoneType.None : bone.boneType,
                         parameter = new ParameterType()
                         {
                             description = param.description,

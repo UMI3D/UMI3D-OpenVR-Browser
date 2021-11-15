@@ -35,7 +35,7 @@ namespace QuestBrowser.Interactions
         /// <summary>
         /// Get the tool associated to an interaction.
         /// </summary>
-        private Dictionary<string, Tool> interactionsIdToTool = new Dictionary<string, Tool>();
+        private Dictionary<ulong, Tool> interactionsIdToTool = new Dictionary<ulong, Tool>();
 
         public AbstractController lastControllerUsedInMenu;
 
@@ -43,7 +43,7 @@ namespace QuestBrowser.Interactions
         /// Associate a tool id and if it is releasbale or not.
         /// </summary>
         
-        private Dictionary<string, bool> releasableTools = new Dictionary<string, bool>();
+        private Dictionary<ulong, bool> releasableTools = new Dictionary<ulong, bool>();
 
         #endregion
 
@@ -64,7 +64,7 @@ namespace QuestBrowser.Interactions
         }
 
         /// <inheritdoc/>
-        public override bool SelectTool(string toolId, bool releasable, string hoveredObjectId, InteractionMappingReason reason = null)
+        public override bool SelectTool(ulong toolId, bool releasable, ulong hoveredObjectId, InteractionMappingReason reason = null)
         {
             AbstractTool tool = GetTool(toolId);
             if (tool == null)
@@ -95,13 +95,24 @@ namespace QuestBrowser.Interactions
                 else
                     releasableTools.Add(tool.id, releasable);
 
-                return SelectTool(tool.id, releasable, controller, hoveredObjectId, reason);
+                bool res = SelectTool(tool.id, releasable, controller, hoveredObjectId, reason);
+                if (res)
+                    lastReason = reason;
+                return res;
             }
             else
             {
                 throw new Exception("No controller is compatible with this tool");
             }
         }
+
+        public override void ReleaseTool(ulong toolId, InteractionMappingReason reason = null)
+        {
+            base.ReleaseTool(toolId, reason);
+            lastReason = null;
+        }
+
+        InteractionMappingReason lastReason = null;
 
         /// <summary>
         /// To remove in the future, made because InteractionMapper.ShouldForceProjection(AbstractController, AbstractTool, Reason) can be overriden
@@ -114,6 +125,8 @@ namespace QuestBrowser.Interactions
             if(oculusController != null)
             {
                 if (oculusController.controllersMenu.WasHiddenLastFrame && reason is AutoProjectOnHover)
+                    res = true;
+                else if (lastReason is AutoProjectOnHover && reason is AutoProjectOnHover)
                     res = true;
 
             } else
@@ -151,7 +164,7 @@ namespace QuestBrowser.Interactions
             }
         }
 
-        public Tool GetToolFromInteraction(string interactionId)
+        public Tool GetToolFromInteraction(ulong interactionId)
         {
             return interactionsIdToTool[interactionId];
         }
@@ -162,7 +175,7 @@ namespace QuestBrowser.Interactions
         /// <returns></returns>
         public List<Tool> GetToolsWithoutToolbox()
         {
-            Dictionary<string, Toolbox> toolIdToToolbox = new Dictionary<string, Toolbox>();
+            Dictionary<ulong, Toolbox> toolIdToToolbox = new Dictionary<ulong, Toolbox>();
 
             foreach (var toolbox in GetToolboxes())
             {
@@ -178,7 +191,7 @@ namespace QuestBrowser.Interactions
         /// <summary>
         /// Returns true if users can release the tool associated to toolId
         /// </summary>
-        public bool IsToolReleasable(string toolId)
+        public bool IsToolReleasable(ulong toolId)
         {
             bool res = true;
 
@@ -189,7 +202,7 @@ namespace QuestBrowser.Interactions
         }
 
         /// <inheritdoc/>
-        public override bool SwitchTools(string select, string release, bool releasable, string hoveredObjectId, InteractionMappingReason reason = null)
+        public override bool SwitchTools(ulong select, ulong release, bool releasable, ulong hoveredObjectId, InteractionMappingReason reason = null)
         {
             if (toolIdToController.ContainsKey(release))
             {
@@ -198,22 +211,30 @@ namespace QuestBrowser.Interactions
                 if (!SelectTool(select, releasable, controller, hoveredObjectId, reason))
                 {
                     if (SelectTool(release, releasable, controller, hoveredObjectId))
+                    {
+                        lastReason = reason;
                         return false;
+                    }
                     else
                         throw new Exception("Internal error");
+                }
+                else
+                {
+                    lastReason = reason;
                 }
             }
             else
             {
                 foreach (var c in Controllers)
                 {
-                    var menu = PlayerMenuManager.FindInstanceAssociatedToController(c);
-                    var tool = menu?.currentToolMenu?.tool;
+                    var menu = MenuOpenner.FindInstanceAssociatedToController(c);
+                    var tool = menu?.playerMenuManager.currentToolMenu?.tool;
                     if (tool != null && tool.id == release)
                     {
-                        if (SelectTool(select, releasable, hoveredObjectId, new AutoProjectOnHover { controller = c }))
+                        if (SelectTool(select, releasable, hoveredObjectId, new RequestedUsingSelector { controller = c }))
                         {
-                            menu.Hide();
+                            menu.Close();
+                            lastReason = new RequestedFromMenu();
                             return true;
                         }
                     }

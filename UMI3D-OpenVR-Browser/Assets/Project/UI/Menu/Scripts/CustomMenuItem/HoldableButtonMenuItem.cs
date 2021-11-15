@@ -28,17 +28,17 @@ public class HoldableButtonMenuItem : MenuItem, IObservable<bool>
     /// <summary>
     /// This menu item can store an interaction.
     /// </summary>
-    public EventDto associatedInteractionDto;
+    public AbstractInteractionDto associatedInteractionDto;
 
     /// <summary>
     /// If associatedIntearctionDto is not null stores the associated tool id.
     /// </summary>
-    public string toolId;
+    public ulong toolId;
 
     /// <summary>
     /// If associatedIntearctionDto is not null stores the hovered object id.
     /// </summary>
-    public string hoveredObjectId;
+    public ulong hoveredObjectId;
 
     /// <summary>
     /// UMI3DInput associated.
@@ -57,6 +57,10 @@ public class HoldableButtonMenuItem : MenuItem, IObservable<bool>
     /// </summary>
     private List<UnityAction<bool>> subscribers = new List<UnityAction<bool>>();
 
+    /// <summary>
+    /// Relevant only if <see cref="associatedInteractionDto"/> is a ManipulationDto.
+    /// </summary>
+    public DofGroupEnum dofs;
 
 
     /// <summary>
