@@ -29,7 +29,10 @@ namespace umi3d.cdk.collaboration
     /// </summary>
     public class HttpClient
     {
-        private UMI3DCollaborationClientServer client;
+        const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
+
+
+        private readonly UMI3DCollaborationClientServer client;
         internal string ComputedToken;
 
         private string httpUrl => UMI3DCollaborationClientServer.Media.connection.httpUrl;
@@ -321,8 +324,10 @@ namespace umi3d.cdk.collaboration
             };
             string url = System.Text.RegularExpressions.Regex.Replace(httpUrl + UMI3DNetworkingKeys.uploadFile, ":param", token);
             //Header
-            var headers = new List<(string, string)>();
-            headers.Add((UMI3DNetworkingKeys.contentHeader, fileName));
+            var headers = new List<(string, string)>
+            {
+                (UMI3DNetworkingKeys.contentHeader, fileName)
+            };
             client.StartCoroutine(_PostRequest(url, bytes, action, onError, (e) => shouldTryAgain?.Invoke(e) ?? DefaultShouldTryAgain(e), true, headers));
         }
         #endregion
@@ -359,8 +364,8 @@ namespace umi3d.cdk.collaboration
                     }
                     else
                     {
-                        Debug.LogError(www.error);
-                        Debug.LogError("Failed to get " + www.url);
+                        UMI3DLogger.LogError(www.error,scope);
+                        UMI3DLogger.LogError("Failed to get " + www.url,scope);
                     }
                 }
                 yield break;
@@ -399,8 +404,8 @@ namespace umi3d.cdk.collaboration
                     }
                     else
                     {
-                        Debug.LogError(www.error);
-                        Debug.LogError("Failed to post " + www.url);
+                        UMI3DLogger.LogError(www.error,scope);
+                        UMI3DLogger.LogError("Failed to post " + www.url,scope);
                     }
                 }
                 yield break;

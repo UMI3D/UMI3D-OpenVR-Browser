@@ -26,7 +26,9 @@ namespace umi3d.cdk
 
     public class UMI3DSceneLoader : UMI3DAbstractNodeLoader
     {
-        private UMI3DEnvironmentLoader EnvironementLoader;
+        const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+
+        private readonly UMI3DEnvironmentLoader EnvironementLoader;
 
         public UMI3DSceneLoader(UMI3DEnvironmentLoader EnvironementLoader)
         {
@@ -108,17 +110,26 @@ namespace umi3d.cdk
                 case UMI3DPropertyKeys.Position:
                     dto.position = (SerializableVector3)property.value;
                     if (node.updatePose)
+                    {
                         node.transform.localPosition = dto.position;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 case UMI3DPropertyKeys.Rotation:
                     dto.rotation = (SerializableVector4)property.value;
                     if (node.updatePose)
+                    {
                         node.transform.localRotation = dto.rotation;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 case UMI3DPropertyKeys.Scale:
                     dto.scale = (SerializableVector3)property.value;
                     if (node.updatePose)
+                    {
                         node.transform.localScale = dto.scale;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 default:
                     return false;
@@ -148,17 +159,26 @@ namespace umi3d.cdk
                 case UMI3DPropertyKeys.Position:
                     dto.position = UMI3DNetworkingHelper.Read<SerializableVector3>(container); ;
                     if (node.updatePose)
+                    {
                         node.transform.localPosition = dto.position;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 case UMI3DPropertyKeys.Rotation:
                     dto.rotation = UMI3DNetworkingHelper.Read<SerializableVector4>(container); ;
                     if (node.updatePose)
+                    {
                         node.transform.localRotation = dto.rotation;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 case UMI3DPropertyKeys.Scale:
                     dto.scale = UMI3DNetworkingHelper.Read<SerializableVector3>(container); ;
                     if (node.updatePose)
+                    {
                         node.transform.localScale = dto.scale;
+                        node.SendOnPoseUpdated();
+                    }
                     break;
                 default:
                     return false;
@@ -208,7 +228,7 @@ namespace umi3d.cdk
                 }
                 catch
                 {
-                    Debug.LogError("this material failed to load : " + material.name);
+                    UMI3DLogger.LogError("this material failed to load : " + material.name,scope);
                 }
             }
             callback.Invoke();
@@ -250,7 +270,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.HeightTexture:
-                    Debug.LogWarning("Height Texture not supported");
+                    UMI3DLogger.LogWarning("Height Texture not supported",scope);
                     break;
 
                 case UMI3DPropertyKeys.TextureTilingOffset:
@@ -272,7 +292,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.ShaderProperties:
-                    Debug.LogWarning("not totaly implemented");
+                    UMI3DLogger.LogWarning("not totaly implemented",scope);
                     IMaterialDto extension = glTFMaterialDto.extensions.umi3d;
                     switch (property)
                     {
@@ -281,7 +301,7 @@ namespace umi3d.cdk
                             if (extension.shaderProperties.ContainsKey((string)p.key))
                             {
                                 extension.shaderProperties[(string)p.key] = ((UMI3DShaderPropertyDto)p.value).value;
-                                Debug.LogWarning("this key (" + p.key.ToString() + ") already exists. Update old value");
+                                UMI3DLogger.LogWarning("this key (" + p.key.ToString() + ") already exists. Update old value",scope);
                             }
                             else
                             {
@@ -291,7 +311,7 @@ namespace umi3d.cdk
                             break;
                         case SetEntityDictionaryRemovePropertyDto p:
                             extension.shaderProperties.Remove((string)p.key);
-                            Debug.LogWarning("Warning a property is removed but it cannot be applied");
+                            UMI3DLogger.LogWarning("Warning a property is removed but it cannot be applied",scope);
                             break;
                         case SetEntityDictionaryPropertyDto p:
                             extension.shaderProperties[(string)p.key] = ((UMI3DShaderPropertyDto)p.value).value;
@@ -362,7 +382,7 @@ namespace umi3d.cdk
                             break;
 
                         case UMI3DPropertyKeys.HeightTextureScale:
-                            //Debug.LogWarning("Height Texture not supported");
+                            //UMI3DLogger.LogWarning("Height Texture not supported",scope);
                             AbstractUMI3DMaterialLoader.LoadTextureInMaterial(id, (TextureDto)property.value, MRTKShaderUtils.BumpMap, materialToModify);
                             uMI3DMaterialDto.heightTexture = (ScalableTextureDto)property.value;
                             break;
@@ -468,7 +488,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.HeightTexture:
-                    Debug.LogWarning("Height Texture not supported");
+                    UMI3DLogger.LogWarning("Height Texture not supported",scope);
                     break;
 
                 case UMI3DPropertyKeys.TextureTilingOffset:
@@ -526,7 +546,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.ShaderProperties:
-                    Debug.LogWarning("not totaly implemented");
+                    UMI3DLogger.LogWarning("not totaly implemented",scope);
                     IMaterialDto extension = glTFMaterialDto.extensions.umi3d;
                     string key;
                     object value;
@@ -539,7 +559,7 @@ namespace umi3d.cdk
                             if (extension.shaderProperties.ContainsKey(key))
                             {
                                 extension.shaderProperties[key] = value;
-                                Debug.LogWarning($"this key [{key}] already exists. Update old value");
+                                UMI3DLogger.LogWarning($"this key [{key}] already exists. Update old value",scope);
                             }
                             else
                             {
@@ -550,7 +570,7 @@ namespace umi3d.cdk
                         case UMI3DOperationKeys.SetEntityDictionnaryRemoveProperty:
                             key = UMI3DNetworkingHelper.Read<string>(container);
                             extension.shaderProperties.Remove((string)key);
-                            Debug.LogWarning("Warning a property is removed but it cannot be applied");
+                            UMI3DLogger.LogWarning("Warning a property is removed but it cannot be applied",scope);
                             break;
                         case UMI3DOperationKeys.SetEntityDictionnaryProperty:
                             key = UMI3DNetworkingHelper.Read<string>(container);
@@ -783,7 +803,7 @@ namespace umi3d.cdk
 
                         case UMI3DPropertyKeys.HeightTextureScale:
                             ScalableTextureDto hts = UMI3DNetworkingHelper.Read<ScalableTextureDto>(container);
-                            //Debug.LogWarning("Height Texture not supported");
+                            //UMI3DLogger.LogWarning("Height Texture not supported");
                             if (materialToModify is Material)
                             {
                                 AbstractUMI3DMaterialLoader.LoadTextureInMaterial(id, hts, MRTKShaderUtils.BumpMap, materialToModify as Material);
@@ -895,7 +915,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.HeightTexture:
-                    Debug.LogWarning("Height Texture not supported");
+                    UMI3DLogger.LogWarning("Height Texture not supported",scope);
                     break;
 
                 case UMI3DPropertyKeys.TextureTilingOffset:
@@ -915,7 +935,7 @@ namespace umi3d.cdk
                     break;
 
                 case UMI3DPropertyKeys.ShaderProperties:
-                    Debug.LogWarning("not totaly implemented");
+                    UMI3DLogger.LogWarning("not totaly implemented",scope);
                     break;
 
                 default:

@@ -27,6 +27,8 @@ namespace umi3d.cdk
     /// </summary>
     public class GlTFNodeLoader
     {
+        const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -65,7 +67,7 @@ namespace umi3d.cdk
                 count += 1;
                 UMI3DEnvironmentLoader.Parameters.ReadUMI3DExtension(dto.extensions.umi3d, node.gameObject,
                     () => { count -= 1; LoadedNodesCount?.Invoke(total - count); },
-                    (s) => { count -= 1; Debug.LogWarning($"Failed to read Umi3d extension [{dto.name}] : {s}"); });
+                    (s) => { count -= 1; UMI3DLogger.LogWarning($"Failed to read Umi3d extension [{dto.name}] : {s}",scope); });
                 ReadLightingExtensions(dto, node.gameObject);
 
                 // Important: all nodes in the scene must be registred before to handle hierarchy. 
@@ -73,6 +75,7 @@ namespace umi3d.cdk
                 node.transform.localPosition = dto.position;
                 node.transform.localRotation = dto.rotation;
                 node.transform.localScale = dto.scale;
+                node.SendOnPoseUpdated();
             }
             if (finished != null)
             {
@@ -126,12 +129,15 @@ namespace umi3d.cdk
             {
                 case UMI3DPropertyKeys.Position:
                     node.transform.localPosition = dto.position = (SerializableVector3)property.value;
+                    node.SendOnPoseUpdated();
                     break;
                 case UMI3DPropertyKeys.Rotation:
                     node.transform.localRotation = dto.rotation = (SerializableVector4)property.value;
+                    node.SendOnPoseUpdated();
                     break;
                 case UMI3DPropertyKeys.Scale:
                     node.transform.localScale = dto.scale = (SerializableVector3)property.value;
+                    node.SendOnPoseUpdated();
                     break;
                 default:
                     return false;
@@ -158,12 +164,15 @@ namespace umi3d.cdk
             {
                 case UMI3DPropertyKeys.Position:
                     dto.position = node.transform.localPosition = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                    node.SendOnPoseUpdated();
                     break;
                 case UMI3DPropertyKeys.Rotation:
-                    node.transform.localRotation = dto.rotation = UMI3DNetworkingHelper.Read<SerializableVector4>(container); ;
+                    node.transform.localRotation = dto.rotation = UMI3DNetworkingHelper.Read<SerializableVector4>(container);
+                    node.SendOnPoseUpdated();
                     break;
                 case UMI3DPropertyKeys.Scale:
                     dto.scale = node.transform.localScale = UMI3DNetworkingHelper.Read<Vector3>(container);
+                    node.SendOnPoseUpdated();
                     break;
                 default:
                     return false;
