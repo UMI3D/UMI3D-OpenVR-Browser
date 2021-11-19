@@ -32,6 +32,8 @@ namespace umi3d.cdk.collaboration
     /// </summary>
     public class UMI3DCollaborationClientServer : UMI3DClientServer
     {
+        const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
+
         public static new UMI3DCollaborationClientServer Instance { get => UMI3DClientServer.Instance as UMI3DCollaborationClientServer; set => UMI3DClientServer.Instance = value; }
 
         public static bool useDto { protected set; get; } = false;
@@ -56,8 +58,10 @@ namespace umi3d.cdk.collaboration
             public void Set(UserConnectionDto dto)
             {
                 FormAnswerDto param = this.dto.parameters;
-                this.dto = new UserConnectionAnswerDto(dto);
-                this.dto.parameters = param;
+                this.dto = new UserConnectionAnswerDto(dto)
+                {
+                    parameters = param
+                };
                 this.formdto = dto.parameters;
             }
         }
@@ -179,7 +183,7 @@ namespace umi3d.cdk.collaboration
             return false;
         }
 
-        private double maxMillisecondToWait = 10000;
+        private readonly double maxMillisecondToWait = 10000;
 
         /// <summary>
         /// launch a new request
@@ -236,7 +240,7 @@ namespace umi3d.cdk.collaboration
                     UMI3DCollaborationClientServer.Instance.HttpClient.SendGetIdentity((user) =>
                     {
                         Instance.StartCoroutine(Instance.UpdateIdentity(user));
-                    }, (error) => { Debug.Log("error on get id :" + error); });
+                    }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                     break;
                 case StatusType.READY:
                     if (Identity.userId == 0)
@@ -247,7 +251,7 @@ namespace umi3d.cdk.collaboration
                             Identity.userId = user.id;
                             Instance.Join();
 
-                        }, (error) => { Debug.Log("error on get id :" + error); });
+                        }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                     }
                     else
                     {
@@ -321,7 +325,7 @@ namespace umi3d.cdk.collaboration
                             Instance.HttpClient.SendGetIdentity((user) =>
                             {
                                 Instance.StartCoroutine(Instance.UpdateIdentity(user));
-                            }, (error) => { Debug.Log("error on get id :" + error); });
+                            }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                             break;
                         case StatusType.READY:
                             if (Identity.userId == 0)
@@ -332,7 +336,7 @@ namespace umi3d.cdk.collaboration
                                     Identity.userId = user.id;
                                     Instance.Join();
 
-                                }, (error) => { Debug.Log("error on get id :" + error); });
+                                }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                             }
                             else
                             {
@@ -364,7 +368,7 @@ namespace umi3d.cdk.collaboration
             Instance.HttpClient.SendPostJoin(
                 joinDto,
                 (enter) => { joinning = false; connected = true; Instance.EnterScene(enter); },
-                (error) => { joinning = false; Debug.Log("error on get id :" + error); });
+                (error) => { joinning = false; UMI3DLogger.Log("error on get id :" + error, scope); });
         }
 
         /// <summary>
@@ -400,12 +404,12 @@ namespace umi3d.cdk.collaboration
                                         {
                                             librariesUpdated = true;
                                         },
-                                        (error) => { Ok = false; Debug.Log("error on download Libraries :" + error); }
+                                        (error) => { Ok = false; UMI3DLogger.Log("error on download Libraries :" + error, scope); }
                                         );
                                 }
                             });
                     },
-                    (error) => { Ok = false; Debug.Log("error on get Libraries: " + error); }
+                    (error) => { Ok = false; UMI3DLogger.Log("error on get Libraries: " + error, scope); }
                     );
 
                 yield return new WaitUntil(() => { return librariesUpdated || !Ok; });
@@ -416,7 +420,7 @@ namespace umi3d.cdk.collaboration
                 Instance.Identifier.GetParameterDtos(UserDto.formdto, (param) =>
                 {
                     UserDto.dto.parameters = param;
-                    Instance.HttpClient.SendPostUpdateIdentity(() => { }, (error) => { Debug.Log("error on post id :" + error); });
+                    Instance.HttpClient.SendPostUpdateIdentity(() => { }, (error) => { UMI3DLogger.Log("error on post id :" + error, scope); });
                 });
             }
             else
@@ -439,7 +443,7 @@ namespace umi3d.cdk.collaboration
                     };
                     StartCoroutine(UMI3DEnvironmentLoader.Instance.Load(environement, setStatus, null));
                 },
-                (error) => { Debug.Log("error on get Environement :" + error); });
+                (error) => { UMI3DLogger.Log("error on get Environement :" + error, scope); });
         }
 
         ///<inheritdoc/>

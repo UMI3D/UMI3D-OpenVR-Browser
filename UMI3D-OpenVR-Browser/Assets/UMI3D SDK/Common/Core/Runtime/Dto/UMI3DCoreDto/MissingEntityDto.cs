@@ -13,12 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-using System.Collections.Generic;
 
 namespace umi3d.common
 {
-    public class EntityRequestDto : UMI3DDto
+    /// <summary>
+    /// Dto for entity that has been requested but where not provided by the server
+    /// </summary>
+    public class MissingEntityDto : AbstractEntityDto, IEntity
     {
-        public List<ulong> entitiesId;
+        public MissingEntityDtoReason reason;
+    }
+
+    public enum MissingEntityDtoReason
+    {
+        NotFound,
+        Unregistered,
+        ServerInternalError
     }
 }
