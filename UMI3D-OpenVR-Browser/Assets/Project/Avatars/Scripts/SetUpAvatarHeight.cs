@@ -124,7 +124,10 @@ public class SetUpAvatarHeight : MonoBehaviour
 
             Vector3 virtualNeckPosition = VRAnchor.TransformPoint(neckOffset);
 
-            transform.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
+            transform.position = new Vector3(virtualNeckPosition.x, 0, virtualNeckPosition.z);
+
+            skeletonContainer.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
+            
 
             Vector3 anchorForwardProjected = Vector3.Cross(VRAnchor.right, Vector3.up).normalized;
             transform.rotation = Quaternion.LookRotation(anchorForwardProjected, Vector3.up);

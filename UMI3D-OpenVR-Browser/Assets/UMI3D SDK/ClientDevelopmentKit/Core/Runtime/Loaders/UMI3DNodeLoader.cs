@@ -84,12 +84,22 @@ namespace umi3d.cdk
         private void BindSkinnedMeshBone(ulong skinMeshEntityId, int boneId, Transform node, float maxDelay)
         {
             UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(skinMeshEntityId, e =>
-             {
-                 if (e is UMI3DNodeInstance nodeI)
-                 {
-                     MainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(BindSkinnedMeshBone(nodeI, boneId, node, maxDelay));
-                 }
-             });
+            {
+                if (e is UMI3DNodeInstance nodeI)
+                {
+                    MainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(WaitingForSkinnedMeshBone(skinMeshEntityId, boneId, node, maxDelay, nodeI));
+                }
+            });
+        }
+
+        protected IEnumerator WaitingForSkinnedMeshBone(ulong skinMeshEntityId, int boneId, Transform node, float maxDelay, UMI3DNodeInstance nodeI)
+        {
+            if (nodeI == null)
+                yield break;
+
+            yield return null;
+
+            MainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(BindSkinnedMeshBone(nodeI, boneId, node, maxDelay));
         }
 
         private IEnumerator BindSkinnedMeshBone(UMI3DNodeInstance nodeInstance, int boneId, Transform node, float maxDelay)
@@ -608,7 +618,7 @@ namespace umi3d.cdk
         {
             if (resourceDto == null) return;
 
-            FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariante(resourceDto.variants);  // Peut etre ameliore
+            FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(resourceDto.variants);  // Peut etre ameliore
             if (fileToLoad == null) return;
             string url = fileToLoad.url;
             string ext = fileToLoad.extension;
