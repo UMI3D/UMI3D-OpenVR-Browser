@@ -264,6 +264,7 @@ public class ScreenInputDisplayer : MonoBehaviour
         }
         else if (selectedAxe == Vector2.up && currentManipulatorSelected.nextUpManipulator != null)
         {
+            Debug.Log($"current manipulator = [{currentManipulatorSelected.name}]; nextup manipulator = [{currentManipulatorSelected.nextUpManipulator}]");
             currentManipulatorSelected.UnSelect();
             currentManipulatorSelected = currentManipulatorSelected.nextUpManipulator;
             currentManipulatorSelected.Select();
@@ -274,6 +275,7 @@ public class ScreenInputDisplayer : MonoBehaviour
             currentManipulatorSelected = currentManipulatorSelected.nextDownManipulator;
             currentManipulatorSelected.Select();
         }
+        Debug.Log($"current manipulator = [{currentManipulatorSelected}]");
     }
 
     public void SetScreenSize(float height)

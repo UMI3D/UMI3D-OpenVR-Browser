@@ -311,6 +311,7 @@ public class FormCircularDisplayer : AbstractDisplayer, ICircularDisplayer
                 sliderManipulator.displayValueLabel.text = floatRangeParameterDto.value.ToString();
                 sliderManipulator.slider.onValueChanged.AddListener(f =>
                 {
+                    Debug.Log($"on value changed slider.");
                     floatRangeParameterDto.value = f;
                 });
 
@@ -325,6 +326,7 @@ public class FormCircularDisplayer : AbstractDisplayer, ICircularDisplayer
                 dropDownJoystickManipulator.dropdown.value = enumParameterDto.value;
                 dropDownJoystickManipulator.dropdown.onValueChanged.AddListener(v =>
                 {
+                    Debug.Log($"on value changed dropdown.");
                     enumParameterDto.value = v;
                 });
                 inputs.Add(dropDownJoystickManipulator);

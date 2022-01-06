@@ -29,6 +29,7 @@ public class SliderJoystickManipulator : AbstractJoystickManipulator
     {
         if (IsSelected)
         {
+            Debug.Log($"update content in sliderjmanipulator");
             float input = joystickSelector.GetJoystickValue().x;
             slider.value = Mathf.Clamp(slider.value + input * joystickSensibility, slider.minValue, slider.maxValue);
             if (displayValueLabel != null)
