@@ -31,7 +31,6 @@ public class DropDownJoystickManipulator : AbstractJoystickManipulator
     {
         if (!IsSelected)
             return;
-        Debug.Log($"DDJoystickManipulator updateContent.");
         if (selectionCoroutine == null)
             selectionCoroutine = UnityMainThreadDispatcher.Instance().StartCoroutine(Select(joystickSelector));
 
@@ -65,7 +64,6 @@ public class DropDownJoystickManipulator : AbstractJoystickManipulator
                 float xInput = joystickInput.x;
                 if ((xInput > 0) && (xInput > joystickSelector.deadzone))
                 {
-                    Debug.Log($"selectNextItem in DDJManipulator");
                     dropdown.SelectNextItem();
                     time = 0;
                     joystickWasReleased = false;

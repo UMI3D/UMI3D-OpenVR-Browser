@@ -137,7 +137,6 @@ public class HorizontalDropdown : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log($"On value changed invoke for dropdown");
                     onValueChanged?.Invoke(_value);
                 }
                
@@ -308,8 +307,6 @@ public class HorizontalDropdown : MonoBehaviour
     /// </summary>
     public void SelectNextItem()
     {
-        Debug.Log($"selectNextItem in HorizontalDropdown");
-        //throw new Exception("SelectedNextItem");
         if (currentChoice == choiceItems.Last())
             return;
         else
