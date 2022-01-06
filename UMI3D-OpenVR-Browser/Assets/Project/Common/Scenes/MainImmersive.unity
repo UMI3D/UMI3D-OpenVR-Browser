@@ -6799,6 +6799,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 2875774585785277072}
+        m_MethodName: HideCancelValidateButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   defaultMat: {fileID: 2100000, guid: 1b774b0eddd816a44814c9086f4172e5, type: 2}
   selectedMat: {fileID: 2100000, guid: add235a8672fd874e9952be3cc20b074, type: 2}
   pressMat: {fileID: 2100000, guid: 3985311e590ceb8468c268a7952cf7ad, type: 2}
@@ -6827,6 +6838,17 @@ MonoBehaviour:
       - m_Target: {fileID: 2875774585785277072}
         m_MethodName: HideScreen
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2875774585785277072}
+        m_MethodName: HideCancelValidateButton
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -9665,6 +9687,17 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 2875774586576062731}
+        m_MethodName: HideCancelValidateButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
   defaultMat: {fileID: 2100000, guid: 1b774b0eddd816a44814c9086f4172e5, type: 2}
   selectedMat: {fileID: 2100000, guid: add235a8672fd874e9952be3cc20b074, type: 2}
   pressMat: {fileID: 2100000, guid: 3985311e590ceb8468c268a7952cf7ad, type: 2}
@@ -10386,6 +10419,17 @@ MonoBehaviour:
       - m_Target: {fileID: 2875774586576062731}
         m_MethodName: HideScreen
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2875774586576062731}
+        m_MethodName: HideCancelValidateButton
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
