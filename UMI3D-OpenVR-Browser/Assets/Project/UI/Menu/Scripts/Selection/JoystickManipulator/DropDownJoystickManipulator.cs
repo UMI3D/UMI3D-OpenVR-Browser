@@ -31,7 +31,6 @@ public class DropDownJoystickManipulator : AbstractJoystickManipulator
     {
         if (!IsSelected)
             return;
-
         if (selectionCoroutine == null)
             selectionCoroutine = UnityMainThreadDispatcher.Instance().StartCoroutine(Select(joystickSelector));
 
