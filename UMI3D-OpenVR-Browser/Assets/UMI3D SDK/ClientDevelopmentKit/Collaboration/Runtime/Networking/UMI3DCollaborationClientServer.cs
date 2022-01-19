@@ -75,6 +75,12 @@ namespace umi3d.cdk.collaboration
         public ClientIdentifierApi Identifier;
         private static bool connected = false;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            if (!Exists)
+                HttpClient?.Stop();
+        }
 
         private void Start()
         {
@@ -252,7 +258,7 @@ namespace umi3d.cdk.collaboration
                 case StatusType.CREATED:
                     UMI3DCollaborationClientServer.Instance.HttpClient.SendGetIdentity((user) =>
                     {
-                        Instance.StartCoroutine(Instance.UpdateIdentity(user));
+                        StartCoroutine(Instance.UpdateIdentity(user));
                     }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                     break;
                 case StatusType.READY:
@@ -288,7 +294,7 @@ namespace umi3d.cdk.collaboration
                 Instance?.HttpClient?.SetToken(token);
                 BeardedManStudios.Forge.Networking.Unity.MainThreadManager.Run(() =>
                 {
-                    Instance?.StartCoroutine(Instance.OnNewTokenNextFrame());
+                    StartCoroutine(Instance.OnNewTokenNextFrame());
                 });
             }
         }
@@ -337,7 +343,7 @@ namespace umi3d.cdk.collaboration
                         case StatusType.CREATED:
                             Instance.HttpClient.SendGetIdentity((user) =>
                             {
-                                Instance.StartCoroutine(Instance.UpdateIdentity(user));
+                                StartCoroutine(Instance.UpdateIdentity(user));
                             }, (error) => { UMI3DLogger.Log("error on get id :" + error, scope); });
                             break;
                         case StatusType.READY:
@@ -450,6 +456,7 @@ namespace umi3d.cdk.collaboration
         private void EnterScene(EnterDto enter)
         {
             useDto = enter.usedDto;
+            UMI3DEnvironmentLoader.Instance.NotifyLoad();
             HttpClient.SendGetEnvironment(
                 (environement) =>
                 {
@@ -463,12 +470,6 @@ namespace umi3d.cdk.collaboration
                     StartCoroutine(UMI3DEnvironmentLoader.Instance.Load(environement, setStatus, null));
                 },
                 (error) => { UMI3DLogger.Log("error on get Environement :" + error, scope); });
-        }
-
-        ///<inheritdoc/>
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
         }
 
         ///<inheritdoc/>

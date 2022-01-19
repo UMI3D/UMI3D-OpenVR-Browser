@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using inetum.unityUtils;
+using System.Collections;
 using UnityEngine;
 
 namespace umi3d.common
@@ -90,10 +92,20 @@ namespace umi3d.common
             }
         }
 
+        new public static Coroutine StartCoroutine(IEnumerator enumerator) => Exists ? (Instance as MonoBehaviour).StartCoroutine(enumerator) : null;
+        new public static void StopCoroutine(Coroutine coroutine)
+        {
+            if (Exists)
+                (Instance as MonoBehaviour).StopCoroutine(coroutine);
+        }
+
+
         protected virtual void OnDestroy()
         {
             if (instance == this)
+            {
                 instance = null;
+            }
         }
     }
 }

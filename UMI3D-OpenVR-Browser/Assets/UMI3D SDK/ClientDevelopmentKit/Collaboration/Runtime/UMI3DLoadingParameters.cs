@@ -19,10 +19,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.interaction;
+using umi3d.cdk.volumes;
 using umi3d.cdk.userCapture;
 using umi3d.common;
 using umi3d.common.interaction;
 using umi3d.common.userCapture;
+using umi3d.common.volume;
 using UnityEngine;
 
 namespace umi3d.cdk
@@ -39,6 +41,7 @@ namespace umi3d.cdk
 
         public virtual UMI3DNodeLoader nodeLoader { get; } = new UMI3DNodeLoader();
         public virtual UMI3DMeshNodeLoader meshLoader { get; } = new UMI3DMeshNodeLoader();
+        public virtual UMI3DLineRendererLoader lineLoader { get; } = new UMI3DLineRendererLoader();
         public virtual UMI3DUINodeLoader UILoader { get; } = new UMI3DUINodeLoader();
         public virtual UMI3DAbstractAnchorLoader AnchorLoader { get; protected set; } = null;
         public virtual UMI3DAvatarNodeLoader avatarLoader { get; } = new UMI3DAvatarNodeLoader();
@@ -82,12 +85,18 @@ namespace umi3d.cdk
                 case ToolboxDto t:
                     UMI3DToolBoxLoader.ReadUMI3DExtension(t, node, finished, failed);
                     break;
+                case AbstractVolumeDescriptorDto v:
+                    UMI3DVolumeLoader.ReadUMI3DExtension(v, callback, failed);
+                    break;
                 case ToolDto t:
                     UMI3DToolLoader.ReadUMI3DExtension(t);
                     finished?.Invoke();
                     break;
                 case UMI3DMeshNodeDto m:
                     meshLoader.ReadUMI3DExtension(dto, node, callback, failed);
+                    break;
+                case UMI3DLineDto m:
+                    lineLoader.ReadUMI3DExtension(dto, node, callback, failed);
                     break;
                 case SubModelDto s:
                     SubMeshLoader.ReadUMI3DExtension(s, node, callback, failed);
@@ -137,11 +146,15 @@ namespace umi3d.cdk
                 return true;
             if (UMI3DToolBoxLoader.SetUMI3DProperty(entity, property))
                 return true;
+            if (UMI3DVolumeLoader.SetUMI3DProperty(entity, property))
+                return true;
             if (notificationLoader != null && notificationLoader.SetUMI3DProperty(entity, property))
                 return true;
             if (SubMeshLoader.SetUMI3DProperty(entity, property))
                 return true;
             if (meshLoader.SetUMI3DProperty(entity, property))
+                return true;
+            if (lineLoader.SetUMI3DProperty(entity, property))
                 return true;
             if (UILoader.SetUMI3DProperty(entity, property))
                 return true;
@@ -175,11 +188,15 @@ namespace umi3d.cdk
                 return true;
             if (UMI3DToolBoxLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
+            if (UMI3DVolumeLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
+                return true;
             if (notificationLoader != null && notificationLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
             if (SubMeshLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
             if (meshLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
+                return true;
+            if (lineLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
             if (UILoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
@@ -213,6 +230,8 @@ namespace umi3d.cdk
             if (SubMeshLoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
             if (meshLoader.ReadUMI3DProperty(ref value, propertyKey, container))
+                return true;
+            if (lineLoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
             if (UILoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
