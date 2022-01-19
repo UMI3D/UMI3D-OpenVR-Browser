@@ -449,7 +449,8 @@ namespace umi3d.cdk
 
         protected virtual void RevertOneOverrider(UMI3DNodeInstance entity, UMI3DRenderedNodeDto.MaterialOverrideDto matToRemoveDto)
         {
-            var matToRemove = (Material)UMI3DEnvironmentLoader.GetEntity(matToRemoveDto.newMaterialId).Object;
+            var matToRemove = (Material)UMI3DEnvironmentLoader.GetEntity(matToRemoveDto.newMaterialId)?.Object;
+            if (matToRemove == null) return;
             foreach (Renderer renderer in GetChildRenderersWhithoutOtherModel(entity))
             {
                 OldMaterialContainer oldMaterialContainer = renderer.gameObject.GetComponent<OldMaterialContainer>();
@@ -541,7 +542,7 @@ namespace umi3d.cdk
 
                 //    Renderer[] childRenderers = node.gameObject.GetComponentsInChildren<Renderer>();
                 node.renderers = node.gameObject.GetComponentsInChildren<Renderer>().Where((r) => modelMeshs.Contains(r)).ToList();
-                UMI3DLogger.LogWarning("That should not happen", scope);
+                UMI3DLogger.LogWarning("Renderers list was empty, That should not happen", scope);
                 return node.renderers;
             }
 

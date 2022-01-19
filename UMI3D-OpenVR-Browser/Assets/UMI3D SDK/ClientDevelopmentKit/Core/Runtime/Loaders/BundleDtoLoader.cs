@@ -15,10 +15,12 @@ limitations under the License.
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using umi3d.common;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 namespace umi3d.cdk
 {
@@ -57,7 +59,6 @@ namespace umi3d.cdk
         /// <see cref="IResourcesLoader.UrlToObject"/>
         public virtual void UrlToObject(string url, string extension, string authorization, Action<object> callback, Action<Umi3dException> failCallback, string pathIfObjectInBundle = "")
         {
-
             // add bundle in the cache
 #if UNITY_ANDROID
             UnityWebRequest www = url.Contains("http") ? UnityWebRequestAssetBundle.GetAssetBundle(url) : UnityWebRequestAssetBundle.GetAssetBundle("file://" + url);
@@ -74,56 +75,61 @@ namespace umi3d.cdk
                         if (bundle != null)
                             callback.Invoke(bundle);
                         else
-                            failCallback.Invoke(new Umi3dException(0, "Bundle was empty"));
+                            failCallback.Invoke(new Umi3dException("Bundle was empty"));
                     }
                     catch (Exception e)
                     {
-                        failCallback.Invoke(new Umi3dException(0, e.Message));
+                        failCallback.Invoke(new Umi3dException(e));
                     }
                 },
-                s => failCallback.Invoke(s)
+                s => {  failCallback?.Invoke(s); }
             );
         }
 
         /// <see cref="IResourcesLoader.ObjectFromCache"/>
         public virtual void ObjectFromCache(object o, Action<object> callback, string pathIfObjectInBundle)
         {
-            /*     Usefull to find pathIfObjectInBundle in a bundle
-            UMI3DLogger.Log("asset count : "+((AssetBundle)o).GetAllAssetNames().Length,scope);
-            UMI3DLogger.Log("scene count : "+((AssetBundle)o).GetAllScenePaths().Length,scope);
-            UMI3DLogger.Log(((AssetBundle)o).GetAllAssetNames()[0],scope);
+            UMI3DEnvironmentLoader.StartCoroutine(_ObjectFromCache(o,callback,pathIfObjectInBundle));
+        }
+
+        IEnumerator _ObjectFromCache(object o, Action<object> callback, string pathIfObjectInBundle)
+        {
+            /*     
+                Usefull to find pathIfObjectInBundle in a bundle
+                UMI3DLogger.Log("asset count : "+((AssetBundle)o).GetAllAssetNames().Length,scope);
+                UMI3DLogger.Log("scene count : "+((AssetBundle)o).GetAllScenePaths().Length,scope);
+                UMI3DLogger.Log(((AssetBundle)o).GetAllAssetNames()[0],scope);
             */
-            if (pathIfObjectInBundle != null && pathIfObjectInBundle != "")
+            if (pathIfObjectInBundle != null && pathIfObjectInBundle != "" && o is AssetBundle bundle)
             {
-                if (Array.Exists(((AssetBundle)o).GetAllAssetNames(), element => { return element == pathIfObjectInBundle; }))
+                if (Array.Exists((bundle).GetAllAssetNames(), element => { return element == pathIfObjectInBundle; }))
                 {
-                    UnityEngine.Object objectInBundle = ((AssetBundle)o).LoadAsset(pathIfObjectInBundle);
+                    var load = bundle.LoadAssetAsync(pathIfObjectInBundle);
+                    yield return load;
+                    UnityEngine.Object objectInBundle = load.asset;
                     if (objectInBundle is GameObject)
                     {
                         AbstractMeshDtoLoader.HideModelRecursively((GameObject)objectInBundle);
                     }
-
                     callback.Invoke(objectInBundle);
                 }
                 else
                 {
-                    if (Array.Exists(((AssetBundle)o).GetAllScenePaths(), element => { return element == pathIfObjectInBundle; }))
+                    if (Array.Exists((bundle).GetAllScenePaths(), element => { return element == pathIfObjectInBundle; }))
                     {
-                        callback.Invoke(pathIfObjectInBundle);
+                        var scene = SceneManager.LoadSceneAsync((string)o, LoadSceneMode.Additive);
+                        yield return scene;
+                        callback.Invoke(null);
                     }
-
                     else
                     {
-                        UMI3DLogger.LogWarning("Scene path not found : " + pathIfObjectInBundle,scope);
+                        UMI3DLogger.LogWarning($"Path {pathIfObjectInBundle} not found in Assets nor Scene", scope);
                         callback.Invoke(o);
                     }
-
                 }
             }
             else
-            {
                 callback.Invoke(o);
-            }
         }
 
         /// <summary>
