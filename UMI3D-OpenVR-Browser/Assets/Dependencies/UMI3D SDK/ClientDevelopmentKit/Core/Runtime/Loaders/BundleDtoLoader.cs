@@ -29,8 +29,7 @@ namespace umi3d.cdk
     /// </summary>
     public class BundleDtoLoader : IResourcesLoader
     {
-
-        const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
 
         public List<string> supportedFileExtentions;
         public List<string> ignoredFileExtentions;
@@ -71,11 +70,21 @@ namespace umi3d.cdk
                 {
                     try
                     {
-                        AssetBundle bundle = ((DownloadHandlerAssetBundle)www.downloadHandler)?.assetBundle;
-                        if (bundle != null)
-                            callback.Invoke(bundle);
+                        if (www.downloadHandler is DownloadHandlerAssetBundle downloadHandlerAssetBundle)
+                        {
+                            AssetBundle bundle = downloadHandlerAssetBundle?.assetBundle;
+                            if (bundle != null)
+                                callback.Invoke(bundle);
+
+#if UNITY_2020
+                            else if (downloadHandlerAssetBundle?.error != null)
+                                throw new Umi3dException($"An error has occurred during the decoding of the asset bundle’s assets.\n{downloadHandlerAssetBundle?.error}");
+#endif
+                            else
+                                throw new Umi3dException("The asset bundle was empty. An error might have occurred during the decoding of the asset bundle’s assets.");
+                        }
                         else
-                            failCallback.Invoke(new Umi3dException("Bundle was empty"));
+                            throw new Umi3dException("The downloadHandler provided is not a DownloadHandlerAssetBundle");
                     }
                     catch (Exception e)
                     {
@@ -92,7 +101,7 @@ namespace umi3d.cdk
             UMI3DEnvironmentLoader.StartCoroutine(_ObjectFromCache(o, callback, pathIfObjectInBundle));
         }
 
-        IEnumerator _ObjectFromCache(object o, Action<object> callback, string pathIfObjectInBundle)
+        private IEnumerator _ObjectFromCache(object o, Action<object> callback, string pathIfObjectInBundle)
         {
             /*     
                 Usefull to find pathIfObjectInBundle in a bundle
@@ -121,7 +130,7 @@ namespace umi3d.cdk
                 {
                     if (Array.Exists((bundle).GetAllScenePaths(), element => { return element == pathIfObjectInBundle; }))
                     {
-                        var scene = SceneManager.LoadSceneAsync((string)o, LoadSceneMode.Additive);
+                        AsyncOperation scene = SceneManager.LoadSceneAsync((string)o, LoadSceneMode.Additive);
                         yield return scene;
                         callback.Invoke(null);
                     }

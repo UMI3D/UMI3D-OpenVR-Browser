@@ -25,7 +25,7 @@ using UnityEngine.Events;
 
 namespace umi3d.cdk.userCapture
 {
-    public class UMI3DClientUserTracking : Singleton<UMI3DClientUserTracking>
+    public class UMI3DClientUserTracking : SingleBehaviour<UMI3DClientUserTracking>
     {
         public Transform skeletonContainer;
         public Transform viewpoint;
@@ -34,6 +34,10 @@ namespace umi3d.cdk.userCapture
 
         public bool trackingReception { get; protected set; }
 
+        /// <summary>
+        /// If true the avatar tracking are send, else false.
+        /// </summary>
+        public bool SendTracking => sendTracking;
         [SerializeField]
         protected bool sendTracking = true;
 

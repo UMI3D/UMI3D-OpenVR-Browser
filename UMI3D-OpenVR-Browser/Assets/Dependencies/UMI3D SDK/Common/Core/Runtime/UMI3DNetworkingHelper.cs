@@ -22,7 +22,7 @@ namespace umi3d.common
 {
     public static class UMI3DNetworkingHelper
     {
-        const DebugScope scope = DebugScope.Common | DebugScope.Core | DebugScope.Bytes;
+        private const DebugScope scope = DebugScope.Common | DebugScope.Core | DebugScope.Bytes;
 
         private static readonly List<Umi3dNetworkingHelperModule> modules = new List<Umi3dNetworkingHelperModule>();
 
@@ -352,6 +352,35 @@ namespace umi3d.common
                     return ReadIndexesList<T>(container);
                 default:
                     throw new Exception($"Not a known collection type {container}");
+            }
+        }
+
+        public static void ReadList<T>(uint operationId, ByteContainer container, List<T> list)
+        {
+            switch (operationId)
+            {
+                case UMI3DOperationKeys.SetEntityListAddProperty:
+                    int ind = UMI3DNetworkingHelper.Read<int>(container);
+                    T value = UMI3DNetworkingHelper.Read<T>(container);
+                    if (ind == list.Count)
+                        list.Add(value);
+                    else if (ind < list.Count && ind >= 0)
+                        list.Insert(ind, value);
+                    else
+                        UMI3DLogger.LogWarning($"Add value ignore for {ind} in collection of size {list.Count}", scope);
+                    break;
+                case UMI3DOperationKeys.SetEntityListRemoveProperty:
+                    list.RemoveAt(UMI3DNetworkingHelper.Read<int>(container));
+                    break;
+                case UMI3DOperationKeys.SetEntityListProperty:
+                    int index = UMI3DNetworkingHelper.Read<int>(container);
+                    T v = UMI3DNetworkingHelper.Read<T>(container);
+                    list[index] = v;
+                    break;
+                default:
+                    list.Clear();
+                    list.AddRange(UMI3DNetworkingHelper.ReadList<T>(container));
+                    break;
             }
         }
 
@@ -848,7 +877,7 @@ namespace umi3d.common
 
     public class Bytable
     {
-        const DebugScope scope = DebugScope.Common | DebugScope.Core | DebugScope.Bytes;
+        private const DebugScope scope = DebugScope.Common | DebugScope.Core | DebugScope.Bytes;
 
         public int size { get; private set; }
         public Func<byte[], int, int, (int, int)> function { get; private set; }
@@ -869,14 +898,14 @@ namespace umi3d.common
         {
             byte[] b = new byte[size];
             (int, int) c = function(b, 0, 0);
-            if (c.Item2 != size) UMI3DLogger.LogError($"Size requested [{size}] and size used [{c.Item2}] have a different value. Last position is {c.Item1}. {b.ToString<byte>()}",scope);
+            if (c.Item2 != size) UMI3DLogger.LogError($"Size requested [{size}] and size used [{c.Item2}] have a different value. Last position is {c.Item1}. {b.ToString<byte>()}", scope);
             return b;
         }
 
         public byte[] ToBytes(byte[] bytes, int position = 0)
         {
             (int, int) c = function(bytes, position, 0);
-            if (c.Item2 != size) UMI3DLogger.LogError($"Size requested [{size}] and size used [{c.Item2}] have a different value. Last position is {c.Item1}. {bytes.ToString<byte>()}",scope);
+            if (c.Item2 != size) UMI3DLogger.LogError($"Size requested [{size}] and size used [{c.Item2}] have a different value. Last position is {c.Item1}. {bytes.ToString<byte>()}", scope);
             return bytes;
         }
 

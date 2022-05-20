@@ -19,8 +19,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.interaction;
-using umi3d.cdk.volumes;
 using umi3d.cdk.userCapture;
+using umi3d.cdk.volumes;
 using umi3d.common;
 using umi3d.common.interaction;
 using umi3d.common.userCapture;
@@ -33,7 +33,7 @@ namespace umi3d.cdk
     [CreateAssetMenu(fileName = "DefaultLoadingParameters", menuName = "UMI3D/Default Loading Parameters")]
     public class UMI3DLoadingParameters : AbstractUMI3DLoadingParameters
     {
-        const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Loading;
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Loading;
 
         [ConstEnum(typeof(UMI3DAssetFormat), typeof(string))]
         public List<string> supportedformats = new List<string>();
@@ -82,14 +82,8 @@ namespace umi3d.cdk
                 case InteractableDto i:
                     UMI3DInteractableLoader.ReadUMI3DExtension(i, node, finished, failed);
                     break;
-                case ToolboxDto t:
-                    UMI3DToolBoxLoader.ReadUMI3DExtension(t, node, finished, failed);
-                    break;
-                case AbstractVolumeDescriptorDto v:
-                    UMI3DVolumeLoader.ReadUMI3DExtension(v, callback, failed);
-                    break;
-                case ToolDto t:
-                    UMI3DToolLoader.ReadUMI3DExtension(t);
+                case GlobalToolDto t:
+                    UMI3DGlobalToolLoader.ReadUMI3DExtension(t, finished, failed);
                     finished?.Invoke();
                     break;
                 case UMI3DMeshNodeDto m:
@@ -142,11 +136,7 @@ namespace umi3d.cdk
                 return true;
             if (UMI3DInteractableLoader.SetUMI3DProperty(entity, property))
                 return true;
-            if (UMI3DToolLoader.SetUMI3DProperty(entity, property))
-                return true;
-            if (UMI3DToolBoxLoader.SetUMI3DProperty(entity, property))
-                return true;
-            if (UMI3DVolumeLoader.SetUMI3DProperty(entity, property))
+            if (UMI3DGlobalToolLoader.SetUMI3DProperty(entity, property))
                 return true;
             if (notificationLoader != null && notificationLoader.SetUMI3DProperty(entity, property))
                 return true;
@@ -184,9 +174,7 @@ namespace umi3d.cdk
                 return true;
             if (UMI3DInteractableLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
-            if (UMI3DToolLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
-                return true;
-            if (UMI3DToolBoxLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
+            if (UMI3DGlobalToolLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
             if (UMI3DVolumeLoader.SetUMI3DProperty(entity, operationId, propertyKey, container))
                 return true;
@@ -221,9 +209,7 @@ namespace umi3d.cdk
                 return true;
             if (UMI3DInteractableLoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
-            if (UMI3DToolLoader.ReadUMI3DProperty(ref value, propertyKey, container))
-                return true;
-            if (UMI3DToolBoxLoader.ReadUMI3DProperty(ref value, propertyKey, container))
+            if (UMI3DGlobalToolLoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
             if (notificationLoader != null && notificationLoader.ReadUMI3DProperty(ref value, propertyKey, container))
                 return true;
@@ -321,7 +307,7 @@ namespace umi3d.cdk
                 if (loader.IsToBeIgnored(extension))
                     return null;
             }
-            UMI3DLogger.LogError("there is no compatible loader for this extention : " + extension,scope);
+            UMI3DLogger.LogError("there is no compatible loader for this extention : " + extension, scope);
             return null;
         }
 
@@ -333,7 +319,7 @@ namespace umi3d.cdk
                 if (loader.IsSuitableFor(gltfMatDto))
                     return loader;
             }
-            UMI3DLogger.LogError("there is no compatible material loader for this material.",scope);
+            UMI3DLogger.LogError("there is no compatible material loader for this material.", scope);
             return null;
         }
 
@@ -406,10 +392,10 @@ namespace umi3d.cdk
                         }
                         else
                         {
-                            UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(Texture2D)}",scope);
+                            UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(Texture2D)}", scope);
                         }
                     },
-                    e => UMI3DLogger.LogWarning(e,scope),
+                    e => UMI3DLogger.LogWarning(e, scope),
                     loader.DeleteObject
                     );
             }

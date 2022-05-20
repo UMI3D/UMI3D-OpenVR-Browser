@@ -23,7 +23,7 @@ namespace umi3d.cdk
 {
     public class UMI3DAudioPlayer : UMI3DAbstractAnimation
     {
-        const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Animation;
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Animation;
 
         public static new UMI3DAudioPlayer Get(ulong id) { return UMI3DAbstractAnimation.Get(id) as UMI3DAudioPlayer; }
         public AudioSource audioSource { get; private set; }
@@ -85,10 +85,10 @@ namespace umi3d.cdk
                         }
                         else
                         {
-                            UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(AudioClip)}",scope);
+                            UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(AudioClip)}", scope);
                         }
                     },
-                     e => UMI3DLogger.LogWarning(e,scope),
+                     e => UMI3DLogger.LogWarning(e, scope),
                     loader.DeleteObject
                     );
             }
@@ -100,18 +100,13 @@ namespace umi3d.cdk
         ///<inheritdoc/>
         public override float GetProgress()
         {
-            return (audioSource != null && audioSource.clip != null && audioSource.clip.length > 0) ? audioSource.time  : -1;
+            return (audioSource != null && audioSource.clip != null && audioSource.clip.length > 0) ? audioSource.time : -1;
         }
 
         ///<inheritdoc/>
         public override void Start()
         {
-            if ((audioSource != null) && (audioSource.clip != null))
-            {
-                audioSource.Stop();
-                audioSource.Play();
-                OnEndCoroutine = UMI3DAnimationManager.StartCoroutine(WaitUntilTheEnd(audioSource.clip.length));
-            }
+            Start(0);
         }
 
         private Coroutine OnEndCoroutine;
@@ -174,9 +169,9 @@ namespace umi3d.cdk
                                 if (clipa != null)
                                     audioSource.clip = clipa;
                                 else
-                                    UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(Texture2D)}",scope);
+                                    UMI3DLogger.LogWarning($"invalid cast from {o.GetType()} to {typeof(AudioClip)}", scope);
                             },
-                            e=>UMI3DLogger.LogWarning(e,scope),
+                            e => UMI3DLogger.LogWarning(e, scope),
                             loader.DeleteObject
                             );
                     }
@@ -266,19 +261,41 @@ namespace umi3d.cdk
         ///<inheritdoc/>
         public override void Start(float atTime)
         {
-            if ((audioSource != null) && (audioSource.clip != null))
+            if ((audioSource != null))
             {
-                audioSource.Stop();
-                audioSource.time = atTime;
-                audioSource.Play();
-                OnEndCoroutine = UMI3DAnimationManager.StartCoroutine(WaitUntilTheEnd(audioSource.clip.length));
+                if ((audioSource.clip != null))
+                {
+                    audioSource.Stop();
+                    if(atTime != 0)
+                        audioSource.time = atTime;
+                    audioSource.Play();
+                    OnEndCoroutine = UMI3DAnimationManager.StartCoroutine(WaitUntilTheEnd(audioSource.clip.length));
+                }
+                else
+                {
+                    MainThreadDispatcher.UnityMainThreadDispatcher.Instance().StartCoroutine(StartAfterLoading());
+                }
             }
         }
 
         public override void SetProgress(long frame)
         {
-            audioSource.time = frame/1000f;
+            audioSource.time = frame / 1000f;
 
+        }
+
+        private IEnumerator StartAfterLoading()
+        {
+            while (!audioSource.clip)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+
+            if (dto.playing)
+            {
+                ulong now = UMI3DClientServer.Instance.GetTime();
+                Start((float)(now - dto.startTime));
+            }
         }
     }
 }

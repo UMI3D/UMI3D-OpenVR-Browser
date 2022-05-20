@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Project/ConnectionScene/Scenes/StartScene.unity
+    path: Assets/Dependencies/UMI3D VR Browsers Base/Scene/StartScene.unity
     guid: d1162b709298a0142a26044a94149e03
   - enabled: 1
-    path: Assets/Project/ConnectionScene/Scenes/ConnectionSceneV2.unity
+    path: Assets/Dependencies/UMI3D VR Browsers Base/Scene/ConnectionScene.unity
     guid: 44aa666eee370bf4a80d4017f9d43047
   - enabled: 1
     path: Assets/Project/Scenes/MainImmersive.unity

@@ -27,7 +27,7 @@ namespace umi3d.cdk
 {
     public class AbstractRenderedNodeLoader : UMI3DNodeLoader
     {
-        const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
 
         ///<inheritdoc/>
         public override bool SetUMI3DProperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
@@ -520,7 +520,7 @@ namespace umi3d.cdk
             {
                 foreach (string matKey in listToOverride)
                 {
-                    OverrideMaterial(newMatId, node, newMat, (s) => s.Equals(matKey) || (s.Equals(matKey + " (Instance)")), matEntity, shaderProperties, addIfNotExists);
+                    OverrideMaterial(newMatId, node, newMat, (s) => s.Equals(matKey) || (s.Equals(matKey + " (Instance)") || (matKey.Equals(s + " (Instance)"))), matEntity, shaderProperties, addIfNotExists);
                 }
             }
 
@@ -544,6 +544,14 @@ namespace umi3d.cdk
                 node.renderers = node.gameObject.GetComponentsInChildren<Renderer>().Where((r) => modelMeshs.Contains(r)).ToList();
                 UMI3DLogger.LogWarning("Renderers list was empty, That should not happen", scope);
                 return node.renderers;
+            }
+            if (((GlTFNodeDto)node.dto).extensions.umi3d is UMI3DLineDto)
+            {
+                if (node.renderers != null && node.renderers.Count > 0)
+                    return node.renderers;
+                node.renderers = new List<Renderer>() { node.gameObject.GetComponent<LineRenderer>() };
+                return node.renderers;
+
             }
 
             UMI3DLogger.LogError("RendererNodeLoader used for non rendered node", scope);

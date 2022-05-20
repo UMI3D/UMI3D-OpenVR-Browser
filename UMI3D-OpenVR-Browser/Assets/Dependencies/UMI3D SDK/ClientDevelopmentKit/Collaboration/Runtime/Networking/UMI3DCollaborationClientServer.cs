@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using inetum.unityUtils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +25,6 @@ using umi3d.common.collaboration;
 using umi3d.common.interaction;
 using UnityEngine;
 using UnityEngine.Events;
-using inetum.unityUtils;
 
 namespace umi3d.cdk.collaboration
 {
@@ -33,7 +33,7 @@ namespace umi3d.cdk.collaboration
     /// </summary>
     public class UMI3DCollaborationClientServer : UMI3DClientServer
     {
-        const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
 
         public static new UMI3DCollaborationClientServer Instance { get => UMI3DClientServer.Instance as UMI3DCollaborationClientServer; set => UMI3DClientServer.Instance = value; }
 
@@ -71,6 +71,14 @@ namespace umi3d.cdk.collaboration
 
         public UnityEvent OnNewToken = new UnityEvent();
         public UnityEvent OnConnectionLost = new UnityEvent();
+        /// <summary>
+        /// Event raised when the user will log out.
+        /// </summary>
+        public static event Action LoggingOut;
+        /// <summary>
+        /// Event raised when the user has logged out.
+        /// </summary>
+        public static event Action LoggedOut;
 
         public ClientIdentifierApi Identifier;
         private static bool connected = false;
@@ -154,18 +162,21 @@ namespace umi3d.cdk.collaboration
             UMI3DLogger.Log("Logout", scope | DebugScope.Connection);
             if (Connected())
             {
+                LoggingOut?.Invoke();
                 HttpClient.SendPostLogout(() =>
                 {
                     UMI3DLogger.Log("Logout ok", scope | DebugScope.Connection);
                     ForgeClient.Stop();
+                    LoggedOut?.Invoke();
                     Start();
                     success?.Invoke();
                     Identity = new IdentityDto();
                 },
-                (error) => {
+                (error) =>
+                {
                     UMI3DLogger.LogError("Logout failed", scope | DebugScope.Connection);
-                    failled?.Invoke(error); 
-                    Identity = new IdentityDto(); 
+                    failled?.Invoke(error);
+                    Identity = new IdentityDto();
                 });
             }
             else
@@ -181,7 +192,7 @@ namespace umi3d.cdk.collaboration
         public void ConnectionLost()
         {
             UMI3DLogger.LogWarning("Connection Lost", scope | DebugScope.Connection);
-            UMI3DCollaborationClientServer.Logout(null, null);
+            Logout(null, null);
 
             OnConnectionLost.Invoke();
         }

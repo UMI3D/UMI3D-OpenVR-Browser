@@ -27,7 +27,7 @@ namespace umi3d.cdk
     /// </summary>
     public class UMI3DLineRendererLoader : AbstractRenderedNodeLoader
     {
-      
+
         public UMI3DLineRendererLoader() { }
 
         protected LineRenderer line;
@@ -51,10 +51,18 @@ namespace umi3d.cdk
             base.ReadUMI3DExtension(dto, node, () =>
             {
                 line = node.GetComponent<LineRenderer>();
-                if(line == null)
+                if (line == null)
                 {
                     line = node.AddComponent<LineRenderer>();
-                    line.material = new Material(Shader.Find("Sprites/Default"));
+                    Shader umi3dShader = Shader.Find("UMI3D/default_UMI3D_shader");
+                    if (umi3dShader != null)
+                    {
+                        line.material = new Material(umi3dShader);
+                    }
+                    else
+                    {
+                        line.material = new Material(Shader.Find("Sprites/Default"));
+                    }
                 }
                 line.startColor = lineDto.startColor;
                 line.endColor = lineDto.endColor;
@@ -64,6 +72,11 @@ namespace umi3d.cdk
                 line.startWidth = lineDto.startWidth;
                 line.positionCount = lineDto.positions.Count();
                 line.SetPositions(lineDto.positions.ConvertAll<Vector3>(v => v).ToArray());
+                UMI3DNodeInstance nodeInstance = UMI3DEnvironmentLoader.GetNode(lineDto.id);
+                if (nodeInstance != null)
+                    nodeInstance.renderers = new List<Renderer>() { line };
+                SetMaterialOverided(lineDto, nodeInstance);
+
                 finished?.Invoke();
             }, failed);
         }
@@ -146,7 +159,7 @@ namespace umi3d.cdk
 
             var node = entity as UMI3DNodeInstance;
             switch (propertyKey)
-            { 
+            {
                 case UMI3DPropertyKeys.LineEndColor:
                     extension.endColor = UMI3DNetworkingHelper.Read<SerializableColor>(container);
                     line.endColor = extension.endColor;

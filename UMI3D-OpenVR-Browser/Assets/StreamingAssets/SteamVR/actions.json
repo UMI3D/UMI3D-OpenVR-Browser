@@ -82,6 +82,10 @@
       "name": "/actions/UMI3D/in/JoystickAxis",
       "type": "vector2",
       "requirement": "mandatory"
+    },
+    {
+      "name": "/actions/UMI3D/out/Haptic",
+      "type": "vibration"
     }
   ],
   "action_sets": [

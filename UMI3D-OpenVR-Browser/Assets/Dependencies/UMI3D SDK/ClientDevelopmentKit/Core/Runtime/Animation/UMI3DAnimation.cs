@@ -25,6 +25,8 @@ namespace umi3d.cdk
 {
     public class UMI3DAnimation : UMI3DAbstractAnimation
     {
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+
         public static new UMI3DAnimation Get(ulong id) { return UMI3DAbstractAnimation.Get(id) as UMI3DAnimation; }
         protected new UMI3DAnimationDto dto { get => base.dto as UMI3DAnimationDto; set => base.dto = value; }
 
@@ -176,24 +178,9 @@ namespace umi3d.cdk
 
         private bool UpdateChain(uint operationId, uint propertyKey, ByteContainer container)
         {
-            switch (operationId)
-            {
-                case UMI3DOperationKeys.SetEntityListAddProperty:
-                    UMI3DAnimationDto.AnimationChainDto value = UMI3DNetworkingHelper.Read<UMI3DAnimationDto.AnimationChainDto>(container);
-                    dto.animationChain.Add(value);
-                    break;
-                case UMI3DOperationKeys.SetEntityListRemoveProperty:
-                    dto.animationChain.RemoveAt(UMI3DNetworkingHelper.Read<int>(container));
-                    break;
-                case UMI3DOperationKeys.SetEntityListProperty:
-                    int index = UMI3DNetworkingHelper.Read<int>(container);
-                    UMI3DAnimationDto.AnimationChainDto v = UMI3DNetworkingHelper.Read<UMI3DAnimationDto.AnimationChainDto>(container);
-                    dto.animationChain[index] = v;
-                    break;
-                default:
-                    dto.animationChain = UMI3DNetworkingHelper.ReadList<UMI3DAnimationDto.AnimationChainDto>(container);
-                    break;
-            }
+            if (dto.animationChain == null)
+                dto.animationChain = new List<UMI3DAnimationDto.AnimationChainDto>();
+            UMI3DNetworkingHelper.ReadList(operationId, container, dto.animationChain);
             return true;
         }
 

@@ -64,7 +64,15 @@ namespace umi3d.cdk.collaboration
                         SavedTransform st = savedTransforms[new BoundObject() { objectId = boneBindingDto.objectId, rigname = boneBindingDto.rigName }];
                         if (boneBindingDto.syncPosition)
                             st.obj.position = boneTransform.position + boneTransform.TransformDirection((Vector3)boneBindingDto.offsetPosition);
-                        st.obj.rotation = boneTransform.rotation * (Quaternion)boneBindingDto.offsetRotation;
+                        if (boneBindingDto.syncRotation)
+                            st.obj.rotation = boneTransform.rotation * (Quaternion)boneBindingDto.offsetRotation;
+                        if (boneBindingDto.freezeWorldScale)
+                        {
+                            Vector3 WscaleMemory = st.savedLossyScale;
+                            Vector3 WScaleParent = st.obj.parent.lossyScale;
+
+                            st.obj.localScale = new Vector3(WscaleMemory.x / WScaleParent.x, WscaleMemory.y / WScaleParent.y, WscaleMemory.z / WScaleParent.z) + boneBindingDto.offsetScale;
+                        }
                     }
                 }
             }
@@ -112,7 +120,7 @@ namespace umi3d.cdk.collaboration
                 boneRotationKalman.previous_prediction = new System.Tuple<double[], double[]>(targetForwardMeasurement, targetUpMeasurement);
         }
 
-        void SkeletonKalmanUpdate(float skeletonNodePosY)
+        private void SkeletonKalmanUpdate(float skeletonNodePosY)
         {
             double[] heightMeasurement = new double[] { skeletonNodePosY };
 
@@ -127,7 +135,7 @@ namespace umi3d.cdk.collaboration
                 skeletonHeightFilter.previous_prediction = heightMeasurement;
         }
 
-        void RegressionSkeletonPosition(KalmanPosition tools)
+        private void RegressionSkeletonPosition(KalmanPosition tools)
         {
             if (tools.previous_prediction.Length > 0)
             {
@@ -138,7 +146,7 @@ namespace umi3d.cdk.collaboration
 
                 if (delta * MeasuresPerSecond <= 1)
                 {
-                    var value_x = (tools.prediction[0] - tools.previous_prediction[0]) * delta * MeasuresPerSecond + tools.previous_prediction[0];
+                    double value_x = (tools.prediction[0] - tools.previous_prediction[0]) * delta * MeasuresPerSecond + tools.previous_prediction[0];
 
                     tools.estimations = new double[] { value_x };
 
@@ -216,9 +224,10 @@ namespace umi3d.cdk.collaboration
                                 var savedTransform = new SavedTransform
                                 {
                                     obj = obj,
-                                    savedParent = obj.parent,
                                     savedPosition = obj.localPosition,
-                                    savedRotation = obj.localRotation
+                                    savedRotation = obj.localRotation,
+                                    savedLocalScale = obj.localScale,
+                                    savedLossyScale = obj.lossyScale
                                 };
 
                                 savedTransforms.Add(new BoundObject() { objectId = boneBindingDto.objectId, rigname = boneBindingDto.rigName }, savedTransform);
