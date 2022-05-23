@@ -21,13 +21,14 @@ using Valve.VR;
 
 public class OpenVRInputManager : AbstractControllerInputManager
 {
-    public string GrabAction => "/actions/UMI3D/in/Grab";
-    public string JoystickAxisAction => "/actions/UMI3D/in/JoystickAxis";
-    public string JoystickButtonAction => "/actions/UMI3D/in/JoystickButton";
-    public string PrimaryButtonAction => "/actions/UMI3D/in/PrimaryButton";
-    public string SecondaryButtonAction => "/actions/UMI3D/in/SecondaryButton";
-    public string TriggerAction => "/actions/UMI3D/in/Trigger";
-    public string HapticAction => "/actions/UMI3D/out/Haptic";
+    [Header("SteamVR Actions")]
+    public SteamVR_Action_Boolean GrabAction;
+    public SteamVR_Action_Vector2 JoystickAxisAction;
+    public SteamVR_Action_Boolean JoystickButtonAction;
+    public SteamVR_Action_Boolean PrimaryButtonAction;
+    public SteamVR_Action_Boolean SecondaryButtonAction;
+    public SteamVR_Action_Boolean TriggerAction;
+    public SteamVR_Action_Vibration HapticAction;
 
     #region Grab
 
@@ -36,9 +37,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetState(GrabAction, SteamVR_Input_Sources.LeftHand);
+                return GrabAction.GetState(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetState(GrabAction, SteamVR_Input_Sources.RightHand);
+                return GrabAction.GetState(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -49,9 +50,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateDown(GrabAction, SteamVR_Input_Sources.LeftHand);
+                return GrabAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateDown(GrabAction, SteamVR_Input_Sources.RightHand);
+                return GrabAction.GetStateDown(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -62,9 +63,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateUp(GrabAction, SteamVR_Input_Sources.LeftHand);
+                return GrabAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateUp(GrabAction, SteamVR_Input_Sources.RightHand);
+                return GrabAction.GetStateUp(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -79,9 +80,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetVector2(JoystickAxisAction, SteamVR_Input_Sources.LeftHand);
+                return JoystickAxisAction.GetAxis(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetVector2(JoystickAxisAction, SteamVR_Input_Sources.RightHand);
+                return JoystickAxisAction.GetAxis(SteamVR_Input_Sources.RightHand);
             default:
                 return Vector2.zero;
         }
@@ -92,9 +93,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetState(JoystickButtonAction, SteamVR_Input_Sources.LeftHand);
+                return JoystickButtonAction.GetState(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetState(JoystickButtonAction, SteamVR_Input_Sources.RightHand);
+                return JoystickButtonAction.GetState(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -105,9 +106,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateDown(JoystickButtonAction, SteamVR_Input_Sources.LeftHand);
+                return JoystickButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateDown(JoystickButtonAction, SteamVR_Input_Sources.RightHand);
+                return JoystickButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -118,9 +119,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateUp(JoystickButtonAction, SteamVR_Input_Sources.LeftHand);
+                return JoystickButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateUp(JoystickButtonAction, SteamVR_Input_Sources.RightHand);
+                return JoystickButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -135,9 +136,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetState(PrimaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return PrimaryButtonAction.GetState(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetState(PrimaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return PrimaryButtonAction.GetState(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -148,9 +149,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateDown(PrimaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return PrimaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateDown(PrimaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return PrimaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -161,9 +162,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateUp(PrimaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return PrimaryButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateUp(PrimaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return PrimaryButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -178,9 +179,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetState(SecondaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return SecondaryButtonAction.GetState(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetState(SecondaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return SecondaryButtonAction.GetState(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -191,9 +192,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateDown(SecondaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateDown(SecondaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -204,9 +205,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateUp(SecondaryButtonAction, SteamVR_Input_Sources.LeftHand);
+                return SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateUp(SecondaryButtonAction, SteamVR_Input_Sources.RightHand);
+                return SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -221,9 +222,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetState(TriggerAction, SteamVR_Input_Sources.LeftHand);
+                return TriggerAction.GetState(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetState(TriggerAction, SteamVR_Input_Sources.RightHand);
+                return TriggerAction.GetState(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -234,9 +235,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateDown(TriggerAction, SteamVR_Input_Sources.LeftHand);
+                return TriggerAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateDown(TriggerAction, SteamVR_Input_Sources.RightHand);
+                return TriggerAction.GetStateDown(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -247,9 +248,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                return SteamVR_Input.GetStateUp(TriggerAction, SteamVR_Input_Sources.LeftHand);
+                return TriggerAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
             case ControllerType.RightHandController:
-                return SteamVR_Input.GetStateUp(TriggerAction, SteamVR_Input_Sources.RightHand);
+                return TriggerAction.GetStateUp(SteamVR_Input_Sources.RightHand);
             default:
                 return false;
         }
@@ -262,12 +263,10 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                SteamVR_Input.GetVibrationAction(HapticAction)
-                    .Execute(0f, vibrationDuration, vibrationFrequency, vibrationAmplitude, SteamVR_Input_Sources.LeftHand);
+                HapticAction.Execute(0f, vibrationDuration, vibrationFrequency, vibrationAmplitude, SteamVR_Input_Sources.LeftHand);
                 break;
             case ControllerType.RightHandController:
-                SteamVR_Input.GetVibrationAction(HapticAction)
-                    .Execute(0f, vibrationDuration, vibrationFrequency, vibrationAmplitude, SteamVR_Input_Sources.RightHand);
+                HapticAction.Execute(0f, vibrationDuration, vibrationFrequency, vibrationAmplitude, SteamVR_Input_Sources.RightHand);
                 break;
         }
     }
