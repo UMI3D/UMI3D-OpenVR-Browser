@@ -2,8 +2,56 @@ fileFormatVersion: 2
 guid: 4e102a1d9004378409ba0a46bef10b9a
 ModelImporter:
   serializedVersion: 19301
-  internalIDToNameTable: []
-  externalObjects: {}
+  internalIDToNameTable:
+  - first:
+      74: 1827226128182048838
+    second: Take 001
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: btn_link_bleu_mat
+    second: {fileID: 2100000, guid: 4901a7d69f6c19544ad92904aced2222, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: btn_option_mat
+    second: {fileID: 2100000, guid: 1b1bbc6abb258274685a4fcbd5d2fec8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert1
+    second: {fileID: 2100000, guid: dedf1587d896c5f4796ca56b4c196699, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert45
+    second: {fileID: 2100000, guid: c8900d4893fa1744c9ae2cfaa3e1df94, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert47
+    second: {fileID: 2100000, guid: 582958374c34e5246a461a9a5764dfc0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: watch_button_color
+    second: {fileID: 2100000, guid: 57a028a987f5ab74e9ea2cc61688f004, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: btn_next_ENABLE_map
+    second: {fileID: 2800000, guid: 143576a401e973e41b18737d7df349d3, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: btn_option_ON_ENABLE_map
+    second: {fileID: 2800000, guid: 1d6d0cd4300366f4ca62d670af179d5c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: btn_watch_ENABLE_map
+    second: {fileID: 2800000, guid: 4df29783f2d7ede4e84021a76bce1bc9, type: 3}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -31,7 +79,7 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 0
+    isReadable: 1
   meshes:
     lODScreenPercentages: []
     globalScale: 1

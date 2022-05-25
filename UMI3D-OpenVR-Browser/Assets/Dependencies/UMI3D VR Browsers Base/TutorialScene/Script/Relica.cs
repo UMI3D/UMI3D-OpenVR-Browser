@@ -16,7 +16,6 @@ limitations under the License.
 
 using System.Collections;
 using umi3d.cdk.menu;
-using umi3d.cdk.menu.interaction;
 using umi3dVRBrowsersBase.interactions.input;
 using umi3dVRBrowsersBase.ui.watchMenu;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace umi3dVRBrowsersBase.tutorial
         {
             var tool = new Menu { Name = "Translation Tool" };
 
-            var button = new EventMenuItem
+            var button = new ButtonMenuItem
             {
                 Name = "Translate"
             };

@@ -43,11 +43,6 @@ namespace umi3dVRBrowsersBase.connection
         public GameObject[] objectsToHide;
 
         /// <summary>
-        /// Sphere used to make the screen black;
-        /// </summary>
-        public GameObject loadingSphere;
-
-        /// <summary>
         /// Event called when the loading of the environment starts.
         /// </summary>
         public static UnityEvent OnLoadingEnvironmentStart = new UnityEvent();
@@ -61,7 +56,6 @@ namespace umi3dVRBrowsersBase.connection
 
         private void Start()
         {
-            loadingSphere.SetActive(false);
             StartCoroutine(WaitForLoader());
             Hide();
         }
@@ -100,7 +94,7 @@ namespace umi3dVRBrowsersBase.connection
             ConnectionMenuManager.instance.HidePreviousNavigationButton();
 
             SetLightningSettings.ResetLightningSettings();
-            loadingSphere.SetActive(true);
+            LoadingScreenDisplayer.Instance.Display();
             foreach (GameObject o in objectsToHide)
                 o.SetActive(false);
         }
@@ -110,7 +104,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         public void HideLoadingScreen()
         {
-            loadingSphere.SetActive(false);
+            LoadingScreenDisplayer.Instance.Hide();
         }
 
         /// <summary>

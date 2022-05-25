@@ -35,11 +35,6 @@ namespace umi3dVRBrowsersBase.interactions
         /// </summary>
         public float interactableLoadTimeout = 60;
 
-        /// <summary>
-        /// Last controller used by users in a menu to trigger a UI.
-        /// </summary>
-        public static ControllerType lastControllerUsedToClick = ControllerType.RightHandController;
-
         #region Data
 
         /// <summary>
@@ -237,15 +232,17 @@ namespace umi3dVRBrowsersBase.interactions
             {
                 foreach (AbstractController c in Controllers)
                 {
-                    if ((c as VRController).type == lastControllerUsedToClick)
+                    Debug.LogError("TODO");
+                    /*var menu = MenuOpenner.FindInstanceAssociatedToController(c);
+                    var tool = menu?.playerMenuManager.currentToolMenu?.tool;
+                    if (tool != null && tool.id == release)
                     {
-                        if (SelectTool(select, releasable, hoveredObjectId, new RequestedUsingSelector { controller = c }))
-                        {
-                            PlayerMenuManager.Instance.Close();
+                        if (SelectTool(select, releasable, hoveredObjectId, new RequestedUsingSelector { controller = c })){
+                            menu.Close();
                             lastReason = new RequestedFromMenu();
                             return true;
                         }
-                    }
+                    }*/
                 }
 
                 if (!SelectTool(select, releasable, hoveredObjectId, reason))

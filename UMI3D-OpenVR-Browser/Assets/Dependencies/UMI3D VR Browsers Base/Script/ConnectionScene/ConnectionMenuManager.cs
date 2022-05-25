@@ -236,7 +236,7 @@ namespace umi3dVRBrowsersBase.connection
         public void ConnectToUmi3DEnvironement(string url, string port)
         {
             keyboard.Hide();
-            StartCoroutine(WaitReady(new AdvancedConnectionPanel.Data() { ip = url, port = port }));
+            StartCoroutine(WaitReady(new Data() { ip = url, port = port }));
         }
 
         /// <summary>
@@ -244,7 +244,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private IEnumerator WaitReady(AdvancedConnectionPanel.Data data)
+        private IEnumerator WaitReady(Data data)
         {
             while (!Connecting.Exists && !UMI3DEnvironmentLoader.Exists)
                 yield return new WaitForEndOfFrame();
