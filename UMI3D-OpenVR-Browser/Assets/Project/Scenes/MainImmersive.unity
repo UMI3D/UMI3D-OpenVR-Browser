@@ -443,6 +443,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 773cf0b54c5ca3d478a37265631a5a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &405715255 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 405715323, guid: c95999b4e970d984db2324d70298aff0,
+    type: 3}
+  m_PrefabInstance: {fileID: 405715249}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405715256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0aa0e47305894f4ea13a82debadbd14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &405715256 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3673981092504156441, guid: c95999b4e970d984db2324d70298aff0,
@@ -483,6 +495,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   boneType: 57
   isTracked: 0
+--- !u!114 &405715260 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 405715344, guid: c95999b4e970d984db2324d70298aff0,
+    type: 3}
+  m_PrefabInstance: {fileID: 405715249}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405715251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0aa0e47305894f4ea13a82debadbd14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &405715261 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5060267790573808009, guid: c95999b4e970d984db2324d70298aff0,
@@ -744,19 +768,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6983789213951145499, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
-      propertyPath: cameraTransform
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6983789213951145499, guid: 43814b73dafd4b74a8ea50e94293f12b,
-        type: 3}
       propertyPath: boneType
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 405715255}
     - target: {fileID: 6983789213951145499, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
-      propertyPath: controller
+      propertyPath: cameraTransform
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8312342796415476349}
     - target: {fileID: 7789742860071276714, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: vrInput
@@ -1292,7 +1311,7 @@ PrefabInstance:
     - target: {fileID: 5988314907380347006, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.0009919998
+      value: 0.0009817437
       objectReference: {fileID: 0}
     - target: {fileID: 6093459749334264534, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
@@ -1537,17 +1556,12 @@ PrefabInstance:
         type: 3}
       propertyPath: boneType
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 405715260}
     - target: {fileID: 676675734947151507, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: cameraTransform
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 676675734947151507, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
-        type: 3}
-      propertyPath: controller
-      value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8312342796415476349}
     - target: {fileID: 2804195366849795432, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: implementedDofs.Array.size
@@ -3109,7 +3123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   navigations:
-  - {fileID: 0}
+  - {fileID: 2875774584620259965}
 --- !u!1 &2875774584620259967
 GameObject:
   m_ObjectHideFlags: 0
