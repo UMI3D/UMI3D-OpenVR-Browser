@@ -158,10 +158,11 @@ namespace umi3d.cdk.interaction
                     rawData => icon2DTex.LoadRawTextureData(rawData),
                     e => Debug.LogError(e));
             }
-            
+
 
             if (interactionDto is EventDto evt)
-                return new EventMenuItem()
+            {
+                var eventMenuItem = new EventMenuItem()
                 {
                     icon2D = icon2DTex,
                     interaction = evt,
@@ -169,6 +170,45 @@ namespace umi3d.cdk.interaction
                     Name = evt.name,
                     toolId = toolId
                 };
+
+                eventMenuItem.Subscribe((val) =>
+                {
+                    if (val)
+                    {
+                        if (evt.hold)
+                        {
+                            var eventdto = new EventStateChangedDto
+                            {
+                                active = true,
+                                id = evt.id,
+                                toolId = toolId,
+                            };
+                            UMI3DClientServer.SendData(eventdto, true);
+                        }
+                        else
+                        {
+                            var eventdto = new EventTriggeredDto
+                            {
+                                id = evt.id,
+                                toolId = toolId,
+                            };
+                            UMI3DClientServer.SendData(eventdto, true);
+                        }
+                    }
+                    else
+                    {
+                        var eventdto = new EventStateChangedDto
+                        {
+                            active = false,
+                            id = evt.id,
+                            toolId = toolId,
+                        };
+                        UMI3DClientServer.SendData(eventdto, true);
+                    }
+                });
+
+                return eventMenuItem;
+            }
 
 
             if (interactionDto is FormDto form)

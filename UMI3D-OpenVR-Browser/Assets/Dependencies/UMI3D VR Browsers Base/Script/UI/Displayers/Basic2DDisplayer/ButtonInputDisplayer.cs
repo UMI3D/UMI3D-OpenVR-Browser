@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using umi3d.cdk.menu;
+using umi3d.cdk.menu.interaction;
 using umi3d.cdk.menu.view;
 using umi3dVRBrowsersBase.interactions.input;
 using UnityEngine.UI;
@@ -31,7 +32,7 @@ namespace umi3dVRBrowsersBase.ui.displayers
         /// <summary>
         /// Associated item.
         /// </summary>
-        private ButtonMenuItem menuItem;
+        private EventMenuItem menuItem;
 
         /// <summary>
         /// Button to select the item.
@@ -62,7 +63,7 @@ namespace umi3dVRBrowsersBase.ui.displayers
         public override void SetMenuItem(AbstractMenuItem menu)
         {
             base.SetMenuItem(menu);
-            menuItem = menu as ButtonMenuItem;
+            menuItem = menu as EventMenuItem;
         }
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace umi3dVRBrowsersBase.ui.displayers
         /// </summary>
         public override int IsSuitableFor(AbstractMenuItem menu)
         {
-            return (menu is ButtonMenuItem) ? 2 : 0;
+            return (menu is EventMenuItem) ? 2 : 0;
         }
 
         #endregion
