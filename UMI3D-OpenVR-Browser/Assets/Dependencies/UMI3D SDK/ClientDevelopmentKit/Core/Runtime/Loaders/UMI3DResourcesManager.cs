@@ -859,7 +859,9 @@ namespace umi3d.cdk
                 UMI3DLogger.LogError(s, scope);
                 finished = true;
             };
-            UMI3DLocalAssetDirectory variant = UMI3DEnvironmentLoader.Parameters.ChooseVariant(assetLibrary);
+            UMI3DLocalAssetDirectory variant = UMI3DEnvironmentLoader
+                .Parameters
+                .ChooseVariant(assetLibrary);
             UMI3DClientServer.GetFile(Path.Combine(assetLibrary.baseUrl, variant.path), action, error);
             yield return new WaitUntil(() => { return finished; });
         }
