@@ -1,0 +1,26 @@
+# Blender MTL File: 'Laboratory.blend'
+# Material Count: 2
+
+newmtl Concrete_01
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 3.000000 C:\\Users\\Quentin\\Desktop\\UMI3DLab\\Materials\\Concrete_01\\TexturesCom_Concrete_WallCast_512_normal.tif
+map_Kd C:\\Users\\Quentin\\Desktop\\UMI3DLab\\Materials\\Concrete_01\\TexturesCom_Concrete_WallCast_512_albedo.tif
+
+newmtl WoodPlank
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump -bm 3.000000 C:\\Users\\Quentin\\Desktop\\UMI3DLab\\Materials\\WoodPlank\\TexturesCom_Wood_PlanksOld_512_normal.tif
+map_Kd C:\\Users\\Quentin\\Desktop\\UMI3DLab\\Materials\\WoodPlank\\TexturesCom_Wood_PlanksOld_512_albedo.tif

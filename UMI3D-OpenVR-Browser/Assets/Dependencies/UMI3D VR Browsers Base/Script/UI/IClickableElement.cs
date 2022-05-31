@@ -1,0 +1,49 @@
+﻿/*
+Copyright 2019 - 2022 Inetum
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+using umi3dVRBrowsersBase.interactions;
+using UnityEngine.Events;
+
+namespace umi3dVRBrowsersBase.ui
+{
+    /// <summary>
+    /// Makes any entity clickable by <see cref="selection.VRClickableElementSelector"/>.
+    /// </summary>
+    public interface IClickableElement
+    {
+        /// <summary>
+        /// Event raised when <see cref="Click"/> is called.
+        /// </summary>
+        UnityEvent OnClicked { get; }
+
+        /// <summary>
+        /// Raises an event when this element is clicked.
+        /// </summary>
+        /// <param name="controller">Controller used to click</param>
+        void Click(ControllerType controller);
+
+        /// <summary>
+        /// Raises an event when this element starts being hovered.
+        /// </summary>
+        void HoverEnter();
+
+        /// <summary>
+        /// Raises an event when this element stopped being hovered.
+        /// </summary>
+        void HoverExit();
+    }
+
+}

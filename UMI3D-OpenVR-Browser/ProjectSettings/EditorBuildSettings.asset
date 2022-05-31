@@ -6,18 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Project/ConnectionScene/Scenes/StartScene.unity
+    path: Assets/Dependencies/UMI3D VR Browsers Base/Scene/StartScene.unity
     guid: d1162b709298a0142a26044a94149e03
   - enabled: 1
-    path: Assets/Project/ConnectionScene/Scenes/ConnectionSceneV2.unity
+    path: Assets/Dependencies/UMI3D VR Browsers Base/Scene/ConnectionScene.unity
     guid: 44aa666eee370bf4a80d4017f9d43047
   - enabled: 1
-    path: Assets/Project/Common/Scenes/MainImmersive.unity
+    path: Assets/Project/Scenes/MainImmersive.unity
     guid: 936718483f9434345b2567228f0162c6
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 3c913eb686950a940b80bf23f7120c5d,
       type: 2}
     Unity.XR.OpenVR.Settings: {fileID: 11400000, guid: a2f964f063a10f1449986739b8978b0e,
+      type: 2}
+    com.unity.addressableassets: {fileID: 11400000, guid: bd12bec76cd7750438ade4d1fafada3f,
       type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: baaa37146a13d2c45b1adb2afb5cb730,
       type: 2}
