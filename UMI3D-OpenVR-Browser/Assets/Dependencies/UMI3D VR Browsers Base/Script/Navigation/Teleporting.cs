@@ -53,8 +53,6 @@ namespace umi3dVRBrowsersBase.navigation
                 teleportingObject.transform.position = new Vector3(position.Value.x - offset.x,
                                                                    position.Value.y,
                                                                    position.Value.z - offset.z);
-
-                Debug.Log($"arc position = [{position.Value}]; player = [{teleportingObject.transform.position}]");
             }
         }
 
