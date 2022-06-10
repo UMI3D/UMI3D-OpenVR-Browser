@@ -5034,7 +5034,7 @@ MonoBehaviour:
   Controllers:
   - {fileID: 2014168367008383658}
   - {fileID: 8249658566724303153}
-  shouldProjectHoldableEventOnSpecificInput: 0
+  shouldProjectHoldableEventOnSpecificInput: 1
   interactableLoadTimeout: 60
   lastControllerUsedInMenu: {fileID: 0}
 --- !u!114 &7289560754810097054
@@ -5071,7 +5071,7 @@ MonoBehaviour:
     actionPath: /actions/UMI3D/in/Trigger
     needsReinit: 0
   HapticAction:
-    actionPath: /actions/UMI3D/out/Haptic
+    actionPath: /actions/default/out/Haptic
     needsReinit: 0
 --- !u!1 &7289560754815008402
 GameObject:
