@@ -74,7 +74,7 @@ namespace umi3d.cdk.interaction
                     toolboxIdToMenu.Add(dto.id, tbmenu);
                 }
 
-                foreach(AbstractMenuItem menu in menuToStoreInMenuAsset.ToList())
+                foreach (AbstractMenuItem menu in menuToStoreInMenuAsset.ToList())
                 {
                     GlobalToolMenu gtm = menu as GlobalToolMenu;
                     if ((gtm != null) && (tool.parent.id == dto.id))
@@ -143,10 +143,10 @@ namespace umi3d.cdk.interaction
             else
             {
                 GlobalToolMenu gtmenu = toolboxIdToMenu[tool.id] as GlobalToolMenu;
-                gtmenu.parent.Remove(gtmenu); 
+                gtmenu.parent.Remove(gtmenu);
             }
         }
-    
+
         public static AbstractMenuItem GetMenuForInteraction(AbstractInteractionDto interactionDto, ulong toolId)
         {
             Texture2D icon2DTex = new Texture2D(0, 0);
@@ -156,7 +156,7 @@ namespace umi3d.cdk.interaction
                 UMI3DResourcesManager.GetFile(
                     icon2DFile.url,
                     rawData => icon2DTex.LoadRawTextureData(rawData),
-                    e => Debug.LogError(e));
+                    e => UMI3DLogger.LogError(e, DebugScope.Interaction));
             }
 
 
@@ -166,7 +166,7 @@ namespace umi3d.cdk.interaction
                 {
                     icon2D = icon2DTex,
                     interaction = evt,
-                    toggle = evt.hold,
+                    hold = evt.hold,
                     Name = evt.name,
                     toolId = toolId
                 };
@@ -221,17 +221,18 @@ namespace umi3d.cdk.interaction
                     interaction = form
                 };
 
-            
+
 
             if (interactionDto is LinkDto link)
                 throw new System.NotImplementedException(); //todo
 
             if (interactionDto is AbstractParameterDto param)
                 return GetInteractionItem(param).Item1;
-            
+
 
             throw new System.Exception("Unknown dto !");
         }
+
 
         public static (MenuItem, ParameterSettingRequestDto) GetInteractionItem(AbstractInteractionDto dto)
         {
@@ -326,7 +327,7 @@ namespace umi3d.cdk.interaction
                     break;
                 default:
                     result = new MenuItem();
-                    result.Subscribe(() => Debug.Log($"Missing case for {dto?.GetType()}"));
+                    result.Subscribe(() => UMI3DLogger.LogError($"Missing case for {dto?.GetType()}", DebugScope.Interaction));
                     break;
             }
             result.Name = dto.name;
