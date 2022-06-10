@@ -14,6 +14,7 @@ using inetum.unityUtils;
 using umi3d.cdk.menu;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
+using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -28,6 +29,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public bool IsOpen { get; private set; } = false;
 
         public bool IsHovered { get; private set; } = false;
+
         public ControllerType CurrentController => m_controllerToolMenu.CurrentController;
 
         /// <summary>
@@ -76,7 +78,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         [Tooltip("")]
         private ControllerToolMenu m_controllerToolMenu;
 
-        
+
         private BoxCollider m_menuCollider;
 
         public UnityEvent onMenuOpen = new UnityEvent();
@@ -124,9 +126,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
             var playerCameraPosition = m_playerCamera.transform.position;
             var playerCameraRotation = m_playerCamera.transform.rotation;
-            m_playerMenuCanvas.transform.rotation = Quaternion.identity;
-            m_playerMenuCanvas.transform.position = new Vector3(playerCameraPosition.x, playerCameraPosition.y, playerCameraPosition.z + m_distanceFromCamera);
-            m_playerMenuCanvas.transform.RotateAround(playerCameraPosition, Vector3.up, playerCameraRotation.eulerAngles.y);
+            transform.rotation = Quaternion.identity;
+            transform.position = new Vector3(playerCameraPosition.x, playerCameraPosition.y, playerCameraPosition.z + m_distanceFromCamera);
+            transform.RotateAround(playerCameraPosition, Vector3.up, playerCameraRotation.eulerAngles.y);
             m_playerMenuCanvas.SetActive(true);
             m_menuCollider.enabled = true;
             ParameterGear.Instance.Hide();
@@ -190,7 +192,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             m_menuCollider = GetComponent<BoxCollider>();
             Close(true);
         }
-        
+
         private void Start()
         {
             MenuHeader.Initialize();

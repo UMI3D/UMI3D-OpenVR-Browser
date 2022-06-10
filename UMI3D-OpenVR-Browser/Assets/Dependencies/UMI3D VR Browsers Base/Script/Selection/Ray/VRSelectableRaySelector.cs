@@ -68,7 +68,10 @@ namespace umi3dVRBrowsersBase.selection
             if (AbstractControllerInputManager.Instance.GetButtonDown(vrController, action))
             {
                 if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = vrController;
                     Select();
+                }
             }
         }
     }

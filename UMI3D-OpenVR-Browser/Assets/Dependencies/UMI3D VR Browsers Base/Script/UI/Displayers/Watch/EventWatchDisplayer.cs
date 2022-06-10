@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 using umi3d.cdk.menu;
-using umi3dVRBrowsersBase.interactions.input;
+using umi3d.cdk.menu.interaction;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
@@ -34,7 +34,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         /// <returns></returns>
         public override int IsSuitableFor(AbstractMenuItem menu)
         {
-            return (menu is ButtonMenuItem) ? 2 : 0;
+            return (menu is EventMenuItem) ? 2 : 0;
         }
 
         /// <summary>

@@ -110,7 +110,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.05458443, y: -0.000016199157}
+  m_AnchoredPosition: {x: 0.00063906034, y: -0.000016199157}
   m_SizeDelta: {x: -183, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2833664588355279773
@@ -1207,8 +1207,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff90a2980c957943a8b7813b77d4a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMenu: {fileID: 7541215250510836390}
-  reducedScale: {x: 0.0006, y: 0.0006, z: 0.0006}
+  playerMenu: {fileID: 1349079759331231196}
+  reducedScale: {x: 0.1, y: 0.1, z: 0.1}
   distanceFromUserWhenDragged: 0.4
 --- !u!1 &2793822693120168270
 GameObject:
@@ -1741,7 +1741,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 309072200303592831}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.24691358
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3654,8 +3654,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff90a2980c957943a8b7813b77d4a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerMenu: {fileID: 7541215250510836390}
-  reducedScale: {x: 0.0006, y: 0.0006, z: 0.0006}
+  playerMenu: {fileID: 1349079759331231196}
+  reducedScale: {x: 0.1, y: 0.1, z: 0.1}
   distanceFromUserWhenDragged: 0.4
 --- !u!1 &7096800376171019954
 GameObject:
@@ -4275,7 +4275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_playerCamera: {fileID: 0}
-  m_distanceFromCamera: 0.5
+  m_distanceFromCamera: 0.6
   m_playerMenuCanvas: {fileID: 7541215250510836391}
   m_playerMenuHeader: {fileID: 8032692294957473749}
   m_playerToolboxMenu: {fileID: 822896285167937283}
@@ -4297,7 +4297,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.3997808, y: 1.2597231, z: 0.05}
+  m_Size: {x: 1.5291927, y: 1.2597231, z: 0.05}
   m_Center: {x: 0, y: 0, z: 0.025}
 --- !u!1001 &3926413729447906309
 PrefabInstance:

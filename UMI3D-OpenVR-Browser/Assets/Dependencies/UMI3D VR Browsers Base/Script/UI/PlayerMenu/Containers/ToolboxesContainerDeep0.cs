@@ -17,7 +17,6 @@ using umi3dVRBrowsersBase.ui.displayers;
 using umi3dVRBrowsersBase.ui.watchMenu;
 using UnityEngine;
 using UnityEngine.UI;
-using static umi3dVRBrowsersBase.ui.playerMenu.Tool_ToolboxButton;
 
 namespace umi3dVRBrowsersBase.ui.playerMenu
 {
@@ -115,6 +114,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             }
             else if (element is IDisplayerUIGUI displayer)
             {
+                ButtonList.SetActive(false);
+                Displayerbox.transform.SetParent(m_displayerboxesContainer.transform, false);
+
                 IsTool = true;
                 AddDisplayerToBox(displayer);
             }
@@ -168,21 +170,6 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             else
                 WatchMenu.UnPinMenu((Menu)menu);
         }
-
-        //private void AddChildrenToContainer(ToolboxesContainerDeep1 containerDeep1)
-        //{
-        //    foreach (AbstractDisplayer displayer in containerDeep1)
-        //    {
-        //        if (displayer is ToolboxesContainerDeep1 containerDeep1Child)
-        //        {
-        //            AddBoxInContainer(containerDeep1Child);
-        //            containerDeep1Child.transform.SetParent(m_deepNPlusContainer.transform, false);
-        //            AddChildrenToContainer(containerDeep1Child);
-        //        }
-        //        else
-        //            return;
-        //    }
-        //}
 
         public void AddBoxInContainer(ToolboxesContainerDeep1 container)
         {

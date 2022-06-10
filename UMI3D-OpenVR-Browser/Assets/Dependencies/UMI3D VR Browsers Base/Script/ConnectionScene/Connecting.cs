@@ -56,6 +56,8 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private AdvancedConnectionPanel.Data data;
 
+        string url = null;
+
         #endregion
 
         #region Methods
@@ -63,8 +65,7 @@ namespace umi3dVRBrowsersBase.connection
         protected override void Awake()
         {
             base.Awake();
-            identifier.GetIdentityAction = DisplayLoginPassword;
-            identifier.GetPinAction = DisplayPassword;
+
             identifier.ShouldDownloadLib = ShouldDlLibraries;
             identifier.GetParameters = GetParameterDtos;
         }
@@ -72,6 +73,7 @@ namespace umi3dVRBrowsersBase.connection
         private void Start()
         {
             UMI3DCollaborationClientServer.Instance.OnConnectionLost.AddListener(OnConnectionLost);
+            UMI3DCollaborationClientServer.Instance.OnLeaving.AddListener(() => Destroy(UMI3DClientServer.Instance.gameObject));
         }
 
         /// <summary>
@@ -81,13 +83,14 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="callback"></param>
         private void ShouldDlLibraries(List<string> ids, Action<bool> callback)
         {
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             if (ids.Count == 0)
             {
                 callback.Invoke(true);
-                LoadingScreen.Instance?.Display("Loading environment ...");
+                LoadingPanel.Instance?.Display("Loading environment ...");
             }
+
             else DisplayAccept(ids.Count, callback);
         }
 
@@ -105,13 +108,23 @@ namespace umi3dVRBrowsersBase.connection
         /// Tries to connect to the server.
         /// </summary>
         /// <param name="data"></param>
-        public void Connect(AdvancedConnectionPanel.Data data)
+        public async void Connect(AdvancedConnectionPanel.Data data)
         {
-            LoadingScreen.Instance.Display("Connecting ...");
+            LoadingPanel.Instance.Display("Connecting ...");
             this.data = data;
             LoginPasswordAsker.Instance.Hide();
-            string url = "http://" + data.ip + ":" + data.port + UMI3DNetworkingKeys.media;
-            UMI3DCollaborationClientServer.GetMedia(url, GetMediaSucces, GetMediaFailed, e => false);
+
+            var currentUrl = "http://" + data.ip + ":" + data.port + UMI3DNetworkingKeys.media;
+            url = currentUrl;
+
+            try
+            {
+                GetMediaSucces(await UMI3DCollaborationClientServer.GetMedia(url, (e) => url == currentUrl && e.count < 3));
+            }
+            catch (Exception e)
+            {
+                GetMediaFailed(e.Message);
+            }
         }
 
         /// <summary>
@@ -132,7 +145,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void GetMediaSucces(MediaDto media)
         {
-            UMI3DCollaborationClientServer.Connect();
+            UMI3DCollaborationClientServer.Connect(media);
             PlayerMenuManager.Instance.MenuHeader.SetEnvironmentName(media);
         }
 
@@ -141,7 +154,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void DisplayLoginPassword(Action<string, string> callback = null)
         {
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             LoginPasswordAsker.Instance.Display();
             LoginPasswordAsker.Instance.UnregisterAll();
@@ -167,7 +180,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void DisplayPassword(Action<string> callback)
         {
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             LoginPasswordAsker.Instance.Display(false);
             LoginPasswordAsker.Instance.UnregisterAll();
@@ -226,9 +239,9 @@ namespace umi3dVRBrowsersBase.connection
             {
                 callback.Invoke(b);
                 if (b)
-                    LoadingScreen.Instance.Display("Connecting ...");
+                    LoadingPanel.Instance.Display("Connecting ...");
                 else
-                    LoadingScreen.Instance.Display("Loading ...");
+                    LoadingPanel.Instance.Display("Loading ...");
                 DialogBox.Instance.Hide();
             });
         }
@@ -251,7 +264,7 @@ namespace umi3dVRBrowsersBase.connection
 
             UMI3DEnvironmentLoader.Clear();
             UMI3DResourcesManager.Instance.ClearCache();
-            UMI3DCollaborationClientServer.Logout(() => { Destroy(UMI3DClientServer.Instance.gameObject); }, null);
+            UMI3DCollaborationClientServer.Logout();
             umi3dVRBrowsersBase.DontDestroyOnLoad.DestroyAllInstances();
 
             WatchMenu.UnPinAllMenus();

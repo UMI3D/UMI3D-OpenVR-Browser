@@ -67,7 +67,7 @@ namespace umi3dVRBrowsersBase.connection
             accept.onClick.AddListener(() =>
             {
                 callback(true);
-                LoadingScreen.Instance?.Display("Downloading libraries ...");
+                LoadingPanel.Instance?.Display("Downloading libraries ...");
                 Hide();
             });
             deny.onClick.AddListener(() =>

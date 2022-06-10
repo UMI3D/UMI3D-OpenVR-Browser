@@ -90,7 +90,7 @@ namespace umi3dVRBrowsersBase.connection
                 sessionListSlider.Clear();
                 launcher.SendDataSession(pin, DisplaySession);
 
-                LoadingScreen.Instance.Display("Connecting ...");
+                LoadingPanel.Instance.Display("Connecting ...");
 
                 waitForGettingSessions = StartCoroutine(WaitForGettingSessions());
             });
@@ -112,7 +112,7 @@ namespace umi3dVRBrowsersBase.connection
             sessionListPanel.SetActive(false);
             currentSelectedEntry = null;
 
-            LoadingScreen.Instance.Display("Connecting ...");
+            LoadingPanel.Instance.Display("Connecting ...");
 
             ConnectionMenuManager.instance.HideNextNavigationButton();
             ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
@@ -125,7 +125,7 @@ namespace umi3dVRBrowsersBase.connection
                 if (waitForGettingSessions != null)
                     StopCoroutine(waitForGettingSessions);
 
-                LoadingScreen.Instance.Hide();
+                LoadingPanel.Instance.Hide();
                 mainPanel.SetActive(false);
                 sessionPinInput.text = string.Empty;
                 ConnectionMenuManager.instance.DisplayHome();
@@ -146,7 +146,7 @@ namespace umi3dVRBrowsersBase.connection
             while (Time.time < t + maxConnectionTime)
                 yield return null;
 
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
             mainPanel.SetActive(false);
             sessionPinInput.text = string.Empty;
 
@@ -167,7 +167,7 @@ namespace umi3dVRBrowsersBase.connection
             while (Time.time < t + maxConnectionTime)
                 yield return null;
 
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
             mainPanel.SetActive(false);
             sessionPinInput.text = string.Empty;
 
@@ -196,7 +196,7 @@ namespace umi3dVRBrowsersBase.connection
             {
                 onConnectToMasterServerSucceded = false;
 
-                LoadingScreen.Instance.Hide();
+                LoadingPanel.Instance.Hide();
                 mainPanel.SetActive(true);
                 sessionPinPanel.SetActive(true);
 
@@ -210,7 +210,7 @@ namespace umi3dVRBrowsersBase.connection
         [ContextMenu("Debug entry")]
         private void DebugEntry()
         {
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             for (int i = 0; i < 6; i++)
             {
@@ -239,7 +239,7 @@ namespace umi3dVRBrowsersBase.connection
 
             yield return null;
 
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             sessionPinPanel.SetActive(false);
             sessionListPanel.SetActive(true);
@@ -258,7 +258,7 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="entry"></param>
         public void OnSelectionChanged(ServerSessionEntry entry)
         {
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             if (currentSelectedEntry == null)
             {
