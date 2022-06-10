@@ -71,7 +71,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         public void Run()
         {
-            LoadingScreen.Instance.Display("Connection ...");
+            LoadingPanel.Instance.Display("Connection ...");
 
             if ((ip != null) && (ip.text != null) && (ip.text != ""))
             {

@@ -79,7 +79,9 @@ namespace umi3dVRBrowsersBase.ikManagement
         {
             float elapsedTime = startTime;
 
-            while (transform != null)
+            Transform relativeTransform = transform != null ? transform : RightHand.transform;
+
+            while (relativeTransform != null)
             {
                 elapsedTime = elapsedTime + Time.deltaTime;
 
@@ -97,7 +99,9 @@ namespace umi3dVRBrowsersBase.ikManagement
         {
             float elapsedTime = startTime;
 
-            while (transform != null)
+            Transform relativeTransform = transform != null ? transform : LeftHand.transform;
+
+            while (relativeTransform != null)
             {
                 elapsedTime = elapsedTime + Time.deltaTime;
 
@@ -209,7 +213,7 @@ namespace umi3dVRBrowsersBase.ikManagement
                     {
                         if (passiveLeftHoverPose != null)
                         {
-                            StopCoroutine(rightHandPlacement);
+                            StopCoroutine(leftHandPlacement);
                             currentLeftPose = passiveLeftHoverPose;
 
                             leftPhalanxRotations = GetHandedRotations(currentLeftPose.PhalanxRotations, boneId);

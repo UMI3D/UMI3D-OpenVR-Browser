@@ -88,7 +88,7 @@ namespace umi3dVRBrowsersBase.connection
         public void Display(bool forceDisplayAddNewServer = false)
         {
             panel.SetActive(true);
-            LoadingScreen.Instance.Hide();
+            LoadingPanel.Instance.Hide();
 
             bool displayFavoriteServers = PlayerPrefsManager.HasFavoriteServersStored() && !forceDisplayAddNewServer;
 

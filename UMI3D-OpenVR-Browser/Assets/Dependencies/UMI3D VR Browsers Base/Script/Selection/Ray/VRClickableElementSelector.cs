@@ -33,7 +33,7 @@ namespace umi3dVRBrowsersBase.selection
         /// <summary>
         /// Stores all current <see cref="IClickableElement"/> hovered.
         /// </summary>
-        static HashSet<IClickableElement> elementsHovered = new HashSet<IClickableElement>();
+        static List<IClickableElement> elementsHovered = new List<IClickableElement>();
 
         /// <summary>
         /// Notifies that a <see cref="IClickableElement"/> starts being hovered.
@@ -123,13 +123,17 @@ namespace umi3dVRBrowsersBase.selection
                         lastElement = clickable;
                         NotifyStartHovering(clickable);
                         clickable.HoverEnter();
+
                         laser.OnHoverEnter(clickable.GetHashCode());
                     }
 
                     laser.SetImpactPoint(hit.point);
 
                     if (AbstractControllerInputManager.Instance.GetButtonDown(controller, action))
+                    {
+                        VRInteractionMapper.lastControllerUsedToClick = controller;
                         clickable.Click(controller);
+                    }
 
                     break;
                 }

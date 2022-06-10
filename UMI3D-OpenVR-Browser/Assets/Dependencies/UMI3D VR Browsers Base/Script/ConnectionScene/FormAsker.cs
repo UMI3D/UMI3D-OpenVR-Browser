@@ -175,8 +175,8 @@ namespace umi3dVRBrowsersBase.connection
             if (form == null)
             {
                 callback.Invoke(null);
-                LoadingScreen.Instance.SetLoadingScreen();
-                LoadingScreen.Instance.Display("Loading environment ...");
+                LoadingPanel.Instance.SetLoadingScreen();
+                LoadingPanel.Instance.Display("Loading environment ...");
                 HideObjects();
                 Hide();
             }
@@ -191,7 +191,7 @@ namespace umi3dVRBrowsersBase.connection
                     answers = new List<ParameterSettingRequestDto>()
                 };
 
-                LoadingScreen.Instance.Hide();
+                LoadingPanel.Instance.Hide();
                 this.gameObject.SetActive(true);
                 menu.menu.RemoveAll();
 
@@ -202,7 +202,7 @@ namespace umi3dVRBrowsersBase.connection
                     answer.answers.Add(c.Item2);
                 }
 
-                var send = new EventMenuItem() { Name = "Join", toggle = false };
+                var send = new EventMenuItem() { Name = "Join", hold = false };
                 UnityAction<bool> action = (bool b) =>
                 {
                     menuDisplayer.Hide(true);
@@ -210,8 +210,8 @@ namespace umi3dVRBrowsersBase.connection
                     ConnectionMenuManager.instance.keyboard.Hide();
 
                     callback.Invoke(answer);
-                    LoadingScreen.Instance.SetLoadingScreen();
-                    LoadingScreen.Instance.Display("Loading environment ...");
+                    LoadingPanel.Instance.SetLoadingScreen();
+                    LoadingPanel.Instance.Display("Loading environment ...");
                     HideObjects();
                     Hide();
                     LocalInfoSender.CheckFormToUpdateAuthorizations(form);

@@ -383,7 +383,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
             root.SetActive(false);
             setCaretPosition = false;
-            IsOpen = false;
 
             WasClosedLastFrame = true;
             StartCoroutine(ResetWasClosedLastFrame());
@@ -396,6 +395,9 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         IEnumerator ResetWasClosedLastFrame()
         {
             yield return null;
+
+            IsOpen = false;
+
             yield return new WaitForEndOfFrame();
 
             WasClosedLastFrame = false;
