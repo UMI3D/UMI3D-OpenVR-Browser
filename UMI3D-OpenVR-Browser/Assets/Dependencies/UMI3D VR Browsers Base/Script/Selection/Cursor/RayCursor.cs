@@ -65,6 +65,11 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
         private bool isChanged = false;
 
         /// <summary>
+        /// True is the laser is infinite
+        /// </summary>
+        private bool isInfinite = true;
+
+        /// <summary>
         /// Max length of the laser
         /// </summary>
         private float maxLength = 500;
@@ -94,13 +99,13 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
                 laserObjectRenderer.material = defaultMaterial;
 
             SetInfinitePoint();
-
-            raycastHelperSelectable = new RaySelectionZone<Selectable>(transform);
-            raycastHelperInteractable = new RaySelectionZone<InteractableContainer>(transform);
         }
 
         public void Update()
         {
+            raycastHelperSelectable = new RaySelectionZone<Selectable>(transform.position, transform.up);
+            raycastHelperInteractable = new RaySelectionZone<InteractableContainer>(transform.position, transform.up);
+
             //Update impact point position
             var closestInteractable = raycastHelperInteractable.GetClosestAndRaycastHit();
             var closestSelectable = raycastHelperSelectable.GetClosestAndRaycastHit();
@@ -117,7 +122,7 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
                 SetImpactPoint(closestInteractable.raycastHit.point);
             else if (closestSelectable.obj != null && closestSelectable.raycastHit.distance < maxLength)
                 SetImpactPoint(closestSelectable.raycastHit.point);
-            else
+            else if (!isInfinite)
                 SetInfinitePoint();
 
             //cache cursor tracking info
@@ -190,7 +195,7 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
         public void SetImpactPoint(Vector3 point, bool displayImpact = true)
         {
             impactPointRenderer.enabled = displayImpact;
-
+            isInfinite = !displayImpact;
             impactPoint.transform.position = point;
             transform.localScale = new Vector3(transform.localScale.x, Vector3.Distance(this.transform.position, point), transform.localScale.z);
         }

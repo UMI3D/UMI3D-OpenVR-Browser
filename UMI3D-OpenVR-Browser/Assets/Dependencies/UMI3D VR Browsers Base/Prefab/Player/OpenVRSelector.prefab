@@ -14,6 +14,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hapticFeedback: {fileID: 6918162485733894591}
   highlightFeedback: {fileID: 6665471286476066155}
+--- !u!114 &6665471286476066155
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1586960993067449256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pointedOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+    type: 3}
+  pointedOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+    type: 2}
+  proximityOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+    type: 3}
+  proximityOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+    type: 2}
 --- !u!114 &6918162485733894591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33,13 +53,26 @@ MonoBehaviour:
   hapticAction:
     actionPath: /actions/default/out/Haptic
     needsReinit: 0
---- !u!114 &6665471286476066155
+--- !u!114 &2323631609456618290
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1586960993067449256}
+  m_GameObject: {fileID: 1717440522931298633}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 181b73555f4049846b5839e2b40fe10f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hapticFeedback: {fileID: 7144339700964463888}
+--- !u!114 &2844523787444164246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1717440522931298633}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
@@ -72,39 +105,6 @@ MonoBehaviour:
   hapticAction:
     actionPath: /actions/default/out/Haptic
     needsReinit: 0
---- !u!114 &2844523787444164246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1717440522931298633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pointedOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
-    type: 3}
-  pointedOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
-    type: 2}
-  proximityOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
-    type: 3}
-  proximityOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
-    type: 2}
---- !u!114 &2323631609456618290
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1717440522931298633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 181b73555f4049846b5839e2b40fe10f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  hapticFeedback: {fileID: 7144339700964463888}
 --- !u!1001 &5357082957213830199
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -196,7 +196,7 @@ PrefabInstance:
         type: 3}
       propertyPath: defaultMaterial
       value: 
-      objectReference: {fileID: 2100000, guid: 53248eaa9a3f0af44a39428f16dd70ed, type: 2}
+      objectReference: {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
     - target: {fileID: 7217446619658254872, guid: 9a2489c3820349e49b50c24c500d47e8,
         type: 3}
       propertyPath: selectionMaterial
@@ -206,12 +206,12 @@ PrefabInstance:
         type: 3}
       propertyPath: impactPointRenderer
       value: 
-      objectReference: {fileID: 1770063059340583362}
+      objectReference: {fileID: 4276512135292236161}
     - target: {fileID: 7217446619658254872, guid: 9a2489c3820349e49b50c24c500d47e8,
         type: 3}
       propertyPath: laserObjectRenderer
       value: 
-      objectReference: {fileID: 4276512135292236161}
+      objectReference: {fileID: 1770063059340583362}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a2489c3820349e49b50c24c500d47e8, type: 3}
 --- !u!1 &1314067235785250341 stripped

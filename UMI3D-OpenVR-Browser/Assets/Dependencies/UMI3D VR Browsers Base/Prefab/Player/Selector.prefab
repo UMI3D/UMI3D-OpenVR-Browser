@@ -49,6 +49,7 @@ MonoBehaviour:
   deactivationRequesters: 
   pointingDetector: {fileID: 9049577297433962889}
   grabDetector: {fileID: 2988025609914875823}
+  selectionFeedbackHandler: {fileID: 0}
 --- !u!114 &9049577297433962889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,6 +258,7 @@ MonoBehaviour:
   deactivationRequesters: 
   pointingDetector: {fileID: 5538973729607222011}
   grabDetector: {fileID: 313899135494070758}
+  selectionFeedbackHandler: {fileID: 0}
 --- !u!114 &5538973729607222011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -383,12 +385,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4288cab000fb86248929a54f994f7ec7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  laserObject: {fileID: 0}
-  impactPoint: {fileID: 0}
-  laserObjectRenderer: {fileID: 0}
-  impactPointRenderer: {fileID: 0}
-  defaultMaterial: {fileID: 0}
-  selectionMaterial: {fileID: 0}
+  laserObject: {fileID: 9190828823993865064}
+  impactPoint: {fileID: 6369408880223590930}
+  laserObjectRenderer: {fileID: 5965202872744209909}
+  impactPointRenderer: {fileID: 8142815646023564726}
+  defaultMaterial: {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
+  selectionMaterial: {fileID: 2100000, guid: e04bfa8c794d264428bed8da8e9a800a, type: 2}
 --- !u!1 &6369408880223590930
 GameObject:
   m_ObjectHideFlags: 0
@@ -436,6 +438,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -460,6 +463,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &2087477415456393586
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -575,6 +579,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -599,6 +604,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &8166024197371415578
 MeshFilter:
   m_ObjectHideFlags: 0
