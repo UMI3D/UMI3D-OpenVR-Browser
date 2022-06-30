@@ -53,35 +53,29 @@ namespace umi3d.cdk.interaction.selection.projector
         /// <param name="controller"></param>
         public void Pick(Selectable selectable, AbstractController controller)
         {
-            switch (selectable.GetType().Name)
+            switch (selectable)
             {
-                case "Button":
-                    Button button = (Button)selectable;
+                case Button button:
                     button.Interact();
                     break;
 
-                case "Toggle":
-                    Toggle toggle = (Toggle)selectable;
+                case Toggle toggle:
                     toggle.Interact();
                     break;
 
-                case "Dropdown":
-                    Dropdown dropdown = (Dropdown)selectable;
+                case Dropdown dropdown:
                     dropdown.Interact();
                     break;
 
-                case "InputField":
-                    InputField inputfield = (InputField)selectable;
-                    inputfield.Interact();
+                case InputField inputfield:
+                    inputfield.Interact(controller.transform);
                     break;
 
-                case "Scrollbar":
-                    Scrollbar scrollbar = (Scrollbar)selectable;
+                case Scrollbar scrollbar:
                     scrollbar.Interact(controller.transform);
                     break;
 
-                case "Slider":
-                    Slider slider = (Slider)selectable;
+                case Slider slider:
                     slider.Interact(controller.transform);
                     break;
             }
@@ -105,9 +99,60 @@ namespace umi3d.cdk.interaction.selection.projector
             dropdown.Show();
         }
 
-        public static void Interact(this InputField inputField)
+        public static void Interact(this InputField inputField, Transform controllerTransform)
         {
-            inputField.Select();
+            RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
+            var closestAndRaycastHit = raycastHelper.GetClosestAndRaycastHit();
+
+            if (inputField == null)
+                return;
+
+            int lenght = inputField.text.Length;
+
+            // If the text of the input is already fully selected.
+            if (inputField.selectionAnchorPosition == lenght && inputField.selectionFocusPosition == 0 && lenght > 0)
+            {
+                Text text = inputField.textComponent;
+                RectTransform textTransform = text.GetComponent<RectTransform>();
+
+                if (textTransform != null)
+                {
+                    Vector3 localClickedPoint = text.transform.InverseTransformPoint(closestAndRaycastHit.raycastHit.point);
+
+                    float tmp = 0;
+                    int i = 1;
+
+                    foreach (char c in text.text)
+                    {
+                        CharacterInfo info;
+                        if (text.font.GetCharacterInfo(c, out info, text.fontSize))
+                        {
+                            tmp += info.advance;
+
+                            if (localClickedPoint.x + Mathf.Abs(textTransform.rect.x) > tmp)
+                            {
+                                i = Mathf.Clamp(i + 1, 0, lenght);
+                                inputField.caretPosition = i;
+                            }
+                            else
+                            {
+                                if (i == 1)
+                                    if (localClickedPoint.x + Mathf.Abs(textTransform.rect.x) < 0)
+                                        inputField.caretPosition = 0;
+                                    else
+                                        inputField.caretPosition = 1;
+                                break;
+                            }
+                        }
+                    }
+                    return;
+                }
+            }
+            else
+            {
+                EventSystem.current.SetSelectedGameObject(null, null); // if the textfield was already selected, we have to unselect it before selecting again to make sure the text will be fully selected
+                inputField.Select();
+            }
         }
 
         public static void Interact(this Scrollbar scrollbar, Transform controllerTransform)
