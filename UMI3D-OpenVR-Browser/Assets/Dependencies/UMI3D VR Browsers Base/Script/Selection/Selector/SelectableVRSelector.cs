@@ -14,6 +14,7 @@ limitations under the License.
 using umi3d.cdk.interaction.selection.feedback;
 using umi3d.cdk.interaction.selection.intentdetector;
 using umi3d.cdk.interaction.selection.projector;
+using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -80,6 +81,19 @@ namespace umi3dbrowser.openvr.interaction.selection
             grabDetector.Reinit();
             selectionEvent.RemoveAllListeners();
             deselectionEvent.RemoveAllListeners();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerClick(new PointerEventData(EventSystem.current));
+                }
+            }
         }
 
 
@@ -194,10 +208,14 @@ namespace umi3dbrowser.openvr.interaction.selection
         /// Callback that trigger the interaction with selectables
         /// </summary>
         /// <param name="eventData"></param>
+        [ContextMenu("Pick")]
         public void OnPointerClick(PointerEventData eventData)
         {
             if (LastSelected != null)
+            {
                 projector.Pick(LastSelected.selectedObject, controller);
+                LastSelected.selectedObject.SendMessage("OnPointerDown", eventData, SendMessageOptions.DontRequireReceiver);
+            }  
         }
     }
 }
