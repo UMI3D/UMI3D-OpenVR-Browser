@@ -159,6 +159,10 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 letter.onPressed.AddListener(() =>
                 {
                     OnCharacterAdded(isUpperCase ? letter.symbol.ToUpper() : letter.symbol.ToLower());
+                    letter.button.OnSelect(new PointerEventData(EventSystem.current));
+                    letter.button.OnPointerUp(new PointerEventData(EventSystem.current));
+                    letter.button.OnPointerExit(new PointerEventData(EventSystem.current));
+                    
                 });
                 letter.onHoverEnter.AddListener(() => hoverSource.Play());
             }
@@ -234,19 +238,19 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             if (IsTextFullySelected())
             {
                 previewField.text = character;
-                previewField.Select();
+                //previewField.Select();
                 setCaretPosition = true;
             }
             else if (carretPosition != previewField.text.Length)
             {
                 previewField.text = previewField.text.Substring(0, carretPosition) + character + previewField.text.Substring(carretPosition, previewField.text.Length - carretPosition);
-                previewField.Select();
+                //previewField.Select();
                 previewField.caretPosition++;
             }
             else
             {
                 previewField.text += character;
-                previewField.Select();
+                //previewField.Select();
                 setCaretPosition = true;
             }
 
@@ -269,19 +273,19 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 if (IsTextFullySelected())
                 {
                     previewField.text = string.Empty;
-                    previewField.Select();
+                    //previewField.Select();
                     setCaretPosition = true;
                 }
                 else if (carretPosition != lenght)
                 {
                     previewField.text = previewField.text.Substring(0, carretPosition - 1) + previewField.text.Substring(carretPosition, lenght - carretPosition);
-                    previewField.Select();
+                    //previewField.Select();
                     previewField.caretPosition = Mathf.Clamp(carretPosition - 1, 0, lenght);
                 }
                 else
                 {
                     previewField.text = previewField.text.Substring(0, lenght - 1);
-                    previewField.Select();
+                    //previewField.Select();
                     setCaretPosition = true;
                 }
 

@@ -91,7 +91,7 @@ namespace umi3dbrowser.openvr.interaction.selection
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerClick(new PointerEventData(EventSystem.current));
+                    OnPointerClick(new PointerEventData(EventSystem.current) { clickCount=1 });
                 }
             }
         }
@@ -214,7 +214,6 @@ namespace umi3dbrowser.openvr.interaction.selection
             if (LastSelected != null)
             {
                 projector.Pick(LastSelected.selectedObject, controller);
-                LastSelected.selectedObject.SendMessage("OnPointerDown", eventData, SendMessageOptions.DontRequireReceiver);
             }  
         }
     }

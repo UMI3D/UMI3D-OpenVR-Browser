@@ -31,8 +31,8 @@ namespace umi3d.cdk.interaction.selection.projector
         /// <param name="controller"></param>
         public void Project(Selectable selectable, AbstractController controller)
         {
-            var pointerEventData = new PointerEventData(EventSystem.current);
-            selectable.SendMessage("OnPointerEnter", pointerEventData, SendMessageOptions.DontRequireReceiver);
+            var pointerEventData = new PointerEventData(EventSystem.current) { clickCount= 1 };
+            selectable.OnPointerEnter(pointerEventData);
         }
 
         /// <summary>
@@ -42,8 +42,12 @@ namespace umi3d.cdk.interaction.selection.projector
         public void Release(Selectable selectable)
         {
             var pointerEventData = new PointerEventData(EventSystem.current);
-            if (selectable != null) //happens when UI element is destroyed but not deselected
-                selectable.SendMessage("OnPointerExit", pointerEventData, SendMessageOptions.DontRequireReceiver);
+            if (selectable != null) //protects against cases when UI element is destroyed but not deselected
+            {
+                selectable.OnPointerExit(pointerEventData);
+                if (!(selectable is InputField)) //keep keyboard focus on input fields
+                    selectable.OnDeselect(pointerEventData);
+            }   
         }
 
         /// <summary>
@@ -124,8 +128,7 @@ namespace umi3d.cdk.interaction.selection.projector
 
                     foreach (char c in text.text)
                     {
-                        CharacterInfo info;
-                        if (text.font.GetCharacterInfo(c, out info, text.fontSize))
+                        if (text.font.GetCharacterInfo(c, out CharacterInfo info, text.fontSize))
                         {
                             tmp += info.advance;
 
