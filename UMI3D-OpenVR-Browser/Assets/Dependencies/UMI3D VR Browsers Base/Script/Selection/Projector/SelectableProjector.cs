@@ -84,25 +84,54 @@ namespace umi3d.cdk.interaction.selection.projector
                     break;
             }
         }
+
+        /// <summary>
+        /// Triggers the UI actions associated to the selectable for a long press interaction
+        /// </summary>
+        /// <param name="selectable"></param>
+        /// <param name="controller"></param>
+        public void Press(Selectable selectable, AbstractController controller)
+        {
+            switch (selectable)
+            {
+                case Button button:
+                    button.Press();
+                    break;
+            }
+        }
+
+
     }
 
     public static class UIProjection
     {
+        #region Button
         public static void Interact(this Button button)
         {
             ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.submitHandler);
         }
 
+        public static void Press(this Button button)
+        {
+            ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.selectHandler);
+        }
+        #endregion
+
+        #region Toggle
         public static void Interact(this Toggle toggle)
         {
             toggle.isOn = !toggle.isOn;
         }
+        #endregion
 
+        #region Dropdown
         public static void Interact(this Dropdown dropdown)
         {
             dropdown.Show();
         }
+        #endregion
 
+        #region InputField
         public static void Interact(this InputField inputField, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
@@ -157,7 +186,9 @@ namespace umi3d.cdk.interaction.selection.projector
                 inputField.Select();
             }
         }
+        #endregion
 
+        #region Scrollbar
         public static void Interact(this Scrollbar scrollbar, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
@@ -174,7 +205,9 @@ namespace umi3d.cdk.interaction.selection.projector
 
             scrollbar.value = Mathf.InverseLerp(Maxdist * 0.9f, 0.1f, Hitdistance);
         }
+        #endregion
 
+        #region Slider
         public static void Interact(this Slider slider, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
@@ -190,5 +223,7 @@ namespace umi3d.cdk.interaction.selection.projector
             float newValue = (float)System.Math.Round(slider.minValue + ((localHitPoint.x + localCorners[3].x) / (localCorners[3].x - localCorners[0].x)) * (slider.maxValue - slider.minValue), 1);
             slider.value = newValue;
         }
+        #endregion
     }
+
 }

@@ -24,7 +24,7 @@ namespace umi3dbrowser.openvr.interaction.selection
     /// <summary>
     /// Selector for <see cref="Selectable"/> objects (2D UI) on VR browsers
     /// </summary>
-    public class SelectableVRSelector : AbstractVRSelector<Selectable>, IPointerClickHandler
+    public class SelectableVRSelector : AbstractVRSelector<Selectable>, IPointerUpHandler, IPointerDownHandler
     {
         /// <summary>
         /// Selection Intent Detector (virtual pointing)
@@ -91,7 +91,15 @@ namespace umi3dbrowser.openvr.interaction.selection
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerClick(new PointerEventData(EventSystem.current) { clickCount=1 });
+                    OnPointerDown(new PointerEventData(EventSystem.current) { clickCount=1 });
+                }
+            }
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1 });
                 }
             }
         }
@@ -209,12 +217,25 @@ namespace umi3dbrowser.openvr.interaction.selection
         /// </summary>
         /// <param name="eventData"></param>
         [ContextMenu("Pick")]
-        public void OnPointerClick(PointerEventData eventData)
+        public void OnPointerUp(PointerEventData eventData)
         {
             if (LastSelected != null)
             {
                 projector.Pick(LastSelected.selectedObject, controller);
             }  
+        }
+
+        /// <summary>
+        /// Callback that trigger the interaction with selectables
+        /// </summary>
+        /// <param name="eventData"></param>
+        [ContextMenu("Pick")]
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (LastSelected != null)
+            {
+                projector.Press(LastSelected.selectedObject, controller);
+            }
         }
     }
 }
