@@ -113,7 +113,7 @@ namespace umi3d.cdk.interaction.selection.projector
 
         public static void Press(this Button button)
         {
-            ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.selectHandler);
+            ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
         }
         #endregion
 
