@@ -169,7 +169,7 @@ GameObject:
   - component: {fileID: 2361566902213494863}
   - component: {fileID: 2361566902213494862}
   m_Layer: 0
-  m_Name: LaserCursor
+  m_Name: LaserCursorOld
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
