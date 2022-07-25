@@ -273,7 +273,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                     //previewField.Select();
                     setCaretPosition = true;
                 }
-                else if (carretPosition != lenght)
+                else if (carretPosition != lenght && carretPosition > 0)
                 {
                     previewField.text = previewField.text.Substring(0, carretPosition - 1) + previewField.text.Substring(carretPosition, lenght - carretPosition);
                     //previewField.Select();
