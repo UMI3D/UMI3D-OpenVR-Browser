@@ -295,8 +295,8 @@ MonoBehaviour:
   controller: {fileID: 0}
   interactableSelector: {fileID: 3036516098682089026}
   selectableSelector: {fileID: 3408741537558009882}
-  pointingCursor: {fileID: 0}
-  grabCursor: {fileID: 0}
+  pointingCursor: {fileID: 1045813945731932043}
+  grabCursor: {fileID: 7144950647784636101}
 --- !u!1 &6655803532226607007
 GameObject:
   m_ObjectHideFlags: 0
@@ -432,6 +432,18 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1261997067463119984}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1045813945731932043 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2234059861995883515, guid: ee7840aa280d46640b49d3b50d965478,
+    type: 3}
+  m_PrefabInstance: {fileID: 1261997067463119984}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4288cab000fb86248929a54f994f7ec7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &6304676921033968587
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -507,3 +519,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6304676921033968587}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7144950647784636101 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3772117097492198670, guid: 2aaaad490f37b884abbc9f44d5b8ddd7,
+    type: 3}
+  m_PrefabInstance: {fileID: 6304676921033968587}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a254a075e3d38540b2b8aac0bc3bd5a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
