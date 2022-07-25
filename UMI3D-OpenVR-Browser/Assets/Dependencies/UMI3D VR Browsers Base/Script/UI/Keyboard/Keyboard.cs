@@ -159,10 +159,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 letter.onPressed.AddListener(() =>
                 {
                     OnCharacterAdded(isUpperCase ? letter.symbol.ToUpper() : letter.symbol.ToLower());
-                    letter.button.OnSelect(new PointerEventData(EventSystem.current));
                     letter.button.OnPointerUp(new PointerEventData(EventSystem.current));
-                    letter.button.OnPointerExit(new PointerEventData(EventSystem.current));
-                    
                 });
                 letter.onHoverEnter.AddListener(() => hoverSource.Play());
             }
