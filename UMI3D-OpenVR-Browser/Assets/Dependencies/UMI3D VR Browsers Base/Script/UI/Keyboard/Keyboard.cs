@@ -69,7 +69,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         private Text editedText;
 
         [Header("Keys")]
-
         [SerializeField]
         [Tooltip("Root of of symbol key")]
         private GameObject symbolsRoot;
@@ -110,7 +109,8 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         [Tooltip("Confirmation key")]
         private KeyboardKey enterKey;
 
-        public class StringEvent : UnityEvent<String> { }
+        public class StringEvent : UnityEvent<String>
+        { }
 
         /// <summary>
         /// Event triggered when edited text changes.
@@ -142,7 +142,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// </summary>
         public bool WasClosedLastFrame { get; private set; } = false;
 
-        #endregion
+        #endregion Fields
 
         #region Methods
 
@@ -232,14 +232,14 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             else if (carretPosition != previewField.text.Length)
             {
                 previewField.text = previewField.text.Substring(0, carretPosition) + character + previewField.text.Substring(carretPosition, previewField.text.Length - carretPosition);
-                StartCoroutine(SetCarretInInputField(previewField, carretPosition+1));
+                StartCoroutine(SetCarretInInputField(previewField, carretPosition + 1));
             }
             else
             {
                 previewField.text += character;
                 StartCoroutine(SetCarretInInputField(previewField, carretPosition + 1));
             }
-            
+
             OnValueChanged.Invoke(previewField.text);
             editedField.text = previewField.text;
             editedField.ForceLabelUpdate();
@@ -332,14 +332,12 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             OpenKeyboard(editedText, onEditFinished, onEditCanceled, true);
         }
 
-    
-
         /// <summary>
         /// Selects an <see cref="InputField"/> once it is possible.
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        IEnumerator WaitAndSelectField(InputField field)
+        private IEnumerator WaitAndSelectField(InputField field)
         {
             while (EventSystem.current.alreadySelecting)
                 yield return null;
@@ -350,7 +348,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             field.Select();
         }
 
-        IEnumerator SetCarretInInputField(InputField field, int position)
+        private IEnumerator SetCarretInInputField(InputField field, int position)
         {
             yield return new WaitForEndOfFrame();
             field.caretPosition = position;
@@ -391,7 +389,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// Coroutine to reset <see cref="WasClosedLastFrame"/> at the end of the next frame.
         /// </summary>
         /// <returns></returns>
-        IEnumerator ResetWasClosedLastFrame()
+        private IEnumerator ResetWasClosedLastFrame()
         {
             yield return null;
 
@@ -411,6 +409,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             return previewField.selectionAnchorPosition == previewField.text.Length && previewField.selectionFocusPosition == 0;
         }
 
-        #endregion
+        #endregion Methods
     }
 }
