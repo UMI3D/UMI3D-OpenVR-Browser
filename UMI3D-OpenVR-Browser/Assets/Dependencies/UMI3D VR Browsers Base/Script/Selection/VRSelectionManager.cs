@@ -12,10 +12,9 @@ limitations under the License.
 */
 
 using umi3d.cdk.interaction.selection.cursor;
-using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 
-namespace umi3dbrowser.openvr.interaction.selection
+namespace umi3dVRBrowsersBase.interactions.selection
 {
     public class VRSelectionManager : MonoBehaviour
     {

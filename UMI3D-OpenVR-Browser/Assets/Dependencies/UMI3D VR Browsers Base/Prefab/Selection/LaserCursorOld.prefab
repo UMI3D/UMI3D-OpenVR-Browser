@@ -78,7 +78,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517127987019514673}
-  m_Mesh: {fileID: -2432090755550338912, guid: 80ff29e28199bd54a8755cd3cfaf1869, type: 3}
+  m_Mesh: {fileID: -2432090755550338912, guid: 8bc2dd26502575740be9481fe2805c1e, type: 3}
 --- !u!1 &2361566901057309259
 GameObject:
   m_ObjectHideFlags: 0
@@ -205,7 +205,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laserObject: {fileID: 517127987019514673}
   impactPoint: {fileID: 2361566901057309259}
-  laserObjectRenderer: {fileID: 3056254595956981164}
-  impactPointRenderer: {fileID: 693625281929244143}
-  defaultMaterial: {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
-  selectionMaterial: {fileID: 2100000, guid: e04bfa8c794d264428bed8da8e9a800a, type: 2}
+  defaultColor: {r: 1, g: 1, b: 1, a: 0}
+  hoverColor: {r: 0.0292809, g: 0.6143529, b: 0.8867924, a: 0}

@@ -13,11 +13,10 @@ limitations under the License.
 
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
-using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace umi3dbrowser.openvr.interaction.selection
+namespace umi3dVRBrowsersBase.interactions.selection
 {
     /// <summary>
     /// Ba template for object selector

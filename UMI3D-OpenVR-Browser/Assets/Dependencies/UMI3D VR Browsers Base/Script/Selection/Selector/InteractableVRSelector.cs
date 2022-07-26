@@ -17,7 +17,7 @@ using umi3d.cdk.interaction.selection.intentdetector;
 using umi3d.cdk.interaction.selection.projector;
 using UnityEngine;
 
-namespace umi3dbrowser.openvr.interaction.selection
+namespace umi3dVRBrowsersBase.interactions.selection
 {
     /// <summary>
     /// Selector for <see cref="InteractableContainer"/> objects on VR browsers

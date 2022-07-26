@@ -20,7 +20,7 @@ namespace umi3d.cdk.interaction.selection
     { };
 }
 
-namespace umi3dbrowser.openvr.interaction.selection
+namespace umi3dVRBrowsersBase.interactions.selection
 {
     using umi3d.cdk.interaction.selection;
 

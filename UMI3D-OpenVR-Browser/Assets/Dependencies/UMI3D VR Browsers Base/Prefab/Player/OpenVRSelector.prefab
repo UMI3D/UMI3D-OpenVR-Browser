@@ -26,13 +26,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointedOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+  pointedOutlineShader: {fileID: 4800000, guid: 194aa10f43091bb429fdfcd379944c8f,
     type: 3}
-  pointedOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+  pointedOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
     type: 2}
-  proximityOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+  proximityOutlineShader: {fileID: 4800000, guid: 194aa10f43091bb429fdfcd379944c8f,
     type: 3}
-  proximityOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+  proximityOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
     type: 2}
 --- !u!114 &6918162485733894591
 MonoBehaviour:
@@ -78,13 +78,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointedOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+  pointedOutlineShader: {fileID: 4800000, guid: 194aa10f43091bb429fdfcd379944c8f,
     type: 3}
-  pointedOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+  pointedOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
     type: 2}
-  proximityOutlineShader: {fileID: 4800000, guid: 672948701e67014488abb7496112a7ec,
+  proximityOutlineShader: {fileID: 4800000, guid: 0c1cf10ea69e60e4f9eb8955749f88ec,
     type: 3}
-  proximityOutlineMaterial: {fileID: 2100000, guid: 0e7f315e308158443a7388d7499e3538,
+  proximityOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
     type: 2}
 --- !u!114 &7144339700964463888
 MonoBehaviour:

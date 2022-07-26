@@ -19,7 +19,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace umi3dbrowser.openvr.interaction.selection
+namespace umi3dVRBrowsersBase.interactions.selection
 {
     /// <summary>
     /// Selector for <see cref="Selectable"/> objects (2D UI) on VR browsers
@@ -91,7 +91,7 @@ namespace umi3dbrowser.openvr.interaction.selection
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerDown(new PointerEventData(EventSystem.current) { clickCount=1 });
+                    OnPointerDown(new PointerEventData(EventSystem.current) { clickCount = 1 });
                 }
             }
             if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
@@ -222,7 +222,7 @@ namespace umi3dbrowser.openvr.interaction.selection
             if (LastSelected != null)
             {
                 projector.Pick(LastSelected.selectedObject, controller);
-            }  
+            }
         }
 
         /// <summary>

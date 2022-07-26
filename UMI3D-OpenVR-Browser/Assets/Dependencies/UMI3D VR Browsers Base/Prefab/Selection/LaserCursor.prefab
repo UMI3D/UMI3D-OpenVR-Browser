@@ -47,11 +47,10 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 53248eaa9a3f0af44a39428f16dd70ed, type: 2}
+  - {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -72,7 +71,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &716877772407184451
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -80,7 +78,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 517127987019514673}
-  m_Mesh: {fileID: -2432090755550338912, guid: 20fff6c5d2a89dc46857d118fbe2047e, type: 3}
+  m_Mesh: {fileID: -2432090755550338912, guid: 8bc2dd26502575740be9481fe2805c1e, type: 3}
 --- !u!1 &2361566901057309259
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,11 +126,10 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 53248eaa9a3f0af44a39428f16dd70ed, type: 2}
+  - {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -153,7 +150,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!33 &7230919058555181355
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -171,7 +167,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2361566902213494863}
-  - component: {fileID: 2234059861995883515}
+  - component: {fileID: 1129190483326477074}
   m_Layer: 0
   m_Name: LaserCursor
   m_TagString: Untagged
@@ -195,7 +191,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
---- !u!114 &2234059861995883515
+--- !u!114 &1129190483326477074
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -209,7 +205,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laserObject: {fileID: 517127987019514673}
   impactPoint: {fileID: 2361566901057309259}
-  laserObjectRenderer: {fileID: 3056254595956981164}
-  impactPointRenderer: {fileID: 693625281929244143}
-  defaultMaterial: {fileID: 2100000, guid: 53248eaa9a3f0af44a39428f16dd70ed, type: 2}
-  selectionMaterial: {fileID: 2100000, guid: 16342452fc97c384082fb753ed853daa, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: 816bcb36847146341a08d62ec4cb0b48, type: 2}
+  selectionMaterial: {fileID: 2100000, guid: e04bfa8c794d264428bed8da8e9a800a, type: 2}

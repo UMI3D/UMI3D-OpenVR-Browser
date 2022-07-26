@@ -28,25 +28,30 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
     /// </summary>
     public class RayCursor : AbstractPointingCursor
     {
+        [Header("Laser")]
         /// <summary>
         /// Ray cast from the controller
         /// </summary>
         public GameObject laserObject;
 
+        private Renderer laserObjectRenderer;
+
+        [Header("ImpactPoint")]
         /// <summary>
         /// Object displayed at the impact point
         /// </summary>
         public GameObject impactPoint;
 
-        private VRController controller;
-
-        [SerializeField]
-        private Renderer laserObjectRenderer;
-        [SerializeField]
         private Renderer impactPointRenderer;
 
+        private VRController controller;
+
+        /// <summary>
+        /// True if the laser is currently displayed
+        /// </summary>
         public bool IsDisplayed { get => laserObjectRenderer.enabled; }
 
+        [Header("Materials")]
         /// <summary>
         /// Color when no intended object are detected
         /// </summary>

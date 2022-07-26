@@ -31,7 +31,7 @@ namespace umi3d.cdk.interaction.selection.projector
         /// <param name="controller"></param>
         public void Project(Selectable selectable, AbstractController controller)
         {
-            var pointerEventData = new PointerEventData(EventSystem.current) { clickCount= 1 };
+            var pointerEventData = new PointerEventData(EventSystem.current) { clickCount = 1 };
             selectable.OnPointerEnter(pointerEventData);
         }
 
@@ -47,7 +47,7 @@ namespace umi3d.cdk.interaction.selection.projector
                 selectable.OnPointerExit(pointerEventData);
                 if (!(selectable is InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
-            }   
+            }
         }
 
         /// <summary>

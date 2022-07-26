@@ -252,24 +252,24 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// </summary>
         private void Delete()
         {
-            int lenght = previewField.text.Length;
+            int length = previewField.text.Length;
             int carretPosition = previewField.caretPosition;
 
-            if (lenght > 0)
+            if (length > 0)
             {
                 if (IsTextFullySelected())
                 {
                     previewField.text = string.Empty;
                     StartCoroutine(SetCarretInInputField(previewField, 0));
                 }
-                else if (carretPosition != lenght && carretPosition > 0)
+                else if (carretPosition != length && carretPosition > 0)
                 {
-                    previewField.text = previewField.text.Substring(0, carretPosition - 1) + previewField.text.Substring(carretPosition, lenght - carretPosition);
-                    StartCoroutine(SetCarretInInputField(previewField, Mathf.Clamp(carretPosition - 1, 0, lenght)));
+                    previewField.text = previewField.text.Substring(0, carretPosition - 1) + previewField.text.Substring(carretPosition, length - carretPosition);
+                    StartCoroutine(SetCarretInInputField(previewField, Mathf.Clamp(carretPosition - 1, 0, length)));
                 }
                 else if (carretPosition > 0)
                 {
-                    previewField.text = previewField.text.Substring(0, lenght - 1);
+                    previewField.text = previewField.text.Substring(0, length - 1);
                     StartCoroutine(SetCarretInInputField(previewField, carretPosition - 1));
                 }
                 else
