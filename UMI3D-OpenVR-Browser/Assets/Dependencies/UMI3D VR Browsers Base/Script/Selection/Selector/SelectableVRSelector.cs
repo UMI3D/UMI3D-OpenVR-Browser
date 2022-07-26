@@ -223,13 +223,19 @@ namespace umi3dVRBrowsersBase.interactions.selection
             {
                 projector.Pick(LastSelected.selectedObject, controller);
             }
+            if (projector.currentlyPressedButton != null
+                && LastSelected?.selectedObject != projector.currentlyPressedButton) //specific rule for button's focus
+            {
+                projector.currentlyPressedButton.OnPointerUp(new PointerEventData(EventSystem.current));
+                projector.currentlyPressedButton = null;
+            }
         }
 
         /// <summary>
         /// Callback that trigger the interaction with selectables
         /// </summary>
         /// <param name="eventData"></param>
-        [ContextMenu("Pick")]
+        [ContextMenu("Press")]
         public void OnPointerDown(PointerEventData eventData)
         {
             if (LastSelected != null)

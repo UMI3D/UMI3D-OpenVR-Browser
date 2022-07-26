@@ -96,11 +96,12 @@ namespace umi3d.cdk.interaction.selection.projector
             {
                 case Button button:
                     button.Press();
+                    currentlyPressedButton = button;
                     break;
             }
         }
 
-
+        public Button currentlyPressedButton;
     }
 
     public static class UIProjection
