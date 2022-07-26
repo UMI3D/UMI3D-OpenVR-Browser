@@ -66,26 +66,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hapticFeedback: {fileID: 7144339700964463888}
---- !u!114 &2844523787444164246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1717440522931298633}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7c3c8ec3be713e348814502288633829, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pointedOutlineShader: {fileID: 4800000, guid: 194aa10f43091bb429fdfcd379944c8f,
-    type: 3}
-  pointedOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
-    type: 2}
-  proximityOutlineShader: {fileID: 4800000, guid: 0c1cf10ea69e60e4f9eb8955749f88ec,
-    type: 3}
-  proximityOutlineMaterial: {fileID: 2100000, guid: 333e7b77b9675544fb38454b96fd0af3,
-    type: 2}
 --- !u!114 &7144339700964463888
 MonoBehaviour:
   m_ObjectHideFlags: 0
