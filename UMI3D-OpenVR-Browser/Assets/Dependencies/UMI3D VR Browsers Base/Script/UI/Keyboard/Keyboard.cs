@@ -60,11 +60,13 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         [Tooltip("Input to display a preview of what users write")]
         private InputField previewField;
 
+        private InputField editedField;
+
         /// <summary>
         /// Relevant if <see cref="previewField"/> is not set by default.
         /// </summary>
         [SerializeField]
-        private Text previewText;
+        private Text editedText;
 
         [Header("Keys")]
 
@@ -173,16 +175,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             SwitchToLetters();
         }
 
-        private void LateUpdate()
-        {
-            if (setCaretPosition && previewField.gameObject.activeInHierarchy)
-            {
-                //Setting carret position in late update is required to prevent from some bugs.
-                previewField.caretPosition = previewField.text.Length;
-                setCaretPosition = false;
-            }
-        }
-
         /// <summary>
         /// Switches keyboard to letter layout.
         /// </summary>
@@ -235,24 +227,22 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             if (IsTextFullySelected())
             {
                 previewField.text = character;
-                //previewField.Select();
-                setCaretPosition = true;
+                StartCoroutine(SetCarretInInputField(previewField, 1));
             }
             else if (carretPosition != previewField.text.Length)
             {
                 previewField.text = previewField.text.Substring(0, carretPosition) + character + previewField.text.Substring(carretPosition, previewField.text.Length - carretPosition);
-                //previewField.Select();
-                previewField.caretPosition++;
+                StartCoroutine(SetCarretInInputField(previewField, carretPosition+1));
             }
             else
             {
                 previewField.text += character;
-                //previewField.Select();
-                setCaretPosition = true;
+                StartCoroutine(SetCarretInInputField(previewField, carretPosition + 1));
             }
-
+            
             OnValueChanged.Invoke(previewField.text);
-            previewText.text = previewField.text;
+            editedField.text = previewField.text;
+            editedField.ForceLabelUpdate();
 
             pressSource.Play();
         }
@@ -270,24 +260,24 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 if (IsTextFullySelected())
                 {
                     previewField.text = string.Empty;
-                    //previewField.Select();
-                    setCaretPosition = true;
+                    StartCoroutine(SetCarretInInputField(previewField, 0));
                 }
                 else if (carretPosition != lenght && carretPosition > 0)
                 {
                     previewField.text = previewField.text.Substring(0, carretPosition - 1) + previewField.text.Substring(carretPosition, lenght - carretPosition);
-                    //previewField.Select();
-                    previewField.caretPosition = Mathf.Clamp(carretPosition - 1, 0, lenght);
+                    StartCoroutine(SetCarretInInputField(previewField, Mathf.Clamp(carretPosition - 1, 0, lenght)));
                 }
-                else
+                else if (carretPosition > 0)
                 {
                     previewField.text = previewField.text.Substring(0, lenght - 1);
-                    //previewField.Select();
-                    setCaretPosition = true;
+                    StartCoroutine(SetCarretInInputField(previewField, carretPosition - 1));
                 }
+                else
+                    return;
 
                 OnValueChanged.Invoke(previewField.text);
-                previewText.text = previewField.text;
+                editedField.text = previewField.text;
+                editedField.ForceLabelUpdate();
             }
         }
 
@@ -298,63 +288,73 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <param name="onEditFinished"></param>
         public void OpenKeyboard(InputField inputField, Action<string> onEditFinished)
         {
-            previewText.gameObject.SetActive(true);
-            this.previewText.text = inputField.text;
-            this.previewField = inputField;
+            this.previewField.text = inputField.text;
+            this.editedField = inputField;
             OpenKeyboard(inputField.text, onEditFinished, null, false);
         }
 
         /// <summary>
         /// Opens the keyboard to edit a text input.
         /// </summary>
-        /// <param name="startValue"></param>
+        /// <param name="editedText"></param>
         /// <param name="onEditFinished">Callback called when the edition ends, string parameter is the final value entered by users.</param>
-        public void OpenKeyboard(string startValue, Action<string> onEditFinished, Action onEditCanceled, bool selectPreviewField)
+        public void OpenKeyboard(string editedText, Action<string> onEditFinished, Action onEditCanceled, bool selectPreviewField)
         {
             if (WasClosedLastFrame)
                 return;
 
             root.SetActive(true);
 
-            previewField.text = startValue;
+            previewField.text = editedText;
 
             if (selectPreviewField)
-                StartCoroutine(SelectField(previewField));
+                previewField.Select();
 
             this.onEditFinished = onEditFinished;
             this.onEditCanceled = onEditCanceled;
 
             IsOpen = true;
+
+            StartCoroutine(WaitAndSelectField(previewField));
         }
+
+        /// <summary>
+        /// Opens the keyboard at a certain position to edit a text input
+        /// </summary>
+        /// <param name="editedText"></param>
+        /// <param name="onEditFinished"></param>
+        /// <param name="position"></param>
+        /// <param name="normal"></param>
+        public void OpenKeyboard(string editedText, Action<string> onEditFinished, Action onEditCanceled, Vector3 position, Vector3 normal)
+        {
+            transform.SetPositionAndRotation(position, Quaternion.LookRotation(normal, Vector3.up));
+
+            OpenKeyboard(editedText, onEditFinished, onEditCanceled, true);
+        }
+
+    
 
         /// <summary>
         /// Selects an <see cref="InputField"/> once it is possible.
         /// </summary>
         /// <param name="field"></param>
         /// <returns></returns>
-        IEnumerator SelectField(InputField field)
+        IEnumerator WaitAndSelectField(InputField field)
         {
             while (EventSystem.current.alreadySelecting)
                 yield return null;
 
-            EventSystem.current.SetSelectedGameObject(null, null);
+            var navMode = new Navigation() { mode = Navigation.Mode.None };
+            editedField.navigation = navMode;
+
             field.Select();
         }
 
-        /// <summary>
-        /// Opens the keyboard at a certain position to edit a text input
-        /// </summary>
-        /// <param name="startValue"></param>
-        /// <param name="onEditFinished"></param>
-        /// <param name="position"></param>
-        /// <param name="normal"></param>
-        public void OpenKeyboard(string startValue, Action<string> onEditFinished, Action onEditCanceled, Vector3 position, Vector3 normal)
+        IEnumerator SetCarretInInputField(InputField field, int position)
         {
-            transform.position = position;
-            transform.rotation = Quaternion.LookRotation(normal, Vector3.up);
-            previewText.gameObject.SetActive(false);
-
-            OpenKeyboard(startValue, onEditFinished, onEditCanceled, true);
+            yield return new WaitForEndOfFrame();
+            field.caretPosition = position;
+            field.ForceLabelUpdate();
         }
 
         /// <summary>
@@ -380,8 +380,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// </summary>
         public void Hide()
         {
-            previewText.gameObject.SetActive(false);
-
             root.SetActive(false);
             setCaretPosition = false;
 
