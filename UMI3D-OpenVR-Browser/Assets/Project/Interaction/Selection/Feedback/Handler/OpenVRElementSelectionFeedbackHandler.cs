@@ -27,7 +27,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
     /// Feedback handler for interactable selection feedback
     /// Mostly useful for Unity's serialization
     /// </summary>
-    public class OpenVRSelectableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
+    public class OpenVRElementSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
     {
         [SerializeField]
         private OpenVRHapticSelectionFeedback hapticFeedback;
@@ -65,6 +65,4 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
             }
         }
     }
-
-
 }

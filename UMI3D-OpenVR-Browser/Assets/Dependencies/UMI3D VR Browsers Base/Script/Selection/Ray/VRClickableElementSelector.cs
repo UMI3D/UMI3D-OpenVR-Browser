@@ -117,12 +117,12 @@ namespace umi3dVRBrowsersBase.selection
                         {
                             laser.OnHoverExit(lastElement.GetHashCode());
                             NotifyStopHovering(lastElement);
-                            lastElement.HoverExit();
+                            //LastElement.HoverExit(controller);
                         }
 
                         lastElement = clickable;
                         NotifyStartHovering(clickable);
-                        clickable.HoverEnter();
+                        //Clickable.HoverEnter();
 
                         laser.OnHoverEnter(clickable.GetHashCode());
                     }
@@ -142,7 +142,7 @@ namespace umi3dVRBrowsersBase.selection
             {
                 laser.OnHoverExit(lastElement.GetHashCode());
                 NotifyStopHovering(lastElement);
-                lastElement.HoverExit();
+                //lastElement.HoverExit();
                 lastElement = null;
             }
         }

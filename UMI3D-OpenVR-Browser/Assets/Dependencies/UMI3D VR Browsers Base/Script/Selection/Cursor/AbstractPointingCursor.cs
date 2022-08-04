@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using UnityEngine;
 using UnityEngine.Events;
 
 namespace umi3d.cdk.interaction.selection.cursor
@@ -24,50 +23,17 @@ namespace umi3d.cdk.interaction.selection.cursor
         public class CursorTrackingEvent : UnityEvent<PointingInfo>
         { }
 
-        public static CursorTrackingEvent OnCursorEnter = new CursorTrackingEvent();
-        public static CursorTrackingEvent OnCursorStay = new CursorTrackingEvent();
-        public static CursorTrackingEvent OnCursorExit = new CursorTrackingEvent();
-
         /// <summary>
-        /// Info on the interactable currently pointed at.
-        /// Previously known as "Hover info"
+        /// Event triggered when the cursor enters an UMI3D interactable
         /// </summary>
-        public struct PointingInfo
-        {
-            /// <summary>
-            /// True if an interactable is hit by the ray
-            /// </summary>
-            public bool isHitting;
-
-            /// <summary>
-            /// Controller tracked
-            /// </summary>
-            public AbstractController controller;
-
-            /// <summary>
-            /// Interactable currently pointed at
-            /// </summary>
-            public Interactable target;
-
-            /// <summary>
-            /// Interactable container of the interactable target
-            /// </summary>
-            public InteractableContainer targetContainer;
-
-            /// <summary>
-            /// Raycast associated
-            /// </summary>
-            public RaycastHit raycastHit;
-
-            /// <summary>
-            /// Ray direction in local coordinates
-            /// </summary>
-            public Vector3 direction;
-
-            /// <summary>
-            /// Ray direction in world coordinates
-            /// </summary>
-            public Vector3 directionWorld;
-        }
+        public static CursorTrackingEvent OnCursorEnter = new CursorTrackingEvent();
+        /// <summary>
+        /// Event triggered when the cursor stays inside an UMI3D interactable
+        /// </summary>
+        public static CursorTrackingEvent OnCursorStay = new CursorTrackingEvent();
+        /// <summary>
+        /// Event triggered when the cursor exits an UMI3D interactable
+        /// </summary>
+        public static CursorTrackingEvent OnCursorExit = new CursorTrackingEvent();
     }
 }

@@ -16,16 +16,16 @@ namespace umi3d.cdk.interaction.selection.projector
     /// <summary>
     /// Projector for Interactable
     /// </summary>
-    public class InteractableProjector : IProjector<Interactable>
+    public class InteractableProjector : IProjector<InteractableContainer>
     {
         /// <summary>
         /// Checks whether an interctable has already projected tools
         /// </summary>
         /// <param name="interactable"></param>
         /// <returns></returns>
-        public bool IsProjected(Interactable interactable)
+        public bool IsProjected(InteractableContainer interactable, AbstractController controller)
         {
-            return InteractionMapper.Instance.IsToolSelected(interactable.dto.id);
+            return InteractionMapper.Instance.IsToolSelected(interactable.Interactable.dto.id);
         }
 
         /// <summary>
@@ -33,10 +33,10 @@ namespace umi3d.cdk.interaction.selection.projector
         /// </summary>
         /// <param name="interactable"></param>
         /// <param name="controller"></param>
-        public void Project(Interactable interactable, AbstractController controller)
+        public void Project(InteractableContainer interactable, AbstractController controller)
         {
-            var interactionTool = AbstractInteractionMapper.Instance.GetTool(interactable.dto.id);
-            Project(interactionTool, interactable.dto.id, controller);
+            var interactionTool = AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id);
+            Project(interactionTool, interactable.Interactable.dto.id, controller);
         }
 
         /// <summary>
@@ -58,6 +58,12 @@ namespace umi3d.cdk.interaction.selection.projector
         public void Release(AbstractTool interactionTool, AbstractController controller)
         {
             controller.Release(interactionTool, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+        }
+
+        /// <inheritdoc/>
+        public void Release(InteractableContainer interactable, AbstractController controller)
+        {
+            controller.Release(AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id), new RequestedUsingSelector<AbstractSelector>() { controller = controller });
         }
     }
 }

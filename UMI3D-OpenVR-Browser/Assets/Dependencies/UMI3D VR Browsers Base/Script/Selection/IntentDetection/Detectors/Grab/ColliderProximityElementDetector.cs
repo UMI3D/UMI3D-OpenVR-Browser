@@ -1,4 +1,4 @@
-/*
+﻿/*
 Copyright 2019 - 2021 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -10,30 +10,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-using umi3dVRBrowsersBase.interactions;
+
+using umi3d.cdk.interaction.selection.intentdetector.method;
+using umi3d.cdk.interaction.selection.zoneselection.utils;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.Events;
 
-namespace umi3dVRBrowsersBase.ui.playerMenu
+namespace umi3d.cdk.interaction.selection.intentdetector
 {
-    public class OnOffButton : Button
+    /// <summary>
+    /// Detector for proximity selection with a collider
+    /// </summary>
+    public class ColliderProximityElementDetector : AbstractGrabElementDetector
     {
         [SerializeField]
-        private GameObject m_onButton = null;
-        [SerializeField]
-        private GameObject m_offButton = null;
+        protected ElementColliderZoneSelectionHandler proximityColliderHandler;
 
-        public bool IsOn { get; private set; }
-
-        public void Toggle(bool value)
+        protected override void SetDetectionMethod()
         {
-            IsOn = value;
-            m_onButton.SetActive(IsOn ? true : false);
-            m_offButton.SetActive(IsOn ? false : true);
+            detectionMethod = new ColliderProximityDetectionMethod<AbstractClientInteractableElement>(proximityColliderHandler);
         }
-
-        public void Toggle() => Toggle(!IsOn);
     }
 }
-

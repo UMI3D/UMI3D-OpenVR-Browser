@@ -49,9 +49,7 @@ public class CameraClicker : MonoBehaviour
             {
                 if (lastElement != clickable)
                 {
-                    lastElement?.HoverExit();
                     lastElement = clickable;
-                    clickable.HoverEnter();
                 }
 
                 if (Input.GetMouseButtonDown(0))
@@ -61,7 +59,6 @@ public class CameraClicker : MonoBehaviour
             {
                 if (lastElement != null)
                 {
-                    lastElement.HoverExit();
                     lastElement = null;
                 }
             }
@@ -70,7 +67,6 @@ public class CameraClicker : MonoBehaviour
         {
             if (lastElement != null)
             {
-                lastElement.HoverExit();
                 lastElement = null;
             }
         }

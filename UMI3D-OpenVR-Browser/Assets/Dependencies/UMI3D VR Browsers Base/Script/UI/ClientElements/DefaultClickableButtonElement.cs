@@ -24,18 +24,22 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Makes a gameobject clickable by a user ray.
     /// </summary>
-    public class DefaultClickableButton : MonoBehaviour, IClickableElement
+    public class DefaultClickableButtonElement : AbstractClientInteractableElement, IClickableElement, IHoverableElement
     {
         #region Fields
 
         [SerializeField]
         [Tooltip("Event raised when this element is clicked")]
         private UnityEvent onClicked = new UnityEvent();
+        private UnityEvent onHoverEnter = new UnityEvent();
+        private UnityEvent onHoverExit = new UnityEvent();
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public UnityEvent OnClicked { get => onClicked; }
+        public UnityEvent OnHoverEnter => onHoverEnter;
+        public UnityEvent OnHoverExit => onHoverExit;
 
         [SerializeField]
         [Tooltip("Renderer of this object")]
@@ -58,20 +62,14 @@ namespace umi3dVRBrowsersBase.ui
         private Material selectMaterial;
 
         /// <summary>
-        /// Is this element in selected mode ?
-        /// </summary>
-        public bool IsSelected { get; private set; } = false;
-
-        /// <summary>
         /// Is this element currently hovered ?
         /// </summary>
         private bool isHovered = false;
 
         #endregion
 
-        private void OnEnable()
+        protected void OnEnable()
         {
-
             if (btnRenderer != null && defaultMaterial != null)
             {
                 btnRenderer.material = defaultMaterial;
@@ -82,7 +80,7 @@ namespace umi3dVRBrowsersBase.ui
         /// <inheritdoc/>
         /// </summary>
         /// <param name="controller"></param>
-        public void Click(ControllerType controller)
+        public virtual void Click(ControllerType controllerType)
         {
             onClicked?.Invoke();
 
@@ -92,16 +90,26 @@ namespace umi3dVRBrowsersBase.ui
             }
         }
 
+        public void ClickWithUnknown()
+        {
+            Click(ControllerType.Unknown);
+        }
+
+        public override void Interact(VRController controller)
+        {
+            Click(controller.type);
+        }
+
         /// <summary>
         /// Displays press feedback during a certain time.
         /// </summary>
         /// <returns></returns>
-        private IEnumerator SetPressFeedback()
+        protected virtual IEnumerator SetPressFeedback()
         {
             btnRenderer.material = pressedMaterial;
             yield return new WaitForSeconds(.3f);
 
-            if (IsSelected && selectMaterial != null)
+            if (isSelected && selectMaterial != null)
             {
 
                 btnRenderer.material = selectMaterial;
@@ -118,38 +126,33 @@ namespace umi3dVRBrowsersBase.ui
             }
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void HoverEnter()
+        public virtual void HoverEnter(ControllerType controller)
         {
-            if (btnRenderer != null && !IsSelected && hoverMaterial != null)
+            if (btnRenderer != null && !isSelected && hoverMaterial != null)
             {
                 btnRenderer.material = hoverMaterial;
             }
             isHovered = true;
+            onHoverEnter.Invoke();
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void HoverExit()
+        public virtual void HoverExit(ControllerType controller)
         {
-            if (btnRenderer != null && !IsSelected && defaultMaterial != null)
+            if (btnRenderer != null && !isSelected && defaultMaterial != null)
             {
                 btnRenderer.material = defaultMaterial;
             }
             isHovered = false;
+            onHoverExit.Invoke();
         }
 
-        /// <summary>
-        /// Selects this element.
-        /// </summary>
-        public void Select()
+        public virtual bool IsHovered(ControllerType controller) => isHovered;
+
+        public override void Select(VRController controller)
         {
-            if (!IsSelected)
+            if (!isSelected)
             {
-                IsSelected = true;
+                isSelected = true;
 
                 if (btnRenderer != null && selectMaterial != null)
                 {
@@ -158,19 +161,40 @@ namespace umi3dVRBrowsersBase.ui
             }
         }
 
-        /// <summary>
-        /// Unselects this element if it was selected.
-        /// </summary>
-        public void UnSelect()
+        public override void Deselect(VRController controller)
         {
-            if (IsSelected)
+            if (isSelected)
             {
-                IsSelected = false;
+                isSelected = false;
                 if (btnRenderer != null && defaultMaterial != null)
                 {
                     btnRenderer.material = defaultMaterial;
                 }
             }
+        }
+
+        /// <summary>
+        /// Force the change for renderer <br/>
+        /// Warning: The visual feedback state should be reset after use 
+        /// </summary>
+        public void ForceSelectionHighlight()
+        {
+            if (btnRenderer != null && selectMaterial != null)
+            {
+                btnRenderer.material = selectMaterial;
+            }
+        }
+
+        /// <summary>
+        /// Force the change for renderer <br/>
+        /// Warning: The visual feedback state should be reset after use 
+        /// </summary>
+        public void ForceDeselectionHighlight()
+        {
+            if (btnRenderer != null && defaultMaterial != null)
+                {
+                    btnRenderer.material = defaultMaterial;
+                }
         }
     }
 

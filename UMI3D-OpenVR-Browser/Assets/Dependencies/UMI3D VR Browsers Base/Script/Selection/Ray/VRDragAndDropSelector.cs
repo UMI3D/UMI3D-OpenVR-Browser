@@ -17,12 +17,13 @@ limitations under the License.
 using System.Collections.Generic;
 using System.Linq;
 using umi3dVRBrowsersBase.interactions;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.selection
 {
     /// <summary>
-    /// Selector for <see cref="IDraggableElement"/> and <see cref="IDropElementHandler"/>.
+    /// Selector for <see cref="IDraggableElement"/> and <see cref="IDropHandlerElement"/>.
     /// </summary>
     public class VRDragAndDropSelector : MonoBehaviour
     {
@@ -31,22 +32,22 @@ namespace umi3dVRBrowsersBase.selection
         /// <summary>
         /// List of element which can receive a drag and drop.
         /// </summary>
-        private static HashSet<IDropElementHandler> droppableHandlers = new HashSet<IDropElementHandler>();
+        private static HashSet<IDropHandlerElement> droppableHandlers = new HashSet<IDropHandlerElement>();
 
         /// <summary>
         /// Adds <paramref name="droppableHandler"/> to the list of current available droppableHandler
         /// </summary>
         /// <param name="droppableHandler"></param>
-        public static void RegisterElement(IDropElementHandler droppableHandler)
+        public static void RegisterElement(IDropHandlerElement droppableHandler)
         {
             droppableHandlers.Add(droppableHandler);
         }
 
         /// <summary>
-        /// Reverts <see cref="RegisterElement(IDropElementHandler)"/>.
+        /// Reverts <see cref="RegisterElement(IDropHandlerElement)"/>.
         /// </summary>
         /// <param name="droppableHandler"></param>
-        public static void UnRegisterElement(IDropElementHandler droppableHandler)
+        public static void UnRegisterElement(IDropHandlerElement droppableHandler)
         {
             droppableHandlers.Remove(droppableHandler);
         }
@@ -268,11 +269,11 @@ namespace umi3dVRBrowsersBase.selection
         /// </summary>
         private void CheckDrop()
         {
-            (IDropElementHandler, float) dropData = (null, Mathf.Infinity);
+            (IDropHandlerElement, float) dropData = (null, Mathf.Infinity);
 
             float tmpDistance;
 
-            foreach (IDropElementHandler dropHandler in droppableHandlers)
+            foreach (IDropHandlerElement dropHandler in droppableHandlers)
             {
                 tmpDistance = Vector3.Distance(dropHandler.GetPosition(), currentElementDragged.GetPosition());
 
@@ -291,9 +292,4 @@ namespace umi3dVRBrowsersBase.selection
 
         #endregion
     }
-
-    /// <summary>
-    /// Defines if its is a 2D or a 3D drag and drop.
-    /// </summary>
-    public enum DragAndDropType { Planar, Spatial }
 }

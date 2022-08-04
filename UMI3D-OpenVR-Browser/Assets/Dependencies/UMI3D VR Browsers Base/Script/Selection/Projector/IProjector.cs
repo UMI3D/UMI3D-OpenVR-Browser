@@ -25,5 +25,12 @@ namespace umi3d.cdk.interaction.selection.projector
         /// <param name="objToProjec"></param>
         /// <param name="controller"></param>
         void Project(T objToProjec, AbstractController controller);
+
+        /// <summary>
+        /// Remove the interaction of an object from a controller
+        /// </summary>
+        /// <param name="objToRelease"></param>
+        /// <param name="controller"></param>
+        void Release(T objToRelease, AbstractController controller);
     }
 }

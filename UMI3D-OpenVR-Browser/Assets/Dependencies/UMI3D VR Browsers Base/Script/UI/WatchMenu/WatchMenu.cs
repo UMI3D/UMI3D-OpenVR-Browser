@@ -87,15 +87,15 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
         [SerializeField]
         [Tooltip("Button to display all menus pinned by users")]
-        private DefaultClickableButton pinMenuButton;
+        private DefaultClickableButtonElement pinMenuButton;
 
         [SerializeField]
         [Tooltip("Button to display playerMenu")]
-        private DefaultClickableButton playerMenuButton;
+        private DefaultClickableButtonElement playerMenuButton;
 
         [SerializeField]
         [Tooltip("Button to display environment settings")]
-        private DefaultClickableButton settingsMenuButton;
+        private DefaultClickableButtonElement settingsMenuButton;
 
         [SerializeField]
         [Tooltip("Root of the menu")]
@@ -104,27 +104,27 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         [Header("Settings menu")]
         [SerializeField]
         [Tooltip("Button to enable microphone")]
-        private DefaultClickableButton setMicOnButton;
+        private DefaultClickableButtonElement setMicOnButton;
 
         [SerializeField]
         [Tooltip("Button to disable microphone")]
-        private DefaultClickableButton setMicOffButton;
+        private DefaultClickableButtonElement setMicOffButton;
 
         [SerializeField]
         [Tooltip("Button to enable sound")]
-        private DefaultClickableButton setSoundOnButton;
+        private DefaultClickableButtonElement setSoundOnButton;
 
         [SerializeField]
         [Tooltip("Button to disable sound")]
-        private DefaultClickableButton setSoundOffButton;
+        private DefaultClickableButtonElement setSoundOffButton;
 
         [SerializeField]
         [Tooltip("Button to send user's avatar movments")]
-        private DefaultClickableButton setAvatarOnButton;
+        private DefaultClickableButtonElement setAvatarOnButton;
 
         [SerializeField]
         [Tooltip("Button to stop sending user's avatar movments")]
-        private DefaultClickableButton setAvatarOffButton;
+        private DefaultClickableButtonElement setAvatarOffButton;
 
         [Header("Notification")]
         [Tooltip("Where all local notifications will be instanciated")]
@@ -166,8 +166,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
             BindSettingButtons();
 
-            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.Select());
-            PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.UnSelect());
+            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.ForceSelectionHighlight());
+            PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.ForceDeselectionHighlight());
 
             playerCamera = PlayerMenuManager.Instance.PlayerCameraTransform;
         }
@@ -221,7 +221,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Open();
             menuDisplayManager.Display(true);
-            pinMenuButton.Select();
+            pinMenuButton.ForceSelectionHighlight();
         }
 
         /// <summary>
@@ -231,7 +231,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Close();
             menuDisplayManager.Hide();
-            pinMenuButton.UnSelect();
+            pinMenuButton.ForceDeselectionHighlight();
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             {
                 isSettingsMenuOpened = true;
                 settingsMenuRoot.SetActive(true);
-                settingsMenuButton.Select();
+                settingsMenuButton.ForceSelectionHighlight();
             }
         }
 
@@ -288,7 +288,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             {
                 isSettingsMenuOpened = false;
                 settingsMenuRoot.SetActive(false);
-                settingsMenuButton.UnSelect();
+                settingsMenuButton.ForceDeselectionHighlight();
             }
         }
 

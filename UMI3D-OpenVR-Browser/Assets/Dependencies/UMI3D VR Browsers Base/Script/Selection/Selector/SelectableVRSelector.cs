@@ -11,10 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using umi3d.cdk.interaction.selection.feedback;
+using System.Collections.Generic;
 using umi3d.cdk.interaction.selection.intentdetector;
 using umi3d.cdk.interaction.selection.projector;
-using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -36,56 +35,53 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractGrabSelectableDetector grabDetector;
 
+        SelectableVRSelector() : base()
+        {
+            supportedObjectType = SelectableObjectType.SELECTABLE;
+            projector = new SelectableProjector();
+        }
+
         /// <summary>
         /// Tag class for selection dta for selectable
         /// Mirror how interactable classes are conceived
         /// </summary>
         public class SelectableSelectionData : SelectionData<Selectable>
-        { }
+        {
+            public SelectableSelectionData() : base(SelectableObjectType.SELECTABLE)
+            {
+            }
+        }
 
         /// <summary>
-        /// Previously selected objects
+        /// Previously detected objects for virtual hand
         /// </summary>
         [HideInInspector]
-        public SelectionCache<SelectableSelectionData> selectionCache = new SelectionCache<SelectableSelectionData>();
+        public Cache<Selectable> detectionCacheProximity = new Cache<Selectable>();
 
         /// <summary>
-        /// Manages projection on the controller
+        /// Previously detected objects from virtual pointing
         /// </summary>
         [HideInInspector]
-        public SelectableProjector projector = new SelectableProjector();
+        public Cache<Selectable> detectionCachePointing = new Cache<Selectable>();
 
-        /// <summary>
-        /// Shortcut for last selected object info
-        /// </summary>
-        public SelectableSelectionData LastSelected => selectionCache.Objects.Last?.Value;
-
-        /// <summary>
-        /// Manage feedback when an object is selected
-        /// </summary>
-        public AbstractSelectionFeedbackHandler<Selectable> selectionFeedbackHandler;
-
+        /// <inheritdoc/>
         protected override void ActivateInternal()
         {
             base.ActivateInternal();
             pointingDetector.Init(controller);
             grabDetector.Init(controller);
-            selectionEvent.AddListener(OnSelection);
-            deselectionEvent.AddListener(OnDeselection);
         }
 
+        /// <inheritdoc/>
         protected override void DeactivateInternal()
         {
             base.DeactivateInternal();
             pointingDetector.Reinit();
             grabDetector.Reinit();
-            selectionEvent.RemoveAllListeners();
-            deselectionEvent.RemoveAllListeners();
         }
 
-        protected override void Update()
+        protected void Update()
         {
-            base.Update();
             if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
             {
                 if (activated)
@@ -104,7 +100,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
             }
         }
 
-
         /// <summary>
         /// Checks if the selectable :
         ///     - exists
@@ -113,103 +108,50 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         /// <param name="uiToSelect"></param>
         /// <returns></returns>
-        private bool CanSelect(Selectable uiToSelect)
+        protected override bool CanSelect(Selectable uiToSelect)
         {
             if (uiToSelect == null)
                 return false;
-            return uiToSelect.enabled
-                && (LastSelected == null || uiToSelect != LastSelected.selectedObject);
+            return uiToSelect.enabled && uiToSelect.interactable;
         }
 
-        /// <summary>
-        /// Select an object according to the current context
-        /// </summary>
+        /// <inheritdoc/>
         [ContextMenu("Pick")] //?
-        public override void Select()
+        public override List<SelectionData> Detect()
         {
-            Selectable uiToSelectProximity = null;
-            Selectable uiToSelectPointed = null;
+            var possibleSelection = new List<SelectionData>();
 
-            //priority for proximity selection
             if (grabDetector.isRunning)
             {
-                uiToSelectProximity = grabDetector.PredictTarget();
-                detectionCacheProximity.Add(uiToSelectProximity);
-                if (CanSelect(uiToSelectProximity))
+                var uiToSelectProximity = grabDetector.PredictTarget();
+                var detectionInfo = new SelectableSelectionData
                 {
-                    Select(uiToSelectProximity, out SelectableSelectionData selectionData);
-                    selectionData.detectionOrigin = SelectionData<Selectable>.DetectionOrigin.PROXIMITY;
-                    selectionCache.Add(selectionData);
-                    selectionEvent.Invoke(selectionData);
-                    return;
-                }
+                    selectedObject = uiToSelectProximity,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.PROXIMITY,
+                };
+                detectionCacheProximity.Add(detectionInfo);
+                if (CanSelect(uiToSelectProximity))
+                    possibleSelection.Add(detectionInfo);
             }
 
             if (pointingDetector.isRunning)
             {
-                uiToSelectPointed = pointingDetector.PredictTarget();
-                detectionCachePointing.Add(uiToSelectPointed);
-                if (CanSelect(uiToSelectPointed))
+                var uiToSelectPointed = pointingDetector.PredictTarget();
+                var detectionInfo = new SelectableSelectionData
                 {
-                    Select(uiToSelectPointed, out SelectableSelectionData selectionData);
-                    selectionData.detectionOrigin = SelectionData<Selectable>.DetectionOrigin.POINTING;
-                    selectionCache.Add(selectionData);
-                    selectionEvent.Invoke(selectionData);
-                    return;
-                }
+                    selectedObject = uiToSelectPointed,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.POINTING,
+                };
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(uiToSelectPointed))
+                    possibleSelection.Add(detectionInfo);
             }
-            if (uiToSelectProximity == null
-                    && uiToSelectPointed == null
-                    && LastSelected != null)
-            {
-                Deselect(LastSelected);
-                selectionCache.Add(null);
-                return;
-            }
-        }
 
-        /// <summary>
-        /// Deselect object and remove feedback
-        /// </summary>
-        /// <param name="uiToDeselectInfo"></param>
-        private void Deselect(SelectableSelectionData uiToDeselectInfo)
-        {
-            projector.Release(uiToDeselectInfo.selectedObject);
-            deselectionEvent.Invoke(uiToDeselectInfo);
-        }
-
-        /// <summary>
-        /// Select a selectable and provides its infos
-        /// </summary>
-        /// <param name="uiToSelect"></param>
-        /// <param name="selectionInfo"></param>
-        private void Select(Selectable uiToSelect, out SelectableSelectionData selectionInfo)
-        {
-            selectionInfo = new SelectableSelectionData() { selectedObject = uiToSelect };
-
-            if (LastSelected != null)
-                Deselect(LastSelected);
-
-            selectionFeedbackHandler.StartFeedback(selectionInfo);
-            projector.Project(uiToSelect, controller);
-        }
-
-        /// <summary>
-        /// Triggered when an selectable is selected
-        /// </summary>
-        /// <param name="deselectionData"></param>
-        protected override void OnSelection(SelectionData<Selectable> selectionData)
-        {
-            selectionFeedbackHandler.StartFeedback(selectionData);
-        }
-
-        /// <summary>
-        /// Triggered when an selectable is deselected
-        /// </summary>
-        /// <param name="deselectionData"></param>
-        protected override void OnDeselection(SelectionData<Selectable> deselectionData)
-        {
-            selectionFeedbackHandler.EndFeedback(deselectionData);
+            foreach (var poss in possibleSelection)
+                propositionSelectionCache.Add(poss);
+            return possibleSelection;
         }
 
         /// <summary>
@@ -219,7 +161,8 @@ namespace umi3dVRBrowsersBase.interactions.selection
         [ContextMenu("Pick")]
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (LastSelected != null)
+            var projector = this.projector as SelectableProjector;
+            if (LastSelected != null && isSelecting && LastSelected?.selectedObject is Button)
             {
                 projector.Pick(LastSelected.selectedObject, controller);
             }
@@ -238,9 +181,9 @@ namespace umi3dVRBrowsersBase.interactions.selection
         [ContextMenu("Press")]
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (LastSelected != null)
+            if (LastSelected != null && isSelecting)
             {
-                projector.Press(LastSelected.selectedObject, controller);
+                (projector as SelectableProjector).Press(LastSelected.selectedObject, controller);
             }
         }
     }

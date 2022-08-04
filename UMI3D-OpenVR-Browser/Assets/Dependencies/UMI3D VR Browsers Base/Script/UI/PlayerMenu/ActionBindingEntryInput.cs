@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System;
+using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
 using umi3dVRBrowsersBase.selection;
 using UnityEngine;
@@ -25,7 +26,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
     /// <summary>
     /// Element drag and droppable, associated to a <see cref="ActionBindingEntry"/>, to enable users to change action bindings.
     /// </summary>
-    public class ActionBindingEntryInput : MonoBehaviour, IDraggableElement, IDropElementHandler
+    public class ActionBindingEntryInput : AbstractClientInteractableElement, IDraggableElement, IDropHandlerElement
     {
         #region
 
@@ -131,6 +132,11 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         }
 
+        public override void Interact(VRController controller)
+        {
+            OnDragStart();
+        }
+
         /// <summary>
         /// Sets the backgound according to binding type.
         /// </summary>
@@ -210,6 +216,16 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public DragAndDropType GetDragType()
         {
             return DragAndDropType.Planar;
+        }
+
+        public override void Select(VRController controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

@@ -34,16 +34,6 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         /// <param name="controller">Controller used to click</param>
         void Click(ControllerType controller);
-
-        /// <summary>
-        /// Raises an event when this element starts being hovered.
-        /// </summary>
-        void HoverEnter();
-
-        /// <summary>
-        /// Raises an event when this element stopped being hovered.
-        /// </summary>
-        void HoverExit();
     }
 
 }

@@ -16,7 +16,9 @@ limitations under the License.
 
 using System;
 using umi3dVRBrowsersBase.selection;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.input
@@ -25,7 +27,7 @@ namespace umi3dVRBrowsersBase.interactions.input
     /// Turns a <see cref="Scrollbar"/> draggable by a <see cref="VRDragAndDropSelector"/>.
     /// </summary>
     [RequireComponent(typeof(Scrollbar))]
-    public class DraggableScrollbar : MonoBehaviour, IDraggableElement
+    public class DraggableScrollbarElement : AbstractClientInteractableElement, IDraggableElement, IPressableElement
     {
         #region Fields
 
@@ -48,6 +50,12 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// World position of <see cref="scrollbarTransform"/> 's bottom left corner.
         /// </summary>
         private Vector3 bottomLeftCorner;
+
+        private UnityEvent onPressedDown = new UnityEvent();
+        private UnityEvent onPressedUp = new UnityEvent();
+        public UnityEvent OnPressedDown => onPressedDown;
+
+        public UnityEvent OnPressedUp => onPressedUp;
 
         #endregion
 
@@ -105,6 +113,11 @@ namespace umi3dVRBrowsersBase.interactions.input
             }
         }
 
+        public override void Interact(VRController controller)
+        {
+            OnDragStart();
+        }
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -146,6 +159,31 @@ namespace umi3dVRBrowsersBase.interactions.input
         public DragAndDropType GetDragType()
         {
             return DragAndDropType.Planar;
+        }
+
+        public void PressDown(ControllerType controller)
+        {
+            OnDragStart();
+        }
+
+        public void PressUp(ControllerType controller)
+        {
+            OnDragStop();
+        }
+
+        public bool IsPressed(ControllerType controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Select(VRController controller)
+        {
+            
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            
         }
 
         #endregion

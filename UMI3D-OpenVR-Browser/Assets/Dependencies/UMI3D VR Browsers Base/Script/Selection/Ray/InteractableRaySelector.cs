@@ -22,6 +22,7 @@ using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.ui;
+using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -278,9 +279,9 @@ namespace umi3dVRBrowsersBase.selection
                         interactable.HoverEnter(boneId, currentHoveredId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
 
                         if (interactable.interactions.Count(i => i is AbstractParameterDto) > 0)
-                            ParameterGear.Instance.Display(interactable, hit.Value.point, transform.position - hit.Value.point, Vector3.ProjectOnPlane(transform.position - lastPosition, cameraTransform.forward));
+                            PlayerMenuManager.Instance.parameterGear.Display(interactable, hit.Value.point, transform.position - hit.Value.point, Vector3.ProjectOnPlane(transform.position - lastPosition, cameraTransform.forward));
                         else
-                            ParameterGear.Instance.Hide();
+                            PlayerMenuManager.Instance.parameterGear.Hide();
 
                         Pulse();
 
@@ -324,7 +325,7 @@ namespace umi3dVRBrowsersBase.selection
                 {
                     lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                     onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
-                    ParameterGear.Instance.Hide();
+                    PlayerMenuManager.Instance.parameterGear.Hide();
 
                     if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
                     {
@@ -347,7 +348,7 @@ namespace umi3dVRBrowsersBase.selection
             {
                 lastActiveHoveredInteractable.Interactable.HoverExit(boneId, lastActiveHoveredInteractableId, lastHoveredPos, lastHoveredNormal, lastHoveredDirection);
                 onHoverExit.Invoke(lastActiveHoveredInteractable.Interactable);
-                ParameterGear.Instance.Hide();
+                PlayerMenuManager.Instance.parameterGear.Hide();
 
                 if (lastActiveHoveredInteractable.Interactable.dto.HoverExitAnimationId != 0)
                 {

@@ -16,20 +16,20 @@ limitations under the License.
 
 using UnityEngine;
 
-namespace umi3dVRBrowsersBase.selection
+namespace umi3dVRBrowsersBase.ui
 {
     /// <summary>
     /// Makes an object able to receive <see cref="IDraggableElement"/>.
     /// </summary>
-    public interface IDropElementHandler
+    public interface IDropHandlerElement
     {
         /// <summary>
-        /// Overriding required to call <see cref="VRDragAndDropSelector.RegisterElement(IDropElementHandler)"/>. 
+        /// Overriding required to call <see cref="VRDragAndDropSelector.RegisterElement(IDropHandlerElement)"/>. 
         /// </summary>
         void OnEnable();
 
         /// <summary>
-        /// Overriding required to call <see cref="VRDragAndDropSelector.UnRegisterElement(IDropElementHandler)(IDropElementHandler)"/>. 
+        /// Overriding required to call <see cref="VRDragAndDropSelector.UnRegisterElement(IDropHandlerElement)(IDropElementHandler)"/>. 
         /// </summary>
         void OnDisable();
 

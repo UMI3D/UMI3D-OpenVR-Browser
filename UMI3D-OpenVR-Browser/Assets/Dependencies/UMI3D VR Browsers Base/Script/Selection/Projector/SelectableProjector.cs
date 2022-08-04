@@ -24,11 +24,7 @@ namespace umi3d.cdk.interaction.selection.projector
     /// </summary>
     public class SelectableProjector : IProjector<Selectable>
     {
-        /// <summary>
-        /// Makes interactons available on the controller
-        /// </summary>
-        /// <param name="selectable"></param>
-        /// <param name="controller"></param>
+        /// <inheritdoc/>
         public void Project(Selectable selectable, AbstractController controller)
         {
             var pointerEventData = new PointerEventData(EventSystem.current) { clickCount = 1 };
@@ -48,6 +44,12 @@ namespace umi3d.cdk.interaction.selection.projector
                 if (!(selectable is InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
+        }
+
+        /// <inheritdoc/>
+        public void Release(Selectable selectable, AbstractController controller)
+        {
+            Release(selectable);
         }
 
         /// <summary>

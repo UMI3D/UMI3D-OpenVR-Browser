@@ -14,9 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 
-namespace umi3dVRBrowsersBase.selection
+namespace umi3dVRBrowsersBase.ui
 {
     /// <summary>
     /// Interface to make an object draggable by a VR controller.
@@ -46,7 +47,7 @@ namespace umi3dVRBrowsersBase.selection
         Vector3 GetPosition();
 
         /// <summary>
-        /// Defines what to do when this element is not released on top of a <see cref="IDropElementHandler"/>.
+        /// Defines what to do when this element is not released on top of a <see cref="IDropHandlerElement"/>.
         /// </summary>
         void OnDropFailCallback();
 
@@ -73,4 +74,9 @@ namespace umi3dVRBrowsersBase.selection
         /// <returns></returns>
         DragAndDropType GetDragType();
     }
+
+    /// <summary>
+    /// Defines if its is a 2D or a 3D drag and drop.
+    /// </summary>
+    public enum DragAndDropType { Planar, Spatial }
 }

@@ -74,12 +74,12 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
             SelectionData<InteractableContainer> interactableSelectionData = selectionData as SelectionData<InteractableContainer>;
             if (interactableSelectionData == null)
                 return;
-            if (interactableSelectionData.detectionOrigin == SelectionData<InteractableContainer>.DetectionOrigin.POINTING)
+            if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
             {
                 Outline(interactableSelectionData.selectedObject, pointedOutlineShader);
                 pointingCursor.ChangeAccordingToSelection(selectionData);
             }
-            else if (interactableSelectionData.detectionOrigin == SelectionData<InteractableContainer>.DetectionOrigin.PROXIMITY)
+            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
             {
                 Outline(interactableSelectionData.selectedObject, proximityOutlineShader);
             }               
@@ -91,7 +91,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
             if (interactableSelectionData == null)
                 return;
             DisableOutline(interactableSelectionData.selectedObject);
-            if (interactableSelectionData.detectionOrigin == SelectionData<InteractableContainer>.DetectionOrigin.POINTING)
+            if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
                 pointingCursor.ChangeAccordingToSelection(null);
         }
 

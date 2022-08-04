@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
 using umi3d.cdk.interaction;
-using umi3d.cdk.interaction.selection.feedback;
 using umi3d.cdk.interaction.selection.intentdetector;
 using umi3d.cdk.interaction.selection.projector;
 using UnityEngine;
@@ -34,34 +34,38 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractGrabInteractableDetector grabDetector;
 
+        InteractableVRSelector() : base()
+        {
+            supportedObjectType = SelectableObjectType.INTERACTABLE;
+            projector = new InteractableProjector();
+        }
 
+        /// <inheritdoc/>
         [HideInInspector]
         public class InteractableSelectionData : SelectionData<InteractableContainer>
         {
+            /// <summary>
+            /// Tool associated to the Interactable
+            /// </summary>
             public AbstractTool tool;
+
+            public InteractableSelectionData() : base(SelectableObjectType.INTERACTABLE)
+            {
+            }
         }
 
         /// <summary>
-        /// Previously selected objects
+        /// Previously detected objects for virtual hand
         /// </summary>
         [HideInInspector]
-        public SelectionCache<InteractableSelectionData> selectionCache = new SelectionCache<InteractableSelectionData>();
+        public Cache<InteractableContainer> detectionCacheProximity = new Cache<InteractableContainer>();
 
         /// <summary>
-        /// Manages projection on the controller
+        /// Previously detected objects from virtual pointing
         /// </summary>
         [HideInInspector]
-        public InteractableProjector projector = new InteractableProjector();
+        public Cache<InteractableContainer> detectionCachePointing = new Cache<InteractableContainer>();
 
-        /// <summary>
-        /// Shortcut for last selected object info
-        /// </summary>
-        public InteractableSelectionData LastSelected => selectionCache.Objects.Last?.Value;
-
-        /// <summary>
-        /// Manage feedback when an object is selected
-        /// </summary>
-        public AbstractSelectionFeedbackHandler<InteractableContainer> selectionFeedbackHandler;
 
         /// <inheritdoc/>
         protected override void ActivateInternal()
@@ -69,8 +73,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             base.ActivateInternal();
             pointingDetector.Init(controller);
             grabDetector.Init(controller);
-            selectionEvent.AddListener(OnSelection);
-            deselectionEvent.AddListener(OnDeselection);
+            projector = new InteractableProjector();
         }
 
         /// <inheritdoc/>
@@ -79,8 +82,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
             base.DeactivateInternal();
             pointingDetector.Reinit();
             grabDetector.Reinit();
-            selectionEvent.RemoveAllListeners();
-            deselectionEvent.RemoveAllListeners();
         }
 
         /// <summary>
@@ -91,109 +92,100 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <returns></returns>
-        private bool CanSelect(InteractableContainer icToSelect)
+        protected override bool CanSelect(InteractableContainer icToSelect)
         {
             return icToSelect != null
-                    && icToSelect != LastSelected?.selectedObject
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
                     && !InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.dto.id);
         }
 
-        /// <summary>
-        /// Select an object according to the current context
-        /// </summary>
-        public override void Select()
+        private bool IsObjectAlreadySelected(InteractableContainer ic)
         {
-            InteractableContainer interactableToSelectProximity = null;
-            InteractableContainer interactableToSelectPointed = null;
+            return ic == LastSelected?.selectedObject
+                    || InteractionMapper.Instance.IsToolSelected(ic.Interactable.dto.id);
+        }
 
-            //priority for proximity selection
+
+        /// <inheritdoc/>
+        public override List<SelectionData> Detect()
+        {
+            var possibleSelection = new List<SelectionData>();
+
             if (grabDetector.isRunning)
             {
-                interactableToSelectProximity = grabDetector.PredictTarget();
-                detectionCacheProximity.Add(interactableToSelectProximity);
-                if (CanSelect(interactableToSelectProximity))
+                var interactableToSelectProximity = grabDetector.PredictTarget();
+                var detectionInfo = new InteractableSelectionData
                 {
-                    Select(interactableToSelectProximity, out InteractableSelectionData selectionData);
-                    selectionData.detectionOrigin = SelectionData<InteractableContainer>.DetectionOrigin.PROXIMITY;
-                    selectionCache.Add(selectionData);
-                    selectionEvent.Invoke(selectionData);
-                    return;
-                }
+                    selectedObject = interactableToSelectProximity,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.PROXIMITY,
+                };
+                detectionCacheProximity.Add(detectionInfo);
+                if (CanSelect(interactableToSelectProximity))
+                    possibleSelection.Add(detectionInfo);
             }
 
             if (pointingDetector.isRunning)
             {
-                interactableToSelectPointed = pointingDetector.PredictTarget();
-                detectionCachePointing.Add(interactableToSelectPointed);
-                if (CanSelect(interactableToSelectPointed))
+                var interactableToSelectPointed = pointingDetector.PredictTarget();
+                var detectionInfo = new InteractableSelectionData
                 {
-                    Select(interactableToSelectPointed, out InteractableSelectionData selectionData);
-                    selectionData.detectionOrigin = SelectionData<InteractableContainer>.DetectionOrigin.POINTING;
-                    selectionCache.Add(selectionData);
-                    selectionEvent.Invoke(selectionData);
-                    return;
-                }
+                    selectedObject = interactableToSelectPointed,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.POINTING,
+                };
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(interactableToSelectPointed))
+                    possibleSelection.Add(detectionInfo);
             }
 
-            if (interactableToSelectProximity == null
-                    && interactableToSelectPointed == null
-                    && LastSelected != null)
-            {
-                Deselect(LastSelected);
-                selectionCache.Add(null);
-                return;
-            }
+            foreach (var poss in possibleSelection)
+                propositionSelectionCache.Add(poss);
+            return possibleSelection;
         }
 
         /// <summary>
         /// Deselect object and remove feedback
         /// </summary>
         /// <param name="interactableToDeselectInfo"></param>
-        private void Deselect(InteractableSelectionData interactableToDeselectInfo)
+        protected override void Deselect(SelectionData<InteractableContainer> interactableToDeselectInfo)
         {
-            if (LastSelected != null
-                || (LastSelected == null && LastSelected.tool != null)) //destroyed object but tool still there
-                projector.Release(LastSelected.tool, controller);
-            deselectionEvent.Invoke(interactableToDeselectInfo);
+            var icToDeselectinfo = interactableToDeselectInfo as InteractableSelectionData;
+            if (isSelecting 
+                && (LastSelected?.selectedObject.Interactable != null 
+                    || InteractionMapper.Instance.IsToolSelected(icToDeselectinfo.tool.id))) // happens when object destroyed but tool still selected
+            {
+                projector.Release(LastSelected.selectedObject, controller);
+                isSelecting = false;
+                deselectionEvent.Invoke(interactableToDeselectInfo);
+            } 
         }
 
         /// <summary>
         /// Select an interactable and provides its infos
         /// </summary>
-        /// <param name="icToSelect"></param>
         /// <param name="selectionInfo"></param>
-        private void Select(InteractableContainer icToSelect, out InteractableSelectionData selectionInfo)
+        /// <param name="selectionInfo"></param>
+        protected override void Select(SelectionData<InteractableContainer> selectionInfo)
         {
-            var interactionTool = AbstractInteractionMapper.Instance.GetTool(icToSelect.Interactable.dto.id);
-            selectionInfo = new InteractableSelectionData() { selectedObject = icToSelect, tool = interactionTool };
+            if (IsObjectAlreadySelected(selectionInfo.selectedObject) && isSelecting)
+                return;
 
-            if (LastSelected != null
-                || (!controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool)))
+            var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);
+            if (selectionInfo is InteractableSelectionData)
+                (selectionInfo as InteractableSelectionData).tool = interactionTool;
+
+            if (isSelecting 
+                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))))
                 // happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
-            
-            selectionFeedbackHandler.StartFeedback(selectionInfo);
-            projector.Project(interactionTool, icToSelect.Interactable.dto.id, controller);
-        }
 
-        /// <summary>
-        /// Triggered when an Interactable is selected
-        /// </summary>
-        /// <param name="deselectionData"></param>
-        protected override void OnSelection(SelectionData<InteractableContainer> selectionData)
-        {
-            selectionFeedbackHandler.StartFeedback(selectionData);
-        }
-
-        /// <summary>
-        /// Triggered when an Interactable is deselected
-        /// </summary>
-        /// <param name="deselectionData"></param>
-        protected override void OnDeselection(SelectionData<InteractableContainer> deselectionData)
-        {
-            selectionFeedbackHandler.EndFeedback(deselectionData);
+            projector.Project(selectionInfo.selectedObject, controller);
+            selectionInfo.hasBeenSelected = true;
+            LastSelected = selectionInfo;
+            isSelecting = true;
+            selectionEvent.Invoke(selectionInfo);
         }
     }
 }

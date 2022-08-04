@@ -11,14 +11,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using umi3d.cdk.interaction;
 using umi3d.cdk.interaction.selection;
 using umi3d.cdk.interaction.selection.cursor;
 using umi3d.cdk.interaction.selection.zoneselection;
 using umi3dVRBrowsersBase.interactions;
+using umi3dVRBrowsersBase.interactions.selection;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dbrowser.openvr.interaction.selection.cursor
@@ -29,17 +31,11 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
     public class RayCursor : AbstractPointingCursor
     {
         [Header("Laser")]
-        /// <summary>
-        /// Ray cast from the controller
-        /// </summary>
         public GameObject laserObject;
 
         private Renderer laserObjectRenderer;
 
         [Header("ImpactPoint")]
-        /// <summary>
-        /// Object displayed at the impact point
-        /// </summary>
         public GameObject impactPoint;
 
         private Renderer impactPointRenderer;
@@ -79,13 +75,15 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
         /// </summary>
         private float maxLength = 500;
 
-        RaySelectionZone<Selectable> raycastHelperSelectable;
-        RaySelectionZone<InteractableContainer> raycastHelperInteractable;
+        private RaySelectionZone<Selectable> raycastHelperSelectable;
+        private RaySelectionZone<InteractableContainer> raycastHelperInteractable;
+        private RaySelectionZone<AbstractClientInteractableElement> raycastHelperElement;
 
         /// <summary>
         /// Info of the interactable currently pointed at and associated raycast
         /// </summary>
         public PointingInfo trackingInfo = new PointingInfo();
+
         /// <summary>
         /// Info of the last interactable pointed at and associated raycast
         /// </summary>
@@ -104,30 +102,66 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
                 laserObjectRenderer.material = defaultMaterial;
 
             SetInfinitePoint();
+
+            OnCursorEnter.AddListener((PointingInfo trackingInfo) =>
+            {
+                trackingInfo.targetContainer.Interactable.HoverEnter(
+                    controller.bone.boneType,
+                    trackingInfo.targetContainer.Interactable.id,
+                    trackingInfo.raycastHit.point,
+                    trackingInfo.raycastHit.normal,
+                    trackingInfo.direction);
+            });
+
+            OnCursorExit.AddListener((PointingInfo trackingInfo) =>
+            {
+                trackingInfo.targetContainer.Interactable.HoverExit(
+                    controller.bone.boneType,
+                    trackingInfo.targetContainer.Interactable.id,
+                    trackingInfo.raycastHit.point,
+                    trackingInfo.raycastHit.normal,
+                    trackingInfo.direction);
+            });
+
+            OnCursorStay.AddListener((PointingInfo trackingInfo) =>
+            {
+                trackingInfo.targetContainer.Interactable.Hovered(
+                    controller.bone.boneType,
+                    trackingInfo.targetContainer.Interactable.id,
+                    trackingInfo.raycastHit.point,
+                    trackingInfo.raycastHit.normal,
+                    trackingInfo.direction);
+            });
+        }
+
+        private bool IsAtReach(object obj, float distance)
+        {
+            return obj != null && distance < maxLength;
         }
 
         public void Update()
         {
             raycastHelperSelectable = new RaySelectionZone<Selectable>(transform.position, transform.up);
             raycastHelperInteractable = new RaySelectionZone<InteractableContainer>(transform.position, transform.up);
+            raycastHelperElement = new RaySelectionZone<AbstractClientInteractableElement>(transform.position, transform.up);
 
             //Update impact point position
             var closestInteractable = raycastHelperInteractable.GetClosestAndRaycastHit();
             var closestSelectable = raycastHelperSelectable.GetClosestAndRaycastHit();
+            var closestElement = raycastHelperElement.GetClosestAndRaycastHit();
 
-            if (closestInteractable.obj != null && closestInteractable.raycastHit.distance < maxLength
-                && closestSelectable.obj != null && closestInteractable.raycastHit.distance < maxLength)
+            var listObjects = new List<KeyValuePair<object, RaycastHit>>()
             {
-                if (closestInteractable.raycastHit.distance < closestSelectable.raycastHit.distance)
-                    SetImpactPoint(closestInteractable.raycastHit.point);
-                else
-                    SetImpactPoint(closestSelectable.raycastHit.point);
-            }
-            else if (closestInteractable.obj != null && (closestInteractable.raycastHit.distance < maxLength))
-                SetImpactPoint(closestInteractable.raycastHit.point);
-            else if (closestSelectable.obj != null && closestSelectable.raycastHit.distance < maxLength)
-                SetImpactPoint(closestSelectable.raycastHit.point);
-            else if (!isInfinite)
+                new KeyValuePair<object, RaycastHit>(closestInteractable.obj, closestInteractable.raycastHit),
+                new KeyValuePair<object, RaycastHit>(closestSelectable.obj, closestSelectable.raycastHit),
+                new KeyValuePair<object, RaycastHit>(closestElement.obj, closestElement.raycastHit),
+            };
+
+            var listReachableObjects = listObjects.Where(x => IsAtReach(x.Key, x.Value.distance));
+
+            if (listReachableObjects.Any())
+                SetImpactOnClosest(listReachableObjects.Select(x => x.Value));
+            else
                 SetInfinitePoint();
 
             //cache cursor tracking info
@@ -168,16 +202,16 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
             else if (closestInteractable.obj != null && closestInteractable.obj == lastTrackingInfo.targetContainer) //same object
                 OnCursorStay.Invoke(trackingInfo);
             else if (lastTrackingInfo.isHitting) //from one object to no object
-                    OnCursorExit.Invoke(lastTrackingInfo);
+                OnCursorExit.Invoke(lastTrackingInfo);
         }
-
 
         /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObject)
         {
+            var selectedInfo = selectedObject as SelectionData;
             if (IsDisplayed)
             {
-                if (isChanged && selectedObject == null)
+                if (isChanged && selectedInfo == null)
                 {
                     laserObjectRenderer.material = defaultMaterial;
                     impactPointRenderer.material = defaultMaterial;
@@ -188,6 +222,23 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
                     laserObjectRenderer.material = selectionMaterial;
                     impactPointRenderer.material = selectionMaterial;
                     isChanged = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Look for the best raycasthit and set the impact point
+        /// </summary>
+        /// <param name="raycastHits"></param>
+        private void SetImpactOnClosest(IEnumerable<RaycastHit> raycastHits)
+        {
+            var minDist = raycastHits.Min(x => x.distance);
+            foreach (RaycastHit rh in raycastHits)
+            {
+                if (rh.distance == minDist)
+                {
+                    SetImpactPoint(rh.point);
+                    break;
                 }
             }
         }

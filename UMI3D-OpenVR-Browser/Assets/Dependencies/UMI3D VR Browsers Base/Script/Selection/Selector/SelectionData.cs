@@ -17,23 +17,31 @@ namespace umi3d.cdk.interaction.selection
     /// Information of selection tagging interface
     /// </summary>
     public abstract class AbstractSelectionData
-    { };
+    {
+        /// <summary>
+        /// Controller source of detection
+        /// </summary>
+        public AbstractController controller;
+
+        /// <summary>
+        /// Set to true when the object is the one chosen to be projected on the controller
+        /// </summary>
+        public bool hasBeenSelected;
+    }
 }
 
 namespace umi3dVRBrowsersBase.interactions.selection
 {
+    using umi3d.cdk.interaction;
     using umi3d.cdk.interaction.selection;
+    using UnityEngine;
 
     /// <summary>
     /// Selection info on an object
     /// </summary>
     /// <typeparam name="T">InteractableContainer or Selectable</typeparam>
-    public class SelectionData<T> : AbstractSelectionData
+    public class SelectionData : AbstractSelectionData
     {
-        /// <summary>
-        /// Selected object
-        /// </summary>
-        public T selectedObject;
         /// <summary>
         /// Selection Intent Detection paradigm used for detection
         /// </summary>
@@ -42,10 +50,57 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <summary>
         /// Selection Intent Detection paradigm used for detection
         /// </summary>
-        public enum DetectionOrigin
+        public SelectableObjectType objectType;
+    }
+
+    /// <summary>
+    /// Selection info on an object
+    /// </summary>
+    /// <typeparam name="T">InteractableContainer or Selectable</typeparam>
+    public class SelectionData<T> : SelectionData
+    {
+        /// <summary>
+        /// Selected object
+        /// </summary>
+        public T selectedObject;
+
+        public SelectionData(SelectableObjectType objType)
         {
-            POINTING,
-            PROXIMITY
+            objectType = objType;
         }
+    }
+
+    public enum SelectableObjectType
+    {
+        /// <summary>
+        /// Corresponds to <see cref="InteractableContainer"/>
+        /// </summary>
+        INTERACTABLE,
+
+        /// <summary>
+        /// Corresponds to <see cref="UnityEngine.UI.Selectable"/>
+        /// </summary>
+        SELECTABLE,
+
+        /// <summary>
+        /// Corresponds to <see cref="ui.AbstractClientInteractableElement"/>
+        /// </summary>
+        CLIENT_ELEMENT
+    }
+
+    /// <summary>
+    /// Selection Intent Detection paradigm used for detection
+    /// </summary>
+    public enum DetectionOrigin
+    {
+        /// <summary>
+        /// Object is detected through pointing by a controller
+        /// </summary>
+        POINTING,
+
+        /// <summary>
+        /// Object is detected through proximity with a controller
+        /// </summary>
+        PROXIMITY
     }
 }

@@ -16,7 +16,9 @@ limitations under the License.
 
 using System;
 using umi3dVRBrowsersBase.selection;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.input
@@ -24,7 +26,7 @@ namespace umi3dVRBrowsersBase.interactions.input
     /// <summary>
     /// Turns a <see cref="Slider"/> draggable by a <see cref="VRDragAndDropSelector"/>.
     /// </summary>
-    public class DraggableSlider : MonoBehaviour, IDraggableElement
+    public class DraggableSliderElement : AbstractClientInteractableElement, IDraggableElement, IPressableElement
     {
         #region Fields
 
@@ -56,6 +58,10 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// </summary>
         private bool isSetUp = false;
 
+        public UnityEvent OnPressedDown => throw new NotImplementedException();
+
+        public UnityEvent OnPressedUp => throw new NotImplementedException();
+
         #endregion
 
         #region Methods
@@ -85,6 +91,11 @@ namespace umi3dVRBrowsersBase.interactions.input
         public bool IsDraggingAllowed()
         {
             return true;
+        }
+
+        public override void Interact(VRController controller)
+        {
+            OnDragStart();
         }
 
         /// <summary>
@@ -156,6 +167,32 @@ namespace umi3dVRBrowsersBase.interactions.input
             return DragAndDropType.Planar;
         }
 
+        public void PressDown(ControllerType controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void PressUp(ControllerType controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsPressed(ControllerType controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Select(VRController controller)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
+
     }
 }
