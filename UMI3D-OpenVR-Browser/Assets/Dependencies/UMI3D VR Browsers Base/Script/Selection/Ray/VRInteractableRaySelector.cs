@@ -74,8 +74,8 @@ namespace umi3dVRBrowsersBase.selection
         /// </summary>
         protected override void Update()
         {
-            if ((controller as VRController).IsInputPressed || ParameterGear.Instance.IsHovered ||
-                (PlayerMenuManager.Exists && PlayerMenuManager.Instance.IsOpen) || (Keyboard.Instance?.IsOpen ?? false)
+            if ((controller as VRController).IsInputPressed || PlayerMenuManager.Instance.parameterGear.IsHovered ||
+                (PlayerMenuManager.Exists && PlayerMenuManager.Instance.IsMenuOpen) || (Keyboard.Instance?.IsOpen ?? false)
                 || VRClickableElementSelector.IsElementHovered()
                 || (associatedWatch != null && associatedWatch.IsObjectInPlayerFieldOfView()))
                 return;

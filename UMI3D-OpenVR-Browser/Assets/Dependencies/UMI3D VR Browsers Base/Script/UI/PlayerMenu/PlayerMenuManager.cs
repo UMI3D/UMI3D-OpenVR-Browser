@@ -20,15 +20,19 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui.playerMenu
 {
-    [RequireComponent(typeof(BoxCollider))]
     public partial class PlayerMenuManager
     {
+        public PlayerMenu playerMenu;
+
         /// <summary>
         /// Is the player Menu open.
         /// </summary>
-        public bool IsOpen { get; private set; } = false;
+        public bool IsMenuOpen
+        {
+            get { return playerMenu.IsOpen; }
+        }
 
-        public bool IsHovered { get; private set; } = false;
+        public bool IsMenuHovered { get; private set; } = false;
 
         public ControllerType CurrentController => m_controllerToolMenu.CurrentController;
 
@@ -85,35 +89,10 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public UnityEvent onMenuClose = new UnityEvent();
     }
 
-    public partial class PlayerMenuManager : IClickableElement
+    public partial class PlayerMenuManager : SingleBehaviour<PlayerMenuManager>
     {
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public UnityEvent OnClicked { get; private set; } = new UnityEvent();
+        public ParameterGear parameterGear;
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="controller"></param>
-        public void Click(ControllerType controller)
-        { }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void HoverEnter()
-            => IsHovered = true;
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void HoverExit()
-            => IsHovered = false;
-    }
-
-    public partial class PlayerMenuManager
-    {
         #region Player Menu
 
         /// <summary>
@@ -122,7 +101,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <param name="forceOpen"></param>
         public void Open(bool forceOpen = false)
         {
-            if (IsOpen && !forceOpen) return;
+            if (IsMenuOpen && !forceOpen) return;
 
             var playerCameraPosition = m_playerCamera.transform.position;
             var playerCameraRotation = m_playerCamera.transform.rotation;
@@ -131,13 +110,14 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             transform.RotateAround(playerCameraPosition, Vector3.up, playerCameraRotation.eulerAngles.y);
             m_playerMenuCanvas.SetActive(true);
             m_menuCollider.enabled = true;
-            ParameterGear.Instance.Hide();
+            parameterGear.Hide();
+            
 
             ToolboxesMenu.Open();
             CloseSubWindow();
 
             onMenuOpen?.Invoke();
-            IsOpen = true;
+            playerMenu.IsOpen = true;
         }
 
         /// <summary>
@@ -146,13 +126,13 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <param name="forceClose"></param>
         public void Close(bool forceClose = false)
         {
-            if (!IsOpen && !forceClose) return;
+            if (!IsMenuOpen && !forceClose) return;
             CloseSubWindow();
             m_playerMenuCanvas.SetActive(false);
             m_menuCollider.enabled = false;
 
             onMenuClose?.Invoke();
-            IsOpen = false;
+            playerMenu.IsOpen = false;
         }
 
         #endregion
@@ -183,13 +163,14 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         }
     }
 
-    public partial class PlayerMenuManager : SingleBehaviour<PlayerMenuManager>
+    public partial class PlayerMenuManager
     {
         protected override void Awake()
         {
             base.Awake();
             Debug.Assert(m_playerCamera != null, "Player Camera is null in Player Menu Manager");
             m_menuCollider = GetComponent<BoxCollider>();
+            //gear  =
             Close(true);
         }
 

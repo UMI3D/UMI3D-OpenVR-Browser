@@ -28,7 +28,7 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// 3D Object to show users its associated UMI3D Entity has UMI3D Parameters, by clicking on this gear, opens <see cref="playerMenu.PlayerMenuManager"/> to edit them.
     /// </summary>
-    public class ParameterGear : SingleBehaviour<ParameterGear>, IClickableElement
+    public class ParameterGear : AbstractClientInteractableElement, IClickableElement
     {
         #region Fields
 
@@ -104,14 +104,19 @@ namespace umi3dVRBrowsersBase.ui
         /// <inheritdoc/>
         /// </summary>
         /// <param name="controller"></param>
-        public void Click(ControllerType controller)
+        public void Click(ControllerType controllerType)
         {
             OnClicked?.Invoke();
 
-            PlayerMenuManager.Instance.OpenParameterMenu(controller);
+            PlayerMenuManager.Instance.OpenParameterMenu(controllerType);
 
             if(gameObject.activeInHierarchy)
                 StartCoroutine(ClickAnimation());
+        }
+
+        public override void Interact(VRController controller)
+        {
+            Click(controller.type);
         }
 
         /// <summary>
@@ -171,6 +176,17 @@ namespace umi3dVRBrowsersBase.ui
         {
             gameObject.SetActive(false);
         }
+
+        public override void Select(VRController controller)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            throw new System.NotImplementedException();
+        }
+
 
         #endregion
     }

@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 using System;
+using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 
@@ -20,7 +21,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
     /// <summary>
     /// Handler to enable users to move <see cref="PlayerMenuManager"/>.
     /// </summary>
-    public class PlayerMenuHandler : MonoBehaviour, IDraggableElement
+    public class PlayerMenuHandler : AbstractClientInteractableElement, IDraggableElement
     {
         #region Methods
 
@@ -125,6 +126,11 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             playerMenu.localScale = reducedScale;
         }
 
+        public override void Interact(VRController controller)
+        {
+            OnDragStart();
+        }
+
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
@@ -156,6 +162,17 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         {
             return DragAndDropType.Spatial;
         }
+
+        public override void Select(VRController controller)
+        {
+            
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            
+        }
+
 
         #endregion
     }

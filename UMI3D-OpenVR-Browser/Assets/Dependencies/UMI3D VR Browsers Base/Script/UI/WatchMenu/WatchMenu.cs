@@ -250,7 +250,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// </summary>
         public void ToggleDisplayPlayerMenuManager()
         {
-            if (PlayerMenuManager.Instance.IsOpen)
+            if (PlayerMenuManager.Instance.IsMenuOpen)
             {
                 PlayerMenuManager.Instance.Close();
             }
