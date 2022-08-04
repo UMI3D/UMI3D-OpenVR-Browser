@@ -90,11 +90,6 @@ namespace umi3dVRBrowsersBase.ui
             }
         }
 
-        public void ClickWithUnknown()
-        {
-            Click(ControllerType.Unknown);
-        }
-
         public override void Interact(VRController controller)
         {
             Click(controller.type);

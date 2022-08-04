@@ -162,7 +162,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         public void OnPointerUp(PointerEventData eventData)
         {
             var projector = this.projector as SelectableProjector;
-            if (LastSelected != null && isSelecting && LastSelected?.selectedObject is Button)
+            if (LastSelected != null && isSelecting )
             {
                 projector.Pick(LastSelected.selectedObject, controller);
             }
