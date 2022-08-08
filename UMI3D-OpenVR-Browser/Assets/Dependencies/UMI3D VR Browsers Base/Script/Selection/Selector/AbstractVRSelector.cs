@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 using System.Collections.Generic;
+using umi3d.cdk.collaboration;
 using umi3d.cdk.interaction;
 using umi3d.cdk.interaction.selection.feedback;
 using umi3d.cdk.interaction.selection.projector;
@@ -160,6 +161,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         {
             controller = GetComponentInParent<VRSelectionManager>().controller;
             base.Awake();
+            UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
         }
 
         /// <summary>
@@ -223,12 +225,20 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="selectionInfo"></param>
         protected virtual void Select(SelectionData<T> selectionInfo)
         {
-            if (LastSelected?.selectedObject == selectionInfo.selectedObject && isSelecting)
-                return;
-            if (LastSelected != null && isSelecting)
-            { 
-                Deselect(LastSelected);
+            if (isSelecting)
+            {
+                if (selectionInfo == null  && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
+                {
+                    Deselect(LastSelected);
+                    LastSelected = null;
+                    return;
+                }
+                else if (LastSelected?.selectedObject == selectionInfo.selectedObject) //  the selector was selecting the same target before
+                    return;
+                else if (LastSelected != null) // the selector was selecting something else before
+                    Deselect(LastSelected);
             }
+               
             projector.Project(selectionInfo.selectedObject, controller);
             selectionInfo.hasBeenSelected = true;
             LastSelected = selectionInfo;
@@ -250,12 +260,17 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="interactableToDeselectInfo"></param>
         protected virtual void Deselect(SelectionData<T> interactableToDeselectInfo)
         {
-            if (LastSelected != null && isSelecting)
-            {
-                projector.Release(interactableToDeselectInfo.selectedObject, controller);
-                isSelecting = false;
-                deselectionEvent.Invoke(interactableToDeselectInfo);
-            }
+            projector.Release(interactableToDeselectInfo.selectedObject, controller);
+            isSelecting = false;
+            deselectionEvent.Invoke(interactableToDeselectInfo);
         }
+
+        protected void OnEnvironmentLeave()
+        {
+            if (isSelecting && LastSelected?.selectedObject != null)
+                Deselect(LastSelected);
+        }
+
+        bool ISelector.IsSelecting() => IsSelecting;
     }
 }

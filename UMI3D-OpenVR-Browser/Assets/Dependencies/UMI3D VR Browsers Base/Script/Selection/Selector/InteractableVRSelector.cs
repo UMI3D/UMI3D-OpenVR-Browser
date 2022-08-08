@@ -100,7 +100,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
                     && !InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.dto.id);
         }
 
-        private bool IsObjectAlreadySelected(InteractableContainer ic)
+        private bool IsObjectSelected(InteractableContainer ic)
         {
             return ic == LastSelected?.selectedObject
                     || InteractionMapper.Instance.IsToolSelected(ic.Interactable.dto.id);
@@ -152,17 +152,13 @@ namespace umi3dVRBrowsersBase.interactions.selection
         protected override void Deselect(SelectionData<InteractableContainer> interactableToDeselectInfo)
         {
             var icToDeselectinfo = interactableToDeselectInfo as InteractableSelectionData;
-            if (isSelecting 
-                && (LastSelected?.selectedObject != null 
-                    || 
-                    (icToDeselectinfo.tool != null && InteractionMapper.Instance.IsToolSelected(icToDeselectinfo.tool.id)))) // happens when object destroyed but tool still selected
-            { 
-                if (icToDeselectinfo.tool != null)
-                    (projector as InteractableProjector)?.Release(icToDeselectinfo.tool, controller);
-                //! there is a case where the tool is not released and the material is not changed
-                isSelecting = false;
-                deselectionEvent.Invoke(interactableToDeselectInfo);
-            }
+
+            if (icToDeselectinfo.tool != null)
+                (projector as InteractableProjector)?.Release(icToDeselectinfo.tool, controller);
+            //! there is a case where the tool is not released and the material is not changed
+            isSelecting = false;
+            deselectionEvent.Invoke(interactableToDeselectInfo);
+
             pointingDetector.Reinit();
             grabDetector.Reinit();
         }
@@ -174,8 +170,19 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="selectionInfo"></param>
         protected override void Select(SelectionData<InteractableContainer> selectionInfo)
         {
-            if (IsObjectAlreadySelected(selectionInfo.selectedObject) && isSelecting)
-                return;
+            if (isSelecting)
+            {
+                if (selectionInfo == null && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
+                {
+                    Deselect(LastSelected);
+                    LastSelected = null;
+                    return;
+                }
+                else if (selectionInfo == null)
+                    throw new System.ArgumentNullException("Argument should be null only if moving outside of an object");
+                else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
+                    return;
+            }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);
             if (selectionInfo is InteractableSelectionData)
@@ -186,13 +193,16 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 // happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
 
-            projector.Project(selectionInfo.selectedObject, controller);
-            selectionInfo.hasBeenSelected = true;
-            LastSelected = selectionInfo;
-            isSelecting = true;
-            selectionEvent.Invoke(selectionInfo);
-            pointingDetector.Reinit();
-            grabDetector.Reinit();
+            if (controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))
+            {
+                projector.Project(selectionInfo.selectedObject, controller);
+                selectionInfo.hasBeenSelected = true;
+                LastSelected = selectionInfo;
+                isSelecting = true;
+                selectionEvent.Invoke(selectionInfo);
+                pointingDetector.Reinit();
+                grabDetector.Reinit();
+            }
         }
     }
 }

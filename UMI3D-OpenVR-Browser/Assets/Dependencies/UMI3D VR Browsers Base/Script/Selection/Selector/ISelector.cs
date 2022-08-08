@@ -19,6 +19,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
     {
         public List<SelectionData> Detect();
         public void Select(SelectionData data);
-        public void Deselect(SelectionData data);       
+        public void Deselect(SelectionData data);
+        public bool IsSelecting();
     }
 }

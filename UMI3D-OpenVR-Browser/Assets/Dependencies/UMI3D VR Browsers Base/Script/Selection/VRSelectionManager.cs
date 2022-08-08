@@ -57,12 +57,18 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 possibleSelec.AddRange(elementSelector.Detect());
             }
 
-            if (possibleSelec.Count == 0 && LastSelectedInfo != null)
+            if (possibleSelec.Count == 0) //no selection intent detected
             {
-                LastSelectorUsed?.Deselect(LastSelectedInfo);
+                if (LastSelectorUsed != null 
+                    && LastSelectorUsed.IsSelecting()
+                    && LastSelectedInfo != null)
+            {
+                    LastSelectorUsed.Select(null); //make the selector remember it cannot select something this time
+                    LastSelectedInfo = null;
+                    LastSelectorUsed = null;
+                }
             }
-
-            if (TrySelect(possibleSelec, DetectionOrigin.PROXIMITY))
+            else if (TrySelect(possibleSelec, DetectionOrigin.PROXIMITY))
                 return;
             else if (TrySelect(possibleSelec, DetectionOrigin.POINTING))
                 return;
@@ -112,12 +118,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
             // selector switching, deselection is normally handled when the selector remains the sam
             if (LastSelectedInfo != null && LastSelectorUsed != appropriateSelector)
-                LastSelectorUsed.Deselect(LastSelectedInfo);
+                LastSelectorUsed?.Select(null); //make the selector remember it cannot select something this time
 
             appropriateSelector.Select(preferedObjectData);
             LastSelectorUsed = appropriateSelector;
             LastSelectedInfo = preferedObjectData;
-
         }
 
         /// <summary>
