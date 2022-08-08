@@ -41,6 +41,8 @@ namespace umi3d.cdk.interaction.selection.zoneselection
         /// <inheritdoc/>
         public override bool IsObjectInZone(T obj)
         {
+            if (obj == null) //happens when an object is destroyed but remains someway in the cache
+                return false;
             var vectorToObject = obj.transform.position - origin;
             return Vector3.Dot(vectorToObject.normalized, direction) > Mathf.Cos(coneAngle * Mathf.PI / 180);
         }

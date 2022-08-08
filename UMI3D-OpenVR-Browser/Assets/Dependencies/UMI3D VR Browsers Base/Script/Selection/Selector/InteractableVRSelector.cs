@@ -153,13 +153,18 @@ namespace umi3dVRBrowsersBase.interactions.selection
         {
             var icToDeselectinfo = interactableToDeselectInfo as InteractableSelectionData;
             if (isSelecting 
-                && (LastSelected?.selectedObject.Interactable != null 
-                    || InteractionMapper.Instance.IsToolSelected(icToDeselectinfo.tool.id))) // happens when object destroyed but tool still selected
-            {
-                projector.Release(LastSelected.selectedObject, controller);
+                && (LastSelected?.selectedObject != null 
+                    || 
+                    (icToDeselectinfo.tool != null && InteractionMapper.Instance.IsToolSelected(icToDeselectinfo.tool.id)))) // happens when object destroyed but tool still selected
+            { 
+                if (icToDeselectinfo.tool != null)
+                    (projector as InteractableProjector)?.Release(icToDeselectinfo.tool, controller);
+                //! there is a case where the tool is not released and the material is not changed
                 isSelecting = false;
                 deselectionEvent.Invoke(interactableToDeselectInfo);
-            } 
+            }
+            pointingDetector.Reinit();
+            grabDetector.Reinit();
         }
 
         /// <summary>
@@ -186,6 +191,8 @@ namespace umi3dVRBrowsersBase.interactions.selection
             LastSelected = selectionInfo;
             isSelecting = true;
             selectionEvent.Invoke(selectionInfo);
+            pointingDetector.Reinit();
+            grabDetector.Reinit();
         }
     }
 }
