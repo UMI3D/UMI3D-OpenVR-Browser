@@ -16,15 +16,17 @@ using umi3dVRBrowsersBase.ui;
 namespace umi3d.cdk.interaction.selection.intentdetector
 {
     /// <summary>
-    /// Template implementation of the selection intent detector for interactables.
+    /// Template implementation of the selection intent detector for client elements.
     /// Empty class that allows Unity serialization in the inspector
     /// </summary>
     public abstract class AbstractElementDetector : AbstractDetector<AbstractClientInteractableElement>
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractPointingElementDetector : AbstractElementDetector
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractGrabElementDetector : AbstractElementDetector
     { }
 }

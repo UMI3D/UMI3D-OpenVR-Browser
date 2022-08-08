@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,16 +25,16 @@ namespace umi3dVRBrowsersBase.interactions.selection
     /// Ba template for object selector
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class AbstractVRSelector<T> : AbstractSelector, ISelector where T : MonoBehaviour
+    public abstract class AbstractVRSelector<T> : AbstractSelector, IIntentSelector where T : MonoBehaviour
     {
+        #region fields
+
         /// <summary>
         /// Controller the selector belongs to
         /// </summary>
         protected VRController controller;
 
-        protected SelectableObjectType supportedObjectType; 
-
-        public class SelectionEvent : UnityEvent<SelectionData<T>>
+        public class SelectionEvent : UnityEvent<SelectionIntentData<T>>
         { };
 
         /// <summary>
@@ -52,11 +52,38 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractSelectionFeedbackHandler<T> selectionFeedbackHandler;
 
+        /// <summary>
+        /// True when an object is currently selected by the selector
+        /// </summary>
         protected bool isSelecting = false;
 
-        public bool IsSelecting => isSelecting;
+        /// <summary>
+        /// Info concerning the last selected object
+        /// </summary>
+        public SelectionIntentData<T> LastSelected;
 
-        public SelectionData<T> LastSelected;
+        /// <summary>
+        /// Previously proposed objects
+        /// </summary>
+        [HideInInspector]
+        public Cache<SelectionIntentData<T>> propositionSelectionCache = new Cache<SelectionIntentData<T>>();
+
+        // <summary>
+        /// Manages projection on the controller
+        /// </summary>
+        [HideInInspector]
+        public IProjector<T> projector;
+
+        #endregion fields
+
+        #region lifecycle
+
+        protected override void Awake()
+        {
+            controller = GetComponentInParent<VRSelectionManager>().controller; //controller is required before awake
+            base.Awake();
+            UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
+        }
 
         /// <inheritdoc/>
         protected override void ActivateInternal()
@@ -75,6 +102,19 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <summary>
+        /// Executed when the environment is left
+        /// </summary>
+        protected void OnEnvironmentLeave()
+        {
+            if (isSelecting && LastSelected?.selectedObject != null)
+                Deselect(LastSelected);
+        }
+
+        #endregion lifecycle
+
+        #region caching
+
+        /// <summary>
         /// Cached information of the previous selection. FILO queue with a max lenght.
         /// </summary>
         /// <typeparam name="SD"></typeparam>
@@ -83,7 +123,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             /// <summary>
             /// Cached objects info
             /// </summary>
-            public LinkedList<SelectionData> Objects { get; } = new LinkedList<SelectionData>();
+            public LinkedList<SelectionIntentData> Objects { get; } = new LinkedList<SelectionIntentData>();
 
             /// <summary>
             /// Max size of the cache
@@ -94,7 +134,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             /// Add an object to the cache
             /// </summary>
             /// <param name="data"></param>
-            public virtual void Add(SelectionData data)
+            public virtual void Add(SelectionIntentData data)
             {
                 if (Objects.Count == 0)
                 {
@@ -125,7 +165,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <inheritdoc/>
         public class Cache<SD> : Cache
         {
-            public void Add(SelectionData<SD> data)
+            public void Add(SelectionIntentData<SD> data)
             {
                 if (Objects.Count == 0)
                 {
@@ -145,51 +185,33 @@ namespace umi3dVRBrowsersBase.interactions.selection
             }
         }
 
-        /// <summary>
-        /// Previously proposed objects
-        /// </summary>
-        [HideInInspector]
-        public Cache<SelectionData<T>> propositionSelectionCache = new Cache<SelectionData<T>>();
+        #endregion caching
 
-        // <summary>
-        /// Manages projection on the controller
-        /// </summary>
-        [HideInInspector]
-        public IProjector<T> projector;
-
-        protected override void Awake()
-        {
-            controller = GetComponentInParent<VRSelectionManager>().controller;
-            base.Awake();
-            UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
-        }
+        #region selection
 
         /// <summary>
-        /// Triggered when an Element is selected
+        /// Executed when an Element is selected
         /// </summary>
         /// <param name="deselectionData"></param>
-        protected virtual void OnSelection(SelectionData<T> selectionData)
+        protected virtual void OnSelection(SelectionIntentData<T> selectionData)
         {
             selectionFeedbackHandler?.StartFeedback(selectionData);
         }
 
         /// <summary>
-        /// Triggered when an Element is deselected
+        /// Executed when an Element is deselected
         /// </summary>
         /// <param name="deselectionData"></param>
-        protected virtual void OnDeselection(SelectionData<T> deselectionData)
+        protected virtual void OnDeselection(SelectionIntentData<T> deselectionData)
         {
             selectionFeedbackHandler?.EndFeedback(deselectionData);
         }
 
         /// <summary>
-        /// Checks if the element :
-        ///     - exists
-        ///     - has at least one associated interaction
-        ///     - has not been seen its tool projected yet
+        /// Checks if the element could be selected
         /// </summary>
         /// <param name="icToSelect"></param>
-        /// <returns></returns>
+        /// <returns>True if the object could be selected by the selector</returns>
         protected virtual bool CanSelect(T icToSelect)
         {
             return icToSelect != null;
@@ -199,11 +221,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// Retrieve the best proposition for each detector of a selector
         /// </summary>
         /// <returns></returns>
-        public abstract List<SelectionData> Detect();
+        public abstract List<SelectionIntentData> GetIntentDetections();
 
         /// <summary>
         /// Select the last proposed <see cref="T"/> and provides its infos. <br/>
-        /// You probably want to use <see cref="Select(SelectionData)"/> instead.
+        /// You probably want to use <see cref="Select(SelectionIntentData)"/> instead.
         /// </summary>
         public override void Select()
         {
@@ -213,9 +235,9 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <summary>
         /// Select a <see cref="T"/> and provides its infos
         /// </summary>
-        public void Select(SelectionData data)
+        public void Select(SelectionIntentData data)
         {
-            Select(data as SelectionData<T>);
+            Select(data as SelectionIntentData<T>);
         }
 
         /// <summary>
@@ -223,11 +245,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <param name="selectionInfo"></param>
-        protected virtual void Select(SelectionData<T> selectionInfo)
+        protected virtual void Select(SelectionIntentData<T> selectionInfo)
         {
             if (isSelecting)
             {
-                if (selectionInfo == null  && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
+                if (selectionInfo == null && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
                 {
                     Deselect(LastSelected);
                     LastSelected = null;
@@ -238,7 +260,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 else if (LastSelected != null) // the selector was selecting something else before
                     Deselect(LastSelected);
             }
-               
+
             projector.Project(selectionInfo.selectedObject, controller);
             selectionInfo.hasBeenSelected = true;
             LastSelected = selectionInfo;
@@ -249,28 +271,25 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <summary>
         /// Select a <see cref="T"/> and provides its infos
         /// </summary>
-        public void Deselect(SelectionData data)
+        public void Deselect(SelectionIntentData data)
         {
-            Deselect(data as SelectionData<T>);
+            Deselect(data as SelectionIntentData<T>);
         }
 
         /// <summary>
         /// Deselect object and remove feedback
         /// </summary>
         /// <param name="interactableToDeselectInfo"></param>
-        protected virtual void Deselect(SelectionData<T> interactableToDeselectInfo)
+        protected virtual void Deselect(SelectionIntentData<T> interactableToDeselectInfo)
         {
             projector.Release(interactableToDeselectInfo.selectedObject, controller);
             isSelecting = false;
             deselectionEvent.Invoke(interactableToDeselectInfo);
         }
 
-        protected void OnEnvironmentLeave()
-        {
-            if (isSelecting && LastSelected?.selectedObject != null)
-                Deselect(LastSelected);
-        }
+        /// <inheritdoc/>
+        public bool IsSelecting() => isSelecting;
 
-        bool ISelector.IsSelecting() => IsSelecting;
+        #endregion selection
     }
 }

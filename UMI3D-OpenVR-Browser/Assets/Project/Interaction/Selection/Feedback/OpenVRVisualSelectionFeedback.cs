@@ -71,7 +71,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
 
         public void Activate(AbstractSelectionData selectionData)
         {
-            SelectionData<InteractableContainer> interactableSelectionData = selectionData as SelectionData<InteractableContainer>;
+            SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
             if (interactableSelectionData == null)
                 return;
             if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
@@ -87,7 +87,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
 
         public void Deactivate(AbstractSelectionData selectionData)
         {
-            SelectionData<InteractableContainer> interactableSelectionData = selectionData as SelectionData<InteractableContainer>;
+            SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
             if (interactableSelectionData == null)
                 return;
             DisableOutline(interactableSelectionData.selectedObject);

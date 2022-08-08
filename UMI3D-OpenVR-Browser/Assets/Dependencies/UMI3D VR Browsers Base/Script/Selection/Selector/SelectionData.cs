@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -34,13 +34,12 @@ namespace umi3dVRBrowsersBase.interactions.selection
 {
     using umi3d.cdk.interaction;
     using umi3d.cdk.interaction.selection;
-    using UnityEngine;
 
     /// <summary>
     /// Selection info on an object
     /// </summary>
     /// <typeparam name="T">InteractableContainer or Selectable</typeparam>
-    public class SelectionData : AbstractSelectionData
+    public class SelectionIntentData : AbstractSelectionData
     {
         /// <summary>
         /// Selection Intent Detection paradigm used for detection
@@ -57,14 +56,14 @@ namespace umi3dVRBrowsersBase.interactions.selection
     /// Selection info on an object
     /// </summary>
     /// <typeparam name="T">InteractableContainer or Selectable</typeparam>
-    public class SelectionData<T> : SelectionData
+    public class SelectionIntentData<T> : SelectionIntentData
     {
         /// <summary>
         /// Selected object
         /// </summary>
         public T selectedObject;
 
-        public SelectionData(SelectableObjectType objType)
+        public SelectionIntentData(SelectableObjectType objType)
         {
             objectType = objType;
         }

@@ -57,32 +57,32 @@ namespace umi3d.cdk.interaction.selection.projector
         /// </summary>
         /// <param name="selectable"></param>
         /// <param name="controller"></param>
-        public void Pick(Selectable selectable, AbstractController controller)
+        public void Pick(Selectable selectable, AbstractController controller, PointerEventData eventData)
         {
             switch (selectable)
             {
                 case Button button:
-                    button.Interact();
+                    button.Click(eventData);
                     break;
 
                 case Toggle toggle:
-                    toggle.Interact();
+                    toggle.Click(eventData);
                     break;
 
                 case Dropdown dropdown:
-                    dropdown.Interact();
+                    dropdown.Click(eventData);
                     break;
 
                 case InputField inputfield:
-                    inputfield.Interact(controller.transform);
+                    inputfield.Click(controller.transform);
                     break;
 
                 case Scrollbar scrollbar:
-                    scrollbar.Interact(controller.transform);
+                    scrollbar.Click(controller.transform);
                     break;
 
                 case Slider slider:
-                    slider.Interact(controller.transform);
+                    slider.Click(controller.transform);
                     break;
             }
         }
@@ -92,50 +92,64 @@ namespace umi3d.cdk.interaction.selection.projector
         /// </summary>
         /// <param name="selectable"></param>
         /// <param name="controller"></param>
-        public void Press(Selectable selectable, AbstractController controller)
+        public void PressDown(Selectable selectable, AbstractController controller, PointerEventData eventData)
         {
             switch (selectable)
             {
                 case Button button:
-                    button.Press();
+                    button.PressDown(eventData);
                     currentlyPressedButton = button;
                     break;
             }
         }
 
+        /// <summary>
+        /// Button that is currenlty pressed
+        /// </summary>
         public Button currentlyPressedButton;
     }
 
+    /// <summary>
+    /// Define extension methods that are used for interactions with <see cref="Selectable"/> objects
+    /// </summary>
     public static class UIProjection
     {
         #region Button
-        public static void Interact(this Button button)
+
+        public static void Click(this Button button, PointerEventData pointerEventData)
         {
-            ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.submitHandler);
+            ExecuteEvents.Execute(button.gameObject, pointerEventData, ExecuteEvents.submitHandler);
         }
 
-        public static void Press(this Button button)
+        public static void PressDown(this Button button, PointerEventData pointerEventData)
         {
-            ExecuteEvents.Execute(button.gameObject, new PointerEventData(EventSystem.current), ExecuteEvents.pointerDownHandler);
+            ExecuteEvents.Execute(button.gameObject, pointerEventData, ExecuteEvents.pointerDownHandler);
         }
-        #endregion
+
+        #endregion Button
 
         #region Toggle
-        public static void Interact(this Toggle toggle)
+
+        public static void Click(this Toggle toggle, PointerEventData pointerEventData)
         {
-            toggle.isOn = !toggle.isOn;
+            pointerEventData.button = PointerEventData.InputButton.Left;
+            toggle.OnPointerClick(pointerEventData);
         }
-        #endregion
+
+        #endregion Toggle
 
         #region Dropdown
-        public static void Interact(this Dropdown dropdown)
+
+        public static void Click(this Dropdown dropdown, PointerEventData pointerEventData)
         {
-            dropdown.Show();
+            dropdown.OnPointerClick(pointerEventData);
         }
-        #endregion
+
+        #endregion Dropdown
 
         #region InputField
-        public static void Interact(this InputField inputField, Transform controllerTransform)
+
+        public static void Click(this InputField inputField, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
             var closestAndRaycastHit = raycastHelper.GetClosestAndRaycastHit();
@@ -189,10 +203,12 @@ namespace umi3d.cdk.interaction.selection.projector
                 inputField.Select();
             }
         }
-        #endregion
+
+        #endregion InputField
 
         #region Scrollbar
-        public static void Interact(this Scrollbar scrollbar, Transform controllerTransform)
+
+        public static void Click(this Scrollbar scrollbar, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
             var closestAndRaycastHit = raycastHelper.GetClosestAndRaycastHit();
@@ -208,10 +224,12 @@ namespace umi3d.cdk.interaction.selection.projector
 
             scrollbar.value = Mathf.InverseLerp(Maxdist * 0.9f, 0.1f, Hitdistance);
         }
-        #endregion
+
+        #endregion Scrollbar
 
         #region Slider
-        public static void Interact(this Slider slider, Transform controllerTransform)
+
+        public static void Click(this Slider slider, Transform controllerTransform)
         {
             RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controllerTransform);
             var closestRaycastHit = raycastHelper.GetClosestAndRaycastHit();
@@ -226,7 +244,7 @@ namespace umi3d.cdk.interaction.selection.projector
             float newValue = (float)System.Math.Round(slider.minValue + ((localHitPoint.x + localCorners[3].x) / (localCorners[3].x - localCorners[0].x)) * (slider.maxValue - slider.minValue), 1);
             slider.value = newValue;
         }
-        #endregion
-    }
 
+        #endregion Slider
+    }
 }

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -28,6 +28,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
         [Header("Selectors")]
         public InteractableVRSelector interactableSelector;
+
         public SelectableVRSelector selectableSelector;
         public ElementVRSelector elementSelector;
 
@@ -36,33 +37,36 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
         public AbstractCursor grabCursor;
 
-        public SelectionData LastSelectedInfo;
+        /// <summary>
+        /// Last selected object info <br/>
+        /// Null when no object
+        /// </summary>
+        public SelectionIntentData LastSelectedInfo;
 
-        private ISelector LastSelectorUsed;
+        /// <summary>
+        /// Last intent selector used
+        /// </summary>
+        private IIntentSelector LastSelectorUsed;
 
         public void Update()
         {
             // Retrieves propositions from selectors
-            var possibleSelec = new List<SelectionData>();
+            var possibleSelec = new List<SelectionIntentData>();
             if (interactableSelector.activated)
-            {
-                possibleSelec.AddRange(interactableSelector.Detect());
-            }
+                possibleSelec.AddRange(interactableSelector.GetIntentDetections());
+
             if (selectableSelector.activated)
-            {
-                possibleSelec.AddRange(selectableSelector.Detect());
-            }
+                possibleSelec.AddRange(selectableSelector.GetIntentDetections());
+
             if (elementSelector.activated)
-            {
-                possibleSelec.AddRange(elementSelector.Detect());
-            }
+                possibleSelec.AddRange(elementSelector.GetIntentDetections());
 
             if (possibleSelec.Count == 0) //no selection intent detected
             {
-                if (LastSelectorUsed != null 
+                if (LastSelectorUsed != null
                     && LastSelectorUsed.IsSelecting()
                     && LastSelectedInfo != null)
-            {
+                {
                     LastSelectorUsed.Select(null); //make the selector remember it cannot select something this time
                     LastSelectedInfo = null;
                     LastSelectorUsed = null;
@@ -72,10 +76,15 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 return;
             else if (TrySelect(possibleSelec, DetectionOrigin.POINTING))
                 return;
-
         }
 
-        private bool TrySelect(List<SelectionData> possibleSelec, DetectionOrigin origin)
+        /// <summary>
+        /// Give the order to the selector to select the best proposition if possible <br/>
+        /// </summary>
+        /// <param name="possibleSelec"></param>
+        /// <param name="origin"></param>
+        /// <returns>True if a selection has been attempted</returns>
+        private bool TrySelect(List<SelectionIntentData> possibleSelec, DetectionOrigin origin)
         {
             var possibleSelecPointed = possibleSelec.Where(x => x.detectionOrigin == origin);
             if (possibleSelecPointed.Any())
@@ -93,24 +102,27 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <summary>
-        /// Commands the selection with the appropriate
+        /// Commands the selection with the appropriate selector
         /// </summary>
         /// <param name="preferedObjectData"></param>
-        private void StartSelection(SelectionData preferedObjectData)
+        private void StartSelection(SelectionIntentData preferedObjectData)
         {
-            ISelector appropriateSelector;
+            IIntentSelector appropriateSelector;
             // Disambiguation already occured
             switch (preferedObjectData.objectType)
             {
                 case SelectableObjectType.SELECTABLE:
                     appropriateSelector = selectableSelector;
                     break;
+
                 case SelectableObjectType.CLIENT_ELEMENT:
                     appropriateSelector = elementSelector;
                     break;
+
                 case SelectableObjectType.INTERACTABLE:
                     appropriateSelector = interactableSelector;
                     break;
+
                 default:
                     appropriateSelector = null;
                     break;
@@ -131,8 +143,8 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         /// <param name="data1"></param>
         /// <param name="data2"></param>
-        /// <returns></returns>
-        public int Compare(SelectionData data1, SelectionData data2)
+        /// <returns>1 if data1 if more important than data2, -1 otherwise. data1 is always favored in the equal case.</returns>
+        protected int Compare(SelectionIntentData data1, SelectionIntentData data2)
         {
             //! This method could be improved by comparing the distances, but it would assume the detector used
             if (data1.objectType == SelectableObjectType.CLIENT_ELEMENT)

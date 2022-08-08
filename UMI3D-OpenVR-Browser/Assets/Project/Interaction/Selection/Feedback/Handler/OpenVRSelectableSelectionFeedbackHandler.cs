@@ -45,7 +45,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
         {
             if (!isRunning)
             {
-                var selectionDataTyped = selectionData as SelectionData<Selectable>;
+                var selectionDataTyped = selectionData as SelectionIntentData<Selectable>;
                 hapticFeedback.Trigger();
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(selectionData);
@@ -58,7 +58,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
         {
             if (isRunning)
             {
-                var selectionDataTyped = selectionData as SelectionData<Selectable>;
+                var selectionDataTyped = selectionData as SelectionIntentData<Selectable>;
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(null);
                 isRunning = false;

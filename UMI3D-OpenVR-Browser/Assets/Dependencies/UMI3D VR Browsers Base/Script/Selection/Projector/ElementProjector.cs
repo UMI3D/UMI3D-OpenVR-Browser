@@ -1,7 +1,5 @@
 ﻿using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.ui;
-using UnityEditor;
-using UnityEngine;
 
 namespace umi3d.cdk.interaction.selection.projector
 {

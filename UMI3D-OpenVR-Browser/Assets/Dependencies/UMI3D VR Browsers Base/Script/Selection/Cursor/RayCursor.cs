@@ -134,6 +134,12 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
             });
         }
 
+        /// <summary>
+        /// True if the object is below the max length of the ray
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         private bool IsAtReach(object obj, float distance)
         {
             return obj != null && distance < maxLength;
@@ -208,7 +214,7 @@ namespace umi3dbrowser.openvr.interaction.selection.cursor
         /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObject)
         {
-            var selectedInfo = selectedObject as SelectionData;
+            var selectedInfo = selectedObject as SelectionIntentData;
             if (IsDisplayed)
             {
                 if (isChanged && selectedInfo == null)

@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -34,26 +34,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractGrabInteractableDetector grabDetector;
 
-        InteractableVRSelector() : base()
-        {
-            supportedObjectType = SelectableObjectType.INTERACTABLE;
-            projector = new InteractableProjector();
-        }
-
-        /// <inheritdoc/>
-        [HideInInspector]
-        public class InteractableSelectionData : SelectionData<InteractableContainer>
-        {
-            /// <summary>
-            /// Tool associated to the Interactable
-            /// </summary>
-            public AbstractTool tool;
-
-            public InteractableSelectionData() : base(SelectableObjectType.INTERACTABLE)
-            {
-            }
-        }
-
         /// <summary>
         /// Previously detected objects for virtual hand
         /// </summary>
@@ -66,6 +46,30 @@ namespace umi3dVRBrowsersBase.interactions.selection
         [HideInInspector]
         public Cache<InteractableContainer> detectionCachePointing = new Cache<InteractableContainer>();
 
+        #region constructors
+
+        private InteractableVRSelector() : base()
+        {
+            projector = new InteractableProjector();
+        }
+
+        /// <inheritdoc/>
+        [HideInInspector]
+        public class InteractableSelectionData : SelectionIntentData<InteractableContainer>
+        {
+            /// <summary>
+            /// Tool associated to the Interactable
+            /// </summary>
+            public AbstractTool tool;
+
+            public InteractableSelectionData() : base(SelectableObjectType.INTERACTABLE)
+            {
+            }
+        }
+
+        #endregion constructors
+
+        #region lifecycle
 
         /// <inheritdoc/>
         protected override void ActivateInternal()
@@ -83,6 +87,10 @@ namespace umi3dVRBrowsersBase.interactions.selection
             pointingDetector.Reinit();
             grabDetector.Reinit();
         }
+
+        #endregion lifecycle
+
+        #region selection
 
         /// <summary>
         /// Checks if the interactable :
@@ -106,11 +114,10 @@ namespace umi3dVRBrowsersBase.interactions.selection
                     || InteractionMapper.Instance.IsToolSelected(ic.Interactable.dto.id);
         }
 
-
         /// <inheritdoc/>
-        public override List<SelectionData> Detect()
+        public override List<SelectionIntentData> GetIntentDetections()
         {
-            var possibleSelection = new List<SelectionData>();
+            var possibleSelection = new List<SelectionIntentData>();
 
             if (grabDetector.isRunning)
             {
@@ -149,7 +156,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// Deselect object and remove feedback
         /// </summary>
         /// <param name="interactableToDeselectInfo"></param>
-        protected override void Deselect(SelectionData<InteractableContainer> interactableToDeselectInfo)
+        protected override void Deselect(SelectionIntentData<InteractableContainer> interactableToDeselectInfo)
         {
             var icToDeselectinfo = interactableToDeselectInfo as InteractableSelectionData;
 
@@ -168,7 +175,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         /// <param name="selectionInfo"></param>
         /// <param name="selectionInfo"></param>
-        protected override void Select(SelectionData<InteractableContainer> selectionInfo)
+        protected override void Select(SelectionIntentData<InteractableContainer> selectionInfo)
         {
             if (isSelecting)
             {
@@ -188,7 +195,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             if (selectionInfo is InteractableSelectionData)
                 (selectionInfo as InteractableSelectionData).tool = interactionTool;
 
-            if (isSelecting 
+            if (isSelecting
                 && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))))
                 // happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
@@ -204,5 +211,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 grabDetector.Reinit();
             }
         }
+
+        #endregion selection
     }
 }

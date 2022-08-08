@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -15,11 +15,33 @@ using System.Collections.Generic;
 
 namespace umi3dVRBrowsersBase.interactions.selection
 {
-    public interface ISelector
+    /// <summary>
+    /// Interface for Intent Selectors
+    /// </summary>
+    public interface IIntentSelector
     {
-        public List<SelectionData> Detect();
-        public void Select(SelectionData data);
-        public void Deselect(SelectionData data);
+        /// <summary>
+        /// Get selection intent info from the <see cref="AbstractDetector"/> attached to the intent selector
+        /// </summary>
+        /// <returns></returns>
+        public List<SelectionIntentData> GetIntentDetections();
+
+        /// <summary>
+        /// Set as selection intent target
+        /// </summary>
+        /// <param name="data"></param>
+        public void Select(SelectionIntentData data);
+
+        /// <summary>
+        /// Unset as selection intent target
+        /// </summary>
+        /// <param name="data"></param>
+        public void Deselect(SelectionIntentData data);
+
+        /// <summary>
+        /// True if the selector is currently selecting an object
+        /// </summary>
+        /// <returns></returns>
         public bool IsSelecting();
     }
 }

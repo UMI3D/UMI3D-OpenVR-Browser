@@ -13,29 +13,25 @@ limitations under the License.
 
 using umi3d.cdk.interaction.selection;
 using umi3d.cdk.interaction.selection.cursor;
-using UnityEngine;
 
 namespace umi3dbrowser.openvr.interaction.selection.cursor
 {
     /// <summary>
-    /// Cursor for roximity selection
+    /// Cursor for proximity selection <br/>
+    /// To implement
     /// </summary>
     public class SphereGrabCursor : AbstractCursor
     {
         public override void Display()
         {
-            
         }
 
         public override void Hide()
         {
-            
         }
 
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObject)
         {
-            
         }
     }
 }
-

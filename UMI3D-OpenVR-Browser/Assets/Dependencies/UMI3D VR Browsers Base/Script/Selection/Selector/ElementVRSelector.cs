@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2022 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -34,22 +34,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractGrabElementDetector grabDetector;
 
-        ElementVRSelector() : base()
-        {
-            supportedObjectType = SelectableObjectType.CLIENT_ELEMENT;
-            projector = new ElementProjector();
-        }
-
-        /// <inheritdoc/>
-        [HideInInspector]
-        public class ElementSelectionData : SelectionData<AbstractClientInteractableElement>
-        {
-            public ElementSelectionData() : base(SelectableObjectType.CLIENT_ELEMENT)
-            {
-                
-            }
-        }
-
         /// <summary>
         /// Previously detected objects for virtual hand
         /// </summary>
@@ -61,6 +45,26 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         [HideInInspector]
         public Cache<AbstractClientInteractableElement> detectionCachePointing = new Cache<AbstractClientInteractableElement>();
+
+        #region constructors
+
+        private ElementVRSelector() : base()
+        {
+            projector = new ElementProjector();
+        }
+
+        /// <inheritdoc/>
+        [HideInInspector]
+        public class ElementSelectionData : SelectionIntentData<AbstractClientInteractableElement>
+        {
+            public ElementSelectionData() : base(SelectableObjectType.CLIENT_ELEMENT)
+            {
+            }
+        }
+
+        #endregion constructors
+
+        #region lifecycle
 
         /// <inheritdoc/>
         protected override void ActivateInternal()
@@ -79,10 +83,54 @@ namespace umi3dVRBrowsersBase.interactions.selection
             grabDetector.Reinit();
         }
 
-        /// <inheritdoc/>
-        public override List<SelectionData> Detect()
+        protected void Update()
         {
-            var possibleSelection = new List<SelectionData>();
+            // look for interaction from the controller and send the right events
+            // probably should not belong in that piece of code
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerDown();
+                }
+            }
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerUp();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Executed when the pointer transits to down state
+        /// </summary>
+        protected void OnPointerDown()
+        {
+            if (isSelecting)
+            {
+                LastSelected.selectedObject.Interact(controller);
+            }
+        }
+
+        /// <summary>
+        /// Executed when the pointer transits to up state
+        /// </summary>
+        protected void OnPointerUp()
+        {
+        }
+
+        #endregion lifecycle
+
+        #region selection
+
+        /// <inheritdoc/>
+        public override List<SelectionIntentData> GetIntentDetections()
+        {
+            var possibleSelection = new List<SelectionIntentData>();
 
             if (grabDetector.isRunning)
             {
@@ -112,43 +160,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 if (CanSelect(interactableToSelectPointed))
                     possibleSelection.Add(detectionInfo);
             }
-            foreach(var poss in possibleSelection)
+            foreach (var poss in possibleSelection)
                 propositionSelectionCache.Add(poss);
             return possibleSelection;
         }
 
-
-        protected void Update()
-        {
-            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
-            {
-                if (activated)
-                {
-                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerDown();
-                }
-            }
-            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
-            {
-                if (activated)
-                {
-                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerUp();
-                }
-            }
-        }
-
-        protected void OnPointerDown()
-        {
-            if (isSelecting)
-            {
-                LastSelected.selectedObject.Interact(controller);
-            }
-        }
-
-        protected void OnPointerUp()
-        {
-
-        }
+        #endregion selection
     }
 }

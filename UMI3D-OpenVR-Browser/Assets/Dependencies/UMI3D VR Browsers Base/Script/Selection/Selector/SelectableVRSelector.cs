@@ -35,23 +35,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         public AbstractGrabSelectableDetector grabDetector;
 
-        SelectableVRSelector() : base()
-        {
-            supportedObjectType = SelectableObjectType.SELECTABLE;
-            projector = new SelectableProjector();
-        }
-
-        /// <summary>
-        /// Tag class for selection dta for selectable
-        /// Mirror how interactable classes are conceived
-        /// </summary>
-        public class SelectableSelectionData : SelectionData<Selectable>
-        {
-            public SelectableSelectionData() : base(SelectableObjectType.SELECTABLE)
-            {
-            }
-        }
-
         /// <summary>
         /// Previously detected objects for virtual hand
         /// </summary>
@@ -63,6 +46,28 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// </summary>
         [HideInInspector]
         public Cache<Selectable> detectionCachePointing = new Cache<Selectable>();
+
+        #region constructors
+
+        private SelectableVRSelector() : base()
+        {
+            projector = new SelectableProjector();
+        }
+
+        /// <summary>
+        /// Tag class for selection dta for selectable
+        /// Mirror how interactable classes are conceived
+        /// </summary>
+        public class SelectableSelectionData : SelectionIntentData<Selectable>
+        {
+            public SelectableSelectionData() : base(SelectableObjectType.SELECTABLE)
+            {
+            }
+        }
+
+        #endregion constructors
+
+        #region lifecycle
 
         /// <inheritdoc/>
         protected override void ActivateInternal()
@@ -82,6 +87,8 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
         protected void Update()
         {
+            // look for interaction from the controller and send the right events
+            // probably should not belong in that piece of code
             if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
             {
                 if (activated)
@@ -101,6 +108,41 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <summary>
+        /// Callback that trigger the interaction with selectables
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            var projector = this.projector as SelectableProjector;
+            if (LastSelected != null && isSelecting)
+            {
+                projector.Pick(LastSelected.selectedObject, controller, eventData);
+            }
+            if (projector.currentlyPressedButton != null
+                && LastSelected?.selectedObject != projector.currentlyPressedButton) //specific rule for button's focus
+            {
+                projector.currentlyPressedButton.OnPointerUp(eventData);
+                projector.currentlyPressedButton = null;
+            }
+        }
+
+        /// <summary>
+        /// Callback that trigger the interaction with selectables
+        /// </summary>
+        /// <param name="eventData"></param>
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (isSelecting && LastSelected != null)
+            {
+                (projector as SelectableProjector).PressDown(LastSelected.selectedObject, controller, eventData);
+            }
+        }
+
+        #endregion lifecycle
+
+        #region selection
+
+        /// <summary>
         /// Checks if the selectable :
         ///     - exists
         ///     - is enabled
@@ -116,10 +158,9 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <inheritdoc/>
-        [ContextMenu("Pick")] //?
-        public override List<SelectionData> Detect()
+        public override List<SelectionIntentData> GetIntentDetections()
         {
-            var possibleSelection = new List<SelectionData>();
+            var possibleSelection = new List<SelectionIntentData>();
 
             if (grabDetector.isRunning)
             {
@@ -154,37 +195,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
             return possibleSelection;
         }
 
-        /// <summary>
-        /// Callback that trigger the interaction with selectables
-        /// </summary>
-        /// <param name="eventData"></param>
-        [ContextMenu("Pick")]
-        public void OnPointerUp(PointerEventData eventData)
-        {
-            var projector = this.projector as SelectableProjector;
-            if (LastSelected != null && isSelecting )
-            {
-                projector.Pick(LastSelected.selectedObject, controller);
-            }
-            if (projector.currentlyPressedButton != null
-                && LastSelected?.selectedObject != projector.currentlyPressedButton) //specific rule for button's focus
-            {
-                projector.currentlyPressedButton.OnPointerUp(new PointerEventData(EventSystem.current));
-                projector.currentlyPressedButton = null;
-            }
-        }
-
-        /// <summary>
-        /// Callback that trigger the interaction with selectables
-        /// </summary>
-        /// <param name="eventData"></param>
-        [ContextMenu("Press")]
-        public void OnPointerDown(PointerEventData eventData)
-        {
-            if (LastSelected != null && isSelecting)
-            {
-                (projector as SelectableProjector).Press(LastSelected.selectedObject, controller);
-            }
-        }
+        #endregion selection
     }
 }
