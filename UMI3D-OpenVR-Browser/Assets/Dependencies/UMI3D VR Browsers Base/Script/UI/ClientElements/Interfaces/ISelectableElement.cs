@@ -19,7 +19,7 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui
 {
-    internal interface ISelectableElement
+    internal interface ISelectableElement : IClientElement
     {
         /// <summary>
         /// Event raised when <see cref="Click"/> is called.

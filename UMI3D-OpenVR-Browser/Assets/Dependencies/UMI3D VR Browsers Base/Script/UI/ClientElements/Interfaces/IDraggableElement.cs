@@ -22,7 +22,7 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Interface to make an object draggable by a VR controller.
     /// </summary>
-    public interface IDraggableElement
+    public interface IDraggableElement : IClientElement
     {
         /// <summary>
         /// Called when this element is started being dragged.

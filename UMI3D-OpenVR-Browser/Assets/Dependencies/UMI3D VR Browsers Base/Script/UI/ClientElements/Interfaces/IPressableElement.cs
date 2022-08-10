@@ -19,7 +19,7 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui
 {
-    internal interface IPressableElement
+    internal interface IPressableElement : IClientElement
     {
         /// <summary>
         /// Event raised when <see cref="Click"/> is called.

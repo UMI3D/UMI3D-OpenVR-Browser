@@ -101,7 +101,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// </summary>
         private void BindSettings()
         {
-            m_micButton.onClick.AddListener(() =>
+            m_micButton.OnClicked.AddListener(() =>
             {
                 EnvironmentSettings.Instance.micSetting.Toggle();
             });
@@ -110,7 +110,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
                 m_micButton.Toggle(v);
             });
 
-            m_soundButton.onClick.AddListener(() =>
+            m_soundButton.OnClicked.AddListener(() =>
             {
                 EnvironmentSettings.Instance.audioSetting.Toggle();
             });
@@ -119,7 +119,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
                 m_soundButton.Toggle(v);
             });
 
-            m_avatarButton.onClick.AddListener(() =>
+            m_avatarButton.OnClicked.AddListener(() =>
             {
                 EnvironmentSettings.Instance.avatarSetting.Toggle(); 
             });

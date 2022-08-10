@@ -16,13 +16,13 @@ limitations under the License.
 
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
-using umi3d.cdk.interaction.selection;
-using umi3d.cdk.interaction.selection.cursor;
-using umi3d.cdk.interaction.selection.feedback;
+using umi3dBrowsers.interaction.selection;
+using umi3dBrowsers.interaction.selection.cursor;
+using umi3dBrowsers.interaction.selection.feedback;
 using umi3dVRBrowsersBase.interactions.selection;
 using UnityEngine;
 
-namespace umi3dbrowser.openvr.interaction.selection.feedback
+namespace umi3dBrowserOpenVR.interaction.selection.feedback
 {
     /// <summary>
     /// A visual selection feedback for OpenVR devices
@@ -68,7 +68,6 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
             pointingCursor = selectionManager.pointingCursor;
         }
 
-
         public void Activate(AbstractSelectionData selectionData)
         {
             SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
@@ -82,7 +81,7 @@ namespace umi3dbrowser.openvr.interaction.selection.feedback
             else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
             {
                 Outline(interactableSelectionData.selectedObject, proximityOutlineShader);
-            }               
+            }
         }
 
         public void Deactivate(AbstractSelectionData selectionData)

@@ -21,7 +21,7 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Makes an object able to receive <see cref="IDraggableElement"/>.
     /// </summary>
-    public interface IDropHandlerElement
+    public interface IDropHandlerElement : IClientElement
     {
         /// <summary>
         /// Overriding required to call <see cref="VRDragAndDropSelector.RegisterElement(IDropHandlerElement)"/>. 

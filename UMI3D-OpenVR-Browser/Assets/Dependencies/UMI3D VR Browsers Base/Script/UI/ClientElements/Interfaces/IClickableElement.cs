@@ -22,7 +22,7 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Makes any entity clickable by <see cref="selection.VRClickableElementSelector"/>.
     /// </summary>
-    public interface IClickableElement
+    public interface IClickableElement : IClientElement
     {
         /// <summary>
         /// Event raised when <see cref="Click"/> is called.

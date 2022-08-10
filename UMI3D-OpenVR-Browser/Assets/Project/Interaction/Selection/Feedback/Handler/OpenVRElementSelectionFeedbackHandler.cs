@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using umi3d.cdk.interaction.selection.feedback;
 using UnityEngine.UI;
 using UnityEngine;
-using umi3d.cdk.interaction.selection.cursor;
-using umi3d.cdk.interaction.selection;
 using umi3dVRBrowsersBase.interactions.selection;
+using umi3dBrowsers.interaction.selection.feedback;
+using umi3dBrowsers.interaction.selection.cursor;
+using umi3dBrowsers.interaction.selection;
 
-namespace umi3dbrowser.openvr.interaction.selection.feedback
+namespace umi3dBrowserOpenVR.interaction.selection.feedback
 {
     /// <summary>
     /// Feedback handler for interactable selection feedback

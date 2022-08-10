@@ -18,7 +18,7 @@ using umi3dVRBrowsersBase.interactions;
 
 namespace umi3dVRBrowsersBase.ui
 {
-    internal interface IInteractableElement
+    internal interface IInteractableElement : IClientElement
     {
         void Interact(VRController controller);
     }
