@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2620838900469376371}
   - component: {fileID: 4571665007029621577}
   - component: {fileID: 7479123214807585123}
+  - component: {fileID: 7188709923663988875}
   m_Layer: 0
   m_Name: btn_menu_1
   m_TagString: Untagged
@@ -79,6 +80,26 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!114 &7188709923663988875
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 699564420104969720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9fde35e7343fa41835b984ddcd1526, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onClicked:
+    m_PersistentCalls:
+      m_Calls: []
+  btnRenderer: {fileID: 0}
+  defaultMaterial: {fileID: 0}
+  hoverMaterial: {fileID: 0}
+  pressedMaterial: {fileID: 0}
+  selectMaterial: {fileID: 0}
 --- !u!1 &1452450189375881351
 GameObject:
   m_ObjectHideFlags: 0
