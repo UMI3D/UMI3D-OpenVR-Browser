@@ -17,5 +17,6 @@ using umi3dVRBrowsersBase.ui;
 namespace umi3dVRBrowsersBase.interactions.selection.zoneselection
 {
     // Exists just for Unity serialization of templates
-    public class ElementColliderZoneSelectionHandler : ColliderZoneSelectionHandler<AbstractClientInteractableElement> { }
+    public class ElementColliderZoneSelectionHandler : ColliderZoneSelectionHandler<AbstractClientInteractableElement>
+    { }
 }

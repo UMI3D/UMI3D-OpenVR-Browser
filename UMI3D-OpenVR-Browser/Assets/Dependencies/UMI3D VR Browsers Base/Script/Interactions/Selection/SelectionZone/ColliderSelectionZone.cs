@@ -18,7 +18,6 @@ using UnityEngine;
 
 namespace umi3dBrowsers.interaction.selection.zoneselection
 {
-    using utils;
     /// <summary>
     /// Zone selection based on a collider. Requires an handler to manager the collider gameobject.
     /// </summary>

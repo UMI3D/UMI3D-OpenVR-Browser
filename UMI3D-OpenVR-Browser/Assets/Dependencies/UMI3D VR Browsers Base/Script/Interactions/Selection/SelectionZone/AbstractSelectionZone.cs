@@ -26,7 +26,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// Get all the interactable/selectable object in the scene
         /// </summary>
         /// <returns></returns>
-        public List<T> GetAllObjectsInScene() 
+        public List<T> GetAllObjectsInScene()
         {
             var interactableObjectsInScene = Object.FindObjectsOfType<T>().ToList(); //find interactable objects in scene
             return interactableObjectsInScene;

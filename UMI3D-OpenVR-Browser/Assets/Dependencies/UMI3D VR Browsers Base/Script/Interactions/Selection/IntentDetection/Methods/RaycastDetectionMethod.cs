@@ -32,7 +32,7 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
         }
     }
 
-    public class InteractableRaycastDetectionMethod: RaycastDetectionMethod<InteractableContainer>
+    public class InteractableRaycastDetectionMethod : RaycastDetectionMethod<InteractableContainer>
     {
         public override InteractableContainer PredictTarget()
         {

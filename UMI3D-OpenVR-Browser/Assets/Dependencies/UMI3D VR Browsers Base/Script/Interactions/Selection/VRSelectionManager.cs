@@ -120,7 +120,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
                 appropriateSelector = selectableSelector;
             else if (preferedObjectData is SelectionIntentData<AbstractClientInteractableElement>)
                 appropriateSelector = elementSelector;
-            else if (preferedObjectData is SelectionIntentData<AbstractClientInteractableElement>)
+            else if (preferedObjectData is SelectionIntentData<InteractableContainer>)
                 appropriateSelector = interactableSelector;
             else
                 throw new System.Exception("Unrecognized selectable object. No selector is available.");

@@ -17,6 +17,7 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
 {
     using umi3d.cdk.interaction;
     using zoneselection;
+
     /// <summary>
     /// Implementation of a simple virtual hand method
     /// </summary>
@@ -32,7 +33,6 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
         {
             this.proximityColliderHandler = proximityColliderHandler;
         }
-
 
         public override T PredictTarget()
         {
