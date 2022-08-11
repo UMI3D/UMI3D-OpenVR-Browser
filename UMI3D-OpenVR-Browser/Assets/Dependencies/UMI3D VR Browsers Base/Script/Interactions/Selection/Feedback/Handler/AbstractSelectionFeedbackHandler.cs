@@ -32,6 +32,12 @@ namespace umi3dBrowsers.interaction.selection.feedback
         /// <param name="selectionData"></param>
         public abstract void StartFeedback(AbstractSelectionData selectionData);
 
+        // <summary>
+        /// Updates all the necessary feedbacks related to selection
+        /// </summary>
+        /// <param name="selectionData"></param>
+        public abstract void UpdateFeedback(AbstractSelectionData selectionData);
+
         /// <summary>
         /// Ends all the necessary feedbacks related to selection
         /// </summary>

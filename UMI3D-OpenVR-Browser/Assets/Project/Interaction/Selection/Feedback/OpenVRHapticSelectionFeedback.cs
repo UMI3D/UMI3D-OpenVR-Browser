@@ -41,6 +41,9 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             controller = GetComponentInParent<VRController>();
         }
 
+        /// <summary>
+        /// Trigger a pulse according to the haptic settings
+        /// </summary>
         public void Trigger()
         {
             var input = controller.type == ControllerType.LeftHandController ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;

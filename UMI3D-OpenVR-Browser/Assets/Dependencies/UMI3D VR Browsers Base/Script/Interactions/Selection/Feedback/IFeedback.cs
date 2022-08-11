@@ -44,4 +44,17 @@ namespace umi3dBrowsers.interaction.selection.feedback
         /// <param name="selectionData"></param>
         void Deactivate(AbstractSelectionData selectionData);
     }
+
+    /// <summary>
+    /// Interface for feedbacks that have an ON/OFF mode and could be updated
+    /// </summary>
+    public interface IUpdatablePersistentFeedback : IPersistentFeedback
+    {
+        /// <summary>
+        /// Update a feedback that persists in time
+        /// </summary>
+        /// <param name="selectionData"></param>
+        void UpdateFeedback(AbstractSelectionData selectionData);
+    }
+
 }

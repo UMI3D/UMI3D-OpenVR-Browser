@@ -45,6 +45,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         public SelectionEvent selectionEvent = new SelectionEvent();
 
         /// <summary>
+        /// Event triggered each frame when a selection is available
+        /// </summary>
+        public SelectionEvent selectionStayEvent = new SelectionEvent();
+
+        /// <summary>
         /// Event triggered when a deselection occurs
         /// </summary>
         public SelectionEvent deselectionEvent = new SelectionEvent();
@@ -87,11 +92,18 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
         }
 
+        protected void Update()
+        {
+            if (IsSelecting())
+                selectionStayEvent.Invoke(LastSelected);
+        }
+
         /// <inheritdoc/>
         protected override void ActivateInternal()
         {
             base.ActivateInternal();
             selectionEvent.AddListener(OnSelection);
+            selectionStayEvent.AddListener(OnSelectionStay);
             deselectionEvent.AddListener(OnDeselection);
         }
 
@@ -100,6 +112,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             base.DeactivateInternal();
             selectionEvent.RemoveAllListeners();
+            selectionStayEvent.RemoveAllListeners();
             deselectionEvent.RemoveAllListeners();
         }
 
@@ -198,6 +211,15 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         protected virtual void OnSelection(SelectionIntentData<T> selectionData)
         {
             selectionFeedbackHandler?.StartFeedback(selectionData);
+        }
+
+        /// <summary>
+        /// Executed when an Element is selected
+        /// </summary>
+        /// <param name="deselectionData"></param>
+        protected virtual void OnSelectionStay(SelectionIntentData<T> selectionData)
+        {
+            selectionFeedbackHandler?.UpdateFeedback(selectionData);
         }
 
         /// <summary>

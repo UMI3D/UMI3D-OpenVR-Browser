@@ -43,7 +43,6 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         }
 
         /// <inheritdoc/>
-        /// <param name="selectionData"></param
         public override void StartFeedback(AbstractSelectionData selectionData)
         {
             if (!isRunning)
@@ -57,6 +56,10 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
                 isRunning = true;
             }
         }
+
+        /// <inheritdoc/>
+        public override void UpdateFeedback(AbstractSelectionData selectionData)
+        { }
 
         /// <inheritdoc/>
         public override void EndFeedback(AbstractSelectionData selectionData)

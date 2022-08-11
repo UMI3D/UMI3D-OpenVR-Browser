@@ -28,7 +28,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
     /// A visual selection feedback for OpenVR devices
     /// Only used for Interactable as Selectable have their own system.
     /// </summary>
-    public class OpenVRVisualSelectionFeedback : MonoBehaviour, IPersistentFeedback
+    public class OpenVRVisualSelectionFeedback : MonoBehaviour, IUpdatablePersistentFeedback
     {
         [Header("Target object")]
         /// <summary>
@@ -38,27 +38,17 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         private Shader pointedOutlineShader;
 
         /// <summary>
-        /// Glowing effect shader
-        /// </summary>
-        [SerializeField]
-        private Material pointedOutlineMaterial;
-
-        /// <summary>
-        /// Glowing effect shader
-        /// </summary>
-        [SerializeField]
-        private Shader proximityOutlineShader;
-
-        /// <summary>
-        /// Glowing effect shader
-        /// </summary>
-        [SerializeField]
-        private Material proximityOutlineMaterial;
-
-        /// <summary>
         /// Stores shaders while the predicted object receives a glowing effect
         /// </summary>
-        private Dictionary<int, Shader> cachedShaders = new Dictionary<int, Shader>();
+        private Dictionary<int, OverridenRendererInfo> cachedRenderers;
+
+
+        protected class OverridenRendererInfo
+        {
+            public int objId;
+            public Renderer overridenRenderer;
+            public Dictionary<Material, Shader> overridenMaterials = new Dictionary<Material, Shader>();
+        }
 
         private AbstractCursor pointingCursor;
         private AbstractCursor grabCursor;
@@ -70,6 +60,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             grabCursor = selectionManager.grabCursor;
         }
 
+        /// <inheritdoc/>
         public void Activate(AbstractSelectionData selectionData)
         {
             SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
@@ -82,11 +73,11 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             }
             else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
             {
-                Outline(interactableSelectionData.selectedObject, proximityOutlineShader);
                 grabCursor.ChangeAccordingToSelection(selectionData);
             }
         }
 
+        /// <inheritdoc/>
         public void Deactivate(AbstractSelectionData selectionData)
         {
             SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
@@ -100,31 +91,68 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
 
         }
 
+        public void UpdateFeedback(AbstractSelectionData selectionData)
+        {
+            SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
+            if (interactableSelectionData == null)
+                return;
+            var id = interactableSelectionData.selectedObject.GetInstanceID();
+            if (cachedRenderers.ContainsKey(id))
+            {
+                var renderer = cachedRenderers[id].overridenRenderer;
+                if (!cachedRenderers[id].overridenMaterials.ContainsKey(renderer.material)) // happens when material is changed at runtime
+                {
+                    cachedRenderers[id].overridenMaterials.Add(renderer.material, renderer.material.shader);
+                    cachedRenderers[id].overridenRenderer.material.shader = pointedOutlineShader;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set up the outline shader on the material
+        /// </summary>
+        /// <param name="interactable"></param>
+        /// <param name="shader"></param>
         private void Outline(InteractableContainer interactable, Shader shader)
         {
             var renderer = interactable.gameObject.GetComponentInChildren<Renderer>();
             var id = interactable.GetInstanceID();
             if (renderer != null
                 && renderer.material != null
-                && !cachedShaders.ContainsKey(id)
+                && !cachedRenderers.ContainsKey(id)
                 && renderer.material.shader != shader)
             {
-                cachedShaders.Add(id, renderer.material.shader);
+                var savedRenderer = new OverridenRendererInfo()
+                {
+                    objId = id,
+                    overridenRenderer = renderer
+                };
+                savedRenderer.overridenMaterials.Add(renderer.material, renderer.material.shader);
+                cachedRenderers.Add(id, savedRenderer);
                 renderer.material.shader = shader;
             }
         }
 
+        /// <summary>
+        /// Remove the outline shader from the material
+        /// </summary>
+        /// <param name="interactable"></param>
+        /// <param name="shader"></param>
         private void DisableOutline(InteractableContainer interactable)
         {
             if (interactable != null)
             {
                 var renderer = interactable.gameObject.GetComponentInChildren<Renderer>();
                 var id = interactable.GetInstanceID();
-                if (renderer != null && renderer.material != null && cachedShaders.ContainsKey(id))
+                if (renderer != null && renderer.material != null && cachedRenderers.ContainsKey(id))
                 {
-                    renderer.material.shader = cachedShaders[id];
+                    foreach (var mat in renderer.materials)
+                    {
+                        if (cachedRenderers[id].overridenMaterials.ContainsKey(mat))
+                            mat.shader = cachedRenderers[id].overridenMaterials[mat]; // remove all the material overrides that have been performed
+                    }
                 }
-                cachedShaders.Remove(id);
+                cachedRenderers.Remove(id);
             }
         }
     }
