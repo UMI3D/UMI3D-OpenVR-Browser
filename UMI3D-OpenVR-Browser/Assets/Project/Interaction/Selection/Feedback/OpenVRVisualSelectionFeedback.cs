@@ -61,11 +61,13 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         private Dictionary<int, Shader> cachedShaders = new Dictionary<int, Shader>();
 
         private AbstractCursor pointingCursor;
+        private AbstractCursor grabCursor;
 
         private void Awake()
         {
             var selectionManager = GetComponentInParent<VRSelectionManager>();
             pointingCursor = selectionManager.pointingCursor;
+            grabCursor = selectionManager.grabCursor;
         }
 
         public void Activate(AbstractSelectionData selectionData)
@@ -81,6 +83,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
             {
                 Outline(interactableSelectionData.selectedObject, proximityOutlineShader);
+                grabCursor.ChangeAccordingToSelection(selectionData);
             }
         }
 
@@ -92,6 +95,9 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             DisableOutline(interactableSelectionData.selectedObject);
             if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
                 pointingCursor.ChangeAccordingToSelection(null);
+            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
+                grabCursor.ChangeAccordingToSelection(selectionData);
+
         }
 
         private void Outline(InteractableContainer interactable, Shader shader)

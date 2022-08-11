@@ -29,12 +29,12 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
         public List<ObjectInsideCollider<T>> ObjectsInCollider { get; } = new List<ObjectInsideCollider<T>>();
 
-        private void Awake()
+        protected void Awake()
         {
             zoneCollider = GetComponentInChildren<Collider>();
         }
 
-        private void FixedUpdate()
+        protected void FixedUpdate()
         {
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
@@ -43,18 +43,20 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             }
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected virtual void OnTriggerEnter(Collider other)
         {
             T neighbour = other.GetComponent<T>();
             if (neighbour == null)
                 neighbour = other.GetComponentInParent<T>();
 
             if (neighbour != null)
+            {
                 ObjectsInCollider.Add(new ObjectInsideCollider<T>()
                 {
                     obj = neighbour,
                     collider = other
                 });
+            }   
         }
 
         protected virtual void OnTriggerExit(Collider other)

@@ -13,6 +13,7 @@ limitations under the License.
 
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
+using UnityEngine;
 
 namespace umi3dVRBrowsersBase.interactions.selection.cursor
 {
@@ -22,16 +23,78 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
     /// </summary>
     public class SphereGrabCursor : AbstractCursor
     {
+        [SerializeField]
+        protected Renderer cursorRenderer;
+
+        [SerializeField]
+        protected Renderer contactSphereRenderer;
+
+        public bool IsDisplayed => cursorRenderer.enabled;
+
+        private Collider selectedObjectCollider;
+
+        private bool isTrackingSelectedObject;
+
+        private MonoBehaviour trackedObject;
+
+        public void Start()
+        {
+            cursorRenderer.enabled = false;
+            contactSphereRenderer.enabled = false;
+        }
+
+        public void Update()
+        {
+            if (isTrackingSelectedObject)
+            {
+                SetContactSphere();
+            }
+        }
+
         public override void Display()
         {
+            cursorRenderer.enabled = true;
         }
 
         public override void Hide()
         {
+            cursorRenderer.enabled = false;
         }
 
-        public override void ChangeAccordingToSelection(AbstractSelectionData selectedObject)
+        public override void ChangeAccordingToSelection(AbstractSelectionData selectedObjectData)
         {
+            if (selectedObjectData != null)
+            {
+                if (!IsDisplayed)
+                    Display();
+
+                var objData = selectedObjectData as SelectionIntentData<MonoBehaviour>;
+                if (objData.selectedObject != trackedObject) //new object case
+                {
+                    selectedObjectCollider = objData.selectedObject.GetComponent<Collider>();
+                    SetContactSphere();
+                    contactSphereRenderer.enabled = true;
+                    isTrackingSelectedObject = true;
+                    trackedObject = objData.selectedObject;
+                }
+            }
+            else
+            {
+                if (IsDisplayed)
+                    Hide();
+                if (isTrackingSelectedObject)
+                {
+                    isTrackingSelectedObject = false;
+                    contactSphereRenderer.enabled = false;
+                    trackedObject = null;
+                }
+            }
         }
+
+        public void SetContactSphere()
+        {
+            selectedObjectCollider.ClosestPoint(this.transform.position);
+        }
+
     }
 }

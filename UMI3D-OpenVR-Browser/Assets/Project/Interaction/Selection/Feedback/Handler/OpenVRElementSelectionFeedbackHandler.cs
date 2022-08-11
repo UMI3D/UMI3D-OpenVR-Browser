@@ -33,10 +33,13 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         private OpenVRHapticSelectionFeedback hapticFeedback;
 
         private AbstractCursor pointingCursor;
+        private AbstractCursor grabCursor;
 
         private void Awake()
         {
-            pointingCursor = GetComponentInParent<VRSelectionManager>().pointingCursor;
+            var manager = GetComponentInParent<VRSelectionManager>();
+            pointingCursor = manager.pointingCursor;
+            grabCursor = manager.grabCursor;
         }
 
         /// <inheritdoc/>
@@ -49,6 +52,8 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
                 hapticFeedback.Trigger();
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(selectionData);
+                //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
+                //    grabCursor.ChangeAccordingToSelection(selectionData);
                 isRunning = true;
             }
         }
@@ -61,6 +66,8 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
                 var selectionDataTyped = selectionData as SelectionIntentData<Selectable>;
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(null);
+                //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
+                //    grabCursor.ChangeAccordingToSelection(null);
                 isRunning = false;
             }
         }
