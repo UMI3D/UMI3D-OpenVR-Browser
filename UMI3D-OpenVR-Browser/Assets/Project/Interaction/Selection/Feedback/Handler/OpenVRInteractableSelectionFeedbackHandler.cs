@@ -45,7 +45,9 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
 
         /// <inheritdoc/>
         public override void UpdateFeedback(AbstractSelectionData selectionData)
-        { }
+        {
+            highlightFeedback.UpdateFeedback(selectionData);
+        }
 
         /// <inheritdoc/>
         public override void EndFeedback(AbstractSelectionData selectionData)

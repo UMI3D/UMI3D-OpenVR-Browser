@@ -40,7 +40,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         /// <summary>
         /// Stores shaders while the predicted object receives a glowing effect
         /// </summary>
-        private Dictionary<int, OverridenRendererInfo> cachedRenderers;
+        private Dictionary<int, OverridenRendererInfo> cachedRenderers = new Dictionary<int, OverridenRendererInfo>();
 
 
         protected class OverridenRendererInfo
