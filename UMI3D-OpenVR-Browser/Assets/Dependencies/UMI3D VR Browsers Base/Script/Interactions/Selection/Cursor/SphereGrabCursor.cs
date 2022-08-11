@@ -11,9 +11,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
+using umi3dVRBrowsersBase.ui;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.selection.cursor
 {
@@ -24,9 +27,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
     public class SphereGrabCursor : AbstractCursor
     {
         [SerializeField]
+        protected GameObject cursorSphere;
+
         protected Renderer cursorRenderer;
 
         [SerializeField]
+        protected GameObject contactSphere;
+
         protected Renderer contactSphereRenderer;
 
         public bool IsDisplayed => cursorRenderer.enabled;
@@ -36,6 +43,14 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         private bool isTrackingSelectedObject;
 
         private MonoBehaviour trackedObject;
+
+        private bool isConvexOverrided = false;
+
+        public void Awake()
+        {
+            cursorRenderer = cursorSphere.GetComponent<Renderer>();
+            contactSphereRenderer = contactSphere.GetComponent<Renderer>();
+        }
 
         public void Start()
         {
@@ -68,14 +83,32 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (!IsDisplayed)
                     Display();
 
-                var objData = selectedObjectData as SelectionIntentData<MonoBehaviour>;
-                if (objData.selectedObject != trackedObject) //new object case
+                MonoBehaviour obj = null;
+                obj = (selectedObjectData as SelectionIntentData<InteractableContainer>)?.selectedObject;
+                //if (obj == null)
+                //    obj = (selectedObjectData as SelectionIntentData<Selectable>)?.selectedObject;
+                //if (obj == null)
+                //    obj = (selectedObjectData as SelectionIntentData<AbstractClientInteractableElement>)?.selectedObject;
+                if (obj == null) 
+                    return;
+
+                    if (obj != trackedObject) //new object case
                 {
-                    selectedObjectCollider = objData.selectedObject.GetComponent<Collider>();
+                    selectedObjectCollider = obj.GetComponentInChildren<Collider>();
+                    if (selectedObjectCollider is MeshCollider)
+                    {
+                        if (!(selectedObjectCollider as MeshCollider).convex)
+                        {
+                            (selectedObjectCollider as MeshCollider).convex = true; //? Unity Physics.ClosestPoint works only on convex meshes
+                            isConvexOverrided = true;
+                        }
+                            
+                    }
+                        
+                    trackedObject = obj;
+                    isTrackingSelectedObject = true;
                     SetContactSphere();
                     contactSphereRenderer.enabled = true;
-                    isTrackingSelectedObject = true;
-                    trackedObject = objData.selectedObject;
                 }
             }
             else
@@ -84,6 +117,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     Hide();
                 if (isTrackingSelectedObject)
                 {
+                    if (isConvexOverrided)
+                        (selectedObjectCollider as MeshCollider).convex = false;
                     isTrackingSelectedObject = false;
                     contactSphereRenderer.enabled = false;
                     trackedObject = null;
@@ -93,7 +128,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
         public void SetContactSphere()
         {
-            selectedObjectCollider.ClosestPoint(this.transform.position);
+            contactSphere.transform.position = selectedObjectCollider.ClosestPoint(this.transform.position);
         }
 
     }

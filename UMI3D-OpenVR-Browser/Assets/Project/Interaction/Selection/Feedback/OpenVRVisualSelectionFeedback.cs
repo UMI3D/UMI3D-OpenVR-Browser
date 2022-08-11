@@ -96,7 +96,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
                 pointingCursor.ChangeAccordingToSelection(null);
             else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
-                grabCursor.ChangeAccordingToSelection(selectionData);
+                grabCursor.ChangeAccordingToSelection(null);
 
         }
 
