@@ -89,10 +89,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 //    obj = (selectedObjectData as SelectionIntentData<Selectable>)?.selectedObject;
                 //if (obj == null)
                 //    obj = (selectedObjectData as SelectionIntentData<AbstractClientInteractableElement>)?.selectedObject;
-                if (obj == null) 
+                if (obj == null)
                     return;
 
-                    if (obj != trackedObject) //new object case
+                if (obj != trackedObject) //new object case
                 {
                     selectedObjectCollider = obj.GetComponentInChildren<Collider>();
                     if (selectedObjectCollider is MeshCollider)
@@ -102,9 +102,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                             (selectedObjectCollider as MeshCollider).convex = true; //? Unity Physics.ClosestPoint works only on convex meshes
                             isConvexOverrided = true;
                         }
-                            
+
                     }
-                        
+
                     trackedObject = obj;
                     isTrackingSelectedObject = true;
                     SetContactSphere();
