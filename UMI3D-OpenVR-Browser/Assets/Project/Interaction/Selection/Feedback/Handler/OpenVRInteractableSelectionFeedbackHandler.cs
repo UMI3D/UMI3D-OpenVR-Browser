@@ -30,7 +30,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         [SerializeField]
         private OpenVRHapticSelectionFeedback hapticFeedback;
         [SerializeField]
-        private OpenVROutlineShaderSelectionFeedback highlightFeedback;
+        private OpenVROutlineRenderSelectionFeedback highlightFeedback;
 
         /// <inheritdoc/>
         public override void StartFeedback(AbstractSelectionData selectionData)
@@ -46,7 +46,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         /// <inheritdoc/>
         public override void UpdateFeedback(AbstractSelectionData selectionData)
         {
-            highlightFeedback.UpdateFeedback(selectionData);
+            
         }
 
         /// <inheritdoc/>

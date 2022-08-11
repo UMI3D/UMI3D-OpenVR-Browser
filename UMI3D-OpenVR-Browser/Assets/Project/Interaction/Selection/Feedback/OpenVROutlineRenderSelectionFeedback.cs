@@ -36,19 +36,54 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         [Tooltip("Layer associated with selection outline in URP settings")]
         public LayerMask selectionOutlineLayer;
 
+        private AbstractCursor pointingCursor;
+        private AbstractCursor grabCursor;
+
+        private void Awake()
+        {
+            var selectionManager = GetComponentInParent<VRSelectionManager>();
+            pointingCursor = selectionManager.pointingCursor;
+            grabCursor = selectionManager.grabCursor;
+        }
+
         /// <inheritdoc/>
         public void Activate(AbstractSelectionData selectionData)
         {
             SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
             if (interactableSelectionData == null)
                 return;
-
-            targetCachedLayer = interactableSelectionData.selectedObject.gameObject.layer;
-            targetObject.layer = selectionOutlineLayer;
+            if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
+            {
+                Outline(interactableSelectionData.selectedObject);
+                pointingCursor.ChangeAccordingToSelection(selectionData);
+            }
+            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
+            {
+                grabCursor.ChangeAccordingToSelection(selectionData);
+            } 
         }
 
         /// <inheritdoc/>
         public void Deactivate(AbstractSelectionData selectionData)
+        {
+            SelectionIntentData<InteractableContainer> interactableSelectionData = selectionData as SelectionIntentData<InteractableContainer>;
+            if (interactableSelectionData == null)
+                return;
+            DisableOutline(interactableSelectionData.selectedObject);
+            if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
+                pointingCursor.ChangeAccordingToSelection(null);
+            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
+                grabCursor.ChangeAccordingToSelection(null);
+        }
+
+        public void Outline(InteractableContainer ic)
+        {
+            targetCachedLayer = ic.gameObject.layer;
+            ic.gameObject.layer = selectionOutlineLayer;
+            targetObject = ic.gameObject;
+        }
+
+        private void DisableOutline(InteractableContainer ic)
         {
             targetObject.layer = targetCachedLayer;
             targetObject = null;
