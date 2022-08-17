@@ -29,8 +29,14 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
     /// </summary>
     public class OpenVROutlineRenderSelectionFeedback : MonoBehaviour, IPersistentFeedback
     {
-        private GameObject targetObject;
-        private LayerMask targetCachedLayer;
+        private TargetOutlineInfo targetInfo;
+
+        public class TargetOutlineInfo
+        {
+            public GameObject targetObject;
+            public LayerMask originalLayer;
+            public Renderer renderer;
+        }
 
         [Tooltip("Layer associated with selection outline in URP settings")]
         public LayerMask selectionOutlineLayer;
@@ -77,15 +83,22 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
 
         public void Outline(InteractableContainer ic)
         {
-            targetCachedLayer = ic.gameObject.layer;
-            ic.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
-            targetObject = ic.gameObject;
+            var renderer = ic.GetComponentInChildren<Renderer>();
+            targetInfo = new TargetOutlineInfo()
+            {
+                targetObject = ic.gameObject,
+                renderer = renderer,
+                originalLayer = ic.gameObject.layer
+            };
+            renderer.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
         }
 
         private void DisableOutline(InteractableContainer ic)
         {
-            targetObject.layer = targetCachedLayer;
-            targetObject = null;
+            if (targetInfo?.renderer == null)
+                return;
+            targetInfo.renderer.gameObject.layer = targetInfo.originalLayer;
+            targetInfo = null;
         }
     }
 }
