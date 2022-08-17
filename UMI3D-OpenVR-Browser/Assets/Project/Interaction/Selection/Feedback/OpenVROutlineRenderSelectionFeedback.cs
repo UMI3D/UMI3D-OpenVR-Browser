@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System.Collections.Generic;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
@@ -79,7 +78,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         public void Outline(InteractableContainer ic)
         {
             targetCachedLayer = ic.gameObject.layer;
-            ic.gameObject.layer = selectionOutlineLayer;
+            ic.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
             targetObject = ic.gameObject;
         }
 
