@@ -56,6 +56,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
         public void Update()
         {
+            if (interactableSelector.LockedSelector
+                || selectableSelector.LockedSelector
+                || elementSelector.LockedSelector)
+                return;
+
             // Retrieves propositions from selectors
             var possibleSelec = new List<SelectionIntentData>();
             if (interactableSelector.activated)

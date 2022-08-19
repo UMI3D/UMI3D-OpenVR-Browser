@@ -49,7 +49,7 @@ namespace umi3dVRBrowsersBase.interactions.input
         protected override void Awake()
         {
             base.Awake();
-            slider = GetComponent<Slider>();
+            slider = GetComponentInChildren<Slider>();
         }
 
         /// <summary>

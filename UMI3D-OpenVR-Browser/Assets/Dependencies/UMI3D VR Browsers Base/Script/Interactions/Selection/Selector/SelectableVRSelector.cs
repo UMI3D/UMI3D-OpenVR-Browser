@@ -94,6 +94,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
                     OnPointerDown(new PointerEventData(EventSystem.current) { clickCount = 1 });
+                    LockedSelector = true;
                 }
             }
             if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
@@ -102,6 +103,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
                     OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1 });
+                    LockedSelector = false;
                 }
             }
         }

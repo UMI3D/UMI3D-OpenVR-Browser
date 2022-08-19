@@ -92,6 +92,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
                     OnPointerDown();
+                    LockedSelector = true;
                 }
             }
             if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
@@ -100,15 +101,20 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
                     OnPointerUp();
+                    LockedSelector = false;
                 }
             }
             if (AbstractControllerInputManager.Instance.GetButton(controller.type, ActionType.Trigger))
             {
                 if (activated)
                     OnPointerPressed();
+
             }
         }
 
+        /// <summary>
+        /// Executed while the pointer is pressed
+        /// </summary>
         private void OnPointerPressed()
         {
             if (isSelecting)
@@ -137,8 +143,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// </summary>
         protected void OnPointerUp()
         {
-            if (LastSelected.selectedObject is IPressableElement)
-                (LastSelected.selectedObject as IPressableElement).PressUp(controller.type);
+            if (isSelecting)
+            {
+                if (LastSelected.selectedObject is IPressableElement)
+                    (LastSelected.selectedObject as IPressableElement).PressUp(controller.type);
+            }
         }
 
         #endregion lifecycle

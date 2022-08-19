@@ -38,7 +38,7 @@ namespace umi3dVRBrowsersBase.interactions.input
         protected override void Awake()
         {
             base.Awake();
-            scrollbar = GetComponent<Scrollbar>();
+            scrollbar = GetComponentInChildren<Scrollbar>();
         }
 
         /// <inheritdoc/>
