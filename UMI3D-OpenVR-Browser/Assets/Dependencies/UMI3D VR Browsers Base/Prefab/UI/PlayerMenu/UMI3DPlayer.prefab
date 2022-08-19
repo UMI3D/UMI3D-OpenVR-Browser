@@ -110,7 +110,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.054447394, y: -0.000016199157}
+  m_AnchoredPosition: {x: 0.5474761, y: -0.000016199157}
   m_SizeDelta: {x: -183, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2833664588355279773
@@ -1207,6 +1207,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff90a2980c957943a8b7813b77d4a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceRect: {fileID: 0}
   playerMenu: {fileID: 1349079759331231196}
   reducedScale: {x: 0.1, y: 0.1, z: 0.1}
   distanceFromUserWhenDragged: 0.4
@@ -1481,6 +1482,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d67db7dc20a6845459acc0d1d81f07a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceRect: {fileID: 0}
   dropTolerance: 0.05
   actionBinding: {fileID: 6727171883120954354}
   background: {fileID: 9182851178358465183}
@@ -2795,9 +2797,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4910200446124259947}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77373987302fa354e816d7f4ef2b5ab7, type: 3}
+  m_Script: {fileID: 11500000, guid: 6578f90f31ab9ac439cfb74672855336, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceRect: {fileID: 4910200446124259948}
 --- !u!1 &4910200446222283048
 GameObject:
   m_ObjectHideFlags: 0
@@ -3654,6 +3657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ff90a2980c957943a8b7813b77d4a25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  referenceRect: {fileID: 0}
   playerMenu: {fileID: 1349079759331231196}
   reducedScale: {x: 0.1, y: 0.1, z: 0.1}
   distanceFromUserWhenDragged: 0.4
@@ -4301,7 +4305,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e677ab2e8ab310945aa789e3b184a569, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsHovered: 0
 --- !u!65 &2343628667732400445
 BoxCollider:
   m_ObjectHideFlags: 0

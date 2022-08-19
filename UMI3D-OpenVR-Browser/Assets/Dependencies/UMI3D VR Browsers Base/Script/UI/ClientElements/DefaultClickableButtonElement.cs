@@ -70,7 +70,7 @@ namespace umi3dVRBrowsersBase.ui
 
         protected void OnEnable()
         {
-            if (btnRenderer != null && defaultMaterial != null && isActiveAndEnabled)
+            if (btnRenderer != null && defaultMaterial != null)
             {
                 btnRenderer.material = defaultMaterial;
             }
@@ -84,7 +84,7 @@ namespace umi3dVRBrowsersBase.ui
         {
             onClicked?.Invoke();
 
-            if (btnRenderer != null && pressedMaterial != null)
+            if (btnRenderer != null && pressedMaterial != null && isActiveAndEnabled)
             {
                 StartCoroutine(SetPressFeedback());
             }

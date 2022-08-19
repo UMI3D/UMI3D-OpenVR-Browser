@@ -41,6 +41,9 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// <inheritdoc/>
         public override bool IsObjectInZone(T obj)
         {
+            if (obj == null) 
+                return false;
+
             var vectorToObject = obj.transform.position - origin;
             return Vector3.Dot(vectorToObject.normalized, direction) > Mathf.Cos(coneAngle * Mathf.PI / 180);
         }
