@@ -230,7 +230,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.014607391, y: 0, z: 0.014607439}
+  m_Size: {x: 0.0146072, y: 0, z: 0.014607439}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &5641376768558714519
 GameObject:
@@ -373,7 +373,7 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.014607391, y: 0, z: 0.014607439}
+  m_Size: {x: 0.0146072, y: 0, z: 0.014607439}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!65 &2452786840341798081
 BoxCollider:
@@ -642,6 +642,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: -90.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 5729651756320381076, guid: cdd32516f312fea43a85ef09efc1e674,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5762599538235072180, guid: cdd32516f312fea43a85ef09efc1e674,
         type: 3}

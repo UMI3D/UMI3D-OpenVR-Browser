@@ -70,7 +70,7 @@ namespace umi3dVRBrowsersBase.ui
 
         protected void OnEnable()
         {
-            if (btnRenderer != null && defaultMaterial != null)
+            if (btnRenderer != null && defaultMaterial != null && isActiveAndEnabled)
             {
                 btnRenderer.material = defaultMaterial;
             }
