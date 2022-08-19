@@ -20,7 +20,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// <summary>
     /// A Zone Selector to define a zone and select objects within
     /// </summary>
-    public abstract class AbstractSelectionZone<T> where T : Component
+    public abstract class AbstractSelectionZone<T> where T : MonoBehaviour
     {
         /// <summary>
         /// Get all the interactable/selectable object in the scene

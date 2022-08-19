@@ -89,13 +89,13 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         [Tooltip("Button to display all menus pinned by users")]
         private DefaultClickableButtonElement pinMenuButton;
 
-        [SerializeField]
-        [Tooltip("Button to display playerMenu")]
-        private DefaultClickableButtonElement playerMenuButton;
+        //[SerializeField]
+        //[Tooltip("Button to display playerMenu")]
+        //private DefaultClickableButtonElement playerMenuButton;
 
-        [SerializeField]
-        [Tooltip("Button to display environment settings")]
-        private DefaultClickableButtonElement settingsMenuButton;
+        //[SerializeField]
+        //[Tooltip("Button to display environment settings")]
+        //private DefaultClickableButtonElement settingsMenuButton;
 
         [SerializeField]
         [Tooltip("Root of the menu")]
@@ -166,8 +166,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
             BindSettingButtons();
 
-            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.ForceSelectionHighlight());
-            PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.ForceDeselectionHighlight());
+            //PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.ForceSelectionHighlight());
+            //PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.ForceDeselectionHighlight());
 
             playerCamera = PlayerMenuManager.Instance.PlayerCameraTransform;
         }
@@ -274,8 +274,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             if (!isSettingsMenuOpened)
             {
                 isSettingsMenuOpened = true;
-                settingsMenuRoot.SetActive(true);
-                settingsMenuButton.ForceSelectionHighlight();
+                //settingsMenuRoot.SetActive(true);
+                //settingsMenuButton.ForceSelectionHighlight();
             }
         }
 
@@ -287,8 +287,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             if (isSettingsMenuOpened)
             {
                 isSettingsMenuOpened = false;
-                settingsMenuRoot.SetActive(false);
-                settingsMenuButton.ForceDeselectionHighlight();
+                //settingsMenuRoot.SetActive(false);
+                //settingsMenuButton.ForceDeselectionHighlight();
             }
         }
 

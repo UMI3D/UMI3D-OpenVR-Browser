@@ -56,7 +56,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                     obj = neighbour,
                     collider = other
                 });
-            }   
+            }
         }
 
         protected virtual void OnTriggerExit(Collider other)

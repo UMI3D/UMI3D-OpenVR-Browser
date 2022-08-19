@@ -68,6 +68,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// True when a selection cannot occur since an object is manipulated
         /// </summary>
         public bool LockedSelector { get; protected set; } = false;
+
         /// <summary>
         /// Info concerning the last selected object
         /// </summary>
