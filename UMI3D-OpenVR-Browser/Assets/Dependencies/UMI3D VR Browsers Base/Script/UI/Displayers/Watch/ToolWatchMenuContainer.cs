@@ -75,14 +75,14 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
 
         private void OnEnable()
         {
-            navigationButtons[0].OnClicked.AddListener(NavigatePrevious);
-            navigationButtons[1].OnClicked.AddListener(NavigateNext);
+            navigationButtons[0].OnTriggered.AddListener(NavigatePrevious);
+            navigationButtons[1].OnTriggered.AddListener(NavigateNext);
         }
 
         private void OnDisable()
         {
-            navigationButtons[0].OnClicked.RemoveListener(NavigatePrevious);
-            navigationButtons[1].OnClicked.RemoveListener(NavigateNext);
+            navigationButtons[0].OnTriggered.RemoveListener(NavigatePrevious);
+            navigationButtons[1].OnTriggered.RemoveListener(NavigateNext);
         }
 
         /// <summary>

@@ -20,20 +20,29 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui
 {
-    public abstract class AbstractClientInteractableElement : MonoBehaviour, IInteractableElement, ISelectableElement
+    /// <summary>
+    /// Base abstract class for client side interactable elements that are not <see cref="UnityEngine.UI.Selectable"/>.
+    /// </summary>
+    public abstract class AbstractClientInteractableElement : MonoBehaviour, ISelectableElement
     {
+        /// <inheritdoc/>
         public UnityEvent OnSelected { get; private set; } = new UnityEvent();
 
+        /// <inheritdoc/>
         public UnityEvent OnDeselected { get; private set; } = new UnityEvent();
 
-        public abstract void Interact(VRController controller);
-
+        /// <inheritdoc/>
         public abstract void Select(VRController controller);
 
+        /// <inheritdoc/>
         public abstract void Deselect(VRController controller);
 
+        /// <summary>
+        /// Is the element currently selected ?
+        /// </summary>
         protected bool isSelected;
 
+        /// <inheritdoc/>
         public bool IsSelected() => isSelected;
 
     }

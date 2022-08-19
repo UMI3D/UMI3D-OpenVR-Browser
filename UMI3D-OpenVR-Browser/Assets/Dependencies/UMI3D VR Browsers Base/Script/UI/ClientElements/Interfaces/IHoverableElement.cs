@@ -19,6 +19,9 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui
 {
+    /// <summary>
+    /// <see cref="IClientElement"/> that reacts to hover enter/exit
+    /// </summary>
     internal interface IHoverableElement : IClientElement
     {
         /// <summary>
@@ -31,9 +34,20 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         UnityEvent OnHoverExit { get; }
 
-
+        /// <summary>
+        /// Called when the object is hovered / a raycast target
+        /// </summary>
+        /// <param name="controller"></param>
         void HoverEnter(ControllerType controller);
+        /// <summary>
+        /// Called when the object is no longer hovered / a raycast target
+        /// </summary>
+        /// <param name="controller"></param>
         void HoverExit(ControllerType controller);
+        /// <summary>
+        /// True when the object is hovered / a raycast target
+        /// </summary>
+        /// <param name="controller"></param>
         bool IsHovered(ControllerType controller);
     }
 }

@@ -186,24 +186,24 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         private void BindSettingButtons()
         {
             SetMicStatus(false);
-            setMicOnButton.OnClicked.AddListener(() => SetMicStatus(true));
-            setMicOffButton.OnClicked.AddListener(() => SetMicStatus(false));
+            setMicOnButton.OnTriggered.AddListener(() => SetMicStatus(true));
+            setMicOffButton.OnTriggered.AddListener(() => SetMicStatus(false));
             EnvironmentSettings.Instance.micSetting.OnValueChanged.AddListener(v =>
             {
                 setMicOffButton.enabled = v;
                 setMicOnButton.enabled = !v;
             });
 
-            setSoundOnButton.OnClicked.AddListener(() => SetSoundStatus(true));
-            setSoundOffButton.OnClicked.AddListener(() => SetSoundStatus(false));
+            setSoundOnButton.OnTriggered.AddListener(() => SetSoundStatus(true));
+            setSoundOffButton.OnTriggered.AddListener(() => SetSoundStatus(false));
             EnvironmentSettings.Instance.audioSetting.OnValueChanged.AddListener(v =>
             {
                 setSoundOffButton.enabled = v;
                 setSoundOnButton.enabled = !v;
             });
 
-            setAvatarOnButton.OnClicked.AddListener(() => SetAvatarStatus(true));
-            setAvatarOffButton.OnClicked.AddListener(() => SetAvatarStatus(false));
+            setAvatarOnButton.OnTriggered.AddListener(() => SetAvatarStatus(true));
+            setAvatarOffButton.OnTriggered.AddListener(() => SetAvatarStatus(false));
             EnvironmentSettings.Instance.avatarSetting.OnValueChanged.AddListener(v =>
             {
                 setAvatarOffButton.enabled = v;

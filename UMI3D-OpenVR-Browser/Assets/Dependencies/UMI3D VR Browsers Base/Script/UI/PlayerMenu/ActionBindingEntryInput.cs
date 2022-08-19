@@ -26,7 +26,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
     /// <summary>
     /// Element drag and droppable, associated to a <see cref="ActionBindingEntry"/>, to enable users to change action bindings.
     /// </summary>
-    public class ActionBindingEntryInput : AbstractClientInteractableElement, IDraggableElement, IDropHandlerElement
+    public class ActionBindingEntryInput : AbstractDraggableElement, IDropHandlerElement
     {
         #region
 
@@ -80,61 +80,23 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             VRDragAndDropSelector.UnRegisterElement(this);
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
         public float GetDropTolerance()
         {
             return dropTolerance;
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetNormal()
-        {
-            return transform.forward;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetPosition()
-        {
-            return transform.position;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="position"></param>
-        public void OnDrag(Vector3 position, Transform selector)
+        public override void DragMove(Vector3 position, Transform selector)
         {
             transform.position = position;
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStart()
+        public override void OnDragStart()
         {
+            base.OnDragStart();
             positionBeforeDragAndDrop = transform.position;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStop()
-        {
-
-        }
-
-        public override void Interact(VRController controller)
-        {
-            OnDragStart();
         }
 
         /// <summary>
@@ -181,7 +143,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void OnDropFailCallback()
+        public override void OnDropFailCallback()
         {
             transform.position = positionBeforeDragAndDrop;
         }
@@ -190,7 +152,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public bool IsDraggingAllowed()
+        public override bool IsDraggingAllowed()
         {
             return actionBinding.input is BooleanInput;
         }
@@ -199,7 +161,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <inheritdoc/>
         /// </summary>
         /// <param name="callback"></param>
-        public void SetDestroyCallback(Action callback)
+        public override void SetDestroyCallback(Action callback)
         {
             destroyCallback = callback;
         }
@@ -213,19 +175,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public DragAndDropType GetDragType()
+        public override DragAndDropType GetDragType()
         {
             return DragAndDropType.Planar;
-        }
-
-        public override void Select(VRController controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Deselect(VRController controller)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion

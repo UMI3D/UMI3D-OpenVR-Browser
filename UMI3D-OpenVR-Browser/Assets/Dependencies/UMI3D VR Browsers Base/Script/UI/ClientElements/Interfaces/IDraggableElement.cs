@@ -33,12 +33,19 @@ namespace umi3dVRBrowsersBase.ui
         /// Called each update when this element is dragged.
         /// </summary>
         /// <param name="position">World space</param>
-        void OnDrag(Vector3 position, Transform selector);
+        void OnDrag();
 
         /// <summary>
         /// Called when this element stopped being dragged.
         /// </summary>
         void OnDragStop();
+
+        /// <summary>
+        /// Move the object to the target position
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="selector"></param>
+        void DragMove(Vector3 position, Transform selector);
 
         /// <summary>
         /// Returns world position of the element.

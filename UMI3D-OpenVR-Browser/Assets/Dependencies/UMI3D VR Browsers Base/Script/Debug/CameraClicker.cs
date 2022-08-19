@@ -18,14 +18,14 @@ using umi3dVRBrowsersBase.ui;
 using UnityEngine;
 
 /// <summary>
-/// Debug class to test <see cref="IClickableElement"/>.
+/// Debug class to test <see cref="ITriggerableElement"/>.
 /// </summary>
 [RequireComponent(typeof(Camera))]
 public class CameraClicker : MonoBehaviour
 {
     #region 
 
-    private IClickableElement lastElement;
+    private ITriggerableElement lastElement;
     private Camera cam;
 
     #endregion
@@ -43,7 +43,7 @@ public class CameraClicker : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit))
         {
-            IClickableElement clickable = hit.transform.GetComponent<IClickableElement>();
+            ITriggerableElement clickable = hit.transform.GetComponent<ITriggerableElement>();
 
             if (clickable != null)
             {
@@ -53,7 +53,7 @@ public class CameraClicker : MonoBehaviour
                 }
 
                 if (Input.GetMouseButtonDown(0))
-                    clickable.Click(umi3dVRBrowsersBase.interactions.ControllerType.RightHandController);
+                    clickable.Trigger(umi3dVRBrowsersBase.interactions.ControllerType.RightHandController);
             }
             else
             {

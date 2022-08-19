@@ -18,7 +18,6 @@ using System;
 using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.input
@@ -27,81 +26,26 @@ namespace umi3dVRBrowsersBase.interactions.input
     /// Turns a <see cref="Scrollbar"/> draggable by a <see cref="VRDragAndDropSelector"/>.
     /// </summary>
     [RequireComponent(typeof(Scrollbar))]
-    public class DraggableScrollbarElement : AbstractClientInteractableElement, IDraggableElement, IPressableElement
+    public class DraggableScrollbarElement : AbstractDraggableElement, IPressableElement
     {
-        #region Fields
-
         /// <summary>
         /// Scrollbar controller by this handle.
         /// </summary>
-        Scrollbar scrollbar;
-
-        /// <summary>
-        /// <see cref="RectTransform"/> associated to <see cref="scrollbar"/>.
-        /// </summary>
-        RectTransform scrollbarTransform;
-
-        /// <summary>
-        /// World position of <see cref="scrollbarTransform"/> 's top left corner.
-        /// </summary>
-        private Vector3 topLeftCorner;
-
-        /// <summary>
-        /// World position of <see cref="scrollbarTransform"/> 's bottom left corner.
-        /// </summary>
-        private Vector3 bottomLeftCorner;
-
-        private UnityEvent onPressedDown = new UnityEvent();
-        private UnityEvent onPressedUp = new UnityEvent();
-        public UnityEvent OnPressedDown => onPressedDown;
-
-        public UnityEvent OnPressedUp => onPressedUp;
-
-        #endregion
+        private Scrollbar scrollbar;
 
         #region Methods
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             scrollbar = GetComponent<Scrollbar>();
-            Debug.Assert(scrollbar != null);
-
-            scrollbarTransform = GetComponent<RectTransform>();
-            Debug.Assert(scrollbarTransform != null);
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetNormal()
-        {
-            return transform.forward;
-        }
+        public override bool IsDraggingAllowed() => true;
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetPosition()
-        {
-            return transform.position;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public bool IsDraggingAllowed()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="position"></param>
-        public void OnDrag(Vector3 position, Transform selector)
+        public override void DragMove(Vector3 position, Transform selector)
         {
             try
             {
@@ -113,79 +57,10 @@ namespace umi3dVRBrowsersBase.interactions.input
             }
         }
 
-        public override void Interact(VRController controller)
-        {
-            OnDragStart();
-        }
-
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStart()
-        {
-            Vector3[] corners = new Vector3[4];
-            scrollbarTransform.GetWorldCorners(corners);
+        public override DragAndDropType GetDragType()
+            => DragAndDropType.Planar;
 
-            bottomLeftCorner = corners[0];
-            topLeftCorner = corners[1];
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStop()
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void OnDropFailCallback()
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="callback"></param>
-        public void SetDestroyCallback(Action callback)
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public DragAndDropType GetDragType()
-        {
-            return DragAndDropType.Planar;
-        }
-
-        public void PressDown(ControllerType controller)
-        {
-            OnDragStart();
-        }
-
-        public void PressUp(ControllerType controller)
-        {
-            OnDragStop();
-        }
-
-        public bool IsPressed(ControllerType controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Select(VRController controller)
-        {
-            
-        }
-
-        public override void Deselect(VRController controller)
-        {
-            
-        }
-
-        #endregion
+        #endregion Methods
     }
 }

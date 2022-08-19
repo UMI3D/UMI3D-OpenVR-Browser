@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using umi3dBrowsers.interaction.selection;
 using umi3dVRBrowsersBase.interactions.selection.intentdetector;
@@ -101,6 +102,20 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     OnPointerUp();
                 }
             }
+            if (AbstractControllerInputManager.Instance.GetButton(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                    OnPointerPressed();
+            }
+        }
+
+        private void OnPointerPressed()
+        {
+            if (isSelecting)
+            {
+                if (LastSelected.selectedObject is IPressableElement)
+                    (LastSelected.selectedObject as IPressableElement).PressStay(controller.type);
+            }
         }
 
         /// <summary>
@@ -110,7 +125,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             if (isSelecting)
             {
-                LastSelected.selectedObject.Interact(controller);
+                if (LastSelected.selectedObject is IPressableElement)
+                    (LastSelected.selectedObject as IPressableElement).PressDown(controller.type);
+                if (LastSelected.selectedObject is ITriggerableElement)
+                    (LastSelected.selectedObject as ITriggerableElement).Trigger(controller.type);
             }
         }
 
@@ -119,6 +137,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// </summary>
         protected void OnPointerUp()
         {
+            if (LastSelected.selectedObject is IPressableElement)
+                (LastSelected.selectedObject as IPressableElement).PressUp(controller.type);
         }
 
         #endregion lifecycle

@@ -24,7 +24,7 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Makes a gameobject clickable by a user ray.
     /// </summary>
-    public class DefaultClickableButtonElement : AbstractClientInteractableElement, IClickableElement, IHoverableElement
+    public class DefaultClickableButtonElement : AbstractClientInteractableElement, ITriggerableElement, IHoverableElement
     {
         #region Fields
 
@@ -37,7 +37,7 @@ namespace umi3dVRBrowsersBase.ui
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public UnityEvent OnClicked { get => onClicked; }
+        public UnityEvent OnTriggered { get => onClicked; }
         public UnityEvent OnHoverEnter => onHoverEnter;
         public UnityEvent OnHoverExit => onHoverExit;
 
@@ -80,7 +80,7 @@ namespace umi3dVRBrowsersBase.ui
         /// <inheritdoc/>
         /// </summary>
         /// <param name="controller"></param>
-        public virtual void Click(ControllerType controllerType)
+        public virtual void Trigger(ControllerType controllerType)
         {
             onClicked?.Invoke();
 
@@ -88,11 +88,6 @@ namespace umi3dVRBrowsersBase.ui
             {
                 StartCoroutine(SetPressFeedback());
             }
-        }
-
-        public override void Interact(VRController controller)
-        {
-            Click(controller.type);
         }
 
         /// <summary>

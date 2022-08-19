@@ -114,11 +114,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3509481536690522004, guid: da8e28de51f2b11479e0a896051bcf4c,
         type: 3}
-      propertyPath: m_Navigation.m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3509481536690522004, guid: da8e28de51f2b11479e0a896051bcf4c,
-        type: 3}
       propertyPath: m_SpriteState.m_PressedSprite
       value: 
       objectReference: {fileID: 21300000, guid: 01879447f07293049aff37a5784af782,

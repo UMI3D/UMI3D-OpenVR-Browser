@@ -20,20 +20,20 @@ using UnityEngine.Events;
 namespace umi3dVRBrowsersBase.ui
 {
     /// <summary>
-    /// Makes any entity clickable by <see cref="selection.VRClickableElementSelector"/>.
+    /// Makes any entity triggerable/clickable by <see cref="selection.VRClickableElementSelector"/>.
     /// </summary>
-    public interface IClickableElement : IClientElement
+    public interface ITriggerableElement : IClientElement
     {
         /// <summary>
-        /// Event raised when <see cref="Click"/> is called.
+        /// Event raised when <see cref="Trigger"/> is called.
         /// </summary>
-        UnityEvent OnClicked { get; }
+        UnityEvent OnTriggered { get; }
 
         /// <summary>
-        /// Raises an event when this element is clicked.
+        /// Raises an event when this element is triggered/clicked.
         /// </summary>
         /// <param name="controller">Controller used to click</param>
-        void Click(ControllerType controller);
+        void Trigger(ControllerType controller);
     }
 
 }

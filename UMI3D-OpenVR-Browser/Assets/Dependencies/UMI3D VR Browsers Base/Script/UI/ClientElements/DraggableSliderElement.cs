@@ -14,11 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
 using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.input
@@ -26,27 +24,13 @@ namespace umi3dVRBrowsersBase.interactions.input
     /// <summary>
     /// Turns a <see cref="Slider"/> draggable by a <see cref="VRDragAndDropSelector"/>.
     /// </summary>
-    public class DraggableSliderElement : AbstractClientInteractableElement, IDraggableElement, IPressableElement
+    public class DraggableSliderElement : AbstractDraggableElement
     {
         #region Fields
 
         [SerializeField]
         [Tooltip("Slider controller by this handle")]
-        Slider slider;
-
-        [SerializeField]
-        [Tooltip("Element which contains the handle, normally direct parent")]
-        RectTransform handleContainer;
-
-        /// <summary>
-        /// World position of <see cref="handleContainer"/> 's top left corner.
-        /// </summary>
-        private Vector3 topLeftCorner;
-
-        /// <summary>
-        /// World position of <see cref="handleContainer"/> 's top right corner.
-        /// </summary>
-        private Vector3 topRightCorner;
+        private Slider slider;
 
         /// <summary>
         /// Where the drag and drop started
@@ -58,51 +42,21 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// </summary>
         private bool isSetUp = false;
 
-        public UnityEvent OnPressedDown => throw new NotImplementedException();
-
-        public UnityEvent OnPressedUp => throw new NotImplementedException();
-
-        #endregion
+        #endregion Fields
 
         #region Methods
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetNormal()
+        protected override void Awake()
         {
-            return transform.forward;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetPosition()
-        {
-            return transform.position;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public bool IsDraggingAllowed()
-        {
-            return true;
-        }
-
-        public override void Interact(VRController controller)
-        {
-            OnDragStart();
+            base.Awake();
+            slider = GetComponent<Slider>();
         }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="position"></param>
-        public void OnDrag(Vector3 position, Transform selector)
+        public override void DragMove(Vector3 position, Transform selector)
         {
             if (!isSetUp)
             {
@@ -122,77 +76,12 @@ namespace umi3dVRBrowsersBase.interactions.input
             }
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStart()
-        {
-            Vector3[] corners = new Vector3[4];
-            handleContainer.GetWorldCorners(corners);
+        public override bool IsDraggingAllowed() => true;
 
-            topLeftCorner = corners[1];
-            topRightCorner = corners[2];
-
-        }
-
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
-        public void OnDragStop()
-        {
-            isSetUp = false;
-        }
+        public override DragAndDropType GetDragType() => DragAndDropType.Planar;
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void OnDropFailCallback()
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="callback"></param>
-        public void SetDestroyCallback(Action callback)
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public DragAndDropType GetDragType()
-        {
-            return DragAndDropType.Planar;
-        }
-
-        public void PressDown(ControllerType controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void PressUp(ControllerType controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public bool IsPressed(ControllerType controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Select(VRController controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Deselect(VRController controller)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
-
+        #endregion Methods
     }
 }

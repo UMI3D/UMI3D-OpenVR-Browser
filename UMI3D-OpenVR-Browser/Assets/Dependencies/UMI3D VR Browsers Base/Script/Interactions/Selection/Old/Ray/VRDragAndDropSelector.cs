@@ -209,14 +209,14 @@ namespace umi3dVRBrowsersBase.selection
                         float enter;
                         if (currentDragPlane.Raycast(ray, out enter))
                         {
-                            currentElementDragged.OnDrag(ray.GetPoint(enter), this.transform);
+                            currentElementDragged.DragMove(ray.GetPoint(enter), this.transform);
                             laser.SetImpactPoint(hit.point);
                         }
                         break;
                     case DragAndDropType.Spatial:
                         Vector3 point = transform.position + transform.forward * startDistanceFromObject;
                         laser.SetImpactPoint(hit.point);
-                        currentElementDragged.OnDrag(point, this.transform);
+                        currentElementDragged.DragMove(point, this.transform);
                         break;
                     default:
                         break;

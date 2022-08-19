@@ -24,37 +24,37 @@ using UnityEngine;
 namespace umi3dVRBrowsersBase.selection
 {
     /// <summary>
-    /// Selector for <see cref="IClickableElement"/>.
+    /// Selector for <see cref="ITriggerableElement"/>.
     /// </summary>
     public class VRClickableElementSelector : MonoBehaviour
     {
         #region  Static
 
         /// <summary>
-        /// Stores all current <see cref="IClickableElement"/> hovered.
+        /// Stores all current <see cref="ITriggerableElement"/> hovered.
         /// </summary>
-        static List<IClickableElement> elementsHovered = new List<IClickableElement>();
+        static List<ITriggerableElement> elementsHovered = new List<ITriggerableElement>();
 
         /// <summary>
-        /// Notifies that a <see cref="IClickableElement"/> starts being hovered.
+        /// Notifies that a <see cref="ITriggerableElement"/> starts being hovered.
         /// </summary>
         /// <param name="element"></param>
-        public static void NotifyStartHovering(IClickableElement element)
+        public static void NotifyStartHovering(ITriggerableElement element)
         {
             elementsHovered.Add(element);
         }
 
         /// <summary>
-        /// Notifies that a <see cref="IClickableElement"/> stops being hovered.
+        /// Notifies that a <see cref="ITriggerableElement"/> stops being hovered.
         /// </summary>
         /// <param name="element"></param>
-        public static void NotifyStopHovering(IClickableElement element)
+        public static void NotifyStopHovering(ITriggerableElement element)
         {
             elementsHovered.Remove(element);
         }
 
         /// <summary>
-        /// Is a <see cref="IClickableElement"/> currently hovered ? Warning : to be consider as hovered, a <see cref="IClickableElement"/> must use <see cref="NotifyStartHovering(IClickableElement)"/> and <see cref="NotifyStopHovering(IClickableElement)"/>.
+        /// Is a <see cref="ITriggerableElement"/> currently hovered ? Warning : to be consider as hovered, a <see cref="ITriggerableElement"/> must use <see cref="NotifyStartHovering(ITriggerableElement)"/> and <see cref="NotifyStopHovering(ITriggerableElement)"/>.
         /// </summary>
         /// <returns></returns>
         public static bool IsElementHovered()
@@ -81,9 +81,9 @@ namespace umi3dVRBrowsersBase.selection
         public ControllerType controller;
 
         /// <summary>
-        /// Last <see cref="IClickableElement"/> clicked on.
+        /// Last <see cref="ITriggerableElement"/> clicked on.
         /// </summary>
-        private IClickableElement lastElement;
+        private ITriggerableElement lastElement;
 
         /// <summary>
         /// Stores all element hit each frame.
@@ -105,7 +105,7 @@ namespace umi3dVRBrowsersBase.selection
 
             foreach (RaycastHit hit in hits)
             {
-                IClickableElement clickable = hit.transform.GetComponents<IClickableElement>().Where(c => (c is MonoBehaviour mono && mono.enabled)).FirstOrDefault();
+                ITriggerableElement clickable = hit.transform.GetComponents<ITriggerableElement>().Where(c => (c is MonoBehaviour mono && mono.enabled)).FirstOrDefault();
 
                 if (clickable != null && clickable != default)
                 {
@@ -132,7 +132,7 @@ namespace umi3dVRBrowsersBase.selection
                     if (AbstractControllerInputManager.Instance.GetButtonDown(controller, action))
                     {
                         VRInteractionMapper.lastControllerUsedToClick = controller;
-                        clickable.Click(controller);
+                        clickable.Trigger(controller);
                     }
 
                     break;

@@ -21,7 +21,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
     /// <summary>
     /// Handler to enable users to move <see cref="PlayerMenuManager"/>.
     /// </summary>
-    public class PlayerMenuHandler : AbstractClientInteractableElement, IDraggableElement
+    public class PlayerMenuHandler : AbstractDraggableElement
     {
         #region Methods
 
@@ -75,34 +75,13 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public Vector3 GetNormal()
-        {
-            return playerMenu.forward;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public Vector3 GetPosition()
-        {
-            return transform.position;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public bool IsDraggingAllowed()
-        {
-            return true;
-        }
+        public override bool IsDraggingAllowed() => true;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="position"></param>
-        public void OnDrag(Vector3 position, Transform selector)
+        public override void DragMove(Vector3 position, Transform selector)
         {
             if (!isDragAndDropSet)
             {
@@ -121,57 +100,27 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void OnDragStart()
+        public override void OnDragStart()
         {
+            base.OnDragStart();
             playerMenu.localScale = reducedScale;
         }
 
-        public override void Interact(VRController controller)
-        {
-            OnDragStart();
-        }
-
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public void OnDragStop()
+        public override void OnDragStop()
         {
+            base.OnDragStop();
             playerMenu.localScale = defaultScale;
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public void OnDropFailCallback()
-        {
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="callback"></param>
-        public void SetDestroyCallback(Action callback)
-        {
-        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public DragAndDropType GetDragType()
-        {
-            return DragAndDropType.Spatial;
-        }
-
-        public override void Select(VRController controller)
-        {
-            
-        }
-
-        public override void Deselect(VRController controller)
-        {
-            
-        }
+        public override DragAndDropType GetDragType() => DragAndDropType.Spatial;
 
 
         #endregion

@@ -19,22 +19,37 @@ using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.ui
 {
+    /// <summary>
+    /// <see cref="IClientElement"/> that can be selected
+    /// </summary>
     internal interface ISelectableElement : IClientElement
     {
         /// <summary>
-        /// Event raised when <see cref="Click"/> is called.
+        /// Event raised when selection is detected.
         /// </summary>
         UnityEvent OnSelected { get; }
 
         /// <summary>
-        /// Event raised when <see cref="Click"/> is called.
+        /// Event raised when selection is no longer detected.
         /// </summary>
         UnityEvent OnDeselected { get; }
 
+        /// <summary>
+        /// Selects the object
+        /// </summary>
+        /// <param name="controller">Controller used for selection</param>
         void Select(VRController controller);
 
+        /// <summary>
+        /// Deselects the object
+        /// </summary>
+        /// <param name="controller">Controller that was used for selection</param>
         void Deselect(VRController controller);
 
+        /// <summary>
+        /// Returns true i the object is currenlty selected
+        /// </summary>
+        /// <returns></returns>
         bool IsSelected();
     }
 }

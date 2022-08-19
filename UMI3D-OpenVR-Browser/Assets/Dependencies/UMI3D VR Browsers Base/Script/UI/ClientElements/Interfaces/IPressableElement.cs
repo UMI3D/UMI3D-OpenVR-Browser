@@ -48,5 +48,6 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         /// <param name="controller"></param>
         bool IsPressed(ControllerType controller);
+        void PressStay(ControllerType type);
     }
 }
