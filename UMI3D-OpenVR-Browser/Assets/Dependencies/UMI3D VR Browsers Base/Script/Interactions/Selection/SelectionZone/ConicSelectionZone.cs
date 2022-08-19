@@ -20,7 +20,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// <summary>
     /// A conic zone selector
     /// </summary>
-    public class ConicSelectionZone<T> : RaySelectionZone<T> where T : Component
+    public class ConicSelectionZone<T> : RaySelectionZone<T> where T : MonoBehaviour
     {
         /// <summary>
         /// Cone angle in degrees, correspond to the half of the full angle at its apex

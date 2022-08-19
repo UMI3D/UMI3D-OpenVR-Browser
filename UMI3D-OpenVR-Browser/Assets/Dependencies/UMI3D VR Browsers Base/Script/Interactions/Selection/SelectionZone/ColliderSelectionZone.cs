@@ -22,7 +22,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// Zone selection based on a collider. Requires an handler to manager the collider gameobject.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ColliderSelectionZone<T> : AbstractSelectionZone<T> where T : Component
+    public class ColliderSelectionZone<T> : AbstractSelectionZone<T> where T : MonoBehaviour
     {
         /// <summary>
         /// Handles the collider component in the scene

@@ -21,7 +21,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// Seleciton zone defined by a ray
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class RaySelectionZone<T> : AbstractSelectionZone<T> where T : Component
+    public class RaySelectionZone<T> : AbstractSelectionZone<T> where T : MonoBehaviour
     {
         /// <summary>
         /// Orientation of the ray
@@ -83,7 +83,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             if (objList.Count == 0)
                 return null;
 
-            var activeObjects = objList.Where(obj => (obj != null && obj.gameObject.activeInHierarchy)).DefaultIfEmpty();
+            var activeObjects = objList.Where(obj => (obj != null && obj.isActiveAndEnabled)).DefaultIfEmpty();
             if (activeObjects == default)
                 return null;
 
@@ -105,7 +105,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             if (objList.Count == 0)
                 return default;
 
-            var activeObjects = objList.Where(obj => (obj != null && obj.gameObject.activeInHierarchy)).DefaultIfEmpty();
+            var activeObjects = objList.Where(obj => (obj != null && obj.isActiveAndEnabled)).DefaultIfEmpty();
             if (activeObjects == default)
                 return default;
 

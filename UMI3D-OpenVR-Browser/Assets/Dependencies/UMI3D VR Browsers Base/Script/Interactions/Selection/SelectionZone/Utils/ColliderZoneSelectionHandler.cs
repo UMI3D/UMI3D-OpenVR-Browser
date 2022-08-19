@@ -20,7 +20,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// Handler for collider detection. Manages triggers.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class ColliderZoneSelectionHandler<T> : MonoBehaviour where T : Component
+    public class ColliderZoneSelectionHandler<T> : MonoBehaviour where T : MonoBehaviour
     {
         /// <summary>
         /// Collider defining the selection zone
@@ -49,7 +49,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             if (neighbour == null)
                 neighbour = other.GetComponentInParent<T>();
 
-            if (neighbour != null)
+            if (neighbour != null && neighbour.isActiveAndEnabled)
             {
                 ObjectsInCollider.Add(new ObjectInsideCollider<T>()
                 {
