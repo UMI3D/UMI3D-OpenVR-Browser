@@ -87,10 +87,14 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
         [SerializeField]
         [Tooltip("Button to display all menus pinned by users")]
-        private DefaultClickableButtonElement pinMenuButton;
+        private OnOffButton pinMenuButton;
 
         [SerializeField]
-        [Tooltip("Root of the menu")]
+        [Tooltip("Button to display the player menu")]
+        private OnOffButton playerMenuButton;
+
+        [SerializeField]
+        [Tooltip("Root of the settings menu")]
         private GameObject settingsMenuRoot;
 
         [Header("Settings menu")]
@@ -169,6 +173,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             EnvironmentSettings.Instance.micSetting.OnValueChanged.AddListener(setMicButton.Toggle);
             EnvironmentSettings.Instance.audioSetting.OnValueChanged.AddListener(setSoundButton.Toggle);
             EnvironmentSettings.Instance.avatarSetting.OnValueChanged.AddListener(setAvatarButton.Toggle);
+            PlayerMenuManager.Instance.onMenuClose.AddListener(() => { if (playerMenuButton.IsOn) playerMenuButton.Toggle(false);  });
+            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => { if (!playerMenuButton.IsOn) playerMenuButton.Toggle(true); });
             SetMicStatus(false);
         }
 
@@ -182,7 +188,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Open();
             menuDisplayManager.Display(true);
-            pinMenuButton.ForceSelectionHighlight();
         }
 
         /// <summary>
@@ -192,13 +197,12 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Close();
             menuDisplayManager.Hide();
-            pinMenuButton.ForceDeselectionHighlight();
         }
 
         /// <summary>
         /// Toggles the display of the menu with all pinned items.
         /// </summary>
-        public void ToggleDisplayMenu()
+        public void ToggleDisplayPinMenu()
         {
             if (IsOpen)
                 Close();
@@ -209,7 +213,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// <summary>
         /// Toggles the display of <see cref="umi3dVRBrowsersBase.ui.playerMenu.PlayerMenuManager"/>
         /// </summary>
-        public void ToggleDisplayPlayerMenuManager()
+        public void ToggleDisplayPlayerMenu()
         {
             if (PlayerMenuManager.Instance.IsMenuOpen)
             {
