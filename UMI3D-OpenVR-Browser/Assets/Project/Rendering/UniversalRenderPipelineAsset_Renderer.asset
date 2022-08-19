@@ -18,10 +18,10 @@ MonoBehaviour:
   _outlineSettings:
     _outlineSettings: {fileID: 0}
     _outlineColor: {r: 0, g: 0.12727022, b: 1, a: 1}
-    _outlineWidth: 4
+    _outlineWidth: 2
     _outlineIntensity: 2
     _outlineAlphaCutoff: 0.9
-    _outlineMode: 0
+    _outlineMode: 2
     _filterMode: 1
     _layerMask:
       serializedVersion: 2
