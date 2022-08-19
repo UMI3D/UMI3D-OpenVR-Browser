@@ -20,6 +20,7 @@ using umi3dVRBrowsersBase.interactions.selection;
 using umi3dBrowsers.interaction.selection.feedback;
 using umi3dBrowsers.interaction.selection.cursor;
 using umi3dBrowsers.interaction.selection;
+using umi3dVRBrowsersBase.ui;
 
 namespace umi3dBrowserOpenVR.interaction.selection.feedback
 {
@@ -27,7 +28,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
     /// Feedback handler for interactable selection feedback
     /// Mostly useful for Unity's serialization
     /// </summary>
-    public class OpenVRElementSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
+    public class OpenVRElementSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<AbstractClientInteractableElement>
     {
         [SerializeField]
         private OpenVRHapticSelectionFeedback hapticFeedback;
@@ -47,9 +48,9 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         {
             if (!isRunning)
             {
-                var selectionDataTyped = selectionData as SelectionIntentData<Selectable>;
+                var selectionDataTyped = selectionData as SelectionIntentData<AbstractClientInteractableElement>;
                 hapticFeedback.Trigger();
-                if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
+                if (selectionDataTyped?.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(selectionData);
                 //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
                 //    grabCursor.ChangeAccordingToSelection(selectionData);
@@ -66,7 +67,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
         {
             if (isRunning)
             {
-                var selectionDataTyped = selectionData as SelectionIntentData<Selectable>;
+                var selectionDataTyped = selectionData as SelectionIntentData<AbstractClientInteractableElement>;
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
                     pointingCursor.ChangeAccordingToSelection(null);
                 //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
