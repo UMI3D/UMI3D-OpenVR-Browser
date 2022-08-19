@@ -29,6 +29,9 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
     /// </summary>
     public class OpenVROutlineRenderSelectionFeedback : MonoBehaviour, IPersistentFeedback
     {
+        /// <summary>
+        /// Outlined target info
+        /// </summary>
         private TargetOutlineInfo targetInfo;
 
         public class TargetOutlineInfo
@@ -81,6 +84,10 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
                 grabCursor.ChangeAccordingToSelection(null);
         }
 
+        /// <summary>
+        /// Outline the object by placing them on the right layer
+        /// </summary>
+        /// <param name="ic"></param>
         public void Outline(InteractableContainer ic)
         {
             var renderer = ic.GetComponentInChildren<Renderer>();
@@ -93,6 +100,10 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
             renderer.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
         }
 
+        /// <summary>
+        /// Disable outline by replacing the object on its previous layer
+        /// </summary>
+        /// <param name="ic"></param>
         private void DisableOutline(InteractableContainer ic)
         {
             if (targetInfo?.renderer == null)

@@ -26,7 +26,7 @@ namespace umi3dBrowserOpenVR.interaction.selection.feedback
 {
     /// <summary>
     /// A visual selection feedback for OpenVR devices
-    /// Only used for Interactable as Selectable have their own system.
+    /// Only used for Interactable, as Selectable have their own system for visual feedback.
     /// </summary>
     public class OpenVROutlineShaderSelectionFeedback : MonoBehaviour, IUpdatablePersistentFeedback
     {
