@@ -92,7 +92,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
             if (IsSelecting())
                 selectionStayEvent.Invoke(LastSelected);

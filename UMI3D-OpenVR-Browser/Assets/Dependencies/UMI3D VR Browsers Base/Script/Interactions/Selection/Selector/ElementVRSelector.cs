@@ -80,8 +80,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             grabDetector.Reinit();
         }
 
-        protected void Update()
+        protected override void Update()
         {
+            base.Update();
             // look for interaction from the controller and send the right events
             // probably should not belong in that piece of code
             if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
