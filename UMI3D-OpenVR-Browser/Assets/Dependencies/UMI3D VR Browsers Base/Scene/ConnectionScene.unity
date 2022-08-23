@@ -11190,7 +11190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   containerPrefabs:
-  - {fileID: 0}
+  - {fileID: 1253850770}
   exceptions:
     keys: []
     values: []
@@ -11216,12 +11216,12 @@ MonoBehaviour:
   firstContainerInScene: 1
   containerSelector: {fileID: 1289773913}
   DisplayerPrefab:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 6652662328574254241, guid: 018d052a0a0596c48bb9a90f6d2fa249, type: 3}
+  - {fileID: 5348143446619856440, guid: acb3616bd7e3c90449db9892ae28defa, type: 3}
+  - {fileID: 9019132511487808674, guid: e956c5724799d644e8820bba4928fc84, type: 3}
+  - {fileID: 2027875620967027377, guid: 60f6eef9777acd540b7c486a88866189, type: 3}
+  - {fileID: 8801934974886613111, guid: 0a450d39278e62a4bb0e7deae618d3a1, type: 3}
+  - {fileID: 7851029036041233532, guid: f35966682b89ab241933f255b449a611, type: 3}
   onDisplay:
     m_PersistentCalls:
       m_Calls:
