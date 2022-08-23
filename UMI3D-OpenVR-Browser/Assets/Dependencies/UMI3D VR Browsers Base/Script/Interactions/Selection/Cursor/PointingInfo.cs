@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-
 using umi3d.cdk.interaction;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace umi3dBrowsers.interaction.selection.cursor
 {
     /// <summary>
     /// Info on the interactable currently pointed at.
-    /// Previously known as "Hover info"
+    /// Previously known as "Hover info".
     /// </summary>
     public class PointingInfo
     {

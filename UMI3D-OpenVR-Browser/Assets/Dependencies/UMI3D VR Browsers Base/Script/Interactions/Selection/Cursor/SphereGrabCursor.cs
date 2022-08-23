@@ -14,9 +14,7 @@ limitations under the License.
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
-using umi3dVRBrowsersBase.ui;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.selection.cursor
 {
@@ -26,24 +24,39 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
     /// </summary>
     public class SphereGrabCursor : AbstractCursor
     {
-        [SerializeField]
+        /// <summary>
+        /// Sphere around the hand while selecting.
+        /// </summary>
+        [SerializeField, Tooltip("Sphere around the hand while selecting.")]
         protected GameObject cursorSphere;
 
         protected Renderer cursorRenderer;
 
-        [SerializeField]
+        /// <summary>
+        /// Sphere on the object while selecting.
+        /// </summary>
+        [SerializeField, Tooltip("Sphere on the object while selecting.")]
         protected GameObject contactSphere;
 
         protected Renderer contactSphereRenderer;
 
+        /// <summary>
+        /// Is the cursor displayed?
+        /// </summary>
         public bool IsDisplayed => cursorRenderer.enabled;
 
         private Collider selectedObjectCollider;
 
         private bool isTrackingSelectedObject;
 
+        /// <summary>
+        /// Contact tracked object that is close to the hand
+        /// </summary>
         private MonoBehaviour trackedObject;
 
+        /// <summary>
+        /// Is the convex property of the contact tracked object overrided ?
+        /// </summary>
         private bool isConvexOverrided = false;
 
         public void Awake()
@@ -66,16 +79,19 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
             }
         }
 
+        /// <inheritdoc/>
         public override void Display()
         {
             cursorRenderer.enabled = true;
         }
 
+        /// <inheritdoc/>
         public override void Hide()
         {
             cursorRenderer.enabled = false;
         }
 
+        /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObjectData)
         {
             if (selectedObjectData != null)
@@ -85,10 +101,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                 MonoBehaviour obj = null;
                 obj = (selectedObjectData as SelectionIntentData<InteractableContainer>)?.selectedObject;
-                //if (obj == null)
-                //    obj = (selectedObjectData as SelectionIntentData<Selectable>)?.selectedObject;
-                //if (obj == null)
-                //    obj = (selectedObjectData as SelectionIntentData<AbstractClientInteractableElement>)?.selectedObject;
                 if (obj == null)
                     return;
 
@@ -102,7 +114,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                             (selectedObjectCollider as MeshCollider).convex = true; //? Unity Physics.ClosestPoint works only on convex meshes
                             isConvexOverrided = true;
                         }
-
                     }
 
                     trackedObject = obj;
@@ -126,10 +137,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
             }
         }
 
+        /// <summary>
+        /// Set the contact sphere on the closent point available on the contact collider
+        /// </summary>
         public void SetContactSphere()
         {
             contactSphere.transform.position = selectedObjectCollider.ClosestPoint(this.transform.position);
         }
-
     }
 }

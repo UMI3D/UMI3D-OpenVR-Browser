@@ -23,10 +23,14 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     public class ColliderZoneSelectionHandler<T> : MonoBehaviour where T : MonoBehaviour
     {
         /// <summary>
-        /// Collider defining the selection zone
+        /// Associated collider defining the selection zone
         /// </summary>
+        [Tooltip("Collider defining the selection zone")]
         public Collider zoneCollider;
 
+        /// <summary>
+        /// Objects that are currently in the collider.
+        /// </summary>
         public List<ObjectInsideCollider<T>> ObjectsInCollider { get; } = new List<ObjectInsideCollider<T>>();
 
         protected void Awake()

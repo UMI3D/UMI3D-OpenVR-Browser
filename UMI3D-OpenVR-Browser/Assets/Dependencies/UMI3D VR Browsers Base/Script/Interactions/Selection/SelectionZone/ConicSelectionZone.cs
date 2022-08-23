@@ -23,9 +23,9 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     public class ConicSelectionZone<T> : RaySelectionZone<T> where T : MonoBehaviour
     {
         /// <summary>
-        /// Cone angle in degrees, correspond to the half of the full angle at its apex
+        /// Cone angle in degrees, corresponds to the half of the full angle at its apex
         /// </summary>
-        [SerializeField]
+        [SerializeField, Tooltip("Cone angle in degrees, corresponds to the half of the full angle at its apex.")]
         private float coneAngle = 15;
 
         public ConicSelectionZone(Transform originTransform, float angle) : base(originTransform)
@@ -41,7 +41,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// <inheritdoc/>
         public override bool IsObjectInZone(T obj)
         {
-            if (obj == null) 
+            if (obj == null)
                 return false;
 
             var vectorToObject = obj.transform.position - origin;

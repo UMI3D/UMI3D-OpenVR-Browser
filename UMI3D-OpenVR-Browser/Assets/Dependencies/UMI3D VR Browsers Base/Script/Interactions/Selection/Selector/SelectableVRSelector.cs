@@ -27,13 +27,15 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
     public class SelectableVRSelector : AbstractVRSelector<Selectable>, IPointerUpHandler, IPointerDownHandler
     {
         /// <summary>
-        /// Selection Intent Detector (virtual pointing)
+        /// Selection Intent Detector (virtual pointing).
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual pointing.")]
         public AbstractPointingSelectableDetector pointingDetector;
 
         /// <summary>
         /// Selection Intent Detector (virtual hand)
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
         public AbstractGrabSelectableDetector grabDetector;
 
         /// <summary>

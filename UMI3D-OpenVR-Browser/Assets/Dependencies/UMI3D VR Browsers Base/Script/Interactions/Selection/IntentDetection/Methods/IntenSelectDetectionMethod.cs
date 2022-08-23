@@ -40,12 +40,14 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
             this.param = param;
         }
 
+        /// <inheritdoc/>
         public override void Init(AbstractController controller)
         {
             base.Init(controller);
             objectsToConsiderScoresDict = new Dictionary<T, float>();
         }
 
+        /// <inheritdoc/>
         public override void Reset()
         {
             objectsToConsiderScoresDict.Clear();

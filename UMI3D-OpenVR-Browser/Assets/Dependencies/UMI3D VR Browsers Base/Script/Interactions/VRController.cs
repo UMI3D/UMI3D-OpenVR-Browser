@@ -19,7 +19,6 @@ using umi3d.cdk.interaction;
 using umi3d.cdk.menu.interaction;
 using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
-using umi3dBrowsers.interaction.selection.cursor;
 using umi3dVRBrowsersBase.interactions.input;
 using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
@@ -43,7 +42,6 @@ namespace umi3dVRBrowsersBase.interactions
         #region Inputs Fields
 
         [Header("Manipulations")]
-
         public List<ManipulationInput> manipulationInputs = new List<ManipulationInput>();
 
         [Header("Other")]
@@ -90,7 +88,6 @@ namespace umi3dVRBrowsersBase.interactions
             }
         }
 
-
         /// <summary>
         /// Instantiated float parameter inputs.
         /// </summary>
@@ -129,7 +126,7 @@ namespace umi3dVRBrowsersBase.interactions
 
         public bool IsInputPressed = false;
 
-        #endregion
+        #endregion Inputs Fields
 
         private float timeSinceLastInput = 0;
 
@@ -138,9 +135,9 @@ namespace umi3dVRBrowsersBase.interactions
         /// </summary>
         private float inputUsageTimeout = 10;
 
-        #endregion
+        #endregion Fields
 
-        #region Methods 
+        #region Methods
 
         protected virtual void Awake()
         {
@@ -251,7 +248,6 @@ namespace umi3dVRBrowsersBase.interactions
                 result = this.gameObject.AddComponent<MenuInput>();
                 result.Init(this);
                 menuInputs.Add(result as MenuInput);
-
             }
 
             PlayerMenuManager.Instance.CtrlToolMenu.AddBinding(result);
@@ -350,7 +346,6 @@ namespace umi3dVRBrowsersBase.interactions
                     intParameterInputs.Add(intInput);
                 }
                 return intInput;
-
             }
             else if (param is IntegerRangeParameterDto)
             {
@@ -426,7 +421,7 @@ namespace umi3dVRBrowsersBase.interactions
             throw new System.NotImplementedException();
         }
 
-        #endregion
+        #endregion Find Input
 
         #region Tool : projection and release
 
@@ -579,7 +574,6 @@ namespace umi3dVRBrowsersBase.interactions
                     }
                 });
 
-
                 Debug.Log("TODO : add this item to the player controllers menu");
 
                 if (FindInput(evt as EventDto, true) != null)
@@ -625,7 +619,7 @@ namespace umi3dVRBrowsersBase.interactions
             PlayerMenuManager.Instance.MenuHeader.DisplayControllerButton(false, type, string.Empty);
         }
 
-        #endregion
+        #endregion Tool : projection and release
 
         #region Status
 
@@ -647,7 +641,7 @@ namespace umi3dVRBrowsersBase.interactions
             throw new System.NotImplementedException();
         }
 
-        #endregion
+        #endregion Status
 
         #region Change mapping
 
@@ -679,7 +673,7 @@ namespace umi3dVRBrowsersBase.interactions
             }
         }
 
-        #endregion
+        #endregion Change mapping
 
         /// <summary>
         /// <inheritdoc/>
@@ -693,7 +687,6 @@ namespace umi3dVRBrowsersBase.interactions
             return tool.id;
         }
 
-        #endregion
+        #endregion Methods
     }
-
 }

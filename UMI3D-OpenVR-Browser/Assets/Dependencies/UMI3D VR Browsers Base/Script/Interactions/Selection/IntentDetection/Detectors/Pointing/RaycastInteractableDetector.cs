@@ -16,8 +16,12 @@ using umi3dBrowsers.interaction.selection.intentdetector.method;
 
 namespace umi3dBrowsers.interaction.selection.intentdetector
 {
+    /// <summary>
+    /// Raycast detector for <see cref="InteractableContainer"/>.
+    /// </summary>
     public class RaycastInteractableDetector : AbstractPointingInteractableDetector
     {
+        /// <inheritdoc/>
         protected override void SetDetectionMethod()
         {
             detectionMethod = new RaycastDetectionMethod<InteractableContainer>();

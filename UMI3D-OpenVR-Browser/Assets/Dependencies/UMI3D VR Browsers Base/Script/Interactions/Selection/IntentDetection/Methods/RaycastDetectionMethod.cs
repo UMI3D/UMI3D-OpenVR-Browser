@@ -24,6 +24,7 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
     /// <typeparam name="T"></typeparam>
     public class RaycastDetectionMethod<T> : AbstractDetectionMethod<T> where T : MonoBehaviour
     {
+        /// <inheritdoc/>
         public override T PredictTarget()
         {
             var raySelection = new RaySelectionZone<T>(controllerTransform.position, controllerTransform.forward);
@@ -32,8 +33,13 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
         }
     }
 
+    /// <summary>
+    /// <see cref="RaycastDetectionMethod{T}"/> for interactables.
+    /// </summary>
+    /// Implement special UMI3D interactable rules such as "hasPriority".
     public class InteractableRaycastDetectionMethod : RaycastDetectionMethod<InteractableContainer>
     {
+        /// <inheritdoc/>
         public override InteractableContainer PredictTarget()
         {
             var raySelection = new RaySelectionZone<InteractableContainer>(controllerTransform.position, controllerTransform.forward);

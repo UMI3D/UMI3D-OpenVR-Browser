@@ -28,11 +28,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <summary>
         /// Selection Intent Detector (virtual pointing)
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual pointing.")]
         public AbstractPointingInteractableDetector pointingDetector;
 
         /// <summary>
         /// Selection Intent Detector (virtual hand)
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
         public AbstractGrabInteractableDetector grabDetector;
 
         /// <summary>
@@ -105,6 +107,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     && !InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.dto.id);
         }
 
+        /// <summary>
+        /// Is the passed object currently slected by this selector?
+        /// </summary>
+        /// <param name="ic"></param>
+        /// <returns></returns>
         private bool IsObjectSelected(InteractableContainer ic)
         {
             return ic == LastSelected?.selectedObject

@@ -24,6 +24,9 @@ namespace umi3dBrowsers.interaction.selection.feedback
     /// </summary>
     public interface IInstantaneousFeedback : IFeedback
     {
+        /// <summary>
+        /// Trigger once the feedback.
+        /// </summary>
         void Trigger();
     }
 
@@ -56,5 +59,4 @@ namespace umi3dBrowsers.interaction.selection.feedback
         /// <param name="selectionData"></param>
         void UpdateFeedback(AbstractSelectionData selectionData);
     }
-
 }

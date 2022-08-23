@@ -28,13 +28,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
     /// </summary>
     public class RayCursor : AbstractPointingCursor
     {
-        [Header("Laser")]
+        [Header("Laser"), SerializeField, Tooltip("Laser's cylindric part.")]
         public GameObject laserObject;
 
         private Renderer laserObjectRenderer;
 
-        [Header("ImpactPoint")]
-        public GameObject impactPoint;
+        [Header("ImpactPoint"), SerializeField, Tooltip("Laser's impact sphere.")]
+        private GameObject impactPoint;
 
         private Renderer impactPointRenderer;
 
@@ -49,13 +49,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <summary>
         /// Color when no intended object are detected
         /// </summary>
-        [SerializeField]
+        [SerializeField, Tooltip("Color when no intended object are detected.")]
         private Material defaultMaterial;
 
         /// <summary>
         /// Color when an object is selected
         /// </summary>
-        [SerializeField]
+        [SerializeField, Tooltip("Color when an object is selected.")]
         private Material selectionMaterial;
 
         /// <summary>

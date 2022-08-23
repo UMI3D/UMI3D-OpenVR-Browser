@@ -29,18 +29,28 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <summary>
         /// Controller to manage selection for
         /// </summary>
-        [Header("Controller")]
+        [Header("Controller"), Tooltip("Controller to manage selection for.")]
         public VRController controller;
 
-        [Header("Selectors")]
+        [Header("Selectors"), Tooltip("Selectors for interactables.")]
         public InteractableVRSelector interactableSelector;
 
+        [Tooltip("Selectors for selectables.")]
         public SelectableVRSelector selectableSelector;
+
+        [Tooltip("Selectors for other customized UI.")]
         public ElementVRSelector elementSelector;
 
-        [Header("Cursor")]
+        /// <summary>
+        /// Cursor associated with pointing selection.
+        /// </summary>
+        [Header("Cursor"), Tooltip("Cursor associated with pointing selection.")]
         public AbstractCursor pointingCursor;
 
+        /// <summary>
+        /// Cursor associated with proximity selection.
+        /// </summary>
+        [Tooltip("Cursor associated with proximity selection.")]
         public AbstractCursor grabCursor;
 
         /// <summary>
