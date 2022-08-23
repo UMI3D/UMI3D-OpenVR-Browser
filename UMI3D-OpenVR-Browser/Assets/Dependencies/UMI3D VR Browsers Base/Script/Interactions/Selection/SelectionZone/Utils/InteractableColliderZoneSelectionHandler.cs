@@ -15,7 +15,8 @@ using umi3d.cdk.interaction;
 
 namespace umi3dBrowsers.interaction.selection.zoneselection
 {
-    // Exists just for Unity serialization of templates
+    /// <inheritdoc/>
+    /// Exists just for Unity serialization of templates
     public class InteractableColliderZoneSelectionHandler : ColliderZoneSelectionHandler<InteractableContainer>
     { }
 }

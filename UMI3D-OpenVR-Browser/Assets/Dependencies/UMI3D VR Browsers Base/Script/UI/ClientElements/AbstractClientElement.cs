@@ -44,6 +44,5 @@ namespace umi3dVRBrowsersBase.ui
 
         /// <inheritdoc/>
         public bool IsSelected() => isSelected;
-
     }
 }

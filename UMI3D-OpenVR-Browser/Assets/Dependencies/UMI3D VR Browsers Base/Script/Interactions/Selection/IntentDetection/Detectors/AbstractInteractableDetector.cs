@@ -22,9 +22,11 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
     public abstract class AbstractInteractableDetector : AbstractDetector<InteractableContainer>
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractPointingInteractableDetector : AbstractInteractableDetector
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractGrabInteractableDetector : AbstractInteractableDetector
     { }
 }

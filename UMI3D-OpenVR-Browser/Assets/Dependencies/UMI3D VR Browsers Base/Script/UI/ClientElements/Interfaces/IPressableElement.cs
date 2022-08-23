@@ -44,10 +44,15 @@ namespace umi3dVRBrowsersBase.ui
         void PressUp(ControllerType controller);
 
         /// <summary>
+        /// Raises an event when this element is pressed on each frame.
+        /// </summary>
+        /// <param name="type"></param>
+        void PressStay(ControllerType type);
+
+        /// <summary>
         /// Returns true if the controller is currently pressing the element
         /// </summary>
         /// <param name="controller"></param>
         bool IsPressed(ControllerType controller);
-        void PressStay(ControllerType type);
     }
 }

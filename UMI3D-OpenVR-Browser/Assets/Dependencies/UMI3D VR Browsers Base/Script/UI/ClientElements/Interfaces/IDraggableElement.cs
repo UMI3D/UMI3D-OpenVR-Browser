@@ -84,5 +84,6 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// Defines if its is a 2D or a 3D drag and drop.
     /// </summary>
-    public enum DragAndDropType { Planar, Spatial }
+    public enum DragAndDropType
+    { Planar, Spatial }
 }

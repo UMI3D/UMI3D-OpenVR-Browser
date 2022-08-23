@@ -21,8 +21,9 @@ namespace umi3dBrowsers.interaction.selection.projector
 {
     /// <summary>
     /// Projector for Selectable.
-    /// Identifies the Selectable type and interact with it
+    /// Identifies the Selectable type and interact with it.
     /// </summary>
+    /// /// Does not really projects the UMI3D interactions but act like it is projecting the client own's interactions.
     public class SelectableProjector : IProjector<Selectable>
     {
         /// <inheritdoc/>

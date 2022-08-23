@@ -31,14 +31,15 @@ namespace umi3dVRBrowsersBase.ui
         [SerializeField]
         [Tooltip("Event raised when this element is clicked")]
         private UnityEvent onClicked = new UnityEvent();
+
         private UnityEvent onHoverEnter = new UnityEvent();
         private UnityEvent onHoverExit = new UnityEvent();
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
         public UnityEvent OnTriggered { get => onClicked; }
+        /// <inheritdoc/>
         public UnityEvent OnHoverEnter => onHoverEnter;
+        /// <inheritdoc/>
         public UnityEvent OnHoverExit => onHoverExit;
 
         [SerializeField]
@@ -66,7 +67,7 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         private bool isHovered = false;
 
-        #endregion
+        #endregion Fields
 
         protected void OnEnable()
         {
@@ -101,21 +102,19 @@ namespace umi3dVRBrowsersBase.ui
 
             if (isSelected && selectMaterial != null)
             {
-
                 btnRenderer.material = selectMaterial;
             }
             else if (isHovered && hoverMaterial != null)
             {
-
                 btnRenderer.material = hoverMaterial;
             }
             else if (defaultMaterial != null)
             {
-
                 btnRenderer.material = defaultMaterial;
             }
         }
 
+        /// <inheritdoc/>
         public virtual void HoverEnter(ControllerType controller)
         {
             if (btnRenderer != null && !isSelected && hoverMaterial != null)
@@ -126,6 +125,7 @@ namespace umi3dVRBrowsersBase.ui
             onHoverEnter.Invoke();
         }
 
+        /// <inheritdoc/>
         public virtual void HoverExit(ControllerType controller)
         {
             if (btnRenderer != null && !isSelected && defaultMaterial != null)
@@ -136,8 +136,10 @@ namespace umi3dVRBrowsersBase.ui
             onHoverExit.Invoke();
         }
 
+        /// <inheritdoc/>
         public virtual bool IsHovered(ControllerType controller) => isHovered;
 
+        /// <inheritdoc/>
         public override void Select(VRController controller)
         {
             if (!isSelected)
@@ -151,6 +153,7 @@ namespace umi3dVRBrowsersBase.ui
             }
         }
 
+        /// <inheritdoc/>
         public override void Deselect(VRController controller)
         {
             if (isSelected)
@@ -165,7 +168,7 @@ namespace umi3dVRBrowsersBase.ui
 
         /// <summary>
         /// Force the change for renderer <br/>
-        /// Warning: The visual feedback state should be reset after use 
+        /// Warning: The visual feedback state should be reset after use
         /// </summary>
         public void ForceSelectionHighlight()
         {
@@ -177,15 +180,14 @@ namespace umi3dVRBrowsersBase.ui
 
         /// <summary>
         /// Force the change for renderer <br/>
-        /// Warning: The visual feedback state should be reset after use 
+        /// Warning: The visual feedback state should be reset after use
         /// </summary>
         public void ForceDeselectionHighlight()
         {
             if (btnRenderer != null && defaultMaterial != null)
-                {
-                    btnRenderer.material = defaultMaterial;
-                }
+            {
+                btnRenderer.material = defaultMaterial;
+            }
         }
     }
-
 }

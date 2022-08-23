@@ -23,9 +23,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.intentdetector
     public abstract class AbstractElementDetector : AbstractDetector<AbstractClientInteractableElement>
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractPointingElementDetector : AbstractElementDetector
     { }
 
+    /// <inheritdoc/>
     public abstract class AbstractGrabElementDetector : AbstractElementDetector
     { }
 }

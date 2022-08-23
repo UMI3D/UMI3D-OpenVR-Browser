@@ -23,9 +23,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.intentdetector
     /// </summary>
     public class ColliderProximityElementDetector : AbstractGrabElementDetector
     {
-        [SerializeField]
+        [SerializeField, Tooltip("Handler for proximity selection.")]
         protected ElementColliderZoneSelectionHandler proximityColliderHandler;
 
+        /// <inheritdoc/>
         protected override void SetDetectionMethod()
         {
             detectionMethod = new ColliderProximityDetectionMethod<AbstractClientInteractableElement>(proximityColliderHandler);

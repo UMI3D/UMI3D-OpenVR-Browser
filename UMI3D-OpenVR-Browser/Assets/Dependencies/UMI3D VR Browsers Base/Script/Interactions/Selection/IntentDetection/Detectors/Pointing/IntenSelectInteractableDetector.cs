@@ -13,13 +13,22 @@ limitations under the License.
 
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection.intentdetector.method;
+using UnityEngine;
 
 namespace umi3dBrowsers.interaction.selection.intentdetector
 {
+    /// <summary>
+    /// IntenSelect detector for <see cref="InteractableContainer"/>.
+    /// </summary>
     public class IntenSelectInteractableDetector : AbstractPointingInteractableDetector
     {
+        /// <summary>
+        /// Serialized IntenSelect parameters.
+        /// </summary>
+        [Tooltip("Serialized IntenSelect parameters.")]
         public IntenSelectParameters parameters;
 
+        /// <inheritdoc/>
         protected override void SetDetectionMethod()
         {
             detectionMethod = new IntenSelectDetectionMethod<InteractableContainer>(parameters);

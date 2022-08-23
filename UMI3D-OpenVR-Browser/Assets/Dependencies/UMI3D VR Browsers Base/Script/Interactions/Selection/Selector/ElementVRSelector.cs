@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
 using umi3dBrowsers.interaction.selection;
 using umi3dVRBrowsersBase.interactions.selection.intentdetector;
@@ -29,11 +28,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <summary>
         /// Selection Intent Detector (virtual pointing)
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual pointing.")]
         public AbstractPointingElementDetector pointingDetector;
 
         /// <summary>
         /// Selection Intent Detector (virtual hand)
         /// </summary>
+        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
         public AbstractGrabElementDetector grabDetector;
 
         /// <summary>
@@ -108,7 +109,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             {
                 if (activated)
                     OnPointerPressed();
-
             }
         }
 

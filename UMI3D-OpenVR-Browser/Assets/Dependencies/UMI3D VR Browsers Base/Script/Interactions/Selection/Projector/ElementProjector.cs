@@ -17,6 +17,10 @@ using umi3dVRBrowsersBase.ui;
 
 namespace umi3dVRBrowsersBase.interactions.selection.projector
 {
+    /// <summary>
+    /// Projector for AbstractClientElement
+    /// </summary>
+    /// Does not really projects the UMI3D interactions but act like it is projecting the client own's interactions.
     public class ElementProjector : IProjector<AbstractClientInteractableElement>
     {
         /// <inheritdoc/>

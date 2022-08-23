@@ -16,8 +16,12 @@ using UnityEngine.UI;
 
 namespace umi3dBrowsers.interaction.selection.intentdetector
 {
+    /// <summary>
+    /// Raycast detector for <see cref="Selectable"/>.
+    /// </summary>
     public class RaycastSelectableDetector : AbstractPointingSelectableDetector
     {
+        /// <inheritdoc/>
         protected override void SetDetectionMethod()
         {
             detectionMethod = new RaycastDetectionMethod<Selectable>();

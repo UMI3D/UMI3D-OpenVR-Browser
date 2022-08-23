@@ -27,10 +27,12 @@ namespace umi3dBrowsers.interaction.selection.cursor
         /// Event triggered when the cursor enters an UMI3D interactable
         /// </summary>
         public static CursorTrackingEvent OnCursorEnter = new CursorTrackingEvent();
+
         /// <summary>
         /// Event triggered when the cursor stays inside an UMI3D interactable
         /// </summary>
         public static CursorTrackingEvent OnCursorStay = new CursorTrackingEvent();
+
         /// <summary>
         /// Event triggered when the cursor exits an UMI3D interactable
         /// </summary>

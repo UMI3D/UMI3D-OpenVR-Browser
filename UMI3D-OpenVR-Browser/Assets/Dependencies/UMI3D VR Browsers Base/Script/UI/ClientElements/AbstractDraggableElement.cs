@@ -29,6 +29,9 @@ namespace umi3dVRBrowsersBase.ui
         private UnityEvent onPressedDown = new UnityEvent();
         private UnityEvent onPressedUp = new UnityEvent();
 
+        /// <summary>
+        /// True if the object is in the pressed state.
+        /// </summary>
         private bool isPressed;
 
         /// <inheritdoc/>
@@ -41,8 +44,11 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         protected Collider colliderRaycast;
 
+        /// <summary>
+        /// Contains the handle, normally a child component.
+        /// </summary>
         [SerializeField]
-        [Tooltip("Element which contains the handle, normally direct parent")]
+        [Tooltip("Contains the handle, normally a child component.")]
         protected RectTransform referenceRect;
 
         /// <summary>
@@ -54,10 +60,21 @@ namespace umi3dVRBrowsersBase.ui
         /// World position of <see cref="handleContainer"/> 's top right corner.
         /// </summary>
         protected Vector3 topRightCorner;
-
+        /// <summary>
+        /// Plane where the current dragding occurs.
+        /// </summary>
         protected Plane currentDragPlane;
+        /// <summary>
+        /// Distance with the object at the start of the dragging.
+        /// </summary>
         protected float startDistanceFromObject;
+        /// <summary>
+        /// True is the object is currently being dragged.
+        /// </summary>
         protected bool isBeingDragged;
+        /// <summary>
+        /// Controller used for dragging if any.
+        /// </summary>
         protected VRController usedController;
 
         /// <summary>

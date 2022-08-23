@@ -25,38 +25,45 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
         /// <summary>
         /// Corrective term according to de Haan et al. 2005
         /// </summary>
-        [SerializeField]
+        /// The value should be comprised between 0 (strictly) and 1.
+        /// A value closer to 1 will tend to a classic conic field while a smaller value will bend the cone.
+        [SerializeField, Tooltip("Corrective term according to de Haan et al. 2005. 0<k<=1.")]
         public float corrective_k = 4 / 5;
 
         /// <summary>
         /// Cone angle in degrees, correspond to the half of the full angle at its apex
         /// </summary>
-        [SerializeField]
+        [SerializeField, Tooltip("Cone angle in degrees, correspond to the half of the full angle at its apex.")]
         public float coneAngle = 15;
 
         /// <summary>
         /// Rate of decay of the score at each step
         /// </summary>
-        [SerializeField]
+        /// Should be set such as <see cref="stickinessRate"/> + <see cref="snappinessRate"/> = 1.
+        /// Set to 0.5 based on the original study.
+        [SerializeField, Tooltip("Rate of decay of the score at each step. Should sum up to 1 with the snapiness rate.")]
         public float stickinessRate = 0.5f;
 
         /// <summary>
         /// Rate of increase of the score at each step
         /// </summary>
-        [SerializeField]
+        /// See <see cref="stickinessRate"/>.
+        [SerializeField, Tooltip("Rate of increase of the score at each step. Should sum up to 1 with the stickiness rate.")]
         public float snappinessRate = 0.5f;
 
         /// <summary>
         /// Maximum score before provoking a reset of the detector
         /// </summary>
-        [Header("Score boundaries")]
+        /// Exist mainly for security reason, the score should never been reached in real use cases.
+        [Header("Score boundaries"), Tooltip("aximum score before provoking a reset of the detector.")]
         [SerializeField]
         public float scoreMax = 70;
 
         /// <summary>
         /// Minimum score for an object to remain considered
         /// </summary>
-        [SerializeField]
+        /// Exist mainly for security reason, the score should never been reached in real use cases.
+        [SerializeField, Tooltip("Minimum score for an object to remain considered.")]
         public float scoreMin = -10;
     }
 }

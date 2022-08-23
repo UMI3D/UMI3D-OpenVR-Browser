@@ -23,28 +23,35 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
     /// </summary>
     public class ColliderProximityDetectionMethod<T> : AbstractDetectionMethod<T> where T : MonoBehaviour
     {
+        /// <summary>
+        /// Zone selection helper based on a collider used for the method.
+        /// </summary>
         protected ColliderSelectionZone<T> zoneSelection;
 
+        /// <summary>
+        /// Collider handler used by the selection zone for the method.
+        /// </summary>
         protected ColliderZoneSelectionHandler<T> proximityColliderHandler;
-
-        protected bool hasHandlerLoaded = false;
 
         public ColliderProximityDetectionMethod(ColliderZoneSelectionHandler<T> proximityColliderHandler) : base()
         {
             this.proximityColliderHandler = proximityColliderHandler;
         }
 
+        /// <inheritdoc/>
         public override T PredictTarget()
         {
             return zoneSelection.GetClosestInZone();
         }
 
+        /// <inheritdoc/>
         public override void Init(AbstractController controller)
         {
             base.Init(controller);
             zoneSelection = new ColliderSelectionZone<T>(proximityColliderHandler);
         }
 
+        /// <inheritdoc/>
         public override void Reset()
         {
             base.Reset();

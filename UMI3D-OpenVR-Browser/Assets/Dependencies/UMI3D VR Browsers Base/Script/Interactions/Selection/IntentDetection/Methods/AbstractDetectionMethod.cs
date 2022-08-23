@@ -18,8 +18,15 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
 {
     public abstract class AbstractDetectionMethod<T> where T : MonoBehaviour
     {
+        /// <summary>
+        /// Reference to the used controller's transform
+        /// </summary>
         protected Transform controllerTransform;
 
+        /// <summary>
+        /// Initialize the detection method with the specified controller
+        /// </summary>
+        /// <param name="controller"></param>
         public virtual void Init(AbstractController controller)
         {
             controllerTransform = controller.transform;

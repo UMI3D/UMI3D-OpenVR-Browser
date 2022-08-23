@@ -16,8 +16,12 @@ using umi3dVRBrowsersBase.ui;
 
 namespace umi3dVRBrowsersBase.interactions.selection.intentdetector
 {
+    /// <summary>
+    /// Raycast detector for <see cref="AbstractClientInteractableElement"/>.
+    /// </summary>
     public class RaycastElementDetector : AbstractPointingElementDetector
     {
+        /// <inheritdoc/>
         protected override void SetDetectionMethod()
         {
             detectionMethod = new RaycastDetectionMethod<AbstractClientInteractableElement>();
