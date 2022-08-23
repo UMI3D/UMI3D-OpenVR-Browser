@@ -30,7 +30,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         /// Transorm of the element which really display the information.
         /// </summary>
         [SerializeField]
-        private DefaultClickableButton displayerButton;
+        private DefaultClickableButtonElement displayerButton;
 
         #endregion
 
@@ -59,7 +59,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
             else
             {
                 base.Select();
-                displayerButton?.Select();
+                //displayerButton?.Select();
             }
         }
 
@@ -70,7 +70,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         public override void Collapse(bool forceUpdate = false)
         {
             base.Collapse(forceUpdate);
-            displayerButton?.UnSelect();
+            //displayerButton?.UnSelect();
         }
 
         /// <summary>
@@ -82,7 +82,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
             base.Expand(forceUpdate);
             ExpandAs(this);
 
-            displayerButton?.Select();
+            //displayerButton?.Select();
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         public override void Hide()
         {
             base.Hide();
-            displayerButton?.UnSelect();
+            //displayerButton?.UnSelect();
         }
 
         /// <summary>

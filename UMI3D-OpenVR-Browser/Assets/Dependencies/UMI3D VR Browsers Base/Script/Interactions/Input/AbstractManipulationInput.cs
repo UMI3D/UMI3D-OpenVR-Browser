@@ -18,7 +18,6 @@ using System.Collections;
 using umi3d.cdk;
 using umi3d.cdk.interaction;
 using umi3d.common.interaction;
-using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui;
 using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
@@ -223,7 +222,8 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// </summary>
         protected virtual void ActivationButton_onStateUp()
         {
-            if (ParameterGear.Instance.IsHovered || PlayerMenuManager.Instance.IsHovered || VRClickableElementSelector.IsElementHovered())
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+                || PlayerMenuManager.Instance.IsMenuHovered)
                 return;
 
             if (messageSenderCoroutine != null)
@@ -242,7 +242,8 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// </summary>
         protected virtual void ActivationButton_onStateDown()
         {
-            if (ParameterGear.Instance.IsHovered || PlayerMenuManager.Instance.IsHovered || VRClickableElementSelector.IsElementHovered())
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+                || PlayerMenuManager.Instance.IsMenuHovered)
                 return;
 
             if (messageSenderCoroutine != null)

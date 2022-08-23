@@ -20,8 +20,10 @@ using umi3d.cdk;
 using umi3d.cdk.userCapture;
 using umi3d.common;
 using umi3d.common.userCapture;
+using umi3dBrowsers.interaction.selection.cursor;
+using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
-using umi3dVRBrowsersBase.selection;
+using umi3dVRBrowsersBase.interactions.selection;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ikManagement
@@ -44,33 +46,49 @@ namespace umi3dVRBrowsersBase.ikManagement
         private Dictionary<uint, Quaternion> leftPhalanxRotations;
         private uint lastBoneId = 0;
 
+        private AbstractPointingCursor selectionmanager;
+
+        protected void Awake()
+        {
+            
+        }
+
         // Start is called before the first frame update
         private void Start()
         {
             UMI3DClientUserTracking.Instance.handPoseEvent.AddListener((dto) => SetupHandPose(dto, lastBoneId));
-            InteractableRaySelector.HoverEnter.AddListener((hoverId, boneId) =>
+            AbstractPointingCursor.OnCursorEnter.AddListener((PointingInfo poitingInfo) =>
             {
-                lastBoneId = boneId;
-                if (boneId.Equals(BoneType.RightHand))
-                    currentRightHoverId = hoverId;
-                else
-                    currentLeftHoverId = hoverId;
-            });
-            InteractableRaySelector.HoverExit.AddListener((hoverId, boneId) =>
-            {
-                lastBoneId = boneId;
-                if (boneId.Equals(BoneType.RightHand))
-                    if (currentRightHoverId != 0 && hoverId.Equals(currentRightHoverId))
-                    {
-                        currentRightHoverId = 0;
-                        passiveRightHoverPose = null;
-                    }
+                var controller = (poitingInfo.controller as VRController);
+                lastBoneId = controller.bone.boneType;
+                if (poitingInfo.target != null)
+                {
+                    if (controller.type == ControllerType.RightHandController)
+                        currentRightHoverId = poitingInfo.target.id;
                     else
-                    if (currentLeftHoverId != 0 && hoverId.Equals(currentLeftHoverId))
-                    {
-                        currentLeftHoverId = 0;
-                        passiveLeftHoverPose = null;
-                    }
+                        currentLeftHoverId = poitingInfo.target.id;
+                }
+
+            });
+            AbstractPointingCursor.OnCursorExit.AddListener((PointingInfo poitingInfo) =>
+            {
+                var controller = (poitingInfo.controller as VRController);
+                lastBoneId = controller.bone.boneType;
+                if (poitingInfo.target != null)
+                {
+                    if (controller.type == ControllerType.RightHandController)
+                        if (currentRightHoverId != 0 && poitingInfo.target.id.Equals(currentRightHoverId))
+                        {
+                            currentRightHoverId = 0;
+                            passiveRightHoverPose = null;
+                        }
+                        else
+                        if (currentLeftHoverId != 0 && poitingInfo.target.id.Equals(currentLeftHoverId))
+                        {
+                            currentLeftHoverId = 0;
+                            passiveLeftHoverPose = null;
+                        }
+                }
             });
             BooleanInput.BooleanEvent.AddListener(boneId => lastBoneId = boneId);
         }

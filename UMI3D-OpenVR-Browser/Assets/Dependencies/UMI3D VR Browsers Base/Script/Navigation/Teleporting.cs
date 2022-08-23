@@ -49,10 +49,10 @@ namespace umi3dVRBrowsersBase.navigation
 
             if (position.HasValue)
             {
-                Vector3 offset = teleportingObject.transform.rotation * centerEyeAnchor.transform.localPosition;
-                teleportingObject.transform.position = new Vector3(position.Value.x - offset.x,
+                teleportingObject.transform.position = new Vector3(position.Value.x - centerEyeAnchor.transform.localPosition.x,
                                                                    position.Value.y,
-                                                                   position.Value.z - offset.z);
+                                                                   position.Value.z - centerEyeAnchor.transform.localPosition.z);
+
             }
         }
 

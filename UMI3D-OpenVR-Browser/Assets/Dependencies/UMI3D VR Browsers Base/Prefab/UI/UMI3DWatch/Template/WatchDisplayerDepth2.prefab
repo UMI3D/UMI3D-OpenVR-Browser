@@ -267,7 +267,7 @@ GameObject:
   - component: {fileID: 2688231553813592033}
   - component: {fileID: 5841337802718561603}
   - component: {fileID: 2429359644633014940}
-  - component: {fileID: 5236017564498629890}
+  - component: {fileID: 1042732851932543724}
   - component: {fileID: 8341543368022609774}
   m_Layer: 0
   m_Name: WatchDisplayerDepth2
@@ -339,7 +339,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &5236017564498629890
+--- !u!114 &1042732851932543724
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -348,15 +348,28 @@ MonoBehaviour:
   m_GameObject: {fileID: 5239265789185337876}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a67b71918d4736d409382f97e0b28fe5, type: 3}
+  m_Script: {fileID: 11500000, guid: fe9fde35e7343fa41835b984ddcd1526, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onClicked:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 3505722915799702838, guid: c8d4adbe06d629841b11b2a5b052abeb,
+          type: 3}
+        m_MethodName: Select
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   btnRenderer: {fileID: 2429359644633014940}
   defaultMaterial: {fileID: 2100000, guid: 4901a7d69f6c19544ad92904aced2222, type: 2}
-  hoverMaterial: {fileID: 2100000, guid: 739e6d636b6112848a4d54075efac154, type: 2}
+  hoverMaterial: {fileID: 2100000, guid: 4901a7d69f6c19544ad92904aced2222, type: 2}
+  pressedMaterial: {fileID: 0}
   selectMaterial: {fileID: 2100000, guid: 94e42c73586257342b0a4e3de284c568, type: 2}
 --- !u!65 &8341543368022609774
 BoxCollider:

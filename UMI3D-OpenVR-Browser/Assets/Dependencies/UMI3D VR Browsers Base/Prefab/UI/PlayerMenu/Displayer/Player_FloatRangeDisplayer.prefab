@@ -541,7 +541,7 @@ GameObject:
   - component: {fileID: 1004598084314827365}
   - component: {fileID: 6656850773970095511}
   - component: {fileID: 7406101402343301638}
-  - component: {fileID: 6287144457691468682}
+  - component: {fileID: 4335553730834714187}
   - component: {fileID: 471117076557249122}
   m_Layer: 0
   m_Name: Handle
@@ -606,7 +606,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &6287144457691468682
+--- !u!114 &4335553730834714187
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -615,7 +615,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6792481244215732733}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9102e5ddde267d844ab3a8e15bef9f79, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a18f1f89dce09441ac8baefbc922a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   slider: {fileID: 2335799801449817301}

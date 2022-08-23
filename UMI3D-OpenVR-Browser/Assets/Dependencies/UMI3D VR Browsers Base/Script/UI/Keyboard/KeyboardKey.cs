@@ -68,7 +68,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         }
 
         /// <summary>
-        /// Raises <see cref="HoverExit"/>.
+        /// Raises <see cref="onHoverExit"/>.
         /// </summary>
         public void HoverExit()
         {

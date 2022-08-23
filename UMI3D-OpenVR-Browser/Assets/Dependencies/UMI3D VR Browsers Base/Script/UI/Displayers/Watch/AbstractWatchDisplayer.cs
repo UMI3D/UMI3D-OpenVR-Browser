@@ -176,7 +176,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
     [System.Serializable]
     public class DisplayerPrefab
     {
-        public DefaultClickableButton obj;
+        public DefaultClickableButtonElement obj;
 
         public Renderer iconRenderer;
 

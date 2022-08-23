@@ -87,44 +87,29 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
         [SerializeField]
         [Tooltip("Button to display all menus pinned by users")]
-        private DefaultClickableButton pinMenuButton;
+        private OnOffButton pinMenuButton;
 
         [SerializeField]
-        [Tooltip("Button to display playerMenu")]
-        private DefaultClickableButton playerMenuButton;
+        [Tooltip("Button to display the player menu")]
+        private OnOffButton playerMenuButton;
 
         [SerializeField]
-        [Tooltip("Button to display environment settings")]
-        private DefaultClickableButton settingsMenuButton;
-
-        [SerializeField]
-        [Tooltip("Root of the menu")]
+        [Tooltip("Root of the settings menu")]
         private GameObject settingsMenuRoot;
 
         [Header("Settings menu")]
-        [SerializeField]
-        [Tooltip("Button to enable microphone")]
-        private DefaultClickableButton setMicOnButton;
 
         [SerializeField]
-        [Tooltip("Button to disable microphone")]
-        private DefaultClickableButton setMicOffButton;
+        [Tooltip("Button to enable/disable microphone")]
+        private OnOffButton setMicButton;
 
         [SerializeField]
-        [Tooltip("Button to enable sound")]
-        private DefaultClickableButton setSoundOnButton;
+        [Tooltip("Button to enable/disable sound")]
+        private OnOffButton setSoundButton;
 
         [SerializeField]
-        [Tooltip("Button to disable sound")]
-        private DefaultClickableButton setSoundOffButton;
-
-        [SerializeField]
-        [Tooltip("Button to send user's avatar movments")]
-        private DefaultClickableButton setAvatarOnButton;
-
-        [SerializeField]
-        [Tooltip("Button to stop sending user's avatar movments")]
-        private DefaultClickableButton setAvatarOffButton;
+        [Tooltip("Button to send/stop user's avatar movments")]
+        private OnOffButton setAvatarButton;
 
         [Header("Notification")]
         [Tooltip("Where all local notifications will be instanciated")]
@@ -166,8 +151,8 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
 
             BindSettingButtons();
 
-            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.Select());
-            PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.UnSelect());
+            //PlayerMenuManager.Instance.onMenuOpen.AddListener(() => playerMenuButton.ForceSelectionHighlight());
+            //PlayerMenuManager.Instance.onMenuClose.AddListener(() => playerMenuButton.ForceDeselectionHighlight());
 
             playerCamera = PlayerMenuManager.Instance.PlayerCameraTransform;
         }
@@ -185,30 +170,12 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// </summary>
         private void BindSettingButtons()
         {
+            EnvironmentSettings.Instance.micSetting.OnValueChanged.AddListener(setMicButton.Toggle);
+            EnvironmentSettings.Instance.audioSetting.OnValueChanged.AddListener(setSoundButton.Toggle);
+            EnvironmentSettings.Instance.avatarSetting.OnValueChanged.AddListener(setAvatarButton.Toggle);
+            PlayerMenuManager.Instance.onMenuClose.AddListener(() => { if (playerMenuButton.IsOn) playerMenuButton.Toggle(false);  });
+            PlayerMenuManager.Instance.onMenuOpen.AddListener(() => { if (!playerMenuButton.IsOn) playerMenuButton.Toggle(true); });
             SetMicStatus(false);
-            setMicOnButton.OnClicked.AddListener(() => SetMicStatus(true));
-            setMicOffButton.OnClicked.AddListener(() => SetMicStatus(false));
-            EnvironmentSettings.Instance.micSetting.OnValueChanged.AddListener(v =>
-            {
-                setMicOffButton.enabled = v;
-                setMicOnButton.enabled = !v;
-            });
-
-            setSoundOnButton.OnClicked.AddListener(() => SetSoundStatus(true));
-            setSoundOffButton.OnClicked.AddListener(() => SetSoundStatus(false));
-            EnvironmentSettings.Instance.audioSetting.OnValueChanged.AddListener(v =>
-            {
-                setSoundOffButton.enabled = v;
-                setSoundOnButton.enabled = !v;
-            });
-
-            setAvatarOnButton.OnClicked.AddListener(() => SetAvatarStatus(true));
-            setAvatarOffButton.OnClicked.AddListener(() => SetAvatarStatus(false));
-            EnvironmentSettings.Instance.avatarSetting.OnValueChanged.AddListener(v =>
-            {
-                setAvatarOffButton.enabled = v;
-                setAvatarOnButton.enabled = !v;
-            });
         }
 
         #region Abstract Menu Manager
@@ -221,7 +188,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Open();
             menuDisplayManager.Display(true);
-            pinMenuButton.Select();
         }
 
         /// <summary>
@@ -231,13 +197,12 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         {
             base.Close();
             menuDisplayManager.Hide();
-            pinMenuButton.UnSelect();
         }
 
         /// <summary>
         /// Toggles the display of the menu with all pinned items.
         /// </summary>
-        public void ToggleDisplayMenu()
+        public void ToggleDisplayPinMenu()
         {
             if (IsOpen)
                 Close();
@@ -248,9 +213,9 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// <summary>
         /// Toggles the display of <see cref="umi3dVRBrowsersBase.ui.playerMenu.PlayerMenuManager"/>
         /// </summary>
-        public void ToggleDisplayPlayerMenuManager()
+        public void ToggleDisplayPlayerMenu()
         {
-            if (PlayerMenuManager.Instance.IsOpen)
+            if (PlayerMenuManager.Instance.IsMenuOpen)
             {
                 PlayerMenuManager.Instance.Close();
             }
@@ -275,7 +240,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             {
                 isSettingsMenuOpened = true;
                 settingsMenuRoot.SetActive(true);
-                settingsMenuButton.Select();
             }
         }
 
@@ -288,7 +252,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             {
                 isSettingsMenuOpened = false;
                 settingsMenuRoot.SetActive(false);
-                settingsMenuButton.UnSelect();
             }
         }
 
@@ -327,7 +290,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// Asks to change the microphone status.
         /// </summary>
         /// <param name="val"></param>
-        private void SetMicStatus(bool val)
+        public void SetMicStatus(bool val)
         {
             EnvironmentSettings.Instance.micSetting.SetValue(val);
         }
@@ -336,7 +299,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// Asks to change the send user's avatar movments status.
         /// </summary>
         /// <param name="val"></param>
-        private void SetAvatarStatus(bool val)
+        public void SetAvatarStatus(bool val)
         {
             EnvironmentSettings.Instance.avatarSetting.SetValue(val);
         }
@@ -345,7 +308,7 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         /// Asks the sound activation/deactivation.
         /// </summary>
         /// <param name="val"></param>
-        private void SetSoundStatus(bool val)
+        public void SetSoundStatus(bool val)
         {
             EnvironmentSettings.Instance.audioSetting.SetValue(val);
         }

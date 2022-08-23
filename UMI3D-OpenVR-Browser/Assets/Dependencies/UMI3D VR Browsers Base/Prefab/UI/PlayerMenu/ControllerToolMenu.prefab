@@ -232,7 +232,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.0031585693, y: 0.00041848313}
+  m_AnchoredPosition: {x: 0.006832959, y: -0.002999397}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &566116188475549443
@@ -838,7 +838,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 566116189349868558}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9999975
+  m_Size: 0.99999475
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -1021,6 +1021,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   menuAsset: {fileID: 11400000, guid: 11a83fc4ad5862a4c92ac1793a9df861, type: 2}
+  m_displayedOnStart: 0
+  m_collapseOnStart: 0
+  m_displayWhenAddNewItem: 0
+  m_collapseWhenAddNewItem: 0
   hideOnBack: 0
   displayDepth: 0
   firstContainerInScene: 1
@@ -1179,8 +1183,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 566116189275480308}
   m_HandleRect: {fileID: 566116189275480311}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.999993
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

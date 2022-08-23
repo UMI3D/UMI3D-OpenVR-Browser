@@ -28,14 +28,14 @@ namespace umi3dVRBrowsersBase.ui
     /// <summary>
     /// 3D Object to show users its associated UMI3D Entity has UMI3D Parameters, by clicking on this gear, opens <see cref="playerMenu.PlayerMenuManager"/> to edit them.
     /// </summary>
-    public class ParameterGear : SingleBehaviour<ParameterGear>, IClickableElement
+    public class ParameterGear : AbstractClientInteractableElement, ITriggerableElement
     {
         #region Fields
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public UnityEvent OnClicked { get; private set; } = new UnityEvent();
+        public UnityEvent OnTriggered { get; private set; } = new UnityEvent();
 
         /// <summary>
         /// Is the gear currently hovered ?
@@ -104,11 +104,11 @@ namespace umi3dVRBrowsersBase.ui
         /// <inheritdoc/>
         /// </summary>
         /// <param name="controller"></param>
-        public void Click(ControllerType controller)
+        public void Trigger(ControllerType controllerType)
         {
-            OnClicked?.Invoke();
+            OnTriggered?.Invoke();
 
-            PlayerMenuManager.Instance.OpenParameterMenu(controller);
+            PlayerMenuManager.Instance.OpenParameterMenu(controllerType);
 
             if(gameObject.activeInHierarchy)
                 StartCoroutine(ClickAnimation());
@@ -171,6 +171,17 @@ namespace umi3dVRBrowsersBase.ui
         {
             gameObject.SetActive(false);
         }
+
+        public override void Select(VRController controller)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override void Deselect(VRController controller)
+        {
+            throw new System.NotImplementedException();
+        }
+
 
         #endregion
     }

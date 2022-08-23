@@ -17,7 +17,7 @@ MonoBehaviour:
   - obj
   - png
   - jpg
-  - unity_standalone
+  - unity_standalone_urp
   maximumResolution: 0
-  notificationLoader: {fileID: 11400000, guid: 5ed043c7f1075734fa5b879b7b5a3a63, type: 2}
+  notificationLoader: {fileID: 11400000, guid: 0547a6e5311adf04b9592ef5488099fb, type: 2}
   _skyboxMaterial: {fileID: 2100000, guid: 570bb4f4500a62a4a9ab2c867ebb73eb, type: 2}

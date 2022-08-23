@@ -37,6 +37,11 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             m_offButton.SetActive(IsOn ? false : true);
         }
 
+        public void Toggle()
+        {
+            Toggle(!IsOn);
+        }
+
         public void Clicked()
             => OnClicked.Invoke();
     }

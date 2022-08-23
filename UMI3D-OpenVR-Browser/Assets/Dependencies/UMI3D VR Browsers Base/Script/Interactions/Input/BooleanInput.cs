@@ -17,7 +17,6 @@ limitations under the License.
 using System.Collections;
 using umi3d.cdk;
 using umi3d.common.interaction;
-using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui;
 using umi3dVRBrowsersBase.ui.keyboard;
 using umi3dVRBrowsersBase.ui.playerMenu;
@@ -79,8 +78,9 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// <see cref="Associate(AbstractInteractionDto)"/>
         private void VRInput_onStateUp()
         {
-            if (ParameterGear.Instance.IsHovered || PlayerMenuManager.Instance.IsHovered ||
-                VRClickableElementSelector.IsElementHovered() || (Keyboard.Instance?.IsOpen ?? false))
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+                || PlayerMenuManager.Instance.IsMenuHovered
+                || (Keyboard.Instance?.IsOpen ?? false))
                 return;
 
             onActionUp.Invoke();
@@ -94,8 +94,9 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// <see cref="Associate(AbstractInteractionDto)"/>
         private void VRInput_onStateDown()
         {
-            if (ParameterGear.Instance.IsHovered || PlayerMenuManager.Instance.IsHovered ||
-                VRClickableElementSelector.IsElementHovered() || (Keyboard.Instance?.IsOpen ?? false))
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+                || PlayerMenuManager.Instance.IsMenuHovered
+                || (Keyboard.Instance?.IsOpen ?? false))
                 return;
 
             onActionDown.Invoke();

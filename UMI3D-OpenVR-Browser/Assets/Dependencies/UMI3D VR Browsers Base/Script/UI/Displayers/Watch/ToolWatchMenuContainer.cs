@@ -56,7 +56,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         /// <summary>
         /// Buttons to navigate through elements if they are more than <see cref="maxElementsDisplayed"/>.
         /// </summary>
-        public List<DefaultClickableButton> navigationButtons = new List<DefaultClickableButton>();
+        public List<DefaultClickableButtonElement> navigationButtons = new List<DefaultClickableButtonElement>();
 
         [SerializeField]
         private GameObject navigationButtonRoot;
@@ -69,20 +69,20 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         {
             Debug.Assert(navigationButtons.Count == 2, "Two and only two navigation buttons are required for this element");
 
-            foreach (DefaultClickableButton btn in navigationButtons)
+            foreach (DefaultClickableButtonElement btn in navigationButtons)
                 btn.gameObject.SetActive(false);
         }
 
         private void OnEnable()
         {
-            navigationButtons[0].OnClicked.AddListener(NavigatePrevious);
-            navigationButtons[1].OnClicked.AddListener(NavigateNext);
+            navigationButtons[0].OnTriggered.AddListener(NavigatePrevious);
+            navigationButtons[1].OnTriggered.AddListener(NavigateNext);
         }
 
         private void OnDisable()
         {
-            navigationButtons[0].OnClicked.RemoveListener(NavigatePrevious);
-            navigationButtons[1].OnClicked.RemoveListener(NavigateNext);
+            navigationButtons[0].OnTriggered.RemoveListener(NavigatePrevious);
+            navigationButtons[1].OnTriggered.RemoveListener(NavigateNext);
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace umi3dVRBrowsersBase.ui.displayers.watchMenu
         {
             base.Collapse(forceUpdate);
 
-            foreach (DefaultClickableButton btn in navigationButtons)
+            foreach (DefaultClickableButtonElement btn in navigationButtons)
                 btn.gameObject.SetActive(false);
         }
     }
