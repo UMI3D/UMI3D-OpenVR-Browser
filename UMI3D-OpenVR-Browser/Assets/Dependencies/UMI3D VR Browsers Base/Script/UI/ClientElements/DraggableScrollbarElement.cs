@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 using System;
-using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui;
 using UnityEngine;
 using UnityEngine.UI;

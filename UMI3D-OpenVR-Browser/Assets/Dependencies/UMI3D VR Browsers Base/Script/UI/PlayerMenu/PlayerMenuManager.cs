@@ -13,8 +13,6 @@ limitations under the License.
 using inetum.unityUtils;
 using umi3d.cdk.menu;
 using umi3dVRBrowsersBase.interactions;
-using umi3dVRBrowsersBase.interactions.input;
-using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 using UnityEngine.Events;
 

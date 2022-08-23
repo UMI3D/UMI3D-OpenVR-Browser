@@ -17,7 +17,6 @@ limitations under the License.
 using System;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
-using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -72,12 +71,12 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         public void OnEnable()
         {
-            VRDragAndDropSelector.RegisterElement(this);
+            
         }
 
         public void OnDisable()
         {
-            VRDragAndDropSelector.UnRegisterElement(this);
+            
         }
 
         /// <inheritdoc/>

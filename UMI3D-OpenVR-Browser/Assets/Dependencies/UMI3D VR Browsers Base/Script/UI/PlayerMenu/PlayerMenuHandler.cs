@@ -13,7 +13,6 @@ limitations under the License.
 
 using System;
 using umi3dVRBrowsersBase.interactions;
-using umi3dVRBrowsersBase.selection;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ui.playerMenu

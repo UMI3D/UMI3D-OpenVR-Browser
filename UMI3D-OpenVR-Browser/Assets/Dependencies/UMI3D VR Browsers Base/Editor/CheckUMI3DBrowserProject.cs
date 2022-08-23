@@ -25,9 +25,9 @@ using umi3d.cdk.userCapture;
 using umi3dVRBrowsersBase.connection;
 using umi3d.cdk.collaboration;
 using umi3dVRBrowsersBase.interactions.input;
-using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.navigation;
 using umi3dVRBrowsersBase.interactions;
+using umi3dVRBrowsersBase.interactions.selection.selector;
 
 namespace umi3dVRBrowsersBase.editor
 {
@@ -210,12 +210,12 @@ namespace umi3dVRBrowsersBase.editor
                 errors.Add("Warning : Prefab without any ManipulationInput");
 
             //Check selectors
-            if (player.GetComponentsInChildren<InteractableRaySelector>().Length == 0)
-                errors.Add("Prefab without any InteractableRaySelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
-            if (player.GetComponentsInChildren<VRClickableElementSelector>().Length == 0)
-                errors.Add("Prefab without any VRClickableElementSelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
-            if (player.GetComponentsInChildren<VRDragAndDropSelector>().Length == 0)
-                errors.Add("Prefab without any VRDragAndDropSelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
+            if (player.GetComponentsInChildren<InteractableVRSelector>().Length == 0)
+                errors.Add("Prefab without any InteractableVRSelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
+            if (player.GetComponentsInChildren<SelectableVRSelector>().Length == 0)
+                errors.Add("Prefab without any SelectableVRSelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
+            if (player.GetComponentsInChildren<ElementVRSelector>().Length == 0)
+                errors.Add("Prefab without any ElementVRSelector, you can add UMI3D VR Browser Base/Prefab/ControllerSelectors as a children of each of you controller");
 
             //Check TeleportationArc
             if (player.GetComponentsInChildren<TeleportArc>().Length == 0)

@@ -19,8 +19,8 @@ using umi3d.cdk.interaction;
 using umi3d.cdk.menu.interaction;
 using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
+using umi3dBrowsers.interaction.selection.cursor;
 using umi3dVRBrowsersBase.interactions.input;
-using umi3dVRBrowsersBase.selection;
 using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
 
@@ -34,11 +34,6 @@ namespace umi3dVRBrowsersBase.interactions
         /// Type of this controller
         /// </summary>
         public ControllerType type;
-
-        /// <summary>
-        /// Associated selector.
-        /// </summary>
-        public InteractableRaySelector interactableRaySelector;
 
         /// <summary>
         /// Asoociated bone.
@@ -153,8 +148,6 @@ namespace umi3dVRBrowsersBase.interactions
                 input.Init(this);
             foreach (AbstractUMI3DInput input in booleanInputs)
                 input.Init(this);
-
-            Debug.Assert(interactableRaySelector != null);
         }
 
         protected virtual void Update()
@@ -694,7 +687,10 @@ namespace umi3dVRBrowsersBase.interactions
         /// <returns></returns>
         protected override ulong GetCurrentHoveredId()
         {
-            return interactableRaySelector.GetLastHoveredInteractableId();
+            if (tool == null)
+                return 0;
+
+            return tool.id;
         }
 
         #endregion
