@@ -15,7 +15,6 @@ limitations under the License.
 */
 
 using System;
-using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
 using UnityEngine;
 using UnityEngine.UI;
@@ -71,12 +70,10 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         public void OnEnable()
         {
-            
         }
 
         public void OnDisable()
         {
-            
         }
 
         /// <inheritdoc/>
@@ -109,10 +106,12 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
                     background.sprite = backgroundForBinding;
                     button.enabled = true;
                     break;
+
                 case ActionBindingType.NotBound:
                     background.sprite = backgroundWithoutBinding;
                     button.enabled = false;
                     break;
+
                 default:
                     break;
             }

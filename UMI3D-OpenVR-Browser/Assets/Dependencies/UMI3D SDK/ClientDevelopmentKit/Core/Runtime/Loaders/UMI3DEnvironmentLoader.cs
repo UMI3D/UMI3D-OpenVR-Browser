@@ -369,6 +369,8 @@ namespace umi3d.cdk
 
             IEnumerator Load()
             {
+                RenderProbes();
+
                 onProgressChange.Invoke(1f);
                 yield return new WaitForSeconds(0.3f);
                 onEnvironmentLoaded.Invoke();
@@ -384,6 +386,27 @@ namespace umi3d.cdk
             else
             {
                 onFinish();
+            }
+        }
+
+        /// <summary>
+        /// Renders all <see cref="ReflectionProbe"/> set to <see cref=" ReflectionProbeMode.Realtime"/> 
+        /// and <see cref="ReflectionProbeRefreshMode.OnAwake"/> of the environment.
+        /// </summary>
+        private void RenderProbes()
+        {
+            foreach (var entity in entities)
+            {
+                if (entity.Value.dto is GlTFSceneDto && entity.Value is UMI3DNodeInstance scene)
+                {
+                    foreach (var probe in scene.gameObject.GetComponentsInChildren<ReflectionProbe>())
+                    {
+                        if (probe.mode == ReflectionProbeMode.Realtime && probe.refreshMode == ReflectionProbeRefreshMode.OnAwake)
+                        {
+                            probe.RenderProbe();
+                        }
+                    }
+                }
             }
         }
 
@@ -507,7 +530,14 @@ namespace umi3d.cdk
                         if (matDto.name != null && matDto.name.Length > 0)
                             m.name = matDto.name;
                         //register the material
-                        RegisterEntityInstance(((AbstractEntityDto)matDto.extensions.umi3d).id, matDto, m).NotifyLoaded();
+                        if (m == null)
+                        {
+                            RegisterEntityInstance(((AbstractEntityDto)matDto.extensions.umi3d).id, matDto, new List<Material>()).NotifyLoaded();
+                        }
+                        else
+                        {
+                            RegisterEntityInstance(((AbstractEntityDto)matDto.extensions.umi3d).id, matDto, m).NotifyLoaded();
+                        }
                         performed.Invoke();
                     });
                     break;
@@ -549,7 +579,7 @@ namespace umi3d.cdk
             {
                 UMI3DClientServer.GetEntity(ids, callback);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 UMI3DLogger.LogError(e.Message, scope);
                 performed2.Invoke();
@@ -566,6 +596,12 @@ namespace umi3d.cdk
             if (Instance.entities.ContainsKey(entityId))
             {
                 UMI3DEntityInstance entity = Instance.entities[entityId];
+
+                if (entity.Object is UMI3DAbstractAnimation animation)
+                {
+                    animation.Stop();
+                }
+
                 if (entity is UMI3DNodeInstance)
                 {
                     var node = entity as UMI3DNodeInstance;
@@ -597,7 +633,7 @@ namespace umi3d.cdk
         /// <summary>
         /// Clear an environement and make the client ready to load a new environment.
         /// </summary>
-        public static void Clear()
+        public static void Clear(bool clearCache = true)
         {
             Instance.entityFilters.Clear();
 
@@ -605,7 +641,8 @@ namespace umi3d.cdk
             {
                 DeleteEntity(entity, null);
             }
-            UMI3DResourcesManager.Instance.ClearCache();
+            if(clearCache)
+                UMI3DResourcesManager.Instance.ClearCache();
 
             Instance.entities.Clear();
             Instance.entitywaited.Clear();
@@ -624,7 +661,7 @@ namespace umi3d.cdk
             Instance.downloaded = false;
             Instance.loaded = false;
 
-    }
+        }
 
         /// <summary>
         /// Load environment.
@@ -783,7 +820,8 @@ namespace umi3d.cdk
             if (!Exists) return;
             UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(dto.entityId, (e) =>
             {
-                SetEntity(e, dto);
+                if (!SetEntity(e, dto))
+                    UMI3DLogger.LogWarning("SetEntity operation was not applied : entity : " + dto.entityId +  "   propKey : " + dto.property, scope);
             });
 
 
@@ -798,7 +836,8 @@ namespace umi3d.cdk
         {
             UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(entityId, (e) =>
             {
-                SetEntity(e, operationId, entityId, propertyKey, container);
+                if (!SetEntity(e, operationId, entityId, propertyKey, container))
+                    UMI3DLogger.LogWarning("SetEntity operation was not applied : entity : " + entityId + "  opération : " + operationId + "   propKey : " + propertyKey, scope);
             }
             );
         }
@@ -1033,10 +1072,9 @@ namespace umi3d.cdk
             if (!Exists) return false;
             ulong entityId = UMI3DNetworkingHelper.Read<ulong>(container);
             uint propertyKey = UMI3DNetworkingHelper.Read<uint>(container);
-            uint frequence = UMI3DNetworkingHelper.Read<uint>(container);
             WaitForAnEntityToBeLoaded(entityId, (e) =>
             {
-                StartInterpolation(e, entityId, propertyKey, frequence, container);
+                StartInterpolation(e, entityId, propertyKey, container);
             }
             );
             return true;
@@ -1096,7 +1134,7 @@ namespace umi3d.cdk
             return false;
         }
 
-        public static bool StartInterpolation(UMI3DEntityInstance node, ulong entityId, uint property, uint frequence, ByteContainer container)
+        public static bool StartInterpolation(UMI3DEntityInstance node, ulong entityId, uint property, ByteContainer container)
         {
             if (!Instance.entityFilters.ContainsKey(entityId))
             {

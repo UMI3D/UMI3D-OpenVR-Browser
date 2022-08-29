@@ -38,6 +38,9 @@ namespace umi3d.cdk.collaboration
 
         private bool useDto => environmentClient?.useDto ?? false;
 
+        bool pingReceived = false;
+        bool CheckForBandWidthRunning = false;
+
         private UMI3DUser GetUserByNetWorkId(uint nid)
         {
             if (UMI3DCollaborationEnvironmentLoader.Exists && UMI3DCollaborationEnvironmentLoader.Instance.UserList != null)
@@ -58,6 +61,8 @@ namespace umi3d.cdk.collaboration
 
 
         public bool IsConnected => client != null && client.IsConnected;
+
+        private NetworkManager networkManagerComponent = null;
 
         /// <summary>
         /// 
@@ -83,7 +88,7 @@ namespace umi3d.cdk.collaboration
         /// <param name="natServerHost"></param>
         /// <param name="natServerPort"></param>
         /// <returns></returns>
-        public static UMI3DForgeClient Create(UMI3DEnvironmentClient environmentClient,string ip = "127.0.0.1", ushort port = 15937, string masterServerHost = "", ushort masterServerPort = 15940, string natServerHost = "", ushort natServerPort = 15941)
+        public static UMI3DForgeClient Create(UMI3DEnvironmentClient environmentClient, string ip = "127.0.0.1", ushort port = 15937, string masterServerHost = "", ushort masterServerPort = 15940, string natServerHost = "", ushort natServerPort = 15941)
         {
             UMI3DForgeClient client = (new GameObject("UMI3DForgeClient")).AddComponent<UMI3DForgeClient>();
             client.environmentClient = environmentClient;
@@ -93,6 +98,7 @@ namespace umi3d.cdk.collaboration
             client.masterServerPort = masterServerPort;
             client.natServerHost = natServerHost;
             client.natServerPort = natServerPort;
+
             return client;
         }
 
@@ -115,7 +121,7 @@ namespace umi3d.cdk.collaboration
             client.bindFailure += BindFailed;
             client.bindSuccessful += BindSucceded;
             client.forcedDisconnect += (n) => { UMI3DLogger.Log("Force disconnect", scope); };
-            client.playerAccepted += (n,p) => { UMI3DLogger.Log("Player Accepted", scope); };
+            client.playerAccepted += (n, p) => { UMI3DLogger.Log("Player Accepted", scope); };
 
             if (natServerHost.Trim().Length == 0)
                 client.Connect(ip, (ushort)port);
@@ -142,6 +148,70 @@ namespace umi3d.cdk.collaboration
             }
 
             mgr.Initialize(client, masterServerHost, masterServerPort, null);
+
+            networkManagerComponent = NetworkManager.Instance;
+            
+            CheckForBandWidth();
+        }
+
+        protected override void SetRoundTripLatency(double latency, NetWorker sender)
+        {
+            pingReceived = true;
+            base.SetRoundTripLatency(latency, sender);
+        }
+
+        
+        async void CheckForBandWidth()
+        {
+            if (CheckForBandWidthRunning) return;
+            CheckForBandWidthRunning = true;
+
+            while (networkManagerComponent?.Networker != null && networkManagerComponent.Networker.BandwidthIn <= 0 || !IsConnected)
+                await UMI3DAsyncManager.Delay(1000);
+
+            float lastBand = -1;
+            while (networkManagerComponent?.Networker != null && IsConnected && lastBand != networkManagerComponent.Networker.BandwidthIn)
+            {
+                
+                lastBand = networkManagerComponent.Networker.BandwidthIn;
+                await UMI3DAsyncManager.Delay(1000);
+            }
+
+            CheckForBandWidthRunning = false;
+            if (IsConnected && networkManagerComponent?.Networker != null)
+            {
+                CheckForPing();
+            }
+
+        }
+
+        
+        async void CheckForPing()
+        {
+
+            int count = 10;
+            float lastBand = -1;
+
+            while (count > 0)
+            {
+                pingReceived = false;
+                lastBand = networkManagerComponent.Networker.BandwidthIn;
+                client.Ping();
+                UMI3DLogger.Log($"Send Ping", scope);
+                await UMI3DAsyncManager.Delay(10000);
+
+                if (environmentClient == null || !environmentClient.IsConnected() || networkManagerComponent?.Networker == null || !IsConnected)
+                    return;
+
+                if (pingReceived || lastBand != networkManagerComponent.Networker.BandwidthIn)
+                {
+                    CheckForBandWidth();
+                    return;
+                }
+                count--;
+            }
+
+            DisconnectedFromServer(networkManagerComponent.Networker);
         }
 
         /// <summary>
@@ -151,9 +221,12 @@ namespace umi3d.cdk.collaboration
         {
             if (client != null) client.Disconnect(true);
             client = null;
-            if (NetworkManager.Instance?.Networker != null)
-                NetworkManager.Instance.Networker.disconnected -= DisconnectedFromServer;
-            NetworkManager.Instance?.Disconnect();
+
+            if (networkManagerComponent?.Networker != null)
+                networkManagerComponent.Networker.disconnected -= DisconnectedFromServer;
+
+            networkManagerComponent?.Disconnect();
+            networkManagerComponent = null;
         }
 
         #region signaling
@@ -208,13 +281,16 @@ namespace umi3d.cdk.collaboration
         /// <param name="sender"></param>
         private void DisconnectedFromServer(NetWorker sender)
         {
-            if(NetworkManager.Instance?.Networker != null)
-                NetworkManager.Instance.Networker.disconnected -= DisconnectedFromServer;
+            if (networkManagerComponent?.Networker != null)
+                networkManagerComponent.Networker.disconnected -= DisconnectedFromServer;
+
             MainThreadManager.Run(() =>
             {
-                NetworkManager.Instance?.Disconnect();
+                networkManagerComponent?.Disconnect();
+                networkManagerComponent = null;
+
                 if (client != null)
-                    environmentClient?.ConnectionLost();
+                    environmentClient?.ConnectionDisconnected();
             });
         }
 
@@ -373,7 +449,55 @@ namespace umi3d.cdk.collaboration
                             });
                         }
                         break;
+                    case UMI3DOperationKeys.VehicleRequest:
+                        {
+                            SerializableVector3 pos = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                            SerializableVector4 rot = UMI3DNetworkingHelper.Read<SerializableVector4>(container);
+                            ulong vehicleId = UMI3DNetworkingHelper.Read<ulong>(container);
+                            bool stopNavigation = UMI3DNetworkingHelper.Read<bool>(container);
 
+                            var nav = new VehicleDto()
+                            {
+                                position = pos,
+                                rotation = rot,
+                                VehicleId = vehicleId,
+                                StopNavigation = stopNavigation,
+                            };
+
+                            MainThreadManager.Run(() =>
+                            {
+                                StartCoroutine(UMI3DNavigation.Navigate(nav));
+                            });
+                        }
+                        break;
+                    case UMI3DOperationKeys.BoardedVehicleRequest:
+                        {
+                            SerializableVector3 pos = UMI3DNetworkingHelper.Read<SerializableVector3>(container);
+                            SerializableVector4 rot = UMI3DNetworkingHelper.Read<SerializableVector4>(container);
+                            ulong vehicleId = UMI3DNetworkingHelper.Read<ulong>(container);
+                            bool stopNavigation = UMI3DNetworkingHelper.Read<bool>(container);
+                            ulong bodyAnimationId = UMI3DNetworkingHelper.Read<ulong>(container);
+                            bool changeBonesToStream = UMI3DNetworkingHelper.Read<bool>(container);
+                            System.Collections.Generic.List<uint> bonesToStream = UMI3DNetworkingHelper.ReadList<uint>(container);
+
+                            var nav = new BoardedVehicleDto()
+                            {
+                                position = pos,
+                                rotation = rot,
+                                VehicleId = vehicleId,
+                                StopNavigation = stopNavigation,
+                                BodyAnimationId = bodyAnimationId,
+                                ChangeBonesToStream = changeBonesToStream,
+                                BonesToStream = bonesToStream
+                            };
+
+                            MainThreadManager.Run(() =>
+                            {
+                                StartCoroutine(UMI3DNavigation.Navigate(nav));
+                                UMI3DClientUserTracking.Instance.EmbarkVehicle(nav);
+                            });
+                        }
+                        break;
                     case UMI3DOperationKeys.GetLocalInfoRequest:
                         string key = UMI3DNetworkingHelper.Read<string>(container);
                         MainThreadManager.Run(() =>
@@ -411,11 +535,11 @@ namespace umi3d.cdk.collaboration
             }
         }
 
-        async void SendGetLocalInfo(string key)
+        private async void SendGetLocalInfo(string key)
         {
             try
             {
-                var bytes = await environmentClient.HttpClient.SendGetLocalInfo(key);
+                byte[] bytes = await environmentClient.HttpClient.SendGetLocalInfo(key);
                 LocalInfoSender.SetLocalInfo(key, bytes);
             }
             catch
@@ -424,7 +548,7 @@ namespace umi3d.cdk.collaboration
             }
         }
 
-        async void SendPostFile(string token, string fileName, byte[] bytesToUpload)
+        private async void SendPostFile(string token, string fileName, byte[] bytesToUpload)
         {
             try
             {
@@ -570,7 +694,7 @@ namespace umi3d.cdk.collaboration
         }
 
         #region MonoBehaviour
-
+        static bool HasBeenSet = false;
         /// <summary>
         /// 
         /// </summary>
@@ -579,7 +703,8 @@ namespace umi3d.cdk.collaboration
             // If not using TCP
             // Should it be done before Host() ???
             NetWorker.PingForFirewall(port);
-            inetum.unityUtils.QuittingManager.OnApplicationIsQuitting.AddListener(ApplicationQuit);
+            if (!HasBeenSet) inetum.unityUtils.QuittingManager.OnApplicationIsQuitting.AddListener(ApplicationQuit);
+            HasBeenSet = true;
         }
 
         /// <summary>
@@ -587,8 +712,7 @@ namespace umi3d.cdk.collaboration
         /// </summary>
         private void ApplicationQuit()
         {
-            if (!inetum.unityUtils.QuittingManager.ApplicationIsQuitting)
-                return;
+            if (!inetum.unityUtils.QuittingManager.ApplicationIsQuitting) return;
             NetworkManager.Instance.ApplicationQuit();
             Stop();
         }
@@ -597,6 +721,7 @@ namespace umi3d.cdk.collaboration
         {
             Stop();
             destroyed = true;
+            HasBeenSet = false;
         }
 
         private bool destroyed = false;

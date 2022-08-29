@@ -30,6 +30,8 @@ public class OpenVRInputManager : AbstractControllerInputManager
     public SteamVR_Action_Boolean TriggerAction;
     public SteamVR_Action_Vibration HapticAction;
 
+    public Dictionary<ControllerType, bool> isTeleportDown = new Dictionary<ControllerType, bool>();
+
     #region Grab
 
     public override bool GetGrab(ControllerType controller)
@@ -125,6 +127,76 @@ public class OpenVRInputManager : AbstractControllerInputManager
             default:
                 return false;
         }
+    }
+
+    public override bool GetRightSnapTurn(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if ((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    public override bool GetLeftSnapTurn(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if (pole > 160 && pole <= 200)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    private float GetJoystickPole(ControllerType controller)
+    {
+        Vector2 axis = GetJoystickAxis(controller).normalized;
+        float pole = 0.0f;
+
+        if (axis.x != 0)
+            pole = Mathf.Atan(axis.y / axis.x);
+        else
+            if (axis.y == 0)
+            pole = 0;
+        else if (axis.y > 0)
+            pole = Mathf.PI / 2;
+        else
+            pole = -Mathf.PI / 2;
+
+        pole *= Mathf.Rad2Deg;
+
+        if (axis.x < 0)
+            if (axis.y >= 0)
+                pole = 180 - Mathf.Abs(pole);
+            else
+                pole = 180 + Mathf.Abs(pole);
+        else if (axis.y < 0)
+            pole = 360 + pole;
+
+        return pole;
     }
 
     #endregion
@@ -257,6 +329,40 @@ public class OpenVRInputManager : AbstractControllerInputManager
     }
 
     #endregion
+
+    public override bool GetTeleportDown(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if (pole > 20 && pole < 160)
+            {
+                isTeleportDown[controller] = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    public override bool GetTeleportUp(ControllerType controller)
+    {
+        if (GetJoystickUp(controller) && isTeleportDown[controller])
+        {
+            isTeleportDown[controller] = false;
+
+            return true;
+        }
+
+        return false;
+    }
 
     public override void VibrateController(ControllerType controller, float vibrationDuration, float vibrationFrequency, float vibrationAmplitude)
     {

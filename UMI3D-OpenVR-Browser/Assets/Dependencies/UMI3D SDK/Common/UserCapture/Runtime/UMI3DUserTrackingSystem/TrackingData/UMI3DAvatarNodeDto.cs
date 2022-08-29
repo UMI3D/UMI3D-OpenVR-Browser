@@ -46,5 +46,9 @@ namespace umi3d.common.userCapture
         public List<BoneBindingDto> bindings;
 
         public List<UMI3DHandPoseDto> handPoses;
+
+        public List<UMI3DBodyPoseDto> bodyPoses;
+
+        public UMI3DEmotesConfigDto emotesConfigDto;
     }
 }

@@ -30,21 +30,21 @@ namespace umi3d.cdk
         /// <summary>
         /// Environment connected to.
         /// </summary>
-        virtual protected ForgeConnectionDto connectionDto { get; }
+        protected virtual ForgeConnectionDto connectionDto { get; }
+
+        /// <summary>
+        /// If true, authorizations must be set in headers.
+        /// </summary>
+        public bool AuthorizationInHeader => connectionDto?.authorizationInHeader ?? false;
+
         /// <summary>
         /// Environment connected to.
         /// </summary>
-        public static MediaDto Media
-        {
-            get => Exists ? Instance._media : null;
-        }
+        public static MediaDto Media => Exists ? Instance._media : null;
         /// <summary>
         /// Environment connected to.
         /// </summary>
-        public static ForgeConnectionDto Environement
-        {
-            get => Exists ? Instance.connectionDto : null;
-        }
+        public static ForgeConnectionDto Environement => Exists ? Instance.connectionDto : null;
 
 
         public static string getAuthorization()
@@ -81,11 +81,11 @@ namespace umi3d.cdk
         protected virtual void _SendTracking(AbstractBrowserRequestDto dto) { }
 
 
-        public static async void GetFile(string url, Action<byte[]> callback, Action<string> onError)
+        public static async void GetFile(string url, Action<byte[]> callback, Action<string> onError, bool useParameterInsteadOfHeader)
         {
             if (Exists)
             {
-                var bytes = await Instance._GetFile(url);
+                byte[] bytes = await Instance._GetFile(url, useParameterInsteadOfHeader);
                 if (bytes != null)
                     callback.Invoke(bytes);
             }
@@ -93,7 +93,7 @@ namespace umi3d.cdk
                 throw new Exception($"Instance of UMI3DClientServer is null");
         }
 
-        protected virtual Task<byte[]> _GetFile(string url)
+        protected virtual Task<byte[]> _GetFile(string url, bool useParameterInsteadOfHeader)
         {
             throw new NotImplementedException();
         }
@@ -102,7 +102,7 @@ namespace umi3d.cdk
         {
             if (Exists)
             {
-                var dto = await Instance._GetEntity(ids);
+                LoadEntityDto dto = await Instance._GetEntity(ids);
                 if (dto != null)
                     callback.Invoke(dto);
             }

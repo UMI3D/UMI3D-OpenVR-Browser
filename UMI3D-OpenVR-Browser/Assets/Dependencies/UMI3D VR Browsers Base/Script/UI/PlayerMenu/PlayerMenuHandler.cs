@@ -11,8 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System;
-using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ui.playerMenu
@@ -26,44 +24,44 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         [SerializeField]
         [Tooltip("Root of the player menu")]
-        Transform playerMenu;
+        private Transform playerMenu;
 
         /// <summary>
         /// Is drag and drop set up ?
         /// </summary>
-        bool isDragAndDropSet;
+        private bool isDragAndDropSet;
 
         /// <summary>
         /// Offset between selector and draggable object at the begining.
         /// </summary>
-        float startOffset;
+        private float startOffset;
 
         /// <summary>
         /// Player camera's transform;
         /// </summary>
-        Transform playerCamera;
+        private Transform playerCamera;
 
         /// <summary>
         /// Scale of <see cref="playerMenu"/> when it is displayed.
         /// </summary>
-        Vector3 defaultScale;
+        private Vector3 defaultScale;
 
         /// <summary>
         /// Scale of <see cref="playerMenu"/> when it is dragged by a user.
         /// </summary>
         [Tooltip("Size of the player menu when it is dragged by a user")]
         [SerializeField]
-        Vector3 reducedScale = new Vector3(0.0006f, 0.0006f, 0.0006f);
+        private Vector3 reducedScale = new Vector3(0.0006f, 0.0006f, 0.0006f);
 
         [Tooltip("Distance bewteen user and player menu when it is dragged")]
         [SerializeField]
-        float distanceFromUserWhenDragged = .4f;
+        private float distanceFromUserWhenDragged = .4f;
 
-        #endregion
+        #endregion Methods
 
         #region Fields
 
-        void Start()
+        private void Start()
         {
             playerCamera = PlayerMenuManager.Instance.PlayerCameraTransform;
 
@@ -114,14 +112,12 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             playerMenu.localScale = defaultScale;
         }
 
-
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
         public override DragAndDropType GetDragType() => DragAndDropType.Spatial;
 
-
-        #endregion
+        #endregion Fields
     }
 }

@@ -10,6 +10,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 using inetum.unityUtils;
 using umi3d.cdk.menu;
 using umi3dVRBrowsersBase.interactions;
@@ -62,9 +63,11 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         [SerializeField]
         [Tooltip("Main player VR camera.")]
         private Camera m_playerCamera = null;
+
         [SerializeField]
         [Tooltip("How far the menu will be from the player camera.")]
         private float m_distanceFromCamera = 0f;
+
         [SerializeField]
         [Tooltip("Canvas of the player menu")]
         private GameObject m_playerMenuCanvas = null;
@@ -73,13 +76,14 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         [SerializeField]
         [Tooltip("")]
         private PlayerMenuHeader m_playerMenuHeader;
+
         [SerializeField]
         [Tooltip("")]
         private PlayerToolboxMenu m_playerToolboxMenu;
+
         [SerializeField]
         [Tooltip("")]
         private ControllerToolMenu m_controllerToolMenu;
-
 
         private BoxCollider m_menuCollider;
 
@@ -109,7 +113,6 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             m_playerMenuCanvas.SetActive(true);
             m_menuCollider.enabled = true;
             parameterGear.Hide();
-            
 
             ToolboxesMenu.Open();
             CloseSubWindow();
@@ -133,7 +136,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             playerMenu.IsOpen = false;
         }
 
-        #endregion
+        #endregion Player Menu
 
         public void CloseSubWindow()
         {
@@ -178,4 +181,3 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         }
     }
 }
-

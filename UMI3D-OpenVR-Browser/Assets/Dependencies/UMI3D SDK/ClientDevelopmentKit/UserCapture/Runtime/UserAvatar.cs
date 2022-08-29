@@ -57,6 +57,7 @@ namespace umi3d.cdk.userCapture
             public bool syncRot;
             public bool freezeWorldScale;
             public Vector3 frozenLossyScale;
+            public Quaternion anchorRelativeRot;
         }
 
         public List<Transform> boundRigs = new List<Transform>();
@@ -67,7 +68,14 @@ namespace umi3d.cdk.userCapture
 
         protected Dictionary<BoundObject, SavedTransform> savedTransforms = new Dictionary<BoundObject, SavedTransform>();
 
-        private readonly List<Bound> bounds = new List<Bound>();
+        protected readonly List<Bound> bounds = new List<Bound>();
+
+        protected Transform viewpointObject;
+
+        private void Start()
+        {
+            viewpointObject = UMI3DClientUserTracking.Instance.viewpoint;
+        }
 
         private void Update()
         {
@@ -78,19 +86,26 @@ namespace umi3d.cdk.userCapture
             {
                 if (item.obj != null)
                 {
-                    if (!item.bonetype.Equals(BoneType.CenterFeet))
-                    {
-                        if (item.syncPos)
-                            item.obj.position = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).TransformPoint(item.offsetPosition);
-                        if (item.syncRot)
-                            item.obj.rotation = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).rotation * item.offsetRotation;               
-                    }
-                    else
+                    if (item.bonetype.Equals(BoneType.CenterFeet))
                     {
                         if (item.syncPos)
                             item.obj.position = UMI3DClientUserTracking.Instance.skeletonContainer.TransformPoint(item.offsetPosition);
                         if (item.syncRot)
-                            item.obj.rotation = UMI3DClientUserTracking.Instance.skeletonContainer.rotation * item.offsetRotation;
+                            item.obj.rotation = UMI3DClientUserTracking.Instance.skeletonContainer.rotation * item.anchorRelativeRot * item.offsetRotation;
+                   }
+                    else if (item.bonetype.Equals(BoneType.Viewpoint))
+                    {
+                        if (item.syncPos)
+                            item.obj.position = viewpointObject.TransformPoint(item.offsetPosition);
+                        if (item.syncRot)
+                            item.obj.rotation = viewpointObject.rotation * item.anchorRelativeRot * item.offsetRotation;
+                    }
+                    else
+                    {
+                        if (item.syncPos)
+                            item.obj.position = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).TransformPoint(item.offsetPosition);
+                        if (item.syncRot)
+                            item.obj.rotation = UMI3DClientUserTracking.Instance.GetComponentInChildren<Animator>().GetBoneTransform(item.bonetype.ConvertToBoneType().GetValueOrDefault()).rotation * item.anchorRelativeRot * item.offsetRotation;
                     }
 
                     if (item.freezeWorldScale)
@@ -116,10 +131,15 @@ namespace umi3d.cdk.userCapture
             userBindings = dto.bindings;
 
             if (dto.handPoses != null)
-            {
                 foreach (UMI3DHandPoseDto pose in dto.handPoses)
                     UMI3DEnvironmentLoader.RegisterEntityInstance(pose.id, pose, null).NotifyLoaded();
-            }
+
+            if (dto.bodyPoses != null)
+                foreach (UMI3DBodyPoseDto pose in dto.bodyPoses)
+                    UMI3DEnvironmentLoader.RegisterEntityInstance(pose.id, pose, null).NotifyLoaded();
+
+            if (dto.emotesConfigDto != null)
+                UMI3DEmotesConfigLoader.Load(dto.emotesConfigDto);
 
             if (activeUserBindings && userBindings != null)
             {
@@ -301,7 +321,12 @@ namespace umi3d.cdk.userCapture
                 obj = obj,
                 offsetPosition = dto.offsetPosition,
                 offsetRotation = dto.offsetRotation,
-                offsetScale = dto.offsetScale
+                offsetScale = dto.offsetScale,
+                syncPos = dto.syncPosition,
+                syncRot = dto.syncRotation,
+                freezeWorldScale = dto.freezeWorldScale,
+                frozenLossyScale = obj.lossyScale,
+                anchorRelativeRot = dto.rigName == "" ? Quaternion.identity : Quaternion.Inverse(node.transform.rotation) * obj.rotation
             });
         }
 
@@ -343,7 +368,7 @@ namespace umi3d.cdk.userCapture
                     savedPosition = obj.localPosition,
                     savedRotation = obj.localRotation,
                     savedLocalScale = obj.localScale,
-                    savedLossyScale = obj.lossyScale
+                    savedLossyScale = obj.lossyScale,
                 };
 
                 savedTransforms.Add(new BoundObject() { objectId = dto.objectId, rigname = dto.rigName }, savedTransform);
@@ -358,7 +383,8 @@ namespace umi3d.cdk.userCapture
                     syncPos = dto.syncPosition,
                     syncRot = dto.syncRotation,
                     freezeWorldScale = dto.freezeWorldScale,
-                    frozenLossyScale = obj.lossyScale
+                    frozenLossyScale = obj.lossyScale,
+                    anchorRelativeRot = dto.rigName == "" ? Quaternion.identity : Quaternion.Inverse(node.transform.rotation) * obj.rotation
                 });
 
                 if (dto.rigName == "")
@@ -393,8 +419,9 @@ namespace umi3d.cdk.userCapture
                             syncPos = dto.syncPosition,
                             syncRot = dto.syncRotation,
                             freezeWorldScale = dto.freezeWorldScale,
-                            frozenLossyScale = obj.lossyScale
-                        }) ;
+                            frozenLossyScale = obj.lossyScale,
+                            anchorRelativeRot = dto.rigName == "" ? Quaternion.identity : Quaternion.Inverse(node.transform.rotation) * obj.rotation
+                        });
                     }
                 }
             }
