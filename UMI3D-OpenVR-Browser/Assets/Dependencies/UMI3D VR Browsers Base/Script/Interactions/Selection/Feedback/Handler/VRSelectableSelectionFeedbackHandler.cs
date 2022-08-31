@@ -14,23 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using UnityEngine.UI;
-using UnityEngine;
-using umi3dVRBrowsersBase.interactions.selection;
-using umi3dBrowsers.interaction.selection.feedback;
-using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
+using umi3dVRBrowsersBase.interactions.selection;
+using UnityEngine;
+using UnityEngine.UI;
 
-namespace umi3dBrowserOpenVR.interaction.selection.feedback
+namespace umi3dBrowsers.interaction.selection.feedback
 {
     /// <summary>
     /// Feedback handler for interactable selection feedback
     /// Mostly useful for Unity's serialization
     /// </summary>
-    public class OpenVRSelectableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
+    public class VRSelectableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
     {
         [SerializeField]
-        private OpenVRHapticSelectionFeedback hapticFeedback;
+        private AbstractVRHapticSelectionFeedback hapticFeedback;
 
         private AbstractCursor pointingCursor;
 

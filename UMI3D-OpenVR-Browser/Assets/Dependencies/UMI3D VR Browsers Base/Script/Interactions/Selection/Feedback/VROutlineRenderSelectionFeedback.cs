@@ -15,19 +15,17 @@ limitations under the License.
 */
 
 using umi3d.cdk.interaction;
-using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
-using umi3dBrowsers.interaction.selection.feedback;
 using umi3dVRBrowsersBase.interactions.selection;
 using UnityEngine;
 
-namespace umi3dBrowserOpenVR.interaction.selection.feedback
+namespace umi3dBrowsers.interaction.selection.feedback
 {
     /// <summary>
-    /// A visual selection feedback for OpenVR devices
+    /// A visual selection feedback for VR devices
     /// Only used for Interactable as Selectable have their own system.
     /// </summary>
-    public class OpenVROutlineRenderSelectionFeedback : MonoBehaviour, IPersistentFeedback
+    public class VROutlineRenderSelectionFeedback : MonoBehaviour, IPersistentFeedback
     {
         /// <summary>
         /// Outlined target info

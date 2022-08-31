@@ -11,43 +11,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using umi3dBrowsers.interaction.selection.feedback;
-using umi3dVRBrowsersBase.interactions;
-using UnityEngine;
-using Valve.VR;
-
-namespace umi3dBrowserOpenVR.interaction.selection.feedback
+namespace umi3d.openVR.interaction.selection.feedback
 {
     /// <summary>
     /// Hatic feedback for OpenVR devices
     /// </summary>
-    public class OpenVRHapticSelectionFeedback : MonoBehaviour, IInstantaneousFeedback
+    public class OpenVRHapticSelectionFeedback : umi3dBrowsers.interaction.selection.feedback.AbstractVRHapticSelectionFeedback
     {
-        public HapticSettings settings;
-
-        [System.Serializable]
-        public struct HapticSettings
-        {
-            public float duration;
-            public float frequency;
-            public float amplitude;
-        }
-        public SteamVR_Action_Vibration hapticAction;
-
-        private VRController controller;
-
-        private void Awake()
-        {
-            controller = GetComponentInParent<VRController>();
-        }
-
         /// <summary>
         /// Trigger a pulse according to the haptic settings
         /// </summary>
-        public void Trigger()
+        public override void Trigger()
         {
-            var input = controller.type == ControllerType.LeftHandController ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
-            hapticAction.Execute(0, settings.duration, settings.frequency, settings.amplitude, input);
+            OpenVRInputManager.Instance.VibrateController(controller.type, settings.duration, settings.frequency, settings.amplitude);
         }
     }
 }

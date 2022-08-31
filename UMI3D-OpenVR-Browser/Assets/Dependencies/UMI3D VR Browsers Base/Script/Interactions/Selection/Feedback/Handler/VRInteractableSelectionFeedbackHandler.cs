@@ -15,22 +15,20 @@ limitations under the License.
 */
 
 using umi3d.cdk.interaction;
-using umi3dBrowsers.interaction.selection;
-using umi3dBrowsers.interaction.selection.feedback;
 using UnityEngine;
 
-namespace umi3dBrowserOpenVR.interaction.selection.feedback
+namespace umi3dBrowsers.interaction.selection.feedback
 {
     /// <summary>
     /// Feedback handler for interactable selection feedback
     /// Mostly useful for Unity's serialization
     /// </summary>
-    public class OpenVRInteractableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<InteractableContainer>
+    public class VRInteractableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<InteractableContainer>
     {
         [SerializeField]
-        private OpenVRHapticSelectionFeedback hapticFeedback;
+        private AbstractVRHapticSelectionFeedback hapticFeedback;
         [SerializeField]
-        private OpenVROutlineRenderSelectionFeedback highlightFeedback;
+        private VROutlineRenderSelectionFeedback highlightFeedback;
 
         /// <inheritdoc/>
         public override void StartFeedback(AbstractSelectionData selectionData)
