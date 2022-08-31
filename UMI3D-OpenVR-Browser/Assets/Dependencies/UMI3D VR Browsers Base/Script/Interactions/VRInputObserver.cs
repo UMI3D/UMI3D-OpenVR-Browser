@@ -67,7 +67,7 @@ namespace umi3dVRBrowsersBase.interactions
         /// </summary>
         private List<System.Action> subscribers = new List<System.Action>();
 
-        #endregion
+        #endregion Fields
 
         #region Methods
 
@@ -147,6 +147,6 @@ namespace umi3dVRBrowsersBase.interactions
             }
         }
 
-        #endregion
+        #endregion Methods
     }
 }

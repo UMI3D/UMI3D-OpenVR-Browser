@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2022 Inetum
+Copyright 2019 - 2021 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,12 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using umi3dVRBrowsersBase.interactions;
+using System;
+using System.Collections.Generic;
 
-namespace umi3dVRBrowsersBase.ui
+namespace umi3d.common
 {
-    internal interface IInteractableElement : IClientElement
+    [System.Serializable]
+    public class VehicleDto : TeleportDto
     {
-        void Interact(VRController controller);
+        public ulong VehicleId = 0;
+
+        public bool StopNavigation = false;
+
+        public VehicleDto() : base() { }
     }
 }

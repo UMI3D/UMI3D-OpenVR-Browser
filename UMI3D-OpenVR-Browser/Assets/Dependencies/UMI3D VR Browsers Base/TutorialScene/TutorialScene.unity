@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43988708, g: 0.48834306, b: 0.5685527, a: 1}
+  m_IndirectSpecularColor: {r: 0.17520942, g: 0.21920323, b: 0.3015113, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -99,7 +99,7 @@ LightmapSettings:
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 112000000, guid: eab553b48540ed549b1ecb3a3ebc5a33,
     type: 2}
-  m_UseShadowmask: 1
+  m_UseShadowmask: 0
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1078,10 +1078,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d2e07951539a404997374cee04fa5a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnLeaving:
+    m_PersistentCalls:
+      m_Calls: []
+  OnLeavingEnvironment:
+    m_PersistentCalls:
+      m_Calls: []
   OnNewToken:
     m_PersistentCalls:
       m_Calls: []
   OnConnectionLost:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRedirection:
     m_PersistentCalls:
       m_Calls: []
   Identifier: {fileID: 0}
@@ -1374,7 +1383,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 590cd291934ba2848bb8876f9d90081c, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -10646,10 +10655,10 @@ Light:
   m_Type: 0
   m_Shape: 0
   m_Color: {r: 0.9811321, g: 0.86439145, b: 0.6062656, a: 1}
-  m_Intensity: 10
-  m_Range: 25
-  m_SpotAngle: 45.21
-  m_InnerSpotAngle: 21.80208
+  m_Intensity: 500
+  m_Range: 29.9
+  m_SpotAngle: 32.815296
+  m_InnerSpotAngle: 9.40739
   m_CookieSize: 10
   m_Shadows:
     m_Type: 2
@@ -10688,7 +10697,7 @@ Light:
   m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
-  m_BounceIntensity: 2
+  m_BounceIntensity: 3
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}

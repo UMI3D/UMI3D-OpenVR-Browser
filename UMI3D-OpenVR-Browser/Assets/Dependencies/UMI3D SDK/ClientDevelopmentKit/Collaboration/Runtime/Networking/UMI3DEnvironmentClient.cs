@@ -24,21 +24,22 @@ using umi3d.common;
 using umi3d.common.collaboration;
 using umi3d.common.interaction;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace umi3d.cdk.collaboration
 {
     public class UMI3DEnvironmentClient
     {
         private const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
-
-        bool isJoinning, isConnecting, isConnected, needToGetFirstConnectionInfo, disconected;
-        public bool IsConnected() => ForgeClient != null ? isConnected && ForgeClient.IsConnected : false;
+        private bool isJoinning, isConnecting, isConnected, needToGetFirstConnectionInfo, disconected;
+        public bool IsConnected()
+        {
+            return ForgeClient != null ? isConnected && ForgeClient.IsConnected && !disconected : false;
+        }
 
         public readonly double maxMillisecondToWait = 10000;
 
         public readonly ForgeConnectionDto connectionDto;
-        UMI3DWorldControllerClient worldControllerClient;
+        private readonly UMI3DWorldControllerClient worldControllerClient;
 
         public ulong GetUserID() { return UserDto.answerDto.id; }
 
@@ -62,10 +63,7 @@ namespace umi3d.cdk.collaboration
         }
         public StatusType status
         {
-            get
-            {
-                return IsConnected() ? UserDto.answerDto.status : StatusType.NONE;
-            }
+            get => IsConnected() ? UserDto.answerDto.status : StatusType.NONE;
             set
             {
                 if (value == StatusType.AWAY || value == StatusType.ACTIVE)
@@ -155,11 +153,11 @@ namespace umi3d.cdk.collaboration
             return true;
         }
 
-        async void Join(BeardedManStudios.Forge.Networking.IUserAuthenticator authenticator)
+        private async void Join(BeardedManStudios.Forge.Networking.IUserAuthenticator authenticator)
         {
             ForgeClient.Join(authenticator);
-            await UMI3DAsyncManager.Delay(10000);
-            if (!ForgeClient.IsConnected && !disconected)
+            await UMI3DAsyncManager.Delay(5000);
+            if (ForgeClient != null && !ForgeClient.IsConnected && !disconected)
             {
                 isConnecting = false;
                 isConnected = false;
@@ -168,35 +166,48 @@ namespace umi3d.cdk.collaboration
             }
         }
 
-        public async void ConnectionLost()
+        public void ConnectionStatus(bool lost)
+        {
+            if (UMI3DCollaborationClientServer.Exists)
+                UMI3DCollaborationClientServer.Instance.ConnectionStatus(this,lost);
+        }
+
+        public async void ConnectionDisconnected()
         {
             UMI3DLogger.Log($"Connection lost with environment [Was Connected: {IsConnected()}]", scope);
-            if (IsConnected())
-                if (UMI3DCollaborationClientServer.Exists)
-                    UMI3DCollaborationClientServer.Instance.ConnectionLost(this);
+
+            if (UMI3DCollaborationClientServer.Exists)
+                UMI3DCollaborationClientServer.Instance.ConnectionLost(this);
             await Task.Yield();
 
             isConnecting = false;
             isConnected = false;
         }
 
-        public async Task<bool> Logout()
+        public async Task<bool> Logout(bool notify = true)
         {
             bool ok = false;
-            disconected = true;
+            
             if (IsConnected())
             {
 
                 try
                 {
-                    await HttpClient.SendPostLogout();
+                    if(notify)
+                        await HttpClient.SendPostLogout();
                 }
                 finally { };
 
                 ForgeClient.Stop();
                 ok = true;
             }
+            disconected = true;
             isConnected = false;
+            if (ForgeClient != null)
+            {
+                GameObject.Destroy(ForgeClient.gameObject);
+                ForgeClient = null;
+            }
             return ok;
         }
 
@@ -215,7 +226,7 @@ namespace umi3d.cdk.collaboration
             return true;
         }
 
-        void GetLocalToken(Action<string> callback)
+        private void GetLocalToken(Action<string> callback)
         {
             callback?.Invoke(worldControllerClient.Identity.localToken);
         }
@@ -252,14 +263,14 @@ namespace umi3d.cdk.collaboration
                         {
                             case StatusType.CREATED:
                                 needToGetFirstConnectionInfo = false;
-                                var user = await HttpClient.SendGetIdentity();
+                                UserConnectionDto user = await HttpClient.SendGetIdentity();
                                 UpdateIdentity(user);
                                 break;
                             case StatusType.READY:
                                 if (needToGetFirstConnectionInfo)
                                 {
                                     needToGetFirstConnectionInfo = false;
-                                    var _user = await HttpClient.SendGetIdentity();
+                                    UserConnectionDto _user = await HttpClient.SendGetIdentity();
                                     UserDto.Set(_user);
                                     Join();
                                 }
@@ -294,14 +305,14 @@ namespace umi3d.cdk.collaboration
                 {
                     case StatusType.CREATED:
                         needToGetFirstConnectionInfo = false;
-                        var user = await HttpClient.SendGetIdentity();
+                        UserConnectionDto user = await HttpClient.SendGetIdentity();
                         UpdateIdentity(user);
                         break;
                     case StatusType.READY:
                         if (needToGetFirstConnectionInfo)
                         {
                             needToGetFirstConnectionInfo = false;
-                            var _user = await HttpClient.SendGetIdentity();
+                            UserConnectionDto _user = await HttpClient.SendGetIdentity();
                             UserDto.Set(_user);
                             Join();
                         }
@@ -341,7 +352,7 @@ namespace umi3d.cdk.collaboration
                     LibrariesDto LibrariesDto = await HttpClient.SendGetLibraries();
 
                     // UMI3DLogger.Log($"Ask to download Libraries", scope | DebugScope.Connection);
-                    var b = await UMI3DCollaborationClientServer.Instance.Identifier.ShouldDownloadLibraries(
+                    bool b = await UMI3DCollaborationClientServer.Instance.Identifier.ShouldDownloadLibraries(
                         UMI3DResourcesManager.LibrariesToDownload(LibrariesDto)
                         );
 
@@ -372,7 +383,7 @@ namespace umi3d.cdk.collaboration
                     //UMI3DLogger.Log($"Update Identity parameters {UserDto.formdto} ", scope | DebugScope.Connection);
                     if (UserDto.formdto != null)
                     {
-                        var param = await UMI3DCollaborationClientServer.Instance.Identifier.GetParameterDtos(UserDto.formdto);
+                        FormAnswerDto param = await UMI3DCollaborationClientServer.Instance.Identifier.GetParameterDtos(UserDto.formdto);
                         UserDto.answerDto.parameters = param;
                         await HttpClient.SendPostUpdateIdentity(UserDto.answerDto);
                     }
@@ -386,7 +397,7 @@ namespace umi3d.cdk.collaboration
                     await Logout();
                 }
             }
-            catch (UMI3DAsyncManagerException e)
+            catch (UMI3DAsyncManagerException)
             {
                 //This exeception is thrown only when app is stopping.
             }
@@ -417,7 +428,7 @@ namespace umi3d.cdk.collaboration
             };
             try
             {
-                var enter = await HttpClient.SendPostJoin(joinDto);
+                EnterDto enter = await HttpClient.SendPostJoin(joinDto);
                 isConnecting = false; isConnected = true; EnterScene(enter);
             }
             finally
@@ -433,7 +444,7 @@ namespace umi3d.cdk.collaboration
                 //UMI3DLogger.Log($"Enter scene", scope | DebugScope.Connection);
                 useDto = enter.usedDto;
                 UMI3DEnvironmentLoader.Instance.NotifyLoad();
-                var environement = await HttpClient.SendGetEnvironment();
+                GlTFEnvironmentDto environement = await HttpClient.SendGetEnvironment();
                 //UMI3DLogger.Log($"get environment completed", scope | DebugScope.Connection);
                 Action setStatus = () =>
                 {
@@ -478,10 +489,10 @@ namespace umi3d.cdk.collaboration
         }
 
         ///<inheritdoc/>
-        public async Task<byte[]> GetFile(string url)
+        public async Task<byte[]> GetFile(string url, bool useParameterInsteadOfHeader)
         {
             //UMI3DLogger.Log($"GetFile {url}", scope);
-            return await HttpClient.SendGetPrivate(url);
+            return await HttpClient.SendGetPrivate(url, useParameterInsteadOfHeader);
         }
 
         ///<inheritdoc/>

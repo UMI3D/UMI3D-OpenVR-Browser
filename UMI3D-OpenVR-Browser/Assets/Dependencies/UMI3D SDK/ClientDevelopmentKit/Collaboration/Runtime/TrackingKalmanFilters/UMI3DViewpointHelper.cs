@@ -14,14 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-namespace umi3d.common.interaction
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace umi3d.cdk.collaboration
 {
-    /// <summary>
-    /// String parameter dto.
-    /// </summary>
-    [System.Serializable]
-    public class PasswordParameterDto : StringParameterDto
-    {
-        public PasswordParameterDto() : base() { }
-    }
+    public class UMI3DViewpointHelper : MonoBehaviour {}
 }
