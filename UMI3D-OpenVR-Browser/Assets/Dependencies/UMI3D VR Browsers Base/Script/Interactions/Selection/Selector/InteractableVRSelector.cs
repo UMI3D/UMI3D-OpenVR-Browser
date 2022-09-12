@@ -32,6 +32,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         public AbstractPointingInteractableDetector pointingDetector;
 
         /// <summary>
+        /// Optional selection Intent Detector (virtual pointing)
+        /// </summary>
+        [Tooltip("Optional second delection Intent Detector for virtual pointing.")]
+        public AbstractPointingInteractableDetector pointingSecondaryDetector;
+
+        /// <summary>
         /// Selection Intent Detector (virtual hand)
         /// </summary>
         [Tooltip("Selection Intent Detector for virtual hand (grab).")]
@@ -138,6 +144,20 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             }
 
             if (pointingDetector.isRunning)
+            {
+                var interactableToSelectPointed = pointingDetector.PredictTarget();
+                var detectionInfo = new InteractableSelectionData
+                {
+                    selectedObject = interactableToSelectPointed,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.POINTING,
+                };
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(interactableToSelectPointed))
+                    possibleSelection.Add(detectionInfo);
+            }
+
+            if (pointingSecondaryDetector != null && pointingSecondaryDetector.isRunning)
             {
                 var interactableToSelectPointed = pointingDetector.PredictTarget();
                 var detectionInfo = new InteractableSelectionData
