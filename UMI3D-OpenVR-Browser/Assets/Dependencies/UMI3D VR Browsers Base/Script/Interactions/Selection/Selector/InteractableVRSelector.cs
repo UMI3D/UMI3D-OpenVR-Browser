@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
@@ -81,6 +82,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             base.ActivateInternal();
             pointingDetector.Init(controller);
+            if (pointingSecondaryDetector != null)
+                pointingSecondaryDetector.Init(controller);
             grabDetector.Init(controller);
             projector = new InteractableProjector();
         }
@@ -90,7 +93,45 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             base.DeactivateInternal();
             pointingDetector.Reinit();
+            if (pointingSecondaryDetector != null)
+                pointingSecondaryDetector.Reinit();
             grabDetector.Reinit();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            // look for interaction from the controller and send the right events
+            // probably should not belong in that piece of code
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerDown();
+                    LockedSelector = true;
+                }
+            }
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
+            {
+                if (activated)
+                {
+                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                    OnPointerUp();
+                    LockedSelector = false;
+                }
+            }
+        }
+
+        private void OnPointerUp()
+        {
+            
+        }
+
+        private void OnPointerDown()
+        {
+            
         }
 
         #endregion lifecycle
@@ -101,27 +142,25 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// Checks if the interactable :
         ///     - exists
         ///     - has at least one associated interaction
-        ///     - has not been seen its tool projected yet
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <returns></returns>
         protected override bool CanSelect(InteractableContainer icToSelect)
         {
+            
             return icToSelect != null
                     && icToSelect.Interactable.dto.interactions != null
-                    && icToSelect.Interactable.dto.interactions.Count > 0
-                    && !InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.dto.id);
+                    && icToSelect.Interactable.dto.interactions.Count > 0;
         }
 
         /// <summary>
-        /// Is the passed object currently slected by this selector?
+        /// Is the passed object currently selected by this selector?
         /// </summary>
         /// <param name="ic"></param>
         /// <returns></returns>
         private bool IsObjectSelected(InteractableContainer ic)
         {
-            return ic == LastSelected?.selectedObject
-                    || InteractionMapper.Instance.IsToolSelected(ic.Interactable.dto.id);
+            return ic == LastSelected?.selectedObject;
         }
 
         /// <inheritdoc/>
@@ -129,17 +168,17 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             var possibleSelection = new List<SelectionIntentData>();
 
-            if (grabDetector.isRunning)
+            if (pointingSecondaryDetector != null && pointingSecondaryDetector.isRunning)
             {
-                var interactableToSelectProximity = grabDetector.PredictTarget();
+                var interactableToSelectPointed = pointingSecondaryDetector.PredictTarget();
                 var detectionInfo = new InteractableSelectionData
                 {
-                    selectedObject = interactableToSelectProximity,
+                    selectedObject = interactableToSelectPointed,
                     controller = controller,
-                    detectionOrigin = DetectionOrigin.PROXIMITY,
+                    detectionOrigin = DetectionOrigin.POINTING,
                 };
-                detectionCacheProximity.Add(detectionInfo as SelectionIntentData<InteractableContainer>);
-                if (CanSelect(interactableToSelectProximity))
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(interactableToSelectPointed))
                     possibleSelection.Add(detectionInfo);
             }
 
@@ -157,17 +196,17 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     possibleSelection.Add(detectionInfo);
             }
 
-            if (pointingSecondaryDetector != null && pointingSecondaryDetector.isRunning)
+            if (grabDetector.isRunning)
             {
-                var interactableToSelectPointed = pointingDetector.PredictTarget();
+                var interactableToSelectProximity = grabDetector.PredictTarget();
                 var detectionInfo = new InteractableSelectionData
                 {
-                    selectedObject = interactableToSelectPointed,
+                    selectedObject = interactableToSelectProximity,
                     controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
+                    detectionOrigin = DetectionOrigin.PROXIMITY,
                 };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
+                detectionCacheProximity.Add(detectionInfo);
+                if (CanSelect(interactableToSelectProximity))
                     possibleSelection.Add(detectionInfo);
             }
 
@@ -191,6 +230,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             deselectionEvent.Invoke(interactableToDeselectInfo);
 
             pointingDetector.Reinit();
+            if (pointingSecondaryDetector != null)
+                pointingSecondaryDetector.Reinit();
             grabDetector.Reinit();
         }
 
@@ -232,6 +273,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 isSelecting = true;
                 selectionEvent.Invoke(selectionInfo);
                 pointingDetector.Reinit();
+                if (pointingSecondaryDetector != null) 
+                    pointingSecondaryDetector.Reinit();
                 grabDetector.Reinit();
             }
         }
