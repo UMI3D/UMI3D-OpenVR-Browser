@@ -108,7 +108,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     trackingInfo.targetContainer.Interactable.id,
                     trackingInfo.raycastHit.point,
                     trackingInfo.raycastHit.normal,
-                    trackingInfo.direction);
+                    trackingInfo.directionWorld);
             });
 
             OnCursorExit.AddListener((PointingInfo trackingInfo) =>
@@ -118,7 +118,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     trackingInfo.targetContainer.Interactable.id,
                     trackingInfo.raycastHit.point,
                     trackingInfo.raycastHit.normal,
-                    trackingInfo.direction);
+                    trackingInfo.directionWorld);
             });
 
             OnCursorStay.AddListener((PointingInfo trackingInfo) =>
@@ -128,7 +128,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     trackingInfo.targetContainer.Interactable.id,
                     trackingInfo.raycastHit.point,
                     trackingInfo.raycastHit.normal,
-                    trackingInfo.direction);
+                    trackingInfo.directionWorld);
             });
         }
 
@@ -181,7 +181,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     targetContainer = closestInteractable.obj,
                     raycastHit = closestInteractable.raycastHit,
                     directionWorld = raycastHelperInteractable.direction,
-                    direction = closestInteractable.obj.transform.InverseTransformDirection(raycastHelperInteractable.direction)
+                    direction = transform.InverseTransformDirection(raycastHelperInteractable.direction)
                 };
             }
             else
@@ -192,7 +192,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     controller = controller,
                     target = default,
                     targetContainer = default,
-                    directionWorld = raycastHelperInteractable.direction
+                    directionWorld = raycastHelperInteractable.direction,
+                    direction = transform.InverseTransformDirection(raycastHelperInteractable.direction)
                 };
             }
 
