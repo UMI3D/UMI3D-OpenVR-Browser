@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using umi3dVRBrowsersBase.interactions;
@@ -258,6 +259,99 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     #endregion
 
+    #region Navigation
+
+    public Dictionary<ControllerType, bool> isTeleportDown = new Dictionary<ControllerType, bool>();
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        foreach (ControllerType ctrl in Enum.GetValues(typeof(ControllerType)))
+        {
+            isTeleportDown.Add(ctrl, false);
+        }
+    }
+
+    public override bool GetTeleportDown(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if (pole > 20 && pole < 160)
+            {
+                isTeleportDown[controller] = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    public override bool GetTeleportUp(ControllerType controller)
+    {
+        if (GetJoystickUp(controller) && isTeleportDown[controller])
+        {
+            isTeleportDown[controller] = false;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public override bool GetRightSnapTurn(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if ((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    public override bool GetLeftSnapTurn(ControllerType controller)
+    {
+        var res = GetJoystickDown(controller);
+
+        if (res)
+        {
+            float pole = GetJoystickPole(controller);
+
+            if (pole > 160 && pole <= 200)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        return res;
+    }
+
+    #endregion
+
     public override void VibrateController(ControllerType controller, float vibrationDuration, float vibrationFrequency, float vibrationAmplitude)
     {
         switch (controller)
@@ -269,5 +363,33 @@ public class OpenVRInputManager : AbstractControllerInputManager
                 HapticAction.Execute(0f, vibrationDuration, vibrationFrequency, vibrationAmplitude, SteamVR_Input_Sources.RightHand);
                 break;
         }
+    }
+
+    private float GetJoystickPole(ControllerType controller)
+    {
+        Vector2 axis = GetJoystickAxis(controller).normalized;
+        float pole = 0.0f;
+
+        if (axis.x != 0)
+            pole = Mathf.Atan(axis.y / axis.x);
+        else
+            if (axis.y == 0)
+            pole = 0;
+        else if (axis.y > 0)
+            pole = Mathf.PI / 2;
+        else
+            pole = -Mathf.PI / 2;
+
+        pole *= Mathf.Rad2Deg;
+
+        if (axis.x < 0)
+            if (axis.y >= 0)
+                pole = 180 - Mathf.Abs(pole);
+            else
+                pole = 180 + Mathf.Abs(pole);
+        else if (axis.y < 0)
+            pole = 360 + pole;
+
+        return pole;
     }
 }
