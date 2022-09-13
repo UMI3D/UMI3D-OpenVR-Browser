@@ -76,17 +76,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             base.ActivateInternal();
             foreach (var detector in pointingDetectors)
-            {
-                if (detector == null)
-                    throw new NullReferenceException($"Null pointing detector set in {controller.name}.");
                 detector.Init(controller);
-            }
+
             foreach (var detector in grabDetectors)
-            {
-                if (detector == null)
-                    throw new NullReferenceException($"Null grab detector set in {controller.name}.");
                 detector.Init(controller);
-            }
+
             projector = new InteractableProjector();
         }
 
@@ -137,15 +131,16 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// Checks if the interactable :
         ///     - exists
         ///     - has at least one associated interaction
+        ///     - is compatible with this controller
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <returns></returns>
         protected override bool CanSelect(InteractableContainer icToSelect)
         {
-            
             return icToSelect != null
                     && icToSelect.Interactable.dto.interactions != null
-                    && icToSelect.Interactable.dto.interactions.Count > 0;
+                    && icToSelect.Interactable.dto.interactions.Count > 0
+                    && controller.IsCompatibleWith(icToSelect.Interactable);
         }
 
         /// <summary>
@@ -165,36 +160,36 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
             foreach (var detector in grabDetectors)
             {
-                if (detector.isRunning)
+                if (!detector.isRunning)
+                    continue;
+
+                var interactableToSelectPointed = detector.PredictTarget();
+                var detectionInfo = new InteractableSelectionData
                 {
-                    var interactableToSelectPointed = detector.PredictTarget();
-                    var detectionInfo = new InteractableSelectionData
-                    {
-                        selectedObject = interactableToSelectPointed,
-                        controller = controller,
-                        detectionOrigin = DetectionOrigin.PROXIMITY,
-                    };
-                    detectionCachePointing.Add(detectionInfo);
-                    if (CanSelect(interactableToSelectPointed))
-                        possibleSelection.Add(detectionInfo);
-                }
+                    selectedObject = interactableToSelectPointed,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.PROXIMITY,
+                };
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(interactableToSelectPointed))
+                    possibleSelection.Add(detectionInfo);
             }
 
             foreach (var detector in pointingDetectors)
             {
-                if (detector.isRunning)
+                if (!detector.isRunning)
+                    continue;
+
+                var interactableToSelectPointed = detector.PredictTarget();
+                var detectionInfo = new InteractableSelectionData
                 {
-                    var interactableToSelectPointed = detector.PredictTarget();
-                    var detectionInfo = new InteractableSelectionData
-                    {
-                        selectedObject = interactableToSelectPointed,
-                        controller = controller,
-                        detectionOrigin = DetectionOrigin.POINTING,
-                    };
-                    detectionCachePointing.Add(detectionInfo);
-                    if (CanSelect(interactableToSelectPointed))
-                        possibleSelection.Add(detectionInfo);
-                }
+                    selectedObject = interactableToSelectPointed,
+                    controller = controller,
+                    detectionOrigin = DetectionOrigin.POINTING,
+                };
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(interactableToSelectPointed))
+                    possibleSelection.Add(detectionInfo);
             }
 
             foreach (var poss in possibleSelection)
@@ -238,7 +233,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     return;
                 }
                 else if (selectionInfo == null)
-                    throw new System.ArgumentNullException("Argument should be null only if moving outside of an object");
+                    throw new ArgumentNullException("Argument should be null only if moving outside of an object");
                 else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
                     return;
             }
@@ -248,11 +243,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 (selectionInfo as InteractableSelectionData).tool = interactionTool;
 
             if (isSelecting
-                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))))
-                // happens when an object is destroyed but the tool is not released
+                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool)))) // second case happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
 
-            if (controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))
+            if (controller.IsAvailableFor(interactionTool))
             {
                 projector.Project(selectionInfo.selectedObject, controller);
                 selectionInfo.hasBeenSelected = true;

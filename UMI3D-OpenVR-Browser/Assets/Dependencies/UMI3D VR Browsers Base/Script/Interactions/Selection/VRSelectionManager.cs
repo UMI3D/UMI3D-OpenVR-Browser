@@ -27,7 +27,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
     public class VRSelectionManager : MonoBehaviour
     {
         /// <summary>
-        /// Controller to manage selection for
+        /// Controller to manage selection for.
         /// </summary>
         [Header("Controller"), Tooltip("Controller to manage selection for.")]
         public VRController controller;
@@ -54,13 +54,13 @@ namespace umi3dVRBrowsersBase.interactions.selection
         public AbstractCursor grabCursor;
 
         /// <summary>
-        /// Last selected object info <br/>
-        /// Null when no object
+        /// Last selected object info. <br/>
+        /// Null when no object.
         /// </summary>
         public SelectionIntentData LastSelectedInfo;
 
         /// <summary>
-        /// Last intent selector used
+        /// Last intent selector used.
         /// </summary>
         private IIntentSelector LastSelectorUsed;
 
@@ -84,9 +84,9 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
             if (possibleSelec.Count == 0) //no selection intent detected
             {
-                if (LastSelectorUsed != null
-                    && LastSelectorUsed.IsSelecting()
-                    && LastSelectedInfo != null)
+                if (LastSelectorUsed != null //a selection has already occurred
+                    && LastSelectorUsed.IsSelecting() //selection is currently carried on
+                    && LastSelectedInfo != null) //selection was occurring next frame
                 {
                     LastSelectorUsed.Select(null); //make the selector remember it cannot select something this time
                     LastSelectedInfo = null;
@@ -100,11 +100,11 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <summary>
-        /// Give the order to the selector to select the best proposition if possible <br/>
+        /// Give the order to the selector to select the best proposition if possible. <br/>
         /// </summary>
         /// <param name="possibleSelec"></param>
         /// <param name="origin"></param>
-        /// <returns>True if a selection has been attempted</returns>
+        /// <returns>True if a selection has been attempted.</returns>
         private bool TrySelect(List<SelectionIntentData> possibleSelec, DetectionOrigin origin)
         {
             var possibleSelecPointed = possibleSelec.Where(x => x.detectionOrigin == origin);
@@ -128,9 +128,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="preferedObjectData"></param>
         private void StartSelection(SelectionIntentData preferedObjectData)
         {
-            IIntentSelector appropriateSelector;
-            // Disambiguation already occured
-
+            IIntentSelector appropriateSelector; //getting the right selector for selection
             if (preferedObjectData is SelectionIntentData<Selectable>)
                 appropriateSelector = selectableSelector;
             else if (preferedObjectData is SelectionIntentData<AbstractClientInteractableElement>)
@@ -140,7 +138,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             else
                 throw new System.Exception("Unrecognized selectable object. No selector is available.");
 
-            // selector switching, deselection is normally handled when the selector remains the sam
+            // selector switching, deselection is normally handled when the selector remains the same
             if (LastSelectedInfo != null && LastSelectorUsed != appropriateSelector)
                 LastSelectorUsed?.Select(null); //make the selector remember it cannot select something this time
 
