@@ -32,13 +32,13 @@ namespace umi3dVRBrowsersBase.interactions.selection
         [Header("Controller"), Tooltip("Controller to manage selection for.")]
         public VRController controller;
 
-        [Header("Selectors"), Tooltip("Selectors for interactables.")]
+        [Header("Selectors"), Tooltip("Selector for interactables.")]
         public InteractableVRSelector interactableSelector;
 
-        [Tooltip("Selectors for selectables.")]
+        [Tooltip("Selector for selectables.")]
         public SelectableVRSelector selectableSelector;
 
-        [Tooltip("Selectors for other customized UI.")]
+        [Tooltip("Selector for other customized UI.")]
         public ElementVRSelector elementSelector;
 
         /// <summary>
