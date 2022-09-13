@@ -27,22 +27,16 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
     public class InteractableVRSelector : AbstractVRSelector<InteractableContainer>
     {
         /// <summary>
-        /// Selection Intent Detector (virtual pointing)
+        /// Selection Intent Detectors (virtual pointing). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual pointing.")]
-        public AbstractPointingInteractableDetector pointingDetector;
+        [Tooltip("Selection Intent Detector for virtual pointing. In order of decreasing priority.")]
+        public List<AbstractPointingInteractableDetector> pointingDetectors;
 
         /// <summary>
-        /// Optional selection Intent Detector (virtual pointing)
+        /// Selection Intent Detector (virtual hand). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Optional second delection Intent Detector for virtual pointing.")]
-        public AbstractPointingInteractableDetector pointingSecondaryDetector;
-
-        /// <summary>
-        /// Selection Intent Detector (virtual hand)
-        /// </summary>
-        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
-        public AbstractGrabInteractableDetector grabDetector;
+        [Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority.")]
+        public List<AbstractGrabInteractableDetector> grabDetectors;
 
         /// <summary>
         /// Previously detected objects for virtual hand
@@ -81,10 +75,18 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         protected override void ActivateInternal()
         {
             base.ActivateInternal();
-            pointingDetector.Init(controller);
-            if (pointingSecondaryDetector != null)
-                pointingSecondaryDetector.Init(controller);
-            grabDetector.Init(controller);
+            foreach (var detector in pointingDetectors)
+            {
+                if (detector == null)
+                    throw new NullReferenceException($"Null pointing detector set in {controller.name}.");
+                detector.Init(controller);
+            }
+            foreach (var detector in grabDetectors)
+            {
+                if (detector == null)
+                    throw new NullReferenceException($"Null grab detector set in {controller.name}.");
+                detector.Init(controller);
+            }
             projector = new InteractableProjector();
         }
 
@@ -92,10 +94,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         protected override void DeactivateInternal()
         {
             base.DeactivateInternal();
-            pointingDetector.Reinit();
-            if (pointingSecondaryDetector != null)
-                pointingSecondaryDetector.Reinit();
-            grabDetector.Reinit();
+            foreach (var detector in pointingDetectors)
+                detector.Reinit();
+            foreach (var detector in grabDetectors)
+                detector.Reinit();
         }
 
         protected override void Update()
@@ -103,24 +105,17 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             base.Update();
             // look for interaction from the controller and send the right events
             // probably should not belong in that piece of code
-            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger))
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger) && activated)
             {
-                if (activated)
-                {
-                    
-                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerDown();
-                    LockedSelector = true;
-                }
+                VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                OnPointerDown();
+                LockedSelector = true;
             }
-            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger) && activated)
             {
-                if (activated)
-                {
-                    VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerUp();
-                    LockedSelector = false;
-                }
+                VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                OnPointerUp();
+                LockedSelector = false;
             }
         }
 
@@ -168,46 +163,38 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             var possibleSelection = new List<SelectionIntentData>();
 
-            if (pointingSecondaryDetector != null && pointingSecondaryDetector.isRunning)
+            foreach (var detector in grabDetectors)
             {
-                var interactableToSelectPointed = pointingSecondaryDetector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
+                if (detector.isRunning)
                 {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
+                    var interactableToSelectPointed = detector.PredictTarget();
+                    var detectionInfo = new InteractableSelectionData
+                    {
+                        selectedObject = interactableToSelectPointed,
+                        controller = controller,
+                        detectionOrigin = DetectionOrigin.PROXIMITY,
+                    };
+                    detectionCachePointing.Add(detectionInfo);
+                    if (CanSelect(interactableToSelectPointed))
+                        possibleSelection.Add(detectionInfo);
+                }
             }
 
-            if (pointingDetector.isRunning)
+            foreach (var detector in pointingDetectors)
             {
-                var interactableToSelectPointed = pointingDetector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
+                if (detector.isRunning)
                 {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            if (grabDetector.isRunning)
-            {
-                var interactableToSelectProximity = grabDetector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
-                {
-                    selectedObject = interactableToSelectProximity,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.PROXIMITY,
-                };
-                detectionCacheProximity.Add(detectionInfo);
-                if (CanSelect(interactableToSelectProximity))
-                    possibleSelection.Add(detectionInfo);
+                    var interactableToSelectPointed = detector.PredictTarget();
+                    var detectionInfo = new InteractableSelectionData
+                    {
+                        selectedObject = interactableToSelectPointed,
+                        controller = controller,
+                        detectionOrigin = DetectionOrigin.POINTING,
+                    };
+                    detectionCachePointing.Add(detectionInfo);
+                    if (CanSelect(interactableToSelectPointed))
+                        possibleSelection.Add(detectionInfo);
+                }
             }
 
             foreach (var poss in possibleSelection)
@@ -229,10 +216,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             isSelecting = false;
             deselectionEvent.Invoke(interactableToDeselectInfo);
 
-            pointingDetector.Reinit();
-            if (pointingSecondaryDetector != null)
-                pointingSecondaryDetector.Reinit();
-            grabDetector.Reinit();
+            foreach (var detector in pointingDetectors)
+                detector.Reinit();
+            foreach (var detector in grabDetectors)
+                detector.Reinit();
         }
 
         /// <summary>
@@ -272,10 +259,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 LastSelected = selectionInfo;
                 isSelecting = true;
                 selectionEvent.Invoke(selectionInfo);
-                pointingDetector.Reinit();
-                if (pointingSecondaryDetector != null) 
-                    pointingSecondaryDetector.Reinit();
-                grabDetector.Reinit();
+                foreach (var detector in pointingDetectors)
+                    detector.Reinit();
+                foreach (var detector in grabDetectors)
+                    detector.Reinit();
             }
         }
 

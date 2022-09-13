@@ -403,9 +403,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deactivationRequesters: 
   selectionFeedbackHandler: {fileID: 1344738551367691293}
-  pointingDetector: {fileID: 4984395139596033644}
-  pointingSecondaryDetector: {fileID: 5538973729607222011}
-  grabDetector: {fileID: 313899135494070758}
+  pointingDetectors:
+  - {fileID: 4984395139596033644}
+  - {fileID: 5538973729607222011}
+  grabDetectors:
+  - {fileID: 313899135494070758}
 --- !u!114 &5538973729607222011
 MonoBehaviour:
   m_ObjectHideFlags: 0

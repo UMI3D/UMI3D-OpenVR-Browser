@@ -258,7 +258,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// </summary>
         public override void Select()
         {
-            Select(propositionSelectionCache.Objects.Last?.Value);
+            Select(propositionSelectionCache.Objects.First?.Value);
+            propositionSelectionCache.Clear();
         }
 
         /// <summary>
