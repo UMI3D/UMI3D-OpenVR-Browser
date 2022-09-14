@@ -20,18 +20,13 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
     /// <summary>
     /// Abstract parent class for all intention of selection detectors.
     /// </summary>
-    // Separated from detection method because of Unity serialization of templates
-    public abstract class AbstractDetector<T> : MonoBehaviour where T : MonoBehaviour
+    /// Separated from detection method because of Unity serialization of templates.
+    public abstract class AbstractDetector : MonoBehaviour
     {
         /// <summary>
         /// Transform associated with the pointing device
         /// </summary>
         protected Transform controllerTransform;
-
-        /// <summary>
-        /// Detection method logic
-        /// </summary>
-        public AbstractDetectionMethod<T> detectionMethod;
 
         /// <summary>
         /// True is the detector is currently looking for selection intent
@@ -43,6 +38,15 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
         {
             controllerTransform = GetComponentInParent<AbstractController>().transform;
         }
+    }
+
+    /// <inheritdoc/>
+    public abstract class AbstractDetector<T> : AbstractDetector where T : MonoBehaviour
+    {
+        /// <summary>
+        /// Detection method logic
+        /// </summary>
+        public AbstractDetectionMethod<T> detectionMethod;
 
         /// <summary>
         /// Initialize the detector
@@ -54,11 +58,6 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
             controllerTransform = controller.transform;
             isRunning = true;
         }
-
-        /// <summary>
-        /// Method to override to set a detection method
-        /// </summary>
-        protected abstract void SetDetectionMethod();
 
         /// <summary>
         /// Reset parameters of the detector.
@@ -79,6 +78,11 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
         }
 
         /// <summary>
+        /// Method to override to set a detection method
+        /// </summary>
+        protected abstract void SetDetectionMethod();
+
+        /// <summary>
         /// Predict the target of the user selection intention
         /// </summary>
         /// <returns>An interactable object or null</returns>
@@ -87,4 +91,5 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
             return detectionMethod.PredictTarget();
         }
     }
+
 }

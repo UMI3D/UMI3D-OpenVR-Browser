@@ -29,26 +29,14 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <summary>
         /// Selection Intent Detectors (virtual pointing). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual pointing. In order of decreasing priority.")]
-        public List<AbstractPointingInteractableDetector> pointingDetectors;
+        [SerializeField, Tooltip("Selection Intent Detector for virtual pointing. In order of decreasing priority. Cannot be changed at runtime.")]
+        private List<AbstractPointingInteractableDetector> pointingDetectors;
 
         /// <summary>
         /// Selection Intent Detector (virtual hand). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority.")]
-        public List<AbstractGrabInteractableDetector> grabDetectors;
-
-        /// <summary>
-        /// Previously detected objects for virtual hand
-        /// </summary>
-        [HideInInspector]
-        public Cache<InteractableContainer> detectionCacheProximity = new Cache<InteractableContainer>();
-
-        /// <summary>
-        /// Previously detected objects from virtual pointing
-        /// </summary>
-        [HideInInspector]
-        public Cache<InteractableContainer> detectionCachePointing = new Cache<InteractableContainer>();
+        [SerializeField, Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority. Cannot be changed at runtime.")]
+        private List<AbstractGrabInteractableDetector> proximityDetectors;
 
         #region constructors
 
@@ -70,29 +58,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #endregion constructors
 
         #region lifecycle
-
-        /// <inheritdoc/>
-        protected override void ActivateInternal()
-        {
-            base.ActivateInternal();
-            foreach (var detector in pointingDetectors)
-                detector.Init(controller);
-
-            foreach (var detector in grabDetectors)
-                detector.Init(controller);
-
-            projector = new InteractableProjector();
-        }
-
-        /// <inheritdoc/>
-        protected override void DeactivateInternal()
-        {
-            base.DeactivateInternal();
-            foreach (var detector in pointingDetectors)
-                detector.Reinit();
-            foreach (var detector in grabDetectors)
-                detector.Reinit();
-        }
 
         protected override void Update()
         {
@@ -125,6 +90,26 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
         #endregion lifecycle
 
+        #region detectors
+        /// <inheritdoc/>
+        public override List<AbstractDetector<InteractableContainer>> GetProximityDetectors()
+        {
+            var l = new List<AbstractDetector<InteractableContainer>>();
+            foreach (var detector in proximityDetectors)
+                l.Add(detector);
+            return l;
+        }
+
+        /// <inheritdoc/>
+        public override List<AbstractDetector<InteractableContainer>> GetPointingDetectors()
+        {
+            var l = new List<AbstractDetector<InteractableContainer>>();
+            foreach (var detector in pointingDetectors)
+                l.Add(detector);
+            return l;
+        }
+        #endregion
+
         #region selection
 
         /// <summary>
@@ -138,9 +123,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         protected override bool CanSelect(InteractableContainer icToSelect)
         {
             return icToSelect != null
+                    && icToSelect.Interactable != null
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
-                    && controller.IsCompatibleWith(icToSelect.Interactable);
+                    && controller.IsCompatibleWith(icToSelect.Interactable)
+                    && (!InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.id) 
+                        || (LastSelected?.selectedObject.Interactable == icToSelect.Interactable));
         }
 
         /// <summary>
@@ -151,50 +139,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         private bool IsObjectSelected(InteractableContainer ic)
         {
             return ic == LastSelected?.selectedObject;
-        }
-
-        /// <inheritdoc/>
-        public override List<SelectionIntentData> GetIntentDetections()
-        {
-            var possibleSelection = new List<SelectionIntentData>();
-
-            foreach (var detector in grabDetectors)
-            {
-                if (!detector.isRunning)
-                    continue;
-
-                var interactableToSelectPointed = detector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
-                {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.PROXIMITY,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            foreach (var detector in pointingDetectors)
-            {
-                if (!detector.isRunning)
-                    continue;
-
-                var interactableToSelectPointed = detector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
-                {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            foreach (var poss in possibleSelection)
-                propositionSelectionCache.Add(poss);
-            return possibleSelection;
         }
 
         /// <summary>
@@ -213,7 +157,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
             foreach (var detector in pointingDetectors)
                 detector.Reinit();
-            foreach (var detector in grabDetectors)
+            foreach (var detector in proximityDetectors)
                 detector.Reinit();
         }
 
@@ -243,7 +187,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 (selectionInfo as InteractableSelectionData).tool = interactionTool;
 
             if (isSelecting
-                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool)))) // second case happens when an object is destroyed but the tool is not released
+                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && InteractionMapper.Instance.IsToolSelected(interactionTool.id)))) // second case happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
 
             if (controller.IsAvailableFor(interactionTool))
@@ -255,11 +199,22 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 selectionEvent.Invoke(selectionInfo);
                 foreach (var detector in pointingDetectors)
                     detector.Reinit();
-                foreach (var detector in grabDetectors)
+                foreach (var detector in proximityDetectors)
                     detector.Reinit();
             }
         }
 
+        /// <inheritdoc/>
+        public override SelectionIntentData CreateSelectionIntentData(InteractableContainer obj, DetectionOrigin origin)
+        {
+            return new InteractableSelectionData()
+            {
+                selectedObject = obj,
+                controller = controller,
+                detectionOrigin = origin,
+                tool = obj == null ? null : obj.Interactable
+            };
+        }
         #endregion selection
     }
 }

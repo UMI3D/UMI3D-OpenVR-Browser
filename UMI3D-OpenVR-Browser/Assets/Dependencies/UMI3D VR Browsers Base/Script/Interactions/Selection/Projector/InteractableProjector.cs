@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 using umi3d.cdk.interaction;
-using umi3dVRBrowsersBase.interactions;
 
 namespace umi3dBrowsers.interaction.selection.projector
 {
@@ -21,21 +20,6 @@ namespace umi3dBrowsers.interaction.selection.projector
     /// </summary>
     public class InteractableProjector : IProjector<InteractableContainer>
     {
-        /// <summary>
-        /// Checks whether an interctable has already projected tools
-        /// </summary>
-        /// <param name="interactable"></param>
-        /// <returns></returns>
-        public bool IsProjected(InteractableContainer interactable)
-        {   
-            return IsProjected(interactable.Interactable);
-        }
-
-        public bool IsProjected(AbstractTool interactionTool)
-        {
-            return InteractionMapper.Instance.IsToolSelected(interactionTool.id);
-        }
-
         /// <summary>
         /// Project an interactable that possesses a tool on a controller
         /// </summary>
@@ -55,7 +39,7 @@ namespace umi3dBrowsers.interaction.selection.projector
         /// <param name="controller"></param>
         public void Project(AbstractTool interactionTool, ulong selectedObjectId, AbstractController controller)
         {
-            InteractionMapper.Instance.SelectTool(interactionTool.id, true, selectedObjectId, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+            InteractionMapper.Instance.SelectTool(interactionTool.id, true, controller, selectedObjectId, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
         }
 
         /// <inheritdoc/>
