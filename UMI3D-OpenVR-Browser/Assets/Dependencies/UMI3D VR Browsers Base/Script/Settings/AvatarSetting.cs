@@ -51,7 +51,7 @@ namespace umi3dVRBrowsersBase.settings
             if (value != IsOn && UMI3DClientUserTracking.Exists)
             {
                 IsOn = value;
-                UMI3DClientUserTracking.Instance.setTrackingSending(IsOn);
+                UMI3DClientUserTracking.Instance.SetTrackingSending(IsOn);
                 OnValueChanged?.Invoke(IsOn);
             }
         }

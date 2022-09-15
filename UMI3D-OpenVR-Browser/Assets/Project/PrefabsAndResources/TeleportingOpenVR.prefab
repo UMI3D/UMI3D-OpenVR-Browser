@@ -1258,6 +1258,7 @@ GameObject:
   - component: {fileID: 1691626219885343771}
   - component: {fileID: 3542380241650242426}
   - component: {fileID: 7143870400363556948}
+  - component: {fileID: 2604440083431539932}
   m_Layer: 0
   m_Name: VRCamera
   m_TagString: MainCamera
@@ -1307,7 +1308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c208d8290272d8f459403879520cc823, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MainCamera: {fileID: 0}
+  MainCamera: {fileID: 1691626219885343771}
   volume: {fileID: 7143870400363556948}
 --- !u!20 &1691626219885343771
 Camera:
@@ -1402,6 +1403,19 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: 8f30d43859ca6954ea9297266e26a8c7, type: 2}
+--- !u!114 &2604440083431539932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3574216422171357672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df4aba026e59ff747810d4f0a848cdf1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frameRate: 30
 --- !u!1 &3574216422171365704
 GameObject:
   m_ObjectHideFlags: 0
@@ -2786,9 +2800,9 @@ GameObject:
   m_Component:
   - component: {fileID: 4810254922834385339}
   - component: {fileID: 4810254922834385284}
-  - component: {fileID: 4810254922834385285}
   - component: {fileID: 4810254922834385286}
   - component: {fileID: 4810254922834385287}
+  - component: {fileID: 6510464578848799556}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -2907,18 +2921,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &4810254922834385285
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4810254922834385280}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f56fda3ef2d041409bcc1b838fb3470, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &4810254922834385286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2931,13 +2933,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda69d6602aa3f44e99c0700f3af9310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _OnSaturated:
-    m_PersistentCalls:
-      m_Calls: []
-  _OnSending:
-    m_PersistentCalls:
-      m_Calls: []
-  muted: 0
 --- !u!81 &4810254922834385287
 AudioListener:
   m_ObjectHideFlags: 0
@@ -2946,6 +2941,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4810254922834385280}
   m_Enabled: 1
+--- !u!114 &6510464578848799556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4810254922834385280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93fee7ee3a7a8dc438fd50fe6a13d4ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4924439058823442815
 GameObject:
   m_ObjectHideFlags: 0
@@ -3908,8 +3915,7 @@ MonoBehaviour:
   skeletonContainer: {fileID: 2196349589742991132}
   viewpoint: {fileID: 3574216422171299878}
   viewpointBonetype: 58
-  sendTracking: 1
-  targetTrackingFPS: 15
+  <targetTrackingFPS>k__BackingField: 15
   skeletonParsedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -3922,6 +3928,12 @@ MonoBehaviour:
   alwaysSendTrackingFrame: 0
   detectionPositionDelta: 0.1
   detectionRotationDelta: 5
+  EmotePlayedSelfEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  EmoteEndedSelfEvent:
+    m_PersistentCalls:
+      m_Calls: []
   UnitSkeleton: {fileID: 6717733320145798146, guid: 9b9a574ce2b70ad48a0ea039c1930d03,
     type: 3}
 --- !u!114 &6932931507286678211

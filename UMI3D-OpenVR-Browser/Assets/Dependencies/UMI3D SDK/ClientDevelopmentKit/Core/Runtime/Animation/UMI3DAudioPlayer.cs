@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using inetum.unityUtils;
 using MainThreadDispatcher;
 using System.Collections;
 using umi3d.common;
@@ -43,7 +44,7 @@ namespace umi3d.cdk
         }
         private IEnumerator _InitPlayer(UMI3DAudioPlayerDto dto, GameObject gameObject)
         {
-            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource = gameObject.GetOrAddComponent<AudioSource>();
             audioSource.playOnAwake = false;
             audioSource.pitch = dto.pitch;
             audioSource.volume = dto.volume;
@@ -120,7 +121,12 @@ namespace umi3d.cdk
         ///<inheritdoc/>
         public override void Stop()
         {
-            audioSource?.Stop();
+            try
+            {
+                audioSource?.Stop();
+            }
+            catch { }
+
             if (OnEndCoroutine != null) UMI3DAnimationManager.StopCoroutine(OnEndCoroutine);
         }
 
@@ -209,7 +215,7 @@ namespace umi3d.cdk
                     break;
                 case UMI3DPropertyKeys.AnimationResource:
                     ResourceDto res = ADto.audioResource;
-                    ADto.audioResource = (ResourceDto)UMI3DNetworkingHelper.Read<ResourceDto>(container);
+                    ADto.audioResource = UMI3DNetworkingHelper.Read<ResourceDto>(container);
                     if (ADto.audioResource == res) return true;
                     FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(ADto.audioResource.variants);
                     if (ADto.audioResource == null || ADto.audioResource.variants == null || ADto.audioResource.variants.Count < 1)
@@ -261,9 +267,9 @@ namespace umi3d.cdk
         ///<inheritdoc/>
         public override void Start(float atTime)
         {
-            if ((audioSource != null))
+            if (audioSource != null)
             {
-                if ((audioSource.clip != null))
+                if (audioSource.clip != null)
                 {
                     audioSource.Stop();
                     if (atTime != 0)
@@ -294,7 +300,7 @@ namespace umi3d.cdk
             if (dto.playing)
             {
                 ulong now = UMI3DClientServer.Instance.GetTime();
-                Start((float)(now - dto.startTime));
+                Start(now - dto.startTime);
             }
         }
     }

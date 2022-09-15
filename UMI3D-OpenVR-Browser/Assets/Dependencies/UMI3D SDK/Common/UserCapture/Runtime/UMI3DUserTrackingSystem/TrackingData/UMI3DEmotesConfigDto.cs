@@ -16,8 +16,10 @@ using System.Collections.Generic;
 namespace umi3d.common.userCapture
 {
     /// <summary>
-    /// Emote configuration file packaged in a dto
+    /// Emote configuration asset that describes available emotes for client usage
     /// </summary>
+    /// The emote configuration is used asynchronously to describe all the available emotes in an environment and explicit 
+    /// which ones are allow ed to be used for each user.
     [System.Serializable]
     public class UMI3DEmotesConfigDto : AbstractEntityDto, IEntity
     {
@@ -30,6 +32,11 @@ namespace umi3d.common.userCapture
         /// Should the emotes be available by default to users ? When set to true, all emotes are available at start, no matter the configuration
         /// </summary>
         public bool allAvailableByDefault = true;
+
+        /// <summary>
+        /// Default animation state name in the normal avatar animator.
+        /// </summary>
+        public string defaultStateName;
     }
 }
 
