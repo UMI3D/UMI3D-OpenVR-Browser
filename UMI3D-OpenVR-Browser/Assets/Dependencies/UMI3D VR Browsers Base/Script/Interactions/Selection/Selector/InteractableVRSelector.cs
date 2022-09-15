@@ -179,7 +179,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 else if (selectionInfo == null)
                     throw new ArgumentNullException("Argument should be null only if moving outside of an object");
                 else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
+                {
+                    if (LastSelected != null && selectionInfo.detectionOrigin != LastSelected.detectionOrigin)
+                        selectionFeedbackHandler.UpdateFeedback(selectionInfo);
                     return;
+                }
             }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);

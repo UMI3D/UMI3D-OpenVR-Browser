@@ -716,7 +716,7 @@ GameObject:
   - component: {fileID: 6776295091017326307}
   - component: {fileID: 106263226990442865}
   m_Layer: 0
-  m_Name: CursorZone
+  m_Name: CursorSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
