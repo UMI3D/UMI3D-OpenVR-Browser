@@ -17,16 +17,19 @@ using umi3d.common.userCapture;
 
 namespace umi3d.cdk.userCapture
 {
+    /// <summary>
+    /// Loader for <see cref="UMI3DEmotesConfigDto"/>.
+    /// </summary>
     public class UMI3DEmotesConfigLoader
     {
         /// <summary>
-        /// Load a UMI3D Emote config
+        /// Load a UMI3D Emote config dto
         /// </summary>
         /// <param name="dto"></param>
         public static void Load(UMI3DEmotesConfigDto dto)
         {
             UMI3DEnvironmentLoader.RegisterEntityInstance(dto.id, dto, null).NotifyLoaded();
-            foreach (var emoteDto in dto.emotes)
+            foreach (UMI3DEmoteDto emoteDto in dto.emotes)
                 UMI3DEnvironmentLoader.RegisterEntityInstance(emoteDto.id, emoteDto, null).NotifyLoaded();
             UMI3DClientUserTracking.Instance.EmotesLoadedEvent.Invoke(dto);
         }
@@ -54,6 +57,13 @@ namespace umi3d.cdk.userCapture
             return true;
         }
 
+        /// <summary>
+        /// Load an emote config
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="propertyKey"></param>
+        /// <param name="container"></param>
+        /// <returns></returns>
         public static bool ReadUMI3DProperty(ref object value, uint propertyKey, ByteContainer container)
         {
             switch (propertyKey)

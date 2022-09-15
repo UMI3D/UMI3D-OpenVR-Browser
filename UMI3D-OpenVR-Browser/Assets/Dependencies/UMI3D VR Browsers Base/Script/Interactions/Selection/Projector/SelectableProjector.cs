@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using TMPro;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection.zoneselection;
 using UnityEngine;
@@ -43,7 +44,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             if (selectable != null) //protects against cases when UI element is destroyed but not deselected
             {
                 selectable.OnPointerExit(pointerEventData);
-                if (!(selectable is InputField)) //keep keyboard focus on input fields
+                if(!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
         }
@@ -77,6 +78,10 @@ namespace umi3dBrowsers.interaction.selection.projector
 
                 case InputField inputfield:
                     inputfield.Click(controller.transform);
+                    break;
+
+                case TMP_InputField tmp_input:
+                    tmp_input.Click(controller.transform);
                     break;
 
                 case Scrollbar scrollbar:
@@ -202,6 +207,57 @@ namespace umi3dBrowsers.interaction.selection.projector
             else
             {
                 EventSystem.current.SetSelectedGameObject(null, null); // if the textfield was already selected, we have to unselect it before selecting again to make sure the text will be fully selected
+                inputField.Select();
+            }
+        }
+
+        public static void Click(this TMP_InputField inputField, Transform controllerTransform)
+        {
+            if (inputField == null) return;
+
+            var closestAndRaycastHit = new RaySelectionZone<Selectable>(controllerTransform).GetClosestAndRaycastHit();
+            int lenght = inputField.text.Length;
+
+            // If the text of the input is already fully selected.
+            if (inputField.selectionAnchorPosition == lenght && inputField.selectionFocusPosition == 0 && lenght > 0)
+            {
+                TMP_Text text = inputField.textComponent;
+                RectTransform textTransform = text.GetComponent<RectTransform>();
+                if (textTransform == null) return;
+
+                Vector3 localClickedPoint = text.transform.InverseTransformPoint(closestAndRaycastHit.raycastHit.point);
+                float tmpCaretPosition = 0;
+                int i = 1;
+
+                for (int j = 0; j < lenght; ++j)
+                {
+                    var characterInfo = text.textInfo.characterInfo[j];
+                    tmpCaretPosition += characterInfo.xAdvance - characterInfo.origin;
+
+                    // If the current character is before laser point.
+                    if (localClickedPoint.x + Mathf.Abs(textTransform.rect.x) > tmpCaretPosition)
+                    {
+                        i = Mathf.Clamp(i + 1, 0, lenght);
+                        inputField.caretPosition = i;
+                    }
+                    else
+                    {
+                        if (i == 1)
+                        {
+                            if (localClickedPoint.x + Mathf.Abs(textTransform.rect.x) < 0) inputField.caretPosition = 0;
+                            else inputField.caretPosition = 1;
+                        }
+                        EventSystem.current.SetSelectedGameObject(null, null);
+                        inputField.ActivateInputField();
+                        inputField.Select();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                EventSystem.current.SetSelectedGameObject(null, null); // if the textfield was already selected, we have to unselect it before selecting again to make sure the text will be fully selected
+                inputField.ActivateInputField();
                 inputField.Select();
             }
         }

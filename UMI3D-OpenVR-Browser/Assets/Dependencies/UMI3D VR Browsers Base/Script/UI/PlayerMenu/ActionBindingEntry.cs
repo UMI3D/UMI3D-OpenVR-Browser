@@ -94,6 +94,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         private IEnumerator SetBindingDisplayCoroutine()
         {
             yield return null;
+            if (actionNameLabel == null || actionNameLabel.text == null) yield break;
 
             actionNameLabel.text = input.CurrentInteraction()?.name;
 

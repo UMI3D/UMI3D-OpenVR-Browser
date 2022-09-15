@@ -16,6 +16,7 @@ limitations under the License.
 
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -58,7 +59,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
         [SerializeField]
         [Tooltip("Input to display a preview of what users write")]
-        private InputField previewField;
+        private TMP_InputField previewField;
 
         private InputField editedField;
 
@@ -148,10 +149,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
         private void Awake()
         {
-            if (isSingleton)
-            {
-                Instance = this;
-            }
+            if (isSingleton) Instance = this;
         }
 
         private void Start()
@@ -171,9 +169,36 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             symbolToLetterKey.onPressed.AddListener(SwitchToLetters);
             deleteKey.onPressed.AddListener(Delete);
             enterKey.onPressed.AddListener(ClosePopUp);
-
             SwitchToLetters();
+
+            SetPreviousInputField();
         }
+
+        /// <summary>
+        /// Hide mobile and sy system keyboard  caret.
+        /// </summary>
+        private void SetPreviousInputField()
+        {
+            previewField.shouldHideMobileInput = true;
+            previewField.shouldHideSoftKeyboard = true;
+
+            previewField.customCaretColor = true;
+            previewField.caretColor = Color.red;
+            previewField.caretWidth = 3;
+        }
+
+        private void SetEditedInputField()
+        {
+            editedField.shouldHideMobileInput = true;
+        }
+
+        private void BindEditedField(InputField inputField)
+        {
+            editedField = inputField;
+            SetEditedInputField();
+        }
+
+        #region Character Management
 
         /// <summary>
         /// Switches keyboard to letter layout.
@@ -216,28 +241,30 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             lettersLowerRoot.SetActive(!isUpperCase);
         }
 
+        #endregion
+
         /// <summary>
         /// Adds a character to the current text.
         /// </summary>
         /// <param name="character"></param>
         private void OnCharacterAdded(string character)
         {
-            int carretPosition = previewField.caretPosition;
+            int previousCaretPosition = previewField.caretPosition;
 
             if (IsTextFullySelected())
             {
                 previewField.text = character;
-                StartCoroutine(SetCarretInInputField(previewField, 1));
+                SetCaret(previewField, 1);
             }
-            else if (carretPosition != previewField.text.Length)
+            else if (previousCaretPosition != previewField.text.Length)
             {
-                previewField.text = previewField.text.Substring(0, carretPosition) + character + previewField.text.Substring(carretPosition, previewField.text.Length - carretPosition);
-                StartCoroutine(SetCarretInInputField(previewField, carretPosition + 1));
+                previewField.text = previewField.text.Substring(0, previousCaretPosition) + character + previewField.text.Substring(previousCaretPosition, previewField.text.Length - previousCaretPosition);
+                SetCaret(previewField, previousCaretPosition + 1);
             }
             else
             {
                 previewField.text += character;
-                StartCoroutine(SetCarretInInputField(previewField, carretPosition + 1));
+                SetCaret(previewField, previousCaretPosition + 1);
             }
 
             OnValueChanged.Invoke(previewField.text);
@@ -288,9 +315,9 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <param name="onEditFinished"></param>
         public void OpenKeyboard(InputField inputField, Action<string> onEditFinished)
         {
-            this.previewField.text = inputField.text;
-            this.editedField = inputField;
-            OpenKeyboard(inputField.text, onEditFinished, null, false);
+            BindEditedField(inputField);
+
+            OpenKeyboard(inputField.text, onEditFinished, null);
         }
 
         /// <summary>
@@ -298,24 +325,21 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// </summary>
         /// <param name="editedText"></param>
         /// <param name="onEditFinished">Callback called when the edition ends, string parameter is the final value entered by users.</param>
-        public void OpenKeyboard(string editedText, Action<string> onEditFinished, Action onEditCanceled, bool selectPreviewField)
+        public void OpenKeyboard(string editedText, Action<string> onEditFinished, Action onEditCanceled)
         {
-            if (WasClosedLastFrame)
-                return;
+            if (WasClosedLastFrame) return;
 
             root.SetActive(true);
 
+            previewField.ActivateInputField();
             previewField.text = editedText;
-
-            if (selectPreviewField)
-                previewField.Select();
 
             this.onEditFinished = onEditFinished;
             this.onEditCanceled = onEditCanceled;
 
             IsOpen = true;
 
-            StartCoroutine(WaitAndSelectField(previewField));
+            StartCoroutine(WaitAndSelectField());
         }
 
         /// <summary>
@@ -329,28 +353,35 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         {
             transform.SetPositionAndRotation(position, Quaternion.LookRotation(normal, Vector3.up));
 
-            OpenKeyboard(editedText, onEditFinished, onEditCanceled, true);
+            OpenKeyboard(editedText, onEditFinished, onEditCanceled);
         }
 
         /// <summary>
         /// Selects an <see cref="InputField"/> once it is possible.
         /// </summary>
-        /// <param name="field"></param>
         /// <returns></returns>
-        private IEnumerator WaitAndSelectField(InputField field)
+        private IEnumerator WaitAndSelectField()
         {
-            while (EventSystem.current.alreadySelecting)
-                yield return null;
+            while (EventSystem.current.alreadySelecting) yield return null;
 
             var navMode = new Navigation() { mode = Navigation.Mode.None };
             editedField.navigation = navMode;
 
-            field.Select();
+            previewField.Select();
         }
 
-        private IEnumerator SetCarretInInputField(InputField field, int position)
+        private IEnumerator SetCarretInInputField(TMP_InputField field, int position)
         {
             yield return new WaitForEndOfFrame();
+
+            previewField.selectionFocusPosition = position;
+            previewField.selectionAnchorPosition = position;
+            field.caretPosition = position;
+            field.ForceLabelUpdate();
+        }
+
+        private void SetCaret(TMP_InputField field, int position)
+        {
             field.caretPosition = position;
             field.ForceLabelUpdate();
         }
@@ -404,10 +435,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// Is the edited text fully selected by a user ?
         /// </summary>
         /// <returns></returns>
-        private bool IsTextFullySelected()
-        {
-            return previewField.selectionAnchorPosition == previewField.text.Length && previewField.selectionFocusPosition == 0;
-        }
+        private bool IsTextFullySelected() => previewField.selectionAnchorPosition == previewField.text.Length && previewField.selectionFocusPosition == 0;
 
         #endregion Methods
     }

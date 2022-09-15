@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.common;
@@ -56,7 +57,6 @@ namespace umi3d.cdk
 
                 //MeshRenderer nodeMesh = node.AddComponent<MeshRenderer>();
                 FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(((UMI3DMeshNodeDto)dto).mesh.variants);  // Peut etre ameliore
-
                 string url = fileToLoad.url;
                 string ext = fileToLoad.extension;
                 string authorization = fileToLoad.authorization;
@@ -121,8 +121,7 @@ namespace umi3d.cdk
             }
         }
 
-
-        class ChildRef
+        private class ChildRef
         {
             public string refByName;
             public List<int> refByIndex;
@@ -140,12 +139,12 @@ namespace umi3d.cdk
 
         private void SetSubObjectsReferencesAux(Transform root, Transform Parent, Vector3 rotationOffsetByLoader, UMI3DResourcesManager.SubmodelDataCollection collection)
         {
-            List<ChildRef> childs = new List<ChildRef>() { new ChildRef(Parent.name, new List<int>(), new List<string>(), Parent) };
+            var childs = new List<ChildRef>() { new ChildRef(Parent.name, new List<int>(), new List<string>(), Parent) };
             GetChild(Parent, new List<int>(), new List<string>(), childs);
 
-            foreach (var childRef in childs)
+            foreach (ChildRef childRef in childs)
             {
-                var child = childRef.transform;
+                Transform child = childRef.transform;
                 if (!ignoredPrimitiveNameForSubObjectsLoading.Contains(child.name)) // ignore game objects created by the gltf importer or other importer 
                 {
                     child.SetParent(root.transform.parent);
@@ -161,7 +160,7 @@ namespace umi3d.cdk
         {
             for (int i = 0; i < Parent.childCount; i++)
             {
-                var child = Parent.GetChild(i);
+                Transform child = Parent.GetChild(i);
                 var nIndexes = new List<int>(indexes) { i };
                 var nNames = new List<string>(names) { child.name };
                 collection.Add(new ChildRef(child.name, nIndexes, nNames, child));
@@ -180,6 +179,7 @@ namespace umi3d.cdk
             {
                 root = go;
             }
+
             var instance = GameObject.Instantiate(root, parent, true);
             UMI3DNodeInstance nodeInstance = UMI3DEnvironmentLoader.GetNode(dto.id);
             AbstractMeshDtoLoader.ShowModelRecursively(instance);
@@ -195,12 +195,41 @@ namespace umi3d.cdk
             instance.transform.localPosition = root.transform.localPosition;
             instance.transform.localScale = root.transform.localScale;
             instance.transform.localEulerAngles = root.transform.localEulerAngles;
-            ColliderDto colliderDto = (dto).colliderDto;
+            ColliderDto colliderDto = dto.colliderDto;
             SetCollider(dto.id, nodeInstance, colliderDto);
             SetMaterialOverided(dto, nodeInstance);
+            SetLightMap(instance, nodeInstance);
+
             finished?.Invoke();
         }
 
-    }
+        /// <summary>
+        /// If the node has a <see cref="PrefabLightmapData"/>, makes sure to refresh once its references are updated.
+        /// </summary>
+        /// <param name="instance"></param>
+        /// <param name="nodeInstance"></param>
+        private void SetLightMap(GameObject instance, UMI3DNodeInstance nodeInstance)
+        {
+            PrefabLightmapData data = instance.GetComponentInChildren<PrefabLightmapData>();
+            if (data != null)
+            {
+                nodeInstance.prefabLightmapData = data;
 
+                UMI3DEnvironmentLoader.StartCoroutine(RefreshLightmapData(data));
+            }
+        }
+
+        /// <summary>
+        /// Coroutine for <see cref="SetLightMap"/>.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        IEnumerator RefreshLightmapData(PrefabLightmapData data)
+        {
+            while (!UMI3DEnvironmentLoader.Instance.loaded)
+                yield return null;
+
+            data.Init();
+        }
+    }
 }

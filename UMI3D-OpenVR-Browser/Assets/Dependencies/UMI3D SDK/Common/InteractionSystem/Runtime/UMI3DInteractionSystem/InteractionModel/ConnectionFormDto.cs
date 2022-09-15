@@ -14,12 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System.Collections.Generic;
-
 namespace umi3d.common.interaction
 {
     /// <summary>
-    /// 
+    /// DTO describing a connection form.
     /// </summary>
     [System.Serializable]
     public class ConnectionFormDto : FormDto

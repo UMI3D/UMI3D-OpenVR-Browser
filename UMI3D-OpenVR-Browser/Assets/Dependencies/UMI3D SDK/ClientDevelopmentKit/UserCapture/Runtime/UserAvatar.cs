@@ -26,11 +26,16 @@ using UnityEngine;
 
 namespace umi3d.cdk.userCapture
 {
+    /// <summary>
+    /// Client form of a user's avatar, the virtual representation of the usr in the environment.
+    /// </summary>
     public class UserAvatar : MonoBehaviour
     {
         private const DebugScope scope = DebugScope.CDK | DebugScope.UserCapture;
 
-
+        /// <summary>
+        /// Saved state of an object properties before being bound to a user's bone.
+        /// </summary>
         protected struct SavedTransform
         {
             public Transform obj;
@@ -40,12 +45,19 @@ namespace umi3d.cdk.userCapture
             public Vector3 savedLossyScale;
         }
 
+        /// <summary>
+        /// Object that has been bound through a bone binding.
+        /// </summary>
         protected struct BoundObject
         {
             public ulong objectId;
             public string rigname;
         }
 
+        /// <summary>
+        /// Represents a binding.
+        /// </summary>
+        /// Used mainly for computational purposes.
         protected struct Bound
         {
             public uint bonetype;
@@ -61,11 +73,26 @@ namespace umi3d.cdk.userCapture
         }
 
         public List<Transform> boundRigs = new List<Transform>();
+        /// <summary>
+        /// User's registered id
+        /// </summary>
         public ulong userId { get; protected set; }
+        /// <summary>
+        /// User's size.
+        /// </summary>
         public Vector3 userSize { get; protected set; }
+        /// <summary>
+        /// Has the user currently active bindings?
+        /// </summary>
         public bool activeUserBindings { get; protected set; }
+        /// <summary>
+        /// List of currently applied <see cref="BoneBindingDto"/> to the user's skeleton.
+        /// </summary>
         public List<BoneBindingDto> userBindings { get; protected set; }
 
+        /// <summary>
+        /// Saves of the transform of objects before they had been bound to a user's bone.
+        /// </summary>
         protected Dictionary<BoundObject, SavedTransform> savedTransforms = new Dictionary<BoundObject, SavedTransform>();
 
         protected readonly List<Bound> bounds = new List<Bound>();
@@ -328,6 +355,20 @@ namespace umi3d.cdk.userCapture
                 frozenLossyScale = obj.lossyScale,
                 anchorRelativeRot = dto.rigName == "" ? Quaternion.identity : Quaternion.Inverse(node.transform.rotation) * obj.rotation
             });
+
+            if (!savedTransforms.ContainsKey(new BoundObject() { objectId = dto.objectId, rigname = dto.rigName }))
+            {
+                var savedTransform = new SavedTransform
+                {
+                    obj = obj,
+                    savedPosition = obj.localPosition,
+                    savedRotation = obj.localRotation,
+                    savedLocalScale = obj.localScale,
+                    savedLossyScale = obj.lossyScale,
+                };
+
+                savedTransforms.Add(new BoundObject() { objectId = dto.objectId, rigname = dto.rigName }, savedTransform);
+            }
         }
 
         protected void WaitForRig(BoneBindingDto dto, UMI3DClientUserTrackingBone bone)
@@ -427,6 +468,10 @@ namespace umi3d.cdk.userCapture
             }
         }
 
+        /// <summary>
+        /// Replace an object associated with a binding to its saved state.
+        /// </summary>
+        /// <param name="dto"></param>
         protected void ResetObject(BoneBindingDto dto)
         {
             UMI3DNodeInstance node = UMI3DEnvironmentLoader.GetNode(dto.objectId);
@@ -541,9 +586,9 @@ namespace umi3d.cdk.userCapture
 
                 if (delta * MeasuresPerSecond <= 1)
                 {
-                    double value_x = (tools.prediction[0] - tools.previous_prediction[0]) * delta * MeasuresPerSecond + tools.previous_prediction[0];
-                    double value_y = (tools.prediction[1] - tools.previous_prediction[1]) * delta * MeasuresPerSecond + tools.previous_prediction[1];
-                    double value_z = (tools.prediction[2] - tools.previous_prediction[2]) * delta * MeasuresPerSecond + tools.previous_prediction[2];
+                    double value_x = ((tools.prediction[0] - tools.previous_prediction[0]) * delta * MeasuresPerSecond) + tools.previous_prediction[0];
+                    double value_y = ((tools.prediction[1] - tools.previous_prediction[1]) * delta * MeasuresPerSecond) + tools.previous_prediction[1];
+                    double value_z = ((tools.prediction[2] - tools.previous_prediction[2]) * delta * MeasuresPerSecond) + tools.previous_prediction[2];
 
                     tools.estimations = new double[] { value_x, value_y, value_z };
 
@@ -567,13 +612,13 @@ namespace umi3d.cdk.userCapture
 
                 if (delta * MeasuresPerSecond <= 1)
                 {
-                    double fw_value_x = (tools.prediction.Item1[0] - tools.previous_prediction.Item1[0]) * MeasuresPerSecond * delta + tools.previous_prediction.Item1[0];
-                    double fw_value_y = (tools.prediction.Item1[1] - tools.previous_prediction.Item1[1]) * MeasuresPerSecond * delta + tools.previous_prediction.Item1[1];
-                    double fw_value_z = (tools.prediction.Item1[2] - tools.previous_prediction.Item1[2]) * MeasuresPerSecond * delta + tools.previous_prediction.Item1[2];
+                    double fw_value_x = ((tools.prediction.Item1[0] - tools.previous_prediction.Item1[0]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item1[0];
+                    double fw_value_y = ((tools.prediction.Item1[1] - tools.previous_prediction.Item1[1]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item1[1];
+                    double fw_value_z = ((tools.prediction.Item1[2] - tools.previous_prediction.Item1[2]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item1[2];
 
-                    double up_value_x = (tools.prediction.Item2[0] - tools.previous_prediction.Item2[0]) * MeasuresPerSecond * delta + tools.previous_prediction.Item2[0];
-                    double up_value_y = (tools.prediction.Item2[1] - tools.previous_prediction.Item2[1]) * MeasuresPerSecond * delta + tools.previous_prediction.Item2[1];
-                    double up_value_z = (tools.prediction.Item2[2] - tools.previous_prediction.Item2[2]) * MeasuresPerSecond * delta + tools.previous_prediction.Item2[2];
+                    double up_value_x = ((tools.prediction.Item2[0] - tools.previous_prediction.Item2[0]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item2[0];
+                    double up_value_y = ((tools.prediction.Item2[1] - tools.previous_prediction.Item2[1]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item2[1];
+                    double up_value_z = ((tools.prediction.Item2[2] - tools.previous_prediction.Item2[2]) * MeasuresPerSecond * delta) + tools.previous_prediction.Item2[2];
 
                     tools.estimations = new Tuple<double[], double[]>(new double[] { fw_value_x, fw_value_y, fw_value_z }, new double[] { up_value_x, up_value_y, up_value_z });
 
@@ -587,6 +632,8 @@ namespace umi3d.cdk.userCapture
         /// </summary>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
+        /// This method makes it possible to predict/ extrapolate future position 
+        /// and thus to obtain a fluid movement of other's avatar on a user's client. 
         protected void NodeKalmanUpdate(Vector3 position, Quaternion rotation)
         {
             double[] positionMeasurement = new double[] { position.x, position.y, position.z };

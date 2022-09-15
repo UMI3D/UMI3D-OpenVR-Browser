@@ -25,7 +25,7 @@ using UnityEngine;
 namespace umi3d.cdk
 {
     /// <summary>
-    /// Loader for Avatar node
+    /// Loader for <see cref="UMI3DAvatarNodeDto"/>.
     /// </summary>
     public class UMI3DAvatarNodeLoader : UMI3DNodeLoader
     {
@@ -76,13 +76,13 @@ namespace umi3d.cdk
                             switch (property)
                             {
                                 case SetEntityListAddPropertyDto add:
-                                    embd.AddBinding(add.index, (property.value as BoneBindingDto));
+                                    embd.AddBinding(add.index, property.value as BoneBindingDto);
                                     break;
                                 case SetEntityListRemovePropertyDto rem:
                                     embd.RemoveBinding(rem.index);
                                     break;
                                 case SetEntityListPropertyDto set:
-                                    embd.UpdateBinding(set.index, (property.value as BoneBindingDto));
+                                    embd.UpdateBinding(set.index, property.value as BoneBindingDto);
                                     break;
                                 default:
                                     embd.SetBindings(property.value as List<BoneBindingDto>);
@@ -115,6 +115,7 @@ namespace umi3d.cdk
             return true;
         }
 
+        /// <inheritdoc/>
         public override bool SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
         {
             if (base.SetUMI3DProperty(entity, operationId, propertyKey, container)) return true;

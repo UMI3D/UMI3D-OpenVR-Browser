@@ -53,6 +53,7 @@ namespace umi3d.common
         User = 1 << 12,
 
         Connection = 1 << 13,
+        Mumble = 1 << 14,
 
         Editor = 1 << 29,
         Other = 1 << 28
@@ -84,7 +85,7 @@ namespace umi3d.common
         private string logPath;
         public static bool ShouldLog
         {
-            get => Exists ? Instance.log : false;
+            get => Exists && Instance.log;
             set
             {
                 if (Exists)
@@ -197,7 +198,7 @@ namespace umi3d.common
 
         protected virtual string LogData(float time)
         {
-            string data = $"Time : {time},{ Environment.NewLine}";
+            string data = $"Time : {time},{Environment.NewLine}";
             bool globalOk = false;
             foreach (KeyValuePair<ILoggable, List<DebugInfo>> loggable in Loggables)
             {
@@ -254,7 +255,7 @@ namespace umi3d.common
         private float logInfoDelta;
         public static bool ShouldLogInfo
         {
-            get => Exists ? Instance.logInfo : false;
+            get => Exists && Instance.logInfo;
             set
             {
                 if (Exists)
@@ -418,7 +419,6 @@ namespace umi3d.common
                     updated = true;
                     return true;
                 }
-
             }
             return false;
 
