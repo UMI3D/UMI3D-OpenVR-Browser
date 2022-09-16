@@ -76,7 +76,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
                 grabCursor.ChangeAccordingToSelection(null);
                 pointingCursor.ChangeAccordingToSelection(iSelectionData);
                 lastOrigin = DetectionOrigin.POINTING;
-            }    
+            }
         }
 
         /// <inheritdoc/>

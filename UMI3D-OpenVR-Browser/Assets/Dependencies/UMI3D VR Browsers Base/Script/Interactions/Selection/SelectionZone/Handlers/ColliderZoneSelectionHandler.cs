@@ -43,11 +43,13 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         {
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
-                if (obj.Equals(null) 
-                    || (obj.collider == null) 
-                    || (obj.obj == null) 
+                if (obj.Equals(null)
+                    || (obj.collider == null)
+                    || (obj.obj == null)
                     || Vector3.Distance(transform.position, obj.collider.ClosestPoint(transform.position)) > zoneCollider.radius)
-                    ObjectsInCollider.RemoveAll(x=>x.obj==obj.obj);
+                {
+                    ObjectsInCollider.RemoveAll(x => x.obj == obj.obj);
+                }
             }
         }
 
@@ -59,7 +61,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
             if (neighbour != null && neighbour.isActiveAndEnabled)
             {
-                if (!ObjectsInCollider.Exists(x=>x.obj == neighbour))
+                if (!ObjectsInCollider.Exists(x => x.obj == neighbour))
                 {
                     ObjectsInCollider.Add(new ObjectInsideCollider<T>()
                     {

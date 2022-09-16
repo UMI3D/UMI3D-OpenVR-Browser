@@ -80,12 +80,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
         private void OnPointerUp()
         {
-            
+
         }
 
         private void OnPointerDown()
         {
-            
+
         }
 
         #endregion lifecycle
@@ -127,7 +127,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
                     && controller.IsCompatibleWith(icToSelect.Interactable)
-                    && (!InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.id) 
+                    && (!InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.id)
                         || (LastSelected?.selectedObject.Interactable == icToSelect.Interactable));
         }
 

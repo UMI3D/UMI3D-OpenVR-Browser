@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: IntenSelectParameters
   m_EditorClassIdentifier: 
   corrective_k: 0.8
-  coneAngle: 7.5
+  coneAngle: 15
   stickinessRate: 0.5
   snappinessRate: 0.5
   scoreMax: 70

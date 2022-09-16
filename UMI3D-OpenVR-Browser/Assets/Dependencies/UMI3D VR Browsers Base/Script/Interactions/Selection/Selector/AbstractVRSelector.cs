@@ -318,7 +318,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// </summary>
         /// <returns></returns>
         public virtual IEnumerable<SelectionIntentData> GetIntentDetections()
-        { 
+        {
             foreach (var detector in ProximityDetectors) // priority for proximity
             {
                 if (!detector.isRunning)
