@@ -27,7 +27,7 @@ namespace umi3d.common.collaboration
             switch (true)
             {
                 case true when typeof(T) == typeof(UserCameraPropertiesDto):
-                    readable = container.length >= 17 * sizeof(float) + sizeof(uint);
+                    readable = container.length >= (17 * sizeof(float)) + sizeof(uint);
                     if (readable)
                     {
                         var usercam = new UserCameraPropertiesDto
@@ -44,6 +44,31 @@ namespace umi3d.common.collaboration
                     }
 
                     return true;
+
+                case true when typeof(T) == typeof(VoiceDto):
+                    if (UMI3DNetworkingHelper.TryRead(container, out string voiceUrl) &&
+                        UMI3DNetworkingHelper.TryRead(container, out string login) &&
+                        UMI3DNetworkingHelper.TryRead(container, out string password) &&
+                        UMI3DNetworkingHelper.TryRead(container, out string channel))
+                    {
+                        readable = true;
+                        var voice = new VoiceDto
+                        {
+                            url = voiceUrl,
+                            login = login,
+                            password = password,
+                            channelName = channel
+                        };
+                        result = (T)Convert.ChangeType(voice, typeof(T));
+                    }
+                    else
+                    {
+                        readable = false;
+                        result = default(T);
+                    }
+
+                    return true;
+
                 case true when typeof(T) == typeof(BoneDto):
                     uint type;
                     SerializableVector4 rot;
@@ -152,6 +177,7 @@ namespace umi3d.common.collaboration
                     var conf = new UMI3DEmotesConfigDto();
                     result = default(T);
                     readable = UMI3DNetworkingHelper.TryRead<bool>(container, out conf.allAvailableByDefault);
+                    readable &= UMI3DNetworkingHelper.TryRead<string>(container, out conf.defaultStateName);
 
                     if (readable)
                     {
@@ -160,11 +186,8 @@ namespace umi3d.common.collaboration
                         {
                             for (uint i = 0; i < nbEmotes; i++)
                             {
-                                var emote = new UMI3DEmoteDto();
-                                readable = UMI3DNetworkingHelper.TryRead<ulong>(container, out emote.id);
-                                readable &= UMI3DNetworkingHelper.TryRead<string>(container, out emote.name);
-                                readable &= UMI3DNetworkingHelper.TryRead<bool>(container, out emote.available);
-                                readable &= UMI3DNetworkingHelper.TryRead<FileDto>(container, out emote.iconResource);
+                                UMI3DEmoteDto emote;
+                                Read<UMI3DEmoteDto>(container, out readable, out emote);
                                 if (!readable)
                                     break;
                                 else
@@ -180,7 +203,8 @@ namespace umi3d.common.collaboration
                     result = default(T);
 
                     readable = UMI3DNetworkingHelper.TryRead<ulong>(container, out e.id);
-                    readable &= UMI3DNetworkingHelper.TryRead<string>(container, out e.name);
+                    readable &= UMI3DNetworkingHelper.TryRead<string>(container, out e.label);
+                    readable &= UMI3DNetworkingHelper.TryRead<string>(container, out e.stateName);
                     readable &= UMI3DNetworkingHelper.TryRead<bool>(container, out e.available);
                     readable &= UMI3DNetworkingHelper.TryRead<FileDto>(container, out e.iconResource);
 
@@ -312,6 +336,25 @@ namespace umi3d.common.collaboration
                         };
                         readable = true;
                         result = (T)Convert.ChangeType(redirection, typeof(T));
+
+                        return true;
+                    }
+                    result = default(T);
+                    readable = false;
+                    return false;
+                case true when typeof(T) == typeof(ForceLogoutDto):
+                    string reason;
+                    if (
+                        UMI3DNetworkingHelper.TryRead<string>(container, out reason)
+                        )
+                    {
+
+                        var forceLogoutDto = new ForceLogoutDto
+                        {
+                            reason = reason
+                        };
+                        readable = true;
+                        result = (T)Convert.ChangeType(forceLogoutDto, typeof(T));
 
                         return true;
                     }
@@ -476,6 +519,9 @@ namespace umi3d.common.collaboration
                     bytable = UMI3DNetworkingHelper.Write(redirection.media)
                         + UMI3DNetworkingHelper.Write(redirection.gate);
                     break;
+                case ForceLogoutDto forceLogout:
+                    bytable = UMI3DNetworkingHelper.Write(forceLogout.reason);
+                    break;
                 case MediaDto media:
                     bytable = UMI3DNetworkingHelper.Write(media.name)
                         + UMI3DNetworkingHelper.Write(media.icon2D)
@@ -490,6 +536,12 @@ namespace umi3d.common.collaboration
                     bytable = UMI3DNetworkingHelper.Write(gate.gateId)
                         + UMI3DNetworkingHelper.WriteCollection(gate.metaData);
                     break;
+                case VoiceDto voice:
+                    bytable = UMI3DNetworkingHelper.Write(voice.url)
+                        + UMI3DNetworkingHelper.Write(voice.login)
+                        + UMI3DNetworkingHelper.Write(voice.password)
+                        + UMI3DNetworkingHelper.Write(voice.channelName);
+                    break;
                 default:
                     if (typeof(T) == typeof(ResourceDto))
                     {
@@ -502,8 +554,5 @@ namespace umi3d.common.collaboration
             }
             return true;
         }
-
-
-
     }
 }

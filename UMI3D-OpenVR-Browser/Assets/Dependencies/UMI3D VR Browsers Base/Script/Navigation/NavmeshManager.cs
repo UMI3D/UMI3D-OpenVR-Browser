@@ -14,7 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections.Generic;
 using umi3d.cdk;
+using umi3d.cdk.collaboration;
+using umi3d.cdk.volumes;
 using umi3d.common;
 using UnityEngine;
 
@@ -33,7 +36,15 @@ namespace umi3dVRBrowsersBase.navigation
 
         public string navmeshLayerName = "Navmesh";
 
+        /// <summary>
+        /// Layer associated to <see cref="navmeshLayerName"/>.
+        /// </summary>
         private LayerMask layer;
+
+        /// <summary>
+        /// Association between volume id and gameobject.
+        /// </summary>
+        private Dictionary<ulong, GameObject> cellIdToGameobjects = new Dictionary<ulong, GameObject>();
 
         #endregion
 
@@ -43,6 +54,10 @@ namespace umi3dVRBrowsersBase.navigation
         {
             layer = LayerMask.NameToLayer(navmeshLayerName);
             UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(InitNavMesh);
+
+            UMI3DCollaborationClientServer.Instance.OnLeaving.AddListener(Reset);
+            VolumePrimitiveManager.SubscribeToPrimitiveCreation(OnPrimitiveCreated, false);
+            VolumePrimitiveManager.SubscribeToPrimitiveDelete(OnPrimitiveDeleted);
         }
 
         /// <summary>
@@ -141,7 +156,6 @@ namespace umi3dVRBrowsersBase.navigation
                     {
                         r.gameObject.AddComponent<TeleportArea>();
                     }
-
                 }
             }
         }
@@ -155,6 +169,74 @@ namespace umi3dVRBrowsersBase.navigation
             obj.AddComponent<MeshCollider>();
             obj.layer = layer;
         }
+
+        #region Volume
+
+        /// <summary>
+        /// Creates an obstacle when a new primitive non traversable is created.
+        /// </summary>
+        /// <param name="primitive"></param>
+        private void OnPrimitiveCreated(AbstractVolumeCell primitive)
+        {
+            if (primitive.isTraversable)
+                return;
+
+            GameObject go = new GameObject("Obstacle-Volume-" + primitive.Id());
+            go.transform.SetParent((primitive as AbstractPrimitive)?.rootNode?.transform);
+            go.transform.localPosition = Vector3.zero;
+            go.transform.localRotation = Quaternion.identity;
+
+            switch (primitive)
+            {
+                case Box box:
+                    BoxCollider boxCollider = go.AddComponent<BoxCollider>();
+                    boxCollider.center = box.bounds.center;
+                    boxCollider.size = box.bounds.size;
+                    break;
+                case Cylinder cylinder:
+                    CapsuleCollider capsuleCollider = go.AddComponent<CapsuleCollider>();
+                    capsuleCollider.height = cylinder.height;
+                    capsuleCollider.radius = cylinder.radius;
+                    break;
+                default:
+                    Destroy(go);
+                    Debug.LogError("Primitive of type " + primitive?.GetType() + " not supported.");
+                    break;
+            }
+
+            if (go != null)
+                go.layer = layer;
+        }
+
+        /// <summary>
+        /// If <paramref name="primitive"/> had a related obstacle, deletes it.
+        /// </summary>
+        /// <param name="primitive"></param>
+        private void OnPrimitiveDeleted(AbstractVolumeCell primitive)
+        {
+            if (cellIdToGameobjects.ContainsKey(primitive.Id()))
+            {
+                GameObject go = cellIdToGameobjects[primitive.Id()];
+                if (go != null)
+                    Destroy(go);
+                cellIdToGameobjects.Remove(primitive.Id());
+            }
+        }
+
+        /// <summary>
+        /// Resets navmesh data.
+        /// </summary>
+        private void Reset()
+        {
+            foreach (var primitive in cellIdToGameobjects)
+            {
+                if (primitive.Value != null)
+                    Destroy(primitive.Value);
+            }
+            cellIdToGameobjects.Clear();
+        }
+
+        #endregion
 
         #endregion
     }

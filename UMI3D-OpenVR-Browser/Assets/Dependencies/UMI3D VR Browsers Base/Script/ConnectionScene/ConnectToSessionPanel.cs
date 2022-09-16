@@ -131,7 +131,13 @@ namespace umi3dVRBrowsersBase.connection
                 ConnectionMenuManager.instance.DisplayHome();
             });
             waitForMasterServerConnection = StartCoroutine(WaitForMasterServerConnection(url));
-            launcher.ConnectToMasterServer(OnConnectToMasterServerSucceded, url);
+            launcher.ConnectToMasterServer(OnConnectToMasterServerSucceded, url, () =>
+            {
+                ConnectionMenuManager.instance.DisplayError("Cannot connect to master server : " + url, "Go back to home", () =>
+                {
+                    ConnectionMenuManager.instance.DisplayHome();
+                });
+            });
         }
 
         /// <summary>

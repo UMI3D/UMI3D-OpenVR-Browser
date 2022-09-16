@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using inetum.unityUtils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,6 +91,7 @@ namespace umi3d.cdk
                                         renderer.receiveShadows = nodeDto.receiveShadow;
                                     }
 
+                                    UpdateLightmapReferences(rootDto.id, renderers, o as GameObject);
                                 });
 
                             }
@@ -119,6 +119,30 @@ namespace umi3d.cdk
             }, failed);
         }
 
+        /// <summary>
+        /// If root node has a <see cref="PrefabLightmapData"/>, updates its references
+        /// </summary>
+        /// <param name="rooId"></param>
+        /// <param name="renderers"></param>
+        protected void UpdateLightmapReferences(ulong rooId, Renderer[] renderers, GameObject o)
+        {
+            var lightmapData = UMI3DEnvironmentLoader.GetNode(rooId)?.prefabLightmapData;
+
+            if (lightmapData == null)
+                return;
+
+            var renderersInfo = lightmapData.GetRenderersInfo();
+
+            for (int i = 0; i < renderersInfo.Length; i++)
+            {
+                if (renderersInfo[i].renderer.gameObject == o)
+                {
+                    renderersInfo[i].renderer = renderers.FirstOrDefault();
+                    break;
+                }
+            }
+        }
+
         protected override void RevertToOriginalMaterial(UMI3DNodeInstance entity)
         {
 
@@ -140,15 +164,14 @@ namespace umi3d.cdk
                     {
                         if (oldMats[i] != null)
                         {
-                            matsToApply[i] = (oldMats[i]);
+                            matsToApply[i] = oldMats[i];
                         }
                     }
                     if (oldMats.Length != matsToApply.Length)
-                        renderer.materials = ((IEnumerable<Material>)matsToApply).Take(oldMats.Length).ToArray();
+                        renderer.materials = matsToApply.Take(oldMats.Length).ToArray();
                     else
                         renderer.materials = matsToApply;
                 }
-
             }
 
             if (parentDto.applyCustomMaterial /*&& !subDto.ignoreModelMaterialOverride */ /* && !subDto.applyCustomMaterial */&& !subDto.ignoreModelMaterialOverride)

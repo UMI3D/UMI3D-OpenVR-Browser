@@ -426,7 +426,7 @@ PrefabInstance:
     - target: {fileID: 5988314907380347006, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.000994294
+      value: 0.0009866456
       objectReference: {fileID: 0}
     - target: {fileID: 6093459749334264534, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
@@ -662,3 +662,23 @@ Camera:
     type: 3}
   m_PrefabInstance: {fileID: 4810254922228200027}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4810254922228200029 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3574216422171357672, guid: 1a064008d5464ad4980d813a969780e8,
+    type: 3}
+  m_PrefabInstance: {fileID: 4810254922228200027}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4810254922228200030
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4810254922228200029}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0aa0e47305894f4ea13a82debadbd14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boneType: 58
+  isTracked: 1

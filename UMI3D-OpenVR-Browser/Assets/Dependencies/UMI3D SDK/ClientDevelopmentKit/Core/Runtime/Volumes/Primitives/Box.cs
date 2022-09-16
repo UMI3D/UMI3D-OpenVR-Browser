@@ -28,12 +28,9 @@ namespace umi3d.cdk.volumes
         /// <summary>
         /// World to local matrix
         /// </summary>
-        public Matrix4x4 localToWorld { get; private set; }
+        public Matrix4x4 localToWorld { get => rootNode?.localToWorldMatrix ?? Matrix4x4.identity; }
 
         public Bounds bounds { get; private set; }
-
-
-        public ulong rootNodeId;
 
         /// <inheritdoc/>
         public override void Delete() { }
@@ -45,9 +42,9 @@ namespace umi3d.cdk.volumes
             var tris = new List<int>();
 
             verts.Add(bounds.min);
-            verts.Add(bounds.min + bounds.size.x * Vector3.right);
-            verts.Add(bounds.min + bounds.size.x * Vector3.right + bounds.size.z * Vector3.forward);
-            verts.Add(bounds.min + bounds.size.z * Vector3.forward);
+            verts.Add(bounds.min + (bounds.size.x * Vector3.right));
+            verts.Add(bounds.min + (bounds.size.x * Vector3.right) + (bounds.size.z * Vector3.forward));
+            verts.Add(bounds.min + (bounds.size.z * Vector3.forward));
             verts = verts.ConvertAll(v => localToWorld.MultiplyPoint(v));
 
             tris.Add(0); tris.Add(2); tris.Add(1);
@@ -74,18 +71,12 @@ namespace umi3d.cdk.volumes
             if (relativeTo == Space.Self)
                 return bounds.Contains(point);
             else
-                return bounds.Contains(localToWorld.MultiplyPoint(point));
+                return bounds.Contains(rootNode.worldToLocalMatrix.MultiplyPoint(point));
         }
 
         public void SetBounds(Bounds newBounds)
         {
             bounds = newBounds;
-            onUpdate.Invoke();
-        }
-
-        public void SetLocalToWorldMatrix(Matrix4x4 localToWorld)
-        {
-            this.localToWorld = localToWorld;
             onUpdate.Invoke();
         }
     }

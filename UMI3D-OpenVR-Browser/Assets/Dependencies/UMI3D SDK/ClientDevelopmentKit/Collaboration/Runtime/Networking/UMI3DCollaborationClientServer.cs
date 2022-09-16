@@ -24,6 +24,9 @@ using UnityEngine.Events;
 
 namespace umi3d.cdk.collaboration
 {
+
+    public class OnForceLogoutEvent : UnityEvent<string> { }
+
     /// <summary>
     /// Collaboration Extension of the UMI3DClientServer
     /// </summary>
@@ -46,11 +49,15 @@ namespace umi3d.cdk.collaboration
 
         public UnityEvent OnNewToken = new UnityEvent();
         public UnityEvent OnConnectionLost = new UnityEvent();
+        public UnityEvent OnRedirectionStarted = new UnityEvent();
+        public UnityEvent OnRedirectionAborted = new UnityEvent();
         public UnityEvent OnRedirection = new UnityEvent();
         public UnityEvent OnReconnect = new UnityEvent();
 
         public UnityEvent OnConnectionCheck = new UnityEvent();
         public UnityEvent OnConnectionRetreived = new UnityEvent();
+
+        public OnForceLogoutEvent OnForceLogoutMessage = new OnForceLogoutEvent();
 
         public ClientIdentifierApi Identifier;
 
@@ -77,7 +84,9 @@ namespace umi3d.cdk.collaboration
             if (Exists)
             {
                 worldControllerClient?.Clear();
-                await environmentClient?.Clear();
+                if (environmentClient != null) await environmentClient?.Clear();
+                worldControllerClient = null;
+                environmentClient = null;
             }
         }
 
@@ -116,12 +125,14 @@ namespace umi3d.cdk.collaboration
         /// </summary>
         public static async void Connect(RedirectionDto redirection, Action<string> failed = null)
         {
-            if(UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress)
+            if (UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress)
             {
                 failed?.Invoke("Redirection already in progress");
                 return;
             }
+            bool aborted = false;
             UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress = true;
+            Instance.OnRedirectionStarted.Invoke();
             try
             {
                 if (Exists)
@@ -146,19 +157,24 @@ namespace umi3d.cdk.collaboration
 
                         worldControllerClient = wc;
                         environmentClient = await wc.ConnectToEnvironment();
-                        environmentClient.status = StatusType.ACTIVE;
+                        environmentClient.status = StatusType.CREATED;
                     }
                 }
                 else
                 {
                     failed?.Invoke("Client Server do not exist");
+                    aborted = true;
                 }
             }
             catch (Exception e)
             {
+                UnityEngine.Debug.Log($"Error in connection process : {e.Message} \n{e.StackTrace}");
                 failed?.Invoke(e.Message);
+                aborted = true;
             }
             UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress = false;
+            if (aborted)
+                Instance.OnRedirectionAborted.Invoke();
         }
 
         public static void Connect(MediaDto dto, Action<string> failed = null)
@@ -185,6 +201,14 @@ namespace umi3d.cdk.collaboration
                 Instance.OnLeavingEnvironment.Invoke();
                 Instance.OnLeaving.Invoke();
             }
+        }
+
+
+        public static void ReceivedLogoutMessage(string message)
+        {
+            if (Exists)
+                Instance.OnForceLogoutMessage.Invoke(message);
+            Logout();
         }
 
         /// <summary>
@@ -318,18 +342,20 @@ namespace umi3d.cdk.collaboration
         protected override async Task<byte[]> _GetFile(string url, bool useParameterInsteadOfHeader)
         {
             UMI3DLogger.Log($"GetFile {url}", scope);
-            return await environmentClient?.GetFile(url, useParameterInsteadOfHeader);
+            return await (environmentClient?.GetFile(url, useParameterInsteadOfHeader) ?? Task.FromResult<byte[]>(null));
         }
 
         ///<inheritdoc/>
         protected override async Task<LoadEntityDto> _GetEntity(List<ulong> ids)
         {
             UMI3DLogger.Log($"GetEntity {ids.ToString<ulong>()}", scope);
-            return await environmentClient?.GetEntity(ids);
+            return await (environmentClient?.GetEntity(ids) ?? Task.FromResult<LoadEntityDto>(null));
         }
 
         ///<inheritdoc/>
         public override ulong GetUserId() { return worldControllerClient?.GetUserID() ?? 0; }
+
+        public UMI3DEnvironmentClient.UserInfo GetUser() { return environmentClient?.UserDto; }
 
         ///<inheritdoc/>
         public override ulong GetTime()
@@ -347,6 +373,5 @@ namespace umi3d.cdk.collaboration
         /// return HTTPClient if the server is a collaboration server.
         /// </summary>
         public override object GetHttpClient() { return environmentClient?.HttpClient; }
-
     }
 }

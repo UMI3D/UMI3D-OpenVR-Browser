@@ -50,6 +50,14 @@ namespace umi3d.common
         public const uint UserMicrophoneStatus = 2012;
         public const uint UserAvatarStatus = 2013;
         public const uint UserAttentionRequired = 2014;
+        public const uint UserAudioServer = 2015;
+        public const uint UserAudioChannel = 2016;
+        public const uint UserAudioUseMumble = 2017;
+        public const uint UserAudioPassword = 2018;
+        public const uint UserAudioLogin = 2019;
+        public const uint UserOnStartSpeakingAnimationId = 2020;
+        public const uint UserOnStopSpeakingAnimationId = 2021;
+
 
         public const uint AmbientType = 2101;
         public const uint AmbientSkyColor = 2102;
@@ -103,6 +111,9 @@ namespace umi3d.common
         public const uint InteractableNotifyHoverPosition = 5202;
         public const uint InteractableNotifySubObject = 5203;
         public const uint InteractableHasPriority = 5204;
+
+        public const uint InteractableHoverEnterAnimation = 5301;
+        public const uint InteractableHoverExitAnimation = 5302;
         #endregion
 
         #region UI

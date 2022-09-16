@@ -69,21 +69,21 @@ namespace umi3d.cdk
 
         private static bool NotifyEntityToBeLoaded(ulong id)
         {
-            return Exists ? Instance.entityToBeLoaded.Add(id) : false;
+            return Exists && Instance.entityToBeLoaded.Add(id);
         }
 
         private static bool IsEntityToBeLoaded(ulong id)
         {
-            return Exists ? Instance.entityToBeLoaded.Contains(id) : false;
+            return Exists && Instance.entityToBeLoaded.Contains(id);
         }
         private static bool IsEntityToFailedBeLoaded(ulong id)
         {
-            return Exists ? Instance.entityFailedToBeLoaded.Contains(id) : false;
+            return Exists && Instance.entityFailedToBeLoaded.Contains(id);
         }
 
         private static bool RemoveEntityToFailedBeLoaded(ulong id)
         {
-            return Exists ? Instance.entityFailedToBeLoaded.Remove(id) : false;
+            return Exists && Instance.entityFailedToBeLoaded.Remove(id);
         }
 
         private static void NotifyEntityLoad(ulong id)
@@ -298,6 +298,9 @@ namespace umi3d.cdk
         public class ProgressListener : UnityEvent<float> { }
         public ProgressListener onProgressChange = new ProgressListener();
 
+        public class ProgressListenerTitle : UnityEvent<string> { }
+        public ProgressListenerTitle onProgressTitleChange = new ProgressListenerTitle();
+
         public UnityEvent onResourcesLoaded = new UnityEvent();
         public UnityEvent onEnvironmentLoaded = new UnityEvent();
 
@@ -325,7 +328,7 @@ namespace umi3d.cdk
             {
                 throw new Exception("Base Material on UMI3DEnvironmentLoader should never be null");
             }
-
+            onProgressTitleChange.Invoke("Init Loading");
             onProgressChange.Invoke(0.1f);
             isEnvironmentLoaded = false;
 
@@ -337,28 +340,35 @@ namespace umi3d.cdk
             //
             // Load resources
             //
+            onProgressTitleChange.Invoke("Load resources");
             StartCoroutine(LoadResources(dto));
             while (!downloaded)
             {
-                onProgressChange.Invoke(resourcesToLoad == 0 ? 0.2f : 0.1f + loadedResources / resourcesToLoad * 0.4f);
+                onProgressChange.Invoke(resourcesToLoad == 0 ? 0.2f : 0.1f + (loadedResources / resourcesToLoad * 0.4f));
+                onProgressTitleChange.Invoke($"Load resources {(loadedResources / resourcesToLoad * 100).ToString("N2")} %");
                 yield return null;
             }
+            onProgressTitleChange.Invoke("Resources Loaded");
+
             onProgressChange.Invoke(0.5f);
             onResourcesLoaded.Invoke();
 
             //
             // Instantiate nodes
             //
-
+            onProgressTitleChange.Invoke("Load environment data");
             ReadUMI3DExtension(dto, null);
 
+            onProgressTitleChange.Invoke("Instantiate environment");
             InstantiateNodes();
             while (!loaded)
             {
-                onProgressChange.Invoke(nodesToInstantiate == 0 ? 0.6f : 0.5f + instantiatedNodes / nodesToInstantiate * 0.4f);
+                onProgressChange.Invoke(nodesToInstantiate == 0 ? 0.6f : 0.5f + (instantiatedNodes / nodesToInstantiate * 0.4f));
+                onProgressTitleChange.Invoke($"Instantiate environment {(instantiatedNodes / nodesToInstantiate * 100).ToString("N2")} %");
                 yield return null;
             }
 
+            onProgressTitleChange.Invoke("Instantiation is done");
             onProgressChange.Invoke(0.9f);
             yield return new WaitForSeconds(0.3f);
             isEnvironmentLoaded = true;
@@ -369,6 +379,7 @@ namespace umi3d.cdk
 
             IEnumerator Load()
             {
+                onProgressTitleChange.Invoke("Loading over");
                 RenderProbes();
 
                 onProgressChange.Invoke(1f);
@@ -462,9 +473,9 @@ namespace umi3d.cdk
                 float tmpLoadedNodes = instantiatedNodes;
                 bool isFinished = false;
                 float total = 0;
-                sceneLoader.LoadGlTFScene(scene, () => isFinished = true, (i) => total = i, (i) => instantiatedNodes = tmpLoadedNodes + i * 0.5f);
+                sceneLoader.LoadGlTFScene(scene, () => isFinished = true, (i) => total = i, (i) => instantiatedNodes = tmpLoadedNodes + (i * 0.5f));
                 yield return new WaitUntil(() => isFinished == true);
-                instantiatedNodes = tmpLoadedNodes + total * 0.5f;
+                instantiatedNodes = tmpLoadedNodes + (total * 0.5f);
             }
             int count = 0;
             //Organize scenes
@@ -641,7 +652,7 @@ namespace umi3d.cdk
             {
                 DeleteEntity(entity, null);
             }
-            if(clearCache)
+            if (clearCache)
                 UMI3DResourcesManager.Instance.ClearCache();
 
             Instance.entities.Clear();
@@ -689,7 +700,6 @@ namespace umi3d.cdk
                 {
                     Parameters.loadSkybox(extension.skybox);
                 }
-
             }
         }
 
@@ -766,7 +776,7 @@ namespace umi3d.cdk
         protected virtual bool _SetUMI3DPorperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
         {
             if (entity == null) return false;
-            UMI3DEnvironmentDto dto = ((entity.dto as GlTFEnvironmentDto)?.extensions as GlTFEnvironmentExtensions)?.umi3d;
+            UMI3DEnvironmentDto dto = ((entity.dto as GlTFEnvironmentDto)?.extensions)?.umi3d;
             if (dto == null) return false;
             switch (property.property)
             {
@@ -787,7 +797,7 @@ namespace umi3d.cdk
         protected virtual bool _SetUMI3DPorperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
         {
             if (entity == null) return false;
-            UMI3DEnvironmentDto dto = ((entity.dto as GlTFEnvironmentDto)?.extensions as GlTFEnvironmentExtensions)?.umi3d;
+            UMI3DEnvironmentDto dto = ((entity.dto as GlTFEnvironmentDto)?.extensions)?.umi3d;
             if (dto == null) return false;
 
             switch (propertyKey)
@@ -821,7 +831,7 @@ namespace umi3d.cdk
             UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(dto.entityId, (e) =>
             {
                 if (!SetEntity(e, dto))
-                    UMI3DLogger.LogWarning("SetEntity operation was not applied : entity : " + dto.entityId +  "   propKey : " + dto.property, scope);
+                    UMI3DLogger.LogWarning("SetEntity operation was not applied : entity : " + dto.entityId + "   propKey : " + dto.property, scope);
             });
 
 
@@ -966,7 +976,7 @@ namespace umi3d.cdk
                 }
                 catch (Exception e)
                 {
-                    UMI3DLogger.LogWarning($"SetEntity not apply on this object, id = {  id },  operation = { operationId } ,  property = { propertyKey }", scope | DebugScope.Bytes);
+                    UMI3DLogger.LogWarning($"SetEntity not apply on this object, id = {id},  operation = {operationId} ,  property = {propertyKey}", scope | DebugScope.Bytes);
                     UMI3DLogger.LogWarning(e, scope);
                 }
             }
@@ -1276,13 +1286,13 @@ namespace umi3d.cdk
 
                     if (delta * kalmanEntity.measuresPerSecond <= 1)
                     {
-                        double fw_value_x = ((kalmanEntity as KalmanRotationEntity).prediction.Item1[0] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[0]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[0];
-                        double fw_value_y = ((kalmanEntity as KalmanRotationEntity).prediction.Item1[1] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[1]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[1];
-                        double fw_value_z = ((kalmanEntity as KalmanRotationEntity).prediction.Item1[2] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[2]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[2];
+                        double fw_value_x = (((kalmanEntity as KalmanRotationEntity).prediction.Item1[0] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[0]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[0];
+                        double fw_value_y = (((kalmanEntity as KalmanRotationEntity).prediction.Item1[1] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[1]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[1];
+                        double fw_value_z = (((kalmanEntity as KalmanRotationEntity).prediction.Item1[2] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[2]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item1[2];
 
-                        double up_value_x = ((kalmanEntity as KalmanRotationEntity).prediction.Item2[0] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[0]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[0];
-                        double up_value_y = ((kalmanEntity as KalmanRotationEntity).prediction.Item2[1] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[1]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[1];
-                        double up_value_z = ((kalmanEntity as KalmanRotationEntity).prediction.Item2[2] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[2]) * kalmanEntity.measuresPerSecond * delta + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[2];
+                        double up_value_x = (((kalmanEntity as KalmanRotationEntity).prediction.Item2[0] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[0]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[0];
+                        double up_value_y = (((kalmanEntity as KalmanRotationEntity).prediction.Item2[1] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[1]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[1];
+                        double up_value_z = (((kalmanEntity as KalmanRotationEntity).prediction.Item2[2] - (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[2]) * kalmanEntity.measuresPerSecond * delta) + (kalmanEntity as KalmanRotationEntity).previous_prediction.Item2[2];
 
                         (kalmanEntity as KalmanRotationEntity).estimations = new Tuple<double[], double[]>(new double[] { fw_value_x, fw_value_y, fw_value_z }, new double[] { up_value_x, up_value_y, up_value_z });
 
@@ -1312,31 +1322,31 @@ namespace umi3d.cdk
                         switch (kalmanEntity.regressed_value)
                         {
                             case int n:
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
 
                                 (kalmanEntity as KalmanEntity).estimations = new double[] { new_value_1 };
                                 kalmanEntity.regressed_value = (int)new_value_1;
 
                                 break;
                             case float f:
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
 
                                 (kalmanEntity as KalmanEntity).estimations = new double[] { new_value_1 };
                                 kalmanEntity.regressed_value = (float)new_value_1;
 
                                 break;
                             case SerializableVector2 v:
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
-                                new_value_2 = ((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[1];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_2 = (((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[1];
 
                                 (kalmanEntity as KalmanEntity).estimations = new double[] { new_value_1, new_value_2 };
                                 kalmanEntity.regressed_value = new SerializableVector2((float)new_value_1, (float)new_value_2);
 
                                 break;
                             case SerializableVector3 v:
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
-                                new_value_2 = ((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[1];
-                                new_value_3 = ((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[2];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_2 = (((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[1];
+                                new_value_3 = (((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[2];
 
                                 (kalmanEntity as KalmanEntity).estimations = new double[] { new_value_1, new_value_2, new_value_3 };
                                 kalmanEntity.regressed_value = new SerializableVector3((float)new_value_1, (float)new_value_2, (float)new_value_3);
@@ -1346,10 +1356,10 @@ namespace umi3d.cdk
                                 double[] estimations;
                                 object regressed_value;
 
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
-                                new_value_2 = ((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[1];
-                                new_value_3 = ((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[2];
-                                new_value_4 = ((kalmanEntity as KalmanEntity).prediction[3] - (kalmanEntity as KalmanEntity).previous_prediction[3]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[3];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_2 = (((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[1];
+                                new_value_3 = (((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[2];
+                                new_value_4 = (((kalmanEntity as KalmanEntity).prediction[3] - (kalmanEntity as KalmanEntity).previous_prediction[3]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[3];
 
                                 estimations = new double[] { new_value_1, new_value_2, new_value_3, new_value_4 };
                                 regressed_value = new SerializableVector4((float)new_value_1, (float)new_value_2, (float)new_value_3, (float)new_value_4);
@@ -1359,10 +1369,10 @@ namespace umi3d.cdk
 
                                 break;
                             case SerializableColor v:
-                                new_value_1 = ((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[0];
-                                new_value_2 = ((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[1];
-                                new_value_3 = ((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[2];
-                                new_value_4 = ((kalmanEntity as KalmanEntity).prediction[3] - (kalmanEntity as KalmanEntity).previous_prediction[3]) * delta * kalmanEntity.measuresPerSecond + (kalmanEntity as KalmanEntity).previous_prediction[3];
+                                new_value_1 = (((kalmanEntity as KalmanEntity).prediction[0] - (kalmanEntity as KalmanEntity).previous_prediction[0]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[0];
+                                new_value_2 = (((kalmanEntity as KalmanEntity).prediction[1] - (kalmanEntity as KalmanEntity).previous_prediction[1]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[1];
+                                new_value_3 = (((kalmanEntity as KalmanEntity).prediction[2] - (kalmanEntity as KalmanEntity).previous_prediction[2]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[2];
+                                new_value_4 = (((kalmanEntity as KalmanEntity).prediction[3] - (kalmanEntity as KalmanEntity).previous_prediction[3]) * delta * kalmanEntity.measuresPerSecond) + (kalmanEntity as KalmanEntity).previous_prediction[3];
 
                                 (kalmanEntity as KalmanEntity).estimations = new double[] { new_value_1, new_value_2, new_value_3, new_value_4 };
                                 kalmanEntity.regressed_value = new SerializableVector4((float)new_value_1, (float)new_value_2, (float)new_value_3, (float)new_value_4);
@@ -1448,7 +1458,7 @@ namespace umi3d.cdk
 
             else if ((measurement as double[]).Length > 0)
             {
-                (abstractKalman as KalmanEntity).KalmanFilter.Update((measurement as double[]));
+                (abstractKalman as KalmanEntity).KalmanFilter.Update(measurement as double[]);
 
                 double[] newValueState = (abstractKalman as KalmanEntity).KalmanFilter.getState();
 
@@ -1457,7 +1467,7 @@ namespace umi3d.cdk
                 if ((abstractKalman as KalmanEntity).estimations.Length > 0)
                     (abstractKalman as KalmanEntity).previous_prediction = (abstractKalman as KalmanEntity).estimations;
                 else
-                    (abstractKalman as KalmanEntity).previous_prediction = (measurement as double[]);
+                    (abstractKalman as KalmanEntity).previous_prediction = measurement as double[];
             }
             else
             {

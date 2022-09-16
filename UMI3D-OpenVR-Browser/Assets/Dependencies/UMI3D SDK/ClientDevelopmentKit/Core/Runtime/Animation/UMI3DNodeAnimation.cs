@@ -65,7 +65,7 @@ namespace umi3d.cdk
 
         public UMI3DNodeAnimation(UMI3DNodeAnimationDto dto) : base(dto)
         {
-            operationChains = dto.animationChain.Select(chain => new OperationChain(chain)).ToList();
+            operationChains = dto.animationChain?.Select(chain => new OperationChain(chain)).ToList() ?? new List<OperationChain>();
         }
 
         ///<inheritdoc/>
@@ -132,7 +132,7 @@ namespace umi3d.cdk
         public override bool SetUMI3DProperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
         {
             if (base.SetUMI3DProperty(entity, property)) return true;
-            var ADto = dto as UMI3DNodeAnimationDto;
+            UMI3DNodeAnimationDto ADto = dto;
             if (ADto == null) return false;
             switch (property.property)
             {
