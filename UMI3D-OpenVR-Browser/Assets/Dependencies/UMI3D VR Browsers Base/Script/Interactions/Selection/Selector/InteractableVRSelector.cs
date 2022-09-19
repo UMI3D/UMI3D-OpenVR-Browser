@@ -124,6 +124,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             return icToSelect != null
                     && icToSelect.Interactable != null
+                    && ((icToSelect.Interactable.InteractionDistance < 0) 
+                        || icToSelect.Interactable.InteractionDistance >= (icToSelect.transform.position - controller.transform.position).magnitude)
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
                     && controller.IsCompatibleWith(icToSelect.Interactable)

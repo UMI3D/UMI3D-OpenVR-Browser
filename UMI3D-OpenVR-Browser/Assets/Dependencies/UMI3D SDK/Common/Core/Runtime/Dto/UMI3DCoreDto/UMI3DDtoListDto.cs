@@ -14,14 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-namespace umi3d
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace umi3d.common
 {
-    public static class UMI3DVersion
+    public class UMI3DDtoListDto<T> : UMI3DDto where T : UMI3DDto
     {
-        public static string version => major + "." + minor + "." + status + "." + date;
-        public static readonly string major = "2";
-        public static readonly string minor = "5";
-        public static readonly string status = "b";
-        public static readonly string date = "220916";
+        public List<T> values;
     }
 }

@@ -41,7 +41,6 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
         protected void FixedUpdate()
         {
-            var objectsToRemove = new List<ObjectInsideCollider<T>>();
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
                 if (obj.Equals(null)
@@ -49,11 +48,9 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                     || (obj.obj == null)
                     || Vector3.Distance(transform.position, obj.collider.ClosestPoint(transform.position)) > zoneCollider.radius)
                 {
-                    objectsToRemove.Add(obj);
+                    ObjectsInCollider.RemoveAll(x => x.obj == obj.obj);
                 }
             }
-            foreach (var obj in objectsToRemove)
-                ObjectsInCollider.Remove(obj);
         }
 
         protected virtual void OnTriggerEnter(Collider other)

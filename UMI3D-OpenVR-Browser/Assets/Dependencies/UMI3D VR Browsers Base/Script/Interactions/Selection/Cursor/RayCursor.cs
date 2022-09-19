@@ -103,6 +103,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             OnCursorEnter.AddListener((PointingInfo trackingInfo) =>
             {
+                if (controller != (trackingInfo.controller as VRController))
+                    return;
+
                 trackingInfo.targetContainer.Interactable.HoverEnter(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
@@ -113,6 +116,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             OnCursorExit.AddListener((PointingInfo trackingInfo) =>
             {
+                if (controller != (trackingInfo.controller as VRController))
+                    return;
+
                 trackingInfo.targetContainer.Interactable.HoverExit(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
@@ -123,6 +129,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             OnCursorStay.AddListener((PointingInfo trackingInfo) =>
             {
+                if (controller != (trackingInfo.controller as VRController))
+                    return;
+
                 trackingInfo.targetContainer.Interactable.Hovered(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
@@ -170,7 +179,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             //cache cursor tracking info
             lastTrackingInfo = trackingInfo;
-            var isHitting = closestInteractable.obj != null;
+
+            var isHitting = closestInteractable.obj != null
+                && ((closestInteractable.obj.Interactable.InteractionDistance < 0)
+                        || closestInteractable.obj.Interactable.InteractionDistance >= (closestInteractable.obj.transform.position - controller.transform.position).magnitude);
+
             if (isHitting)
             {
                 trackingInfo = new PointingInfo()
@@ -202,12 +215,34 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
             {
                 if (lastTrackingInfo.isHitting) //from one object to another
                     OnCursorExit.Invoke(lastTrackingInfo);
-                OnCursorEnter.Invoke(trackingInfo);
+
+                if (IsCloseEnough(closestInteractable.obj))
+                    OnCursorEnter.Invoke(trackingInfo);
             }
             else if (closestInteractable.obj != null && closestInteractable.obj == lastTrackingInfo.targetContainer) //same object
-                OnCursorStay.Invoke(trackingInfo);
+            {
+                if (IsCloseEnough(closestInteractable.obj))
+                    OnCursorStay.Invoke(trackingInfo);
+                else if (lastTrackingInfo.isHitting)
+                    OnCursorExit.Invoke(lastTrackingInfo);
+            }
             else if (lastTrackingInfo.isHitting) //from one object to no object
+            {
                 OnCursorExit.Invoke(lastTrackingInfo);
+            }
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="i"/> is close enough to controller to be triggered.
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        private bool IsCloseEnough(InteractableContainer container)
+        {
+            if (container == null || container.Interactable == null)
+                return false;
+            return (container.Interactable.InteractionDistance < 0) || 
+                (container.Interactable.InteractionDistance >= (container.transform.position - controller.transform.position).magnitude);
         }
 
         /// <inheritdoc/>
