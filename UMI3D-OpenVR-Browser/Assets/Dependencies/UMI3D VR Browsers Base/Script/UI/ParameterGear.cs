@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using inetum.unityUtils;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using umi3d.cdk.interaction;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.ui.playerMenu;
@@ -42,10 +43,13 @@ namespace umi3dVRBrowsersBase.ui
         /// </summary>
         public bool IsHovered { get; private set; } = false;
 
+        public bool IsDisplayed => isActiveAndEnabled;
+
         /// <summary>
         /// <see cref="Interactable"/> which contains the parameters.
         /// </summary>
         private Interactable currentAssociatedInteractable;
+        public Interactable CurrentAssociatedInteractable => currentAssociatedInteractable;
 
         [SerializeField]
         [Tooltip("Should this gear display on top of every other objects ?")]
@@ -165,11 +169,51 @@ namespace umi3dVRBrowsersBase.ui
         }
 
         /// <summary>
+        /// Displays the parameter gear for an interactable. Use an interactable container and a look at point and compute the adequate position.
+        /// </summary>
+        /// <param name="interactableContainer"></param>
+        /// <param name="lookAtPoint">World position of the point the object is looked at.</param>
+        public void Display(InteractableContainer interactableContainer, Vector3 lookAtPoint)
+        {
+            Vector3 rootPosition;
+            Vector3 normal;
+            Vector3 rayDirection;
+            if (interactableContainer.TryGetComponent(out MeshCollider collider) && collider.convex)
+            {
+                rootPosition = collider.ClosestPoint(lookAtPoint);
+                rayDirection = (rootPosition - lookAtPoint).normalized;
+                normal = -rayDirection;
+            }
+            else
+            {
+                Ray ray = new Ray(lookAtPoint, interactableContainer.transform.position - lookAtPoint);
+                var hits = new List<RaycastHit>(Physics.RaycastAll(ray));
+
+                if (hits.Count == 0) // happens is the center of the object is outside of the mesh
+                {
+                    rootPosition = interactableContainer.transform.position;
+                    rayDirection = (rootPosition - lookAtPoint).normalized;
+                    normal = -rayDirection;
+                }
+                else
+                {
+                    var closestDist = hits.Min(x => x.distance);
+                    var closest = hits.Find(x => x.distance == closestDist);
+                    rootPosition = closest.point;
+                    rayDirection = (rootPosition - lookAtPoint).normalized;
+                    normal = closest.normal;
+                }
+            }
+            Display(interactableContainer.Interactable, rootPosition, normal, rayDirection);
+        }
+
+        /// <summary>
         /// Hides the parameter gear.
         /// </summary>
         public void Hide()
         {
             gameObject.SetActive(false);
+            this.currentAssociatedInteractable = null;
         }
 
         public override void Select(VRController controller)
