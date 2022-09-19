@@ -118,7 +118,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                     trackedObject = obj;
                     isTrackingSelectedObject = true;
-                    SetContactSphere();
                     contactSphereRenderer.enabled = true;
                 }
             }

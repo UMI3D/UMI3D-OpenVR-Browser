@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
+  selectionFeedbackHandler: {fileID: 3600997075644770501}
   pointingDetectors:
   - {fileID: 9049577297433962889}
   proximityDetectors:
@@ -276,6 +277,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
+  selectionFeedbackHandler: {fileID: 7799028259170850122}
   pointingDetectors:
   - {fileID: 3305404400239031573}
   proximityDetectors:
@@ -404,6 +406,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
+  selectionFeedbackHandler: {fileID: 1344738551367691293}
   pointingDetectors:
   - {fileID: 4984395139596033644}
   - {fileID: 5538973729607222011}
