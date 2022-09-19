@@ -194,6 +194,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
                     return;
             }
+            if (selectionInfo == null)
+            {
+                LastSelected = null;
+                return;
+            }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);
             if (selectionInfo is InteractableSelectionData)

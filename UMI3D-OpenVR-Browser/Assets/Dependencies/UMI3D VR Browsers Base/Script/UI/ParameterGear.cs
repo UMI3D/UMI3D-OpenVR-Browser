@@ -85,6 +85,8 @@ namespace umi3dVRBrowsersBase.ui
             if (displayOnTopOfEverything)
                 DisplayOnTopOfEverything();
 
+            PlayerMenuManager.Instance.onMenuClose.AddListener(Hide);
+
             Hide();
         }
 
@@ -197,8 +199,9 @@ namespace umi3dVRBrowsersBase.ui
                 }
                 else
                 {
-                    var closestDist = hits.Min(x => x.distance);
-                    var closest = hits.Find(x => x.distance == closestDist);
+                    Collider icCollider = interactableContainer.GetComponentInChildren<Collider>();
+                    float closestDist = hits.Where(x => x.collider == icCollider).Min(x => x.distance);
+                    RaycastHit closest = hits.Find(x => x.distance == closestDist);
                     rootPosition = closest.point;
                     rayDirection = (rootPosition - lookAtPoint).normalized;
                     normal = closest.normal;
@@ -218,12 +221,10 @@ namespace umi3dVRBrowsersBase.ui
 
         public override void Select(VRController controller)
         {
-            throw new System.NotImplementedException();
         }
 
         public override void Deselect(VRController controller)
         {
-            throw new System.NotImplementedException();
         }
 
 

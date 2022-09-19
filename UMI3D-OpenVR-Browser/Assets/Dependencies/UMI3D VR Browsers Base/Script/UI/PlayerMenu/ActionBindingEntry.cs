@@ -84,7 +84,8 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// </summary>
         private void SetBindingDisplay()
         {
-            PlayerMenuManager.StartCoroutine(SetBindingDisplayCoroutine());
+            if (PlayerMenuManager.Instance.isActiveAndEnabled)
+                PlayerMenuManager.StartCoroutine(SetBindingDisplayCoroutine());
         }
 
         /// <summary>
