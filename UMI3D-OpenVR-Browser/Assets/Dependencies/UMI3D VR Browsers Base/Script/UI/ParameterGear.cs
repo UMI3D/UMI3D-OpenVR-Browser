@@ -92,8 +92,8 @@ namespace umi3dVRBrowsersBase.ui
 
         /// <summary>
         /// Display image on top of everything. 
-        /// Solution found on this thread <see href="https://answers.unity.com/questions/878667/world-space-canvas-on-top-of-everything.html"/>.
         /// </summary>
+        /// Solution found on this thread <see href="https://answers.unity.com/questions/878667/world-space-canvas-on-top-of-everything.html"/>.
         private void DisplayOnTopOfEverything()
         {
             Material material = gearImage.materialForRendering;
@@ -116,7 +116,7 @@ namespace umi3dVRBrowsersBase.ui
 
             PlayerMenuManager.Instance.OpenParameterMenu(controllerType);
 
-            if(gameObject.activeInHierarchy)
+            if (gameObject.activeInHierarchy)
                 StartCoroutine(ClickAnimation());
         }
 
