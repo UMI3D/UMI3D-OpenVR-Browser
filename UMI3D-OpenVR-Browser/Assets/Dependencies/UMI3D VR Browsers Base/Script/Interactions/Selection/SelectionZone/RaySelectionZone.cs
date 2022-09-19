@@ -110,6 +110,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                 return default;
 
             var minDist = (from obj in activeObjects
+                           where obj != null && obj.isActiveAndEnabled
                            select objectWithDistances[obj].distance).Min();
 
             var closestActiveInteractable = objList.FirstOrDefault(obj => objectWithDistances[obj].distance == minDist);

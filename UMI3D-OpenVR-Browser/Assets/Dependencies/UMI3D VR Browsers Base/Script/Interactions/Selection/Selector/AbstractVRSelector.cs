@@ -19,6 +19,7 @@ using umi3dBrowsers.interaction.selection.feedback;
 using umi3dBrowsers.interaction.selection.intentdetector;
 using umi3dBrowsers.interaction.selection.projector;
 using umi3dBrowsers.interaction.selection.selector;
+using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -382,7 +383,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 else if (LastSelected?.selectedObject == selectionInfo.selectedObject) //  the selector was selecting the same target before
                     return;
                 else if (LastSelected != null) // the selector was selecting something else before
+                {
                     Deselect(LastSelected);
+                    if (PlayerMenuManager.Instance.parameterGear.IsDisplayed)
+                        PlayerMenuManager.Instance.parameterGear.Hide();
+                }
+                    
             }
 
             projector.Project(selectionInfo.selectedObject, controller);

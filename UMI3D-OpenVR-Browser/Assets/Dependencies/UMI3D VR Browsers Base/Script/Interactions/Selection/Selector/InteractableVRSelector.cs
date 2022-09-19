@@ -187,6 +187,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     return;
                 }
             }
+            if (selectionInfo == null)
+            {
+                LastSelected = null;
+                return;
+            }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);
             if (selectionInfo is InteractableSelectionData)
