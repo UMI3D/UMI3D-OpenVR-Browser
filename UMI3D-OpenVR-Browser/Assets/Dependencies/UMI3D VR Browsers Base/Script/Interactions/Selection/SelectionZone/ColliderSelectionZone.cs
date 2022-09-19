@@ -64,7 +64,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             foreach (ObjectInsideCollider<T> obj in objectsInZone) //just looking for the closest one
             {
                 float distance = Vector3.Distance(handler.transform.position, obj.collider.ClosestPoint(handler.transform.position));
-                if (distance < minDist)
+                if (distance < minDist && distance > 0)
                 {
                     minDist = distance;
                     closestObj = obj;

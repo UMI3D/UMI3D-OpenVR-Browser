@@ -27,18 +27,18 @@ namespace umi3dVRBrowsersBase.interactions.selection
     public class VRSelectionManager : MonoBehaviour
     {
         /// <summary>
-        /// Controller to manage selection for
+        /// Controller to manage selection for.
         /// </summary>
         [Header("Controller"), Tooltip("Controller to manage selection for.")]
         public VRController controller;
 
-        [Header("Selectors"), Tooltip("Selectors for interactables.")]
+        [Header("Selectors"), Tooltip("Selector for interactables.")]
         public InteractableVRSelector interactableSelector;
 
-        [Tooltip("Selectors for selectables.")]
+        [Tooltip("Selector for selectables.")]
         public SelectableVRSelector selectableSelector;
 
-        [Tooltip("Selectors for other customized UI.")]
+        [Tooltip("Selector for other customized UI.")]
         public ElementVRSelector elementSelector;
 
         /// <summary>
@@ -54,13 +54,13 @@ namespace umi3dVRBrowsersBase.interactions.selection
         public AbstractCursor grabCursor;
 
         /// <summary>
-        /// Last selected object info <br/>
-        /// Null when no object
+        /// Last selected object info. <br/>
+        /// Null when no object.
         /// </summary>
         public SelectionIntentData LastSelectedInfo;
 
         /// <summary>
-        /// Last intent selector used
+        /// Last intent selector used.
         /// </summary>
         private IIntentSelector LastSelectorUsed;
 
@@ -73,50 +73,44 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
             // Retrieves propositions from selectors
             var possibleSelec = new List<SelectionIntentData>();
-            if (interactableSelector.activated)
-                possibleSelec.AddRange(interactableSelector.GetIntentDetections());
+            if (elementSelector.activated)
+                possibleSelec.AddRange(elementSelector.GetIntentDetections());  // Preference: Client Element > Selectable > Interactable 
 
             if (selectableSelector.activated)
                 possibleSelec.AddRange(selectableSelector.GetIntentDetections());
 
-            if (elementSelector.activated)
-                possibleSelec.AddRange(elementSelector.GetIntentDetections());
+            if (interactableSelector.activated)
+                possibleSelec.AddRange(interactableSelector.GetIntentDetections());
 
             if (possibleSelec.Count == 0) //no selection intent detected
             {
-                if (LastSelectorUsed != null
-                    && LastSelectorUsed.IsSelecting()
-                    && LastSelectedInfo != null)
+                if (LastSelectorUsed != null //a selection has already occurred
+                    && LastSelectorUsed.IsSelecting() //selection is currently carried on
+                    && LastSelectedInfo != null) //selection was occurring next frame
                 {
                     LastSelectorUsed.Select(null); //make the selector remember it cannot select something this time
                     LastSelectedInfo = null;
                     LastSelectorUsed = null;
                 }
             }
-            else if (TrySelect(possibleSelec, DetectionOrigin.PROXIMITY))
+            else if (TrySelect(possibleSelec, DetectionOrigin.PROXIMITY)) // proximity prefered over pointing
                 return;
             else if (TrySelect(possibleSelec, DetectionOrigin.POINTING))
                 return;
         }
 
         /// <summary>
-        /// Give the order to the selector to select the best proposition if possible <br/>
+        /// Give the order to the selector to select the best proposition if possible. <br/>
         /// </summary>
         /// <param name="possibleSelec"></param>
         /// <param name="origin"></param>
-        /// <returns>True if a selection has been attempted</returns>
+        /// <returns>True if a selection has been attempted.</returns>
         private bool TrySelect(List<SelectionIntentData> possibleSelec, DetectionOrigin origin)
         {
             var possibleSelecPointed = possibleSelec.Where(x => x.detectionOrigin == origin);
             if (possibleSelecPointed.Any())
             {
-                if (possibleSelecPointed.Count() == 1)
-                    StartSelection(possibleSelecPointed.First());
-                else
-                {
-                    possibleSelecPointed.ToList().Sort(Compare);
-                    StartSelection(possibleSelecPointed.Last());
-                }
+                StartSelection(possibleSelecPointed.First());
                 return true;
             }
             return false;
@@ -128,9 +122,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="preferedObjectData"></param>
         private void StartSelection(SelectionIntentData preferedObjectData)
         {
-            IIntentSelector appropriateSelector;
-            // Disambiguation already occured
-
+            IIntentSelector appropriateSelector; //getting the right selector for selection
             if (preferedObjectData is SelectionIntentData<Selectable>)
                 appropriateSelector = selectableSelector;
             else if (preferedObjectData is SelectionIntentData<AbstractClientInteractableElement>)
@@ -140,7 +132,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             else
                 throw new System.Exception("Unrecognized selectable object. No selector is available.");
 
-            // selector switching, deselection is normally handled when the selector remains the sam
+            // selector switching, deselection is normally handled when the selector remains the same
             if (LastSelectedInfo != null && LastSelectorUsed != appropriateSelector)
                 LastSelectorUsed?.Select(null); //make the selector remember it cannot select something this time
 
@@ -149,29 +141,5 @@ namespace umi3dVRBrowsersBase.interactions.selection
             LastSelectedInfo = preferedObjectData;
         }
 
-        /// <summary>
-        /// Compare selection data between them from a same detection origin.<br/>
-        /// Preference: Client Element > Selectable > Interactable
-        /// </summary>
-        /// <param name="data1"></param>
-        /// <param name="data2"></param>
-        /// <returns>1 if data1 if more important than data2, -1 otherwise. data1 is always favored in the equal case.</returns>
-        protected int Compare(SelectionIntentData data1, SelectionIntentData data2)
-        {
-            //! This method could be improved by comparing the distances, but it would assume the detector used
-            if (data1 is SelectionIntentData<AbstractClientInteractableElement>)
-                return 1;
-            else if (data2 is SelectionIntentData<AbstractClientInteractableElement>) //if data1 is not c_element
-                return -1;
-            else if (data1 is SelectionIntentData<Selectable>)
-                return 1;
-            else if (data2 is SelectionIntentData<Selectable>)
-                return -1;
-            else if (data1 is SelectionIntentData<InteractableContainer>)
-                return 1;
-            else if (data2 is SelectionIntentData<InteractableContainer>)
-                return -1;
-            return 0;
-        }
     }
 }

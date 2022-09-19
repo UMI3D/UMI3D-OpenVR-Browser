@@ -589,6 +589,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4006740988216154192, guid: 1a064008d5464ad4980d813a969780e8,
+        type: 3}
+      propertyPath: selectionOutlineLayer.m_Bits
+      value: 2048
+      objectReference: {fileID: 0}
     - target: {fileID: 7289560753284016164, guid: 1a064008d5464ad4980d813a969780e8,
         type: 3}
       propertyPath: m_Name

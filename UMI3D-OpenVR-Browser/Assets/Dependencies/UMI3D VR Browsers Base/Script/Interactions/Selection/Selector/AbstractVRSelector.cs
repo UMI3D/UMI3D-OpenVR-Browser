@@ -16,6 +16,7 @@ using umi3d.cdk.collaboration;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.feedback;
+using umi3dBrowsers.interaction.selection.intentdetector;
 using umi3dBrowsers.interaction.selection.projector;
 using umi3dBrowsers.interaction.selection.selector;
 using UnityEngine;
@@ -78,13 +79,61 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// Previously proposed objects
         /// </summary>
         [HideInInspector]
-        public Cache<SelectionIntentData<T>> propositionSelectionCache = new Cache<SelectionIntentData<T>>();
+        public LinkedList<SelectionIntentData> selectionPropositions = new LinkedList<SelectionIntentData>();
 
         // <summary>
         /// Manages projection on the controller
         /// </summary>
         [HideInInspector]
         public IProjector<T> projector;
+
+        /// <summary>
+        /// Previously detected objects for virtual hand
+        /// </summary>
+        [HideInInspector]
+        public Cache<T> detectionCacheProximity = new Cache<T>();
+
+        /// <summary>
+        /// Previously detected objects from virtual pointing
+        /// </summary>
+        [HideInInspector]
+        public Cache<T> detectionCachePointing = new Cache<T>();
+
+        /// <summary>
+        /// Selection Intent Detectors (virtual pointing). In order of decreasing priority.
+        /// </summary>
+        [HideInInspector]
+        public List<AbstractDetector<T>> PointingDetectors
+        {
+            get
+            {
+                if (_pointingDetectors == null)
+                {
+                    _pointingDetectors = GetPointingDetectors();
+                }
+                return _pointingDetectors;
+            }
+        }
+
+        private List<AbstractDetector<T>> _pointingDetectors;
+
+        /// <summary>
+        /// Selection Intent Detector (virtual hand). In order of decreasing priority.
+        /// </summary>
+        [HideInInspector]
+        public List<AbstractDetector<T>> ProximityDetectors
+        {
+            get
+            {
+                if (_proximityDetectors == null)
+                {
+                    _proximityDetectors = GetProximityDetectors();
+                }
+                return _proximityDetectors;
+            }
+        }
+
+        private List<AbstractDetector<T>> _proximityDetectors;
 
         #endregion fields
 
@@ -110,6 +159,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             selectionEvent.AddListener(OnSelection);
             selectionStayEvent.AddListener(OnSelectionStay);
             deselectionEvent.AddListener(OnDeselection);
+
+            foreach (var detector in ProximityDetectors)
+                detector.Init(controller);
+            foreach (var detector in PointingDetectors)
+                detector.Init(controller);
         }
 
         /// <inheritdoc/>
@@ -119,6 +173,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             selectionEvent.RemoveAllListeners();
             selectionStayEvent.RemoveAllListeners();
             deselectionEvent.RemoveAllListeners();
+
+            foreach (var detector in ProximityDetectors)
+                detector.Reinit();
+            foreach (var detector in PointingDetectors)
+                detector.Reinit();
         }
 
         /// <summary>
@@ -195,8 +254,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
                 bool lastObjectIsNull = Objects.Last.Value == null;
 
-                if ((data == null && !lastObjectIsNull)
-                    || (data != null && !data.Equals(Objects.Last.Value)))
+                if ((data == null && !lastObjectIsNull) // leaving an object
+                    || (data != null && !data.Equals(Objects.Last.Value))) // moving to another object
                 {
                     Objects.AddLast(data);
                     if (Objects.Count > maxSize)
@@ -247,10 +306,45 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         }
 
         /// <summary>
+        /// Create an appropriate selection intent data.
+        /// </summary>
+        /// <param name="obj">Object that is selection intent target.</param>
+        /// <param name="origin">Paradigm of selection used.</param>
+        /// <returns></returns>
+        public abstract SelectionIntentData CreateSelectionIntentData(T obj, DetectionOrigin origin);
+
+        /// <summary>
         /// Retrieve the best proposition for each detector of a selector
         /// </summary>
         /// <returns></returns>
-        public abstract List<SelectionIntentData> GetIntentDetections();
+        public virtual IEnumerable<SelectionIntentData> GetIntentDetections()
+        {
+            foreach (var detector in ProximityDetectors) // priority for proximity
+            {
+                if (!detector.isRunning)
+                    continue;
+
+                var objToSelectProximity = detector.PredictTarget();
+                var detectionInfo = CreateSelectionIntentData(objToSelectProximity, DetectionOrigin.PROXIMITY);
+                detectionCacheProximity.Add(detectionInfo);
+                if (CanSelect(objToSelectProximity))
+                    selectionPropositions.AddLast(detectionInfo);
+            }
+
+            foreach (var detector in PointingDetectors)
+            {
+                if (!detector.isRunning)
+                    continue;
+
+                var objToSelectPointed = detector.PredictTarget();
+                var detectionInfo = CreateSelectionIntentData(objToSelectPointed, DetectionOrigin.POINTING);
+                detectionCachePointing.Add(detectionInfo);
+                if (CanSelect(objToSelectPointed))
+                    selectionPropositions.AddLast(detectionInfo);
+            }
+
+            return selectionPropositions;
+        }
 
         /// <summary>
         /// Select the last proposed <see cref="T"/> and provides its infos. <br/>
@@ -258,7 +352,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// </summary>
         public override void Select()
         {
-            Select(propositionSelectionCache.Objects.Last?.Value);
+            Select(selectionPropositions.First?.Value);
         }
 
         /// <summary>
@@ -267,6 +361,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         public void Select(SelectionIntentData data)
         {
             Select(data as SelectionIntentData<T>);
+            selectionPropositions.Clear();
         }
 
         /// <summary>
@@ -295,11 +390,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             LastSelected = selectionInfo;
             isSelecting = true;
             selectionEvent.Invoke(selectionInfo);
+            foreach (var detector in PointingDetectors)
+                detector.Reinit();
+            foreach (var detector in ProximityDetectors)
+                detector.Reinit();
         }
 
-        /// <summary>
-        /// Select a <see cref="T"/> and provides its infos
-        /// </summary>
+        /// <inheritdoc/>
         public void Deselect(SelectionIntentData data)
         {
             Deselect(data as SelectionIntentData<T>);
@@ -314,10 +411,27 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             projector.Release(interactableToDeselectInfo.selectedObject, controller);
             isSelecting = false;
             deselectionEvent.Invoke(interactableToDeselectInfo);
+
+            foreach (var detector in PointingDetectors)
+                detector.Reinit();
+            foreach (var detector in ProximityDetectors)
+                detector.Reinit();
         }
 
         /// <inheritdoc/>
         public bool IsSelecting() => isSelecting;
+
+        /// <summary>
+        /// Retrieves detectors associated with virtual hand selection detection.
+        /// </summary>
+        /// <returns></returns>
+        public abstract List<AbstractDetector<T>> GetProximityDetectors();
+
+        /// <summary>
+        /// Retrieves  detectors associated with virtual pointing selection detection.
+        /// </summary>
+        /// <returns></returns>
+        public abstract List<AbstractDetector<T>> GetPointingDetectors();
 
         #endregion selection
     }

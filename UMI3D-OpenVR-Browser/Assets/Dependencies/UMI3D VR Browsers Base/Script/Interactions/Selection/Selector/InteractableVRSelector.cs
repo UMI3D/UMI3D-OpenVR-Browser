@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System;
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
@@ -26,28 +27,16 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
     public class InteractableVRSelector : AbstractVRSelector<InteractableContainer>
     {
         /// <summary>
-        /// Selection Intent Detector (virtual pointing)
+        /// Selection Intent Detectors (virtual pointing). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual pointing.")]
-        public AbstractPointingInteractableDetector pointingDetector;
+        [SerializeField, Tooltip("Selection Intent Detector for virtual pointing. In order of decreasing priority. Cannot be changed at runtime.")]
+        private List<AbstractPointingInteractableDetector> pointingDetectors;
 
         /// <summary>
-        /// Selection Intent Detector (virtual hand)
+        /// Selection Intent Detector (virtual hand). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
-        public AbstractGrabInteractableDetector grabDetector;
-
-        /// <summary>
-        /// Previously detected objects for virtual hand
-        /// </summary>
-        [HideInInspector]
-        public Cache<InteractableContainer> detectionCacheProximity = new Cache<InteractableContainer>();
-
-        /// <summary>
-        /// Previously detected objects from virtual pointing
-        /// </summary>
-        [HideInInspector]
-        public Cache<InteractableContainer> detectionCachePointing = new Cache<InteractableContainer>();
+        [SerializeField, Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority. Cannot be changed at runtime.")]
+        private List<AbstractGrabInteractableDetector> proximityDetectors;
 
         #region constructors
 
@@ -70,24 +59,56 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
         #region lifecycle
 
-        /// <inheritdoc/>
-        protected override void ActivateInternal()
+        protected override void Update()
         {
-            base.ActivateInternal();
-            pointingDetector.Init(controller);
-            grabDetector.Init(controller);
-            projector = new InteractableProjector();
+            base.Update();
+            // look for interaction from the controller and send the right events
+            // probably should not belong in that piece of code
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger) && activated)
+            {
+                VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                OnPointerDown();
+                LockedSelector = true;
+            }
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger) && activated)
+            {
+                VRInteractionMapper.lastControllerUsedToClick = controller.type;
+                OnPointerUp();
+                LockedSelector = false;
+            }
         }
 
-        /// <inheritdoc/>
-        protected override void DeactivateInternal()
+        private void OnPointerUp()
         {
-            base.DeactivateInternal();
-            pointingDetector.Reinit();
-            grabDetector.Reinit();
+
+        }
+
+        private void OnPointerDown()
+        {
+
         }
 
         #endregion lifecycle
+
+        #region detectors
+        /// <inheritdoc/>
+        public override List<AbstractDetector<InteractableContainer>> GetProximityDetectors()
+        {
+            var l = new List<AbstractDetector<InteractableContainer>>();
+            foreach (var detector in proximityDetectors)
+                l.Add(detector);
+            return l;
+        }
+
+        /// <inheritdoc/>
+        public override List<AbstractDetector<InteractableContainer>> GetPointingDetectors()
+        {
+            var l = new List<AbstractDetector<InteractableContainer>>();
+            foreach (var detector in pointingDetectors)
+                l.Add(detector);
+            return l;
+        }
+        #endregion
 
         #region selection
 
@@ -95,65 +116,29 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// Checks if the interactable :
         ///     - exists
         ///     - has at least one associated interaction
-        ///     - has not been seen its tool projected yet
+        ///     - is compatible with this controller
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <returns></returns>
         protected override bool CanSelect(InteractableContainer icToSelect)
         {
             return icToSelect != null
+                    && icToSelect.Interactable != null
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
-                    && !InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.dto.id);
+                    && controller.IsCompatibleWith(icToSelect.Interactable)
+                    && (!InteractionMapper.Instance.IsToolSelected(icToSelect.Interactable.id)
+                        || (LastSelected?.selectedObject.Interactable == icToSelect.Interactable));
         }
 
         /// <summary>
-        /// Is the passed object currently slected by this selector?
+        /// Is the passed object currently selected by this selector?
         /// </summary>
         /// <param name="ic"></param>
         /// <returns></returns>
         private bool IsObjectSelected(InteractableContainer ic)
         {
-            return ic == LastSelected?.selectedObject
-                    || InteractionMapper.Instance.IsToolSelected(ic.Interactable.dto.id);
-        }
-
-        /// <inheritdoc/>
-        public override List<SelectionIntentData> GetIntentDetections()
-        {
-            var possibleSelection = new List<SelectionIntentData>();
-
-            if (grabDetector.isRunning)
-            {
-                var interactableToSelectProximity = grabDetector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
-                {
-                    selectedObject = interactableToSelectProximity,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.PROXIMITY,
-                };
-                detectionCacheProximity.Add(detectionInfo as SelectionIntentData<InteractableContainer>);
-                if (CanSelect(interactableToSelectProximity))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            if (pointingDetector.isRunning)
-            {
-                var interactableToSelectPointed = pointingDetector.PredictTarget();
-                var detectionInfo = new InteractableSelectionData
-                {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            foreach (var poss in possibleSelection)
-                propositionSelectionCache.Add(poss);
-            return possibleSelection;
+            return ic == LastSelected?.selectedObject;
         }
 
         /// <summary>
@@ -170,8 +155,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             isSelecting = false;
             deselectionEvent.Invoke(interactableToDeselectInfo);
 
-            pointingDetector.Reinit();
-            grabDetector.Reinit();
+            foreach (var detector in pointingDetectors)
+                detector.Reinit();
+            foreach (var detector in proximityDetectors)
+                detector.Reinit();
         }
 
         /// <summary>
@@ -190,9 +177,13 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     return;
                 }
                 else if (selectionInfo == null)
-                    throw new System.ArgumentNullException("Argument should be null only if moving outside of an object");
+                    throw new ArgumentNullException("Argument should be null only if moving outside of an object");
                 else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
+                {
+                    if (LastSelected != null && selectionInfo.detectionOrigin != LastSelected.detectionOrigin)
+                        selectionFeedbackHandler.UpdateFeedback(selectionInfo);
                     return;
+                }
             }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);
@@ -200,22 +191,34 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 (selectionInfo as InteractableSelectionData).tool = interactionTool;
 
             if (isSelecting
-                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))))
-                // happens when an object is destroyed but the tool is not released
+                && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && InteractionMapper.Instance.IsToolSelected(interactionTool.id)))) // second case happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
 
-            if (controller.IsAvailableFor(interactionTool) && controller.IsCompatibleWith(interactionTool))
+            if (controller.IsAvailableFor(interactionTool))
             {
                 projector.Project(selectionInfo.selectedObject, controller);
                 selectionInfo.hasBeenSelected = true;
                 LastSelected = selectionInfo;
                 isSelecting = true;
                 selectionEvent.Invoke(selectionInfo);
-                pointingDetector.Reinit();
-                grabDetector.Reinit();
+                foreach (var detector in pointingDetectors)
+                    detector.Reinit();
+                foreach (var detector in proximityDetectors)
+                    detector.Reinit();
             }
         }
 
+        /// <inheritdoc/>
+        public override SelectionIntentData CreateSelectionIntentData(InteractableContainer obj, DetectionOrigin origin)
+        {
+            return new InteractableSelectionData()
+            {
+                selectedObject = obj,
+                controller = controller,
+                detectionOrigin = origin,
+                tool = obj == null ? null : obj.Interactable
+            };
+        }
         #endregion selection
     }
 }

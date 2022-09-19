@@ -71,36 +71,36 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
             contactSphereRenderer.enabled = false;
         }
 
-        public void Update()
+        public void FixedUpdate()
         {
             if (isTrackingSelectedObject)
-            {
                 SetContactSphere();
-            }
         }
 
         /// <inheritdoc/>
         public override void Display()
         {
             cursorRenderer.enabled = true;
+            contactSphereRenderer.enabled = true;
         }
 
         /// <inheritdoc/>
         public override void Hide()
         {
             cursorRenderer.enabled = false;
+            contactSphereRenderer.enabled = false;
         }
 
         /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObjectData)
         {
+            var obj = (selectedObjectData as SelectionIntentData<InteractableContainer>)?.selectedObject;
+
             if (selectedObjectData != null)
             {
                 if (!IsDisplayed)
                     Display();
 
-                MonoBehaviour obj = null;
-                obj = (selectedObjectData as SelectionIntentData<InteractableContainer>)?.selectedObject;
                 if (obj == null)
                     return;
 
@@ -118,7 +118,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                     trackedObject = obj;
                     isTrackingSelectedObject = true;
-                    SetContactSphere();
                     contactSphereRenderer.enabled = true;
                 }
             }
