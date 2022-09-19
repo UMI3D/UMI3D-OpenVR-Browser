@@ -93,9 +93,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
-  selectionFeedbackHandler: {fileID: 3600997075644770501}
-  pointingDetector: {fileID: 9049577297433962889}
-  grabDetector: {fileID: 2988025609914875823}
+  pointingDetectors:
+  - {fileID: 9049577297433962889}
+  proximityDetectors:
+  - {fileID: 2988025609914875823}
 --- !u!114 &9049577297433962889
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,9 +276,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
-  selectionFeedbackHandler: {fileID: 7799028259170850122}
-  pointingDetector: {fileID: 3305404400239031573}
-  grabDetector: {fileID: 2184957991231874897}
+  pointingDetectors:
+  - {fileID: 3305404400239031573}
+  proximityDetectors:
+  - {fileID: 2184957991231874897}
 --- !u!114 &3305404400239031573
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -365,6 +367,7 @@ GameObject:
   - component: {fileID: 3036516098682089026}
   - component: {fileID: 5538973729607222011}
   - component: {fileID: 313899135494070758}
+  - component: {fileID: 4984395139596033644}
   m_Layer: 0
   m_Name: InteractableSelector
   m_TagString: Untagged
@@ -401,9 +404,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
-  selectionFeedbackHandler: {fileID: 1344738551367691293}
-  pointingDetector: {fileID: 5538973729607222011}
-  grabDetector: {fileID: 313899135494070758}
+  pointingDetectors:
+  - {fileID: 4984395139596033644}
+  - {fileID: 5538973729607222011}
+  proximityDetectors:
+  - {fileID: 313899135494070758}
 --- !u!114 &5538973729607222011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -432,6 +437,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isRunning: 0
   proximityColliderHandler: {fileID: 1492645336679593310}
+--- !u!114 &4984395139596033644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3749625149309055651}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12350422c750fc840aff95edb4d8ffe5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isRunning: 0
 --- !u!1 &4113017653088544057
 GameObject:
   m_ObjectHideFlags: 0
@@ -682,7 +700,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   selectionOutlineLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2048
 --- !u!1 &6711545052159805380
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,7 +713,7 @@ GameObject:
   - component: {fileID: 6776295091017326307}
   - component: {fileID: 106263226990442865}
   m_Layer: 0
-  m_Name: CursorZone
+  m_Name: CursorZoneDelimiter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -823,7 +841,7 @@ GameObject:
   - component: {fileID: 349712433518606364}
   - component: {fileID: 4288979665008606888}
   m_Layer: 0
-  m_Name: ContactPoint
+  m_Name: ContactSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

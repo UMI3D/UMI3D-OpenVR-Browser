@@ -42,15 +42,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
         [Tooltip("Layer associated with selection outline in URP settings")]
         public LayerMask selectionOutlineLayer;
 
-        private AbstractCursor pointingCursor;
-        private AbstractCursor grabCursor;
 
-        private void Awake()
-        {
-            var selectionManager = GetComponentInParent<VRSelectionManager>();
-            pointingCursor = selectionManager.pointingCursor;
-            grabCursor = selectionManager.grabCursor;
-        }
 
         /// <inheritdoc/>
         public void Activate(AbstractSelectionData selectionData)
@@ -59,14 +51,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
             if (interactableSelectionData == null)
                 return;
             if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
-            {
                 Outline(interactableSelectionData.selectedObject);
-                pointingCursor.ChangeAccordingToSelection(selectionData);
-            }
-            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
-            {
-                grabCursor.ChangeAccordingToSelection(selectionData);
-            } 
         }
 
         /// <inheritdoc/>
@@ -76,10 +61,6 @@ namespace umi3dBrowsers.interaction.selection.feedback
             if (interactableSelectionData == null)
                 return;
             DisableOutline(interactableSelectionData.selectedObject);
-            if (interactableSelectionData.detectionOrigin == DetectionOrigin.POINTING)
-                pointingCursor.ChangeAccordingToSelection(null);
-            else if (interactableSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
-                grabCursor.ChangeAccordingToSelection(null);
         }
 
         /// <summary>

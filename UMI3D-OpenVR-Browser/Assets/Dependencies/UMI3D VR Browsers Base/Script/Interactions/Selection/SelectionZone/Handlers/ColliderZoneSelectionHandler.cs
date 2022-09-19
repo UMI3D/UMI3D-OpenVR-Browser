@@ -26,7 +26,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// Associated collider defining the selection zone
         /// </summary>
         [Tooltip("Collider defining the selection zone")]
-        public Collider zoneCollider;
+        public SphereCollider zoneCollider;
 
         /// <summary>
         /// Objects that are currently in the collider.
@@ -35,15 +35,21 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
         protected void Awake()
         {
-            zoneCollider = GetComponentInChildren<Collider>();
+            if (zoneCollider == null)
+                zoneCollider = GetComponentInChildren<SphereCollider>();
         }
 
         protected void FixedUpdate()
         {
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
-                if ((obj.Equals(null)) || (obj.collider == null) || (obj.obj == null))
-                    ObjectsInCollider.Remove(obj);
+                if (obj.Equals(null)
+                    || (obj.collider == null)
+                    || (obj.obj == null)
+                    || Vector3.Distance(transform.position, obj.collider.ClosestPoint(transform.position)) > zoneCollider.radius)
+                {
+                    ObjectsInCollider.RemoveAll(x => x.obj == obj.obj);
+                }
             }
         }
 
@@ -55,11 +61,14 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
             if (neighbour != null && neighbour.isActiveAndEnabled)
             {
-                ObjectsInCollider.Add(new ObjectInsideCollider<T>()
+                if (!ObjectsInCollider.Exists(x => x.obj == neighbour))
                 {
-                    obj = neighbour,
-                    collider = other
-                });
+                    ObjectsInCollider.Add(new ObjectInsideCollider<T>()
+                    {
+                        obj = neighbour,
+                        collider = other
+                    });
+                }
             }
         }
 

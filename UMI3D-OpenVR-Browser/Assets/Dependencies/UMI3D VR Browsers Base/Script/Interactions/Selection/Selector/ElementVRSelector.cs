@@ -13,6 +13,7 @@ limitations under the License.
 
 using System.Collections.Generic;
 using umi3dBrowsers.interaction.selection;
+using umi3dBrowsers.interaction.selection.intentdetector;
 using umi3dVRBrowsersBase.interactions.selection.intentdetector;
 using umi3dVRBrowsersBase.interactions.selection.projector;
 using umi3dVRBrowsersBase.ui;
@@ -26,28 +27,16 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
     public class ElementVRSelector : AbstractVRSelector<AbstractClientInteractableElement>
     {
         /// <summary>
-        /// Selection Intent Detector (virtual pointing)
+        /// Selection Intent Detectors (virtual pointing). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual pointing.")]
-        public AbstractPointingElementDetector pointingDetector;
+        [SerializeField, Tooltip("Selection Intent Detector for virtual pointing. In order of decreasing priority.")]
+        private List<AbstractPointingElementDetector> pointingDetectors;
 
         /// <summary>
-        /// Selection Intent Detector (virtual hand)
+        /// Selection Intent Detector (virtual hand). In order of decreasing priority.
         /// </summary>
-        [Tooltip("Selection Intent Detector for virtual hand (grab).")]
-        public AbstractGrabElementDetector grabDetector;
-
-        /// <summary>
-        /// Previously detected objects for virtual hand
-        /// </summary>
-        [HideInInspector]
-        public Cache<AbstractClientInteractableElement> detectionCacheProximity = new Cache<AbstractClientInteractableElement>();
-
-        /// <summary>
-        /// Previously detected objects from virtual pointing
-        /// </summary>
-        [HideInInspector]
-        public Cache<AbstractClientInteractableElement> detectionCachePointing = new Cache<AbstractClientInteractableElement>();
+        [SerializeField, Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority.")]
+        private List<AbstractGrabElementDetector> proximityDetectors;
 
         #region constructors
 
@@ -64,23 +53,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #endregion constructors
 
         #region lifecycle
-
-        /// <inheritdoc/>
-        protected override void ActivateInternal()
-        {
-            base.ActivateInternal();
-            pointingDetector.Init(controller);
-            grabDetector.Init(controller);
-            projector = new ElementProjector();
-        }
-
-        /// <inheritdoc/>
-        protected override void DeactivateInternal()
-        {
-            base.DeactivateInternal();
-            pointingDetector.Reinit();
-            grabDetector.Reinit();
-        }
 
         protected override void Update()
         {
@@ -152,44 +124,37 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
 
         #endregion lifecycle
 
+        #region detectors
+        /// <inheritdoc/>
+        public override List<AbstractDetector<AbstractClientInteractableElement>> GetProximityDetectors()
+        {
+            var l = new List<AbstractDetector<AbstractClientInteractableElement>>();
+            foreach (var detector in proximityDetectors)
+                l.Add(detector);
+            return l;
+        }
+
+        /// <inheritdoc/>
+        public override List<AbstractDetector<AbstractClientInteractableElement>> GetPointingDetectors()
+        {
+            var l = new List<AbstractDetector<AbstractClientInteractableElement>>();
+            foreach (var detector in pointingDetectors)
+                l.Add(detector);
+            return l;
+        }
+        #endregion
+
         #region selection
 
         /// <inheritdoc/>
-        public override List<SelectionIntentData> GetIntentDetections()
+        public override SelectionIntentData CreateSelectionIntentData(AbstractClientInteractableElement obj, DetectionOrigin origin)
         {
-            var possibleSelection = new List<SelectionIntentData>();
-
-            if (grabDetector.isRunning)
+            return new ElementSelectionData()
             {
-                var interactableToSelectProximity = grabDetector.PredictTarget();
-
-                var detectionInfo = new ElementSelectionData
-                {
-                    selectedObject = interactableToSelectProximity,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.PROXIMITY,
-                };
-                detectionCacheProximity.Add(detectionInfo);
-                if (CanSelect(interactableToSelectProximity))
-                    possibleSelection.Add(detectionInfo);
-            }
-
-            if (pointingDetector.isRunning)
-            {
-                var interactableToSelectPointed = pointingDetector.PredictTarget();
-                var detectionInfo = new ElementSelectionData
-                {
-                    selectedObject = interactableToSelectPointed,
-                    controller = controller,
-                    detectionOrigin = DetectionOrigin.POINTING,
-                };
-                detectionCachePointing.Add(detectionInfo);
-                if (CanSelect(interactableToSelectPointed))
-                    possibleSelection.Add(detectionInfo);
-            }
-            foreach (var poss in possibleSelection)
-                propositionSelectionCache.Add(poss);
-            return possibleSelection;
+                selectedObject = obj,
+                controller = controller,
+                detectionOrigin = origin
+            };
         }
 
         #endregion selection

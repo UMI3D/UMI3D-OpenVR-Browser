@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 using System.Collections.Generic;
+using umi3dBrowsers.interaction.selection.intentdetector;
 
 namespace umi3dBrowsers.interaction.selection.selector
 {
@@ -24,7 +25,7 @@ namespace umi3dBrowsers.interaction.selection.selector
         /// Get selection intent info from the <see cref="AbstractDetector"/> attached to the intent selector
         /// </summary>
         /// <returns></returns>
-        List<SelectionIntentData> GetIntentDetections();
+        IEnumerable<SelectionIntentData> GetIntentDetections();
 
         /// <summary>
         /// Set as selection intent target
