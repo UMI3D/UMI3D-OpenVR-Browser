@@ -67,11 +67,7 @@ namespace umi3dBrowsers.interaction.selection.intentdetector.method
 
             interactablesPairs.Sort(delegate (KeyValuePair<InteractableContainer, RaycastHit> x, KeyValuePair<InteractableContainer, RaycastHit> y)
             {
-                if (x.Key.Interactable.Active && !y.Key.Interactable.Active)
-                    return -1;
-                else if (!x.Key.Interactable.Active && y.Key.Interactable.Active)
-                    return 1;
-                else if (x.Key.Interactable.HasPriority && !y.Key.Interactable.HasPriority)
+                if (x.Key.Interactable.HasPriority && !y.Key.Interactable.HasPriority)
                     return -1;
                 else if (!x.Key.Interactable.HasPriority && y.Key.Interactable.HasPriority)
                     return 1;

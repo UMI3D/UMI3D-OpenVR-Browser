@@ -157,6 +157,18 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             };
         }
 
+        /// <summary>
+        /// Checks if the selectable: <br/>
+        ///     - exists <br/>
+        ///     - is enabled <br/>
+        /// </summary>
+        /// <param name="elToSelect"></param>
+        /// <returns>True if the object could be selected by the selector</returns>
+        protected override bool CanSelect(AbstractClientInteractableElement elToSelect)
+        {
+            return elToSelect != null && elToSelect.enabled;
+        }
+
         #endregion selection
     }
 }

@@ -78,6 +78,15 @@ namespace umi3dBrowsers.interaction.selection.intentdetector
         }
 
         /// <summary>
+        /// Restart a stopped detector
+        /// </summary>
+        public virtual void Restart()
+        {
+            Reinit();
+            isRunning = true;
+        }
+
+        /// <summary>
         /// Method to override to set a detection method
         /// </summary>
         protected abstract void SetDetectionMethod();

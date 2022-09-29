@@ -11,14 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.AccessControl;
 using umi3d.cdk.interaction;
-using umi3d.common;
 using umi3d.common.interaction;
 using umi3dVRBrowsersBase.ui.playerMenu;
-using UnityEngine;
 
 namespace umi3dBrowsers.interaction.selection.projector
 {
@@ -27,6 +22,16 @@ namespace umi3dBrowsers.interaction.selection.projector
     /// </summary>
     public class InteractableProjector : IProjector<InteractableContainer>
     {
+        /// <summary>
+        /// Checks whether an interctable has already projected tools
+        /// </summary>
+        /// <param name="interactable"></param>
+        /// <returns></returns>
+        public bool IsProjected(InteractableContainer interactable, AbstractController controller)
+        {
+            return InteractionMapper.Instance.IsToolSelected(interactable.Interactable.dto.id);
+        }
+
         /// <summary>
         /// Project an interactable that possesses a tool on a controller
         /// </summary>
@@ -50,13 +55,7 @@ namespace umi3dBrowsers.interaction.selection.projector
         /// <param name="controller"></param>
         public void Project(AbstractTool interactionTool, ulong selectedObjectId, AbstractController controller)
         {
-            InteractionMapper.Instance.SelectTool(interactionTool.id, true, controller, selectedObjectId, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
-        }
-
-        /// <inheritdoc/>
-        public void Release(InteractableContainer interactable, AbstractController controller)
-        {
-            Release(interactable.Interactable, controller);
+            controller.Project(interactionTool, true, new RequestedUsingSelector<AbstractSelector>() { controller = controller }, selectedObjectId);
         }
 
         /// <summary>
@@ -66,7 +65,13 @@ namespace umi3dBrowsers.interaction.selection.projector
         /// <param name="controller"></param>
         public void Release(AbstractTool interactionTool, AbstractController controller)
         {
-            InteractionMapper.Instance.ReleaseTool(interactionTool.id, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+            controller.Release(interactionTool, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+        }
+
+        /// <inheritdoc/>
+        public void Release(InteractableContainer interactable, AbstractController controller)
+        {
+            controller.Release(AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id), new RequestedUsingSelector<AbstractSelector>() { controller = controller });
         }
     }
 }

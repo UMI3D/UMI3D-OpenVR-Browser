@@ -83,5 +83,11 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     {
         public T obj;
         public Collider collider;
+        /// <summary>
+        /// True when the convex property has been overriden to true.
+        /// </summary>
+        /// To use <see cref="Collider.ClosestPoint(Vector3)"/> meshes are required to be convex, objects inside collider are then all convexes. 
+        /// Een if thickness is very low. Overriding the convex property results in a low thickness added by the engine.
+        public bool hasRequiredConvexOverride;
     }
 }
