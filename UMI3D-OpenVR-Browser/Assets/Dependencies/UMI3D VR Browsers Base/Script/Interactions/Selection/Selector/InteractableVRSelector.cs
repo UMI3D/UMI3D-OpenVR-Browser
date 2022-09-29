@@ -64,17 +64,28 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             base.Update();
             // look for interaction from the controller and send the right events
             // probably should not belong in that piece of code
-            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger) && activated)
+            if (!activated)
+                return;
+
+            if (AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Trigger)
+                || AbstractControllerInputManager.Instance.GetButtonDown(controller.type, ActionType.Grab))
             {
                 VRInteractionMapper.lastControllerUsedToClick = controller.type;
                 OnPointerDown();
-                LockedSelector = true;
+                if (!LockedSelector)
+                    LockSelector();
             }
-            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger) && activated)
+            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger)
+                || AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Grab))
             {
                 VRInteractionMapper.lastControllerUsedToClick = controller.type;
                 OnPointerUp();
-                LockedSelector = false;
+            }
+            else if (!AbstractControllerInputManager.Instance.GetButton(controller.type, ActionType.Trigger)
+                     && !AbstractControllerInputManager.Instance.GetButton(controller.type, ActionType.Grab))
+            {
+                if (LockedSelector)
+                    UnlockSelector();
             }
         }
 
@@ -86,6 +97,24 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         private void OnPointerDown()
         {
 
+        }
+
+        private void LockSelector()
+        {
+            foreach (var detector in ProximityDetectors)
+                detector.Stop();
+            foreach (var detector in PointingDetectors)
+                detector.Stop();
+            LockedSelector = true;
+        }
+
+        private void UnlockSelector()
+        {
+            foreach (var detector in ProximityDetectors)
+                detector.Restart();
+            foreach (var detector in PointingDetectors)
+                detector.Restart();
+            LockedSelector = false;
         }
 
         #endregion lifecycle
@@ -113,17 +142,22 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #region selection
 
         /// <summary>
-        /// Checks if the interactable :
-        ///     - exists
-        ///     - has at least one associated interaction
-        ///     - is compatible with this controller
+        /// Checks if the interactable : <br/>
+        ///     - exists <br/>
+        ///     - is enabled <br/>
+        ///     - is active <br/>
+        ///     - has at least one associated interaction <br/>
+        ///     - is compatible with this controller <br/>
+        ///     - is not the last selected interactable <br/>
         /// </summary>
         /// <param name="icToSelect"></param>
         /// <returns></returns>
         protected override bool CanSelect(InteractableContainer icToSelect)
         {
             return icToSelect != null
+                    && icToSelect.enabled
                     && icToSelect.Interactable != null
+                    && icToSelect.Interactable.Active
                     && ((icToSelect.Interactable.InteractionDistance < 0) 
                         || icToSelect.Interactable.InteractionDistance >= (icToSelect.transform.position - controller.transform.position).magnitude)
                     && icToSelect.Interactable.dto.interactions != null
@@ -186,11 +220,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                         selectionFeedbackHandler.UpdateFeedback(selectionInfo);
                     return;
                 }
-            }
-            if (selectionInfo == null)
-            {
-                LastSelected = null;
-                return;
             }
 
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(selectionInfo.selectedObject.Interactable.dto.id);

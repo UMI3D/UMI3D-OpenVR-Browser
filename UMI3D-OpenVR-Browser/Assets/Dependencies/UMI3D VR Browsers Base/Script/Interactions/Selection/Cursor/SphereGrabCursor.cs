@@ -32,6 +32,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
         protected Renderer cursorRenderer;
 
+        private SphereCollider cursorCollider;
+
         /// <summary>
         /// Sphere on the object while selecting.
         /// </summary>
@@ -43,7 +45,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <summary>
         /// Is the cursor displayed?
         /// </summary>
-        public bool IsDisplayed => cursorRenderer.enabled;
+        public bool IsZoneHintDisplayed => cursorRenderer.enabled;
 
         private Collider selectedObjectCollider;
 
@@ -69,27 +71,53 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         {
             cursorRenderer.enabled = false;
             contactSphereRenderer.enabled = false;
+            cursorCollider = GetComponentInChildren<SphereCollider>();
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
             if (isTrackingSelectedObject)
                 SetContactSphere();
         }
 
+        #region Display
+
         /// <inheritdoc/>
         public override void Display()
         {
+            DisplayZoneHint();
+            DisplayContactSphereHint();
+        }
+
+        public void DisplayZoneHint()
+        {
             cursorRenderer.enabled = true;
+        }
+
+        public void DisplayContactSphereHint()
+        {
             contactSphereRenderer.enabled = true;
         }
 
         /// <inheritdoc/>
         public override void Hide()
         {
-            cursorRenderer.enabled = false;
-            contactSphereRenderer.enabled = false;
+            HideZoneHint();
+            HideContactSphereHint();
         }
+
+        public void HideZoneHint()
+        {
+            cursorRenderer.enabled = false;
+        }
+
+        public void HideContactSphereHint()
+        {
+            contactSphereRenderer.enabled = false;
+            contactSphere.transform.position = this.transform.position;
+        }
+
+        #endregion
 
         /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObjectData)
@@ -98,8 +126,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             if (selectedObjectData != null)
             {
-                if (!IsDisplayed)
-                    Display();
+                if (!IsZoneHintDisplayed)
+                    DisplayZoneHint();
 
                 if (obj == null)
                     return;
@@ -118,23 +146,25 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                     trackedObject = obj;
                     isTrackingSelectedObject = true;
-                    contactSphereRenderer.enabled = true;
+                    DisplayContactSphereHint();
                 }
             }
             else
             {
-                if (IsDisplayed)
+                if (IsZoneHintDisplayed)
                     Hide();
                 if (isTrackingSelectedObject)
                 {
                     if (isConvexOverrided)
                         (selectedObjectCollider as MeshCollider).convex = false;
                     isTrackingSelectedObject = false;
-                    contactSphereRenderer.enabled = false;
+                    HideContactSphereHint();
+
                     trackedObject = null;
                 }
             }
         }
+
 
         /// <summary>
         /// Set the contact sphere on the closent point available on the contact collider

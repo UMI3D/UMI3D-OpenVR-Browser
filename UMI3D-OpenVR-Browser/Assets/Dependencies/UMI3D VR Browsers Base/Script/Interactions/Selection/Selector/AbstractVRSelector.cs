@@ -26,7 +26,7 @@ using UnityEngine.Events;
 namespace umi3dVRBrowsersBase.interactions.selection.selector
 {
     /// <summary>
-    /// Ba template for object selector
+    /// Base template for object selector
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class AbstractVRSelector<T> : AbstractSelector, IIntentSelector where T : MonoBehaviour
@@ -297,13 +297,14 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         }
 
         /// <summary>
-        /// Checks if the element could be selected
+        /// Checks if the element could be selected.
         /// </summary>
-        /// <param name="icToSelect"></param>
-        /// <returns>True if the object could be selected by the selector</returns>
-        protected virtual bool CanSelect(T icToSelect)
+        /// Defaut implementation just checks non-nullity.
+        /// <param name="objToSelect">Object to select</param>
+        /// <returns>True if the object could be selected by the selector.</returns>
+        protected virtual bool CanSelect(T objToSelect)
         {
-            return icToSelect != null;
+            return objToSelect != null;
         }
 
         /// <summary>
@@ -388,7 +389,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     if (PlayerMenuManager.Instance.parameterGear.IsDisplayed)
                         PlayerMenuManager.Instance.parameterGear.Hide();
                 }
-                    
+
             }
 
             projector.Project(selectionInfo.selectedObject, controller);

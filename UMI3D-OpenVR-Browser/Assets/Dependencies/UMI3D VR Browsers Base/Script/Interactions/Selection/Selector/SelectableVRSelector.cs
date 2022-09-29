@@ -138,18 +138,18 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #region selection
 
         /// <summary>
-        /// Checks if the selectable :
-        ///     - exists
-        ///     - is enabled
-        ///     - is different from the previous one
+        /// Checks if the selectable: <br/>
+        ///     - exists <br/>
+        ///     - is enabled <br/>
+        ///     - can be interacted with <br/>
         /// </summary>
         /// <param name="uiToSelect"></param>
         /// <returns></returns>
         protected override bool CanSelect(Selectable uiToSelect)
         {
-            if (uiToSelect == null)
-                return false;
-            return uiToSelect.enabled && uiToSelect.interactable;
+            return uiToSelect != null 
+                && uiToSelect.enabled 
+                && uiToSelect.interactable;
         }
 
         /// <inheritdoc/>

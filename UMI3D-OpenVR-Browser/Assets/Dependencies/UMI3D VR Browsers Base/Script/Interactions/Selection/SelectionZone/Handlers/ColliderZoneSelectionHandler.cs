@@ -41,6 +41,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
         protected void FixedUpdate()
         {
+            var objectsToRemove = new List<ObjectInsideCollider<T>>();
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
                 if (obj.Equals(null)
@@ -48,9 +49,16 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                     || (obj.obj == null)
                     || Vector3.Distance(transform.position, obj.collider.ClosestPoint(transform.position)) > zoneCollider.radius)
                 {
-                    ObjectsInCollider.RemoveAll(x => x.obj == obj.obj);
+                    objectsToRemove.Add(obj);
                 }
             }
+            foreach (var obj in objectsToRemove)
+            {
+                if (obj.hasRequiredConvexOverride)
+                    (obj.collider as MeshCollider).convex = false;
+                ObjectsInCollider.Remove(obj);
+            }
+
         }
 
         protected virtual void OnTriggerEnter(Collider other)
@@ -63,10 +71,18 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             {
                 if (!ObjectsInCollider.Exists(x => x.obj == neighbour))
                 {
+                    bool wasConvex = true;
+                    if (other is MeshCollider) //ClosestPoint only works on convex meshes, converting mesh to convex one
+                    {
+                        wasConvex = (other as MeshCollider).convex;
+                        if (!wasConvex)
+                            (other as MeshCollider).convex = true;
+                    }
                     ObjectsInCollider.Add(new ObjectInsideCollider<T>()
                     {
                         obj = neighbour,
-                        collider = other
+                        collider = other,
+                        hasRequiredConvexOverride = !wasConvex
                     });
                 }
             }
@@ -79,7 +95,17 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                 neighbour = other.GetComponentInParent<T>();
 
             if (neighbour != null)
-                ObjectsInCollider.RemoveAll(n => n.collider.Equals(other));
+            {
+                var objToRemove = ObjectsInCollider
+                                    .FindAll(n => n.collider.Equals(other));
+                foreach (var obj in objToRemove)
+                {
+                    if (obj.hasRequiredConvexOverride)
+                        (obj.collider as MeshCollider).convex = false;
+                    ObjectsInCollider.Remove(obj);
+                }
+            }
+
         }
     }
 }
