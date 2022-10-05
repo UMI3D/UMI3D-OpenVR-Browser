@@ -87,7 +87,7 @@ namespace umi3dVRBrowsersBase.interactions.input
 
                 menuItem.Subscribe(callback);
 
-                PlayerMenuManager.Instance.CtrlToolMenu.AddParameter((controller as VRController).type, menuItem);
+                PlayerMenuManager.Instance.CtrlToolMenu.AddParameter((controller as VRController).type, menuItem, DesynchronizeMenuItem);
 
                 currentInteraction = interaction;
             }

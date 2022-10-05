@@ -104,7 +104,7 @@ namespace umi3dVRBrowsersBase.interactions.input
                 };
 
                 menuItem.NotifyValueChange((interaction as ParameterType).value);
-                PlayerMenuManager.Instance.CtrlToolMenu.AddParameter((controller as VRController).type, menuItem);
+                PlayerMenuManager.Instance.CtrlToolMenu.AddParameter((controller as VRController).type, menuItem, DesynchronizeMenuItem);
 
                 var param = interaction as ParameterType;
 
@@ -131,6 +131,12 @@ namespace umi3dVRBrowsersBase.interactions.input
             {
                 throw new System.Exception("Incompatible interaction");
             }
+        }
+
+        public void DesynchronizeMenuItem()
+        {
+            menuItem.UnSubscribe(callback);
+            PlayerMenuManager.Instance.CtrlToolMenu.RemoveParameter((controller as VRController).type, menuItem);
         }
 
         /// <summary>
@@ -160,7 +166,6 @@ namespace umi3dVRBrowsersBase.interactions.input
         public override void Dissociate()
         {
             currentInteraction = null;
-            menuItem.UnSubscribe(callback);
             PlayerMenuManager.Instance.CtrlToolMenu.RemoveParameter((controller as VRController).type, menuItem);
         }
 
