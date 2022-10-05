@@ -30,6 +30,13 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// List of all parameter menu items by controller.
         /// </summary>
         private Dictionary<ControllerType, List<AbstractMenuItem>> parameters = new Dictionary<ControllerType, List<AbstractMenuItem>>();
+        private Dictionary<ControllerType, Dictionary<string, AbstractMenuItem>> cachedParameters = new Dictionary<ControllerType, Dictionary<string, AbstractMenuItem>>();
+        private Dictionary<AbstractMenuItem, Action> cachedCallbacks = new Dictionary<AbstractMenuItem, Action>();
+        /// <summary>
+        /// The menu is async when opened through the parameter gear.
+        /// </summary>
+        private bool isAsync;
+        public bool IsAsync => isAsync;
 
         #endregion
 
@@ -52,11 +59,17 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// </summary>
         /// <param name="controller"></param>
         /// <param name="item"></param>
-        public void AddParameter(ControllerType controller, AbstractMenuItem item)
+        public void AddParameter(ControllerType controller, AbstractMenuItem item, Action callbackOnDesynchronize)
         {
+            if (isAsync)
+                return;
+
             if (parameters.Count == 0) InitFields();
 
             parameters[controller].Add(item);
+
+            if (!cachedCallbacks.ContainsKey(item))
+                cachedCallbacks.Add(item, callbackOnDesynchronize);
         }
 
         /// <summary>
@@ -66,25 +79,62 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <param name="item"></param>
         public void RemoveParameter(ControllerType controller, AbstractMenuItem item)
         {
-            if (parameters.Count == 0) InitFields();
+            if (isAsync)
+                return;
+
+            if (parameters.Count == 0)
+            {
+                InitFields();
+            }
 
             parameters[controller].Remove(item);
         }
 
         /// <summary>
-        /// Displays the menu (do not use <see cref="this.Open()"/>
+        /// Displays the menu (do not use <see cref="ToolParametersMenu.Open()"/>
         /// </summary>
         /// <param name="controller"></param>
-        public void Display(ControllerType controller)
+        public void Display(ControllerType controller, bool isAsync = false)
         {
             Open();
 
+            this.isAsync = isAsync;
+
             menuDisplayManager.menu.RemoveAll();
 
-            foreach (AbstractMenuItem item in parameters[controller])
-                menuDisplayManager.menu.Add(item);
+            if (isAsync)
+            {
+                foreach (var item in cachedParameters[controller].Values)
+                {
+                    menuDisplayManager.menu.Add(item);
+                }
+            }
+            else
+            {
+                cachedParameters.Clear();
+                cachedCallbacks.Clear();
+                foreach (AbstractMenuItem item in parameters[controller])
+                    menuDisplayManager.menu.Add(item);
+            }
 
             menuDisplayManager.Display(true);
+        }
+
+        public void Remember()
+        {
+            cachedParameters.Clear();
+            foreach (var controller in parameters.Keys)
+            {
+                int i = 0;
+                cachedParameters.Add(controller, new Dictionary<string, AbstractMenuItem>());
+                foreach (var item in parameters[controller])
+                {
+                    if (!cachedParameters[controller].ContainsKey(item.Name + i))
+                        cachedParameters[controller].Add(item.Name + i, item);
+                    i++;
+                }
+            }
+
         }
 
         /// <summary>
@@ -94,6 +144,14 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         {
             base.Close();
             menuDisplayManager.Hide();
+            menuDisplayManager.menu.RemoveAll();
+            if (isAsync)
+                isAsync = false;
+            foreach (var callback in cachedCallbacks.Values)
+                callback();
+            cachedCallbacks.Clear();
+            foreach (var controllerKey in cachedParameters.Keys)
+                cachedParameters[controllerKey].Clear();
         }
 
         /// <summary>

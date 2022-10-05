@@ -80,6 +80,8 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// </summary>
         public bool IsOpen { get; private set; }
 
+        public bool IsAsync => toolParametersMenu.IsAsync;
+
         /// <summary>
         /// Controller whose bindings or parameters are currently displayed.
         /// </summary>
@@ -120,6 +122,12 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         {
             IsOpen = false;
             root.SetActive(false);
+        }
+
+        public void Close()
+        {
+            toolParametersMenu.Close();
+            Hide();
         }
 
         /// <summary>
@@ -181,9 +189,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// </summary>
         /// <param name="controller"></param>
         /// <param name="item"></param>
-        public void AddParameter(ControllerType controller, AbstractMenuItem item)
+        public void AddParameter(ControllerType controller, AbstractMenuItem item, System.Action callbackOnDesynchronize)
         {
-            toolParametersMenu.AddParameter(controller, item);
+            toolParametersMenu.AddParameter(controller, item, callbackOnDesynchronize);
         }
 
         /// <summary>
@@ -196,11 +204,16 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             toolParametersMenu.RemoveParameter(controller, item);
         }
 
+        public void RememberParameters()
+        {
+            toolParametersMenu.Remember();
+        }
+
         /// <summary>
         /// Displays all the parameters associated to <paramref name="controller"/>.
         /// </summary>
         /// <param name="controller"></param>
-        public void DisplayParameterMenu(ControllerType controller)
+        public void DisplayParameterMenu(ControllerType controller, bool openParameterGear = false)
         {
             IsOpen = true;
 
@@ -213,7 +226,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             editParametersButtonBck.sprite = editParametersButtonActiveBck;
 
             CurrentController = controller;
-            toolParametersMenu.Display(controller);
+            toolParametersMenu.Display(controller, isAsync: openParameterGear);
         }
 
         #endregion

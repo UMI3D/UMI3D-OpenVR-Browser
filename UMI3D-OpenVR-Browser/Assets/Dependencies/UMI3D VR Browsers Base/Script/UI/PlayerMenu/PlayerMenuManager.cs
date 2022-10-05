@@ -129,6 +129,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         {
             if (!IsMenuOpen && !forceClose) return;
             CloseSubWindow();
+            CtrlToolMenu.Close();
             m_playerMenuCanvas.SetActive(false);
             m_menuCollider.enabled = false;
 
@@ -147,7 +148,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public void OpenParameterMenu(ControllerType controller)
         {
             Open(true);
-            CtrlToolMenu.DisplayParameterMenu(controller);
+            CtrlToolMenu.DisplayParameterMenu(controller, openParameterGear: true);
         }
 
         public void DisplayActionBinding(ControllerType controller)
