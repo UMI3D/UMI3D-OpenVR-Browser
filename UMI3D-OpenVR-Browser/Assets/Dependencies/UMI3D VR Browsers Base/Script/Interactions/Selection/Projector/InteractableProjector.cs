@@ -39,12 +39,15 @@ namespace umi3dBrowsers.interaction.selection.projector
         /// <param name="controller"></param>
         public void Project(InteractableContainer interactable, AbstractController controller)
         {
-            // display the parameter gear if it is required to access the interactions
-            if (interactable.Interactable.interactions.FindAll(i => i is AbstractParameterDto).Count > 0)
-                PlayerMenuManager.Instance.parameterGear.Display(interactable, controller.transform.position);
-
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id);
             Project(interactionTool, interactable.Interactable.dto.id, controller);
+
+            // display the parameter gear if it is required to access the interactions
+            if (interactable.Interactable.interactions.FindAll(i => i is AbstractParameterDto).Count > 0)
+            {
+                PlayerMenuManager.Instance.parameterGear.Display(interactable, controller.transform.position);
+                PlayerMenuManager.Instance.CtrlToolMenu.RememberParameters();
+            }
         }
 
         /// <summary>
