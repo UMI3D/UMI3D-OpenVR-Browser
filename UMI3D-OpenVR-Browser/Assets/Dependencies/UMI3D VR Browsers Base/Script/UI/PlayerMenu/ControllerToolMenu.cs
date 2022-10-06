@@ -12,7 +12,6 @@ limitations under the License.
 */
 
 using umi3d.cdk.menu;
-using umi3d.common;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
 using UnityEngine;
@@ -213,7 +212,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// Displays all the parameters associated to <paramref name="controller"/>.
         /// </summary>
         /// <param name="controller"></param>
-        public void DisplayParameterMenu(ControllerType controller, bool openParameterGear = false)
+        public void DisplayParameterMenu(ControllerType controller, bool menuAsync = false)
         {
             IsOpen = true;
 
@@ -226,7 +225,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             editParametersButtonBck.sprite = editParametersButtonActiveBck;
 
             CurrentController = controller;
-            toolParametersMenu.Display(controller, isAsync: openParameterGear);
+            toolParametersMenu.Display(controller, isAsync: menuAsync);
         }
 
         #endregion

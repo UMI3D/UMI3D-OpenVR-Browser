@@ -114,7 +114,7 @@ namespace umi3dVRBrowsersBase.ui
         {
             OnTriggered?.Invoke();
 
-            PlayerMenuManager.Instance.OpenParameterMenu(controllerType);
+            PlayerMenuManager.Instance.OpenParameterMenu(controllerType, menuAsync: true);
 
             if (gameObject.activeInHierarchy)
                 StartCoroutine(ClickAnimation());
