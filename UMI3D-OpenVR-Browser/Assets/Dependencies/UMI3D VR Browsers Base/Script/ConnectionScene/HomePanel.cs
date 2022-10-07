@@ -147,7 +147,7 @@ namespace umi3dVRBrowsersBase.connection
                 ConnectionMenuManager.instance.SwitchToAdvancedConnectionPanel();
             });
 
-            connectToServerBtn.onClick.AddListener(() =>
+            connectToServerBtn.onClick.AddListener(async () =>
             {
                 ConnectionMenuManager.instance.keyboard.Hide();
 
@@ -156,12 +156,7 @@ namespace umi3dVRBrowsersBase.connection
                 if (string.IsNullOrEmpty(url))
                     return;
 
-                if (rememberServerToggle.isOn)
-                {
-                    PlayerPrefsManager.AddServerToFavorite(url, url);
-                }
-
-                ConnectionMenuManager.instance.ConnectToMasterServer(url);
+                await ConnectionMenuManager.instance._Connect(url, rememberServerToggle.isOn);
             });
 
             connectToANewServerBtn.onClick.AddListener(() =>

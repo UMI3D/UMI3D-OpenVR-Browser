@@ -59,6 +59,9 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="callback"></param>
         public void AskForDownload(int count, Action<bool> callback)
         {
+            LoadingPanel.Instance.HideLoadingScreen();
+            LoadingPanel.Instance.Hide();
+            LoadingPanel.Instance.DisplayObjectHidden();
             panel.SetActive(true);
             accept.onClick.RemoveAllListeners();
             deny.onClick.RemoveAllListeners();

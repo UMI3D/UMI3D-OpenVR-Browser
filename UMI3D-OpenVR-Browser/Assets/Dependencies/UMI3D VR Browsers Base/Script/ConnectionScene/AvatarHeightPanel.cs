@@ -73,6 +73,7 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="validationCallBack"></param>
         public void Display(System.Action validationCallBack)
         {
+            ConnectionMenuManager.instance.Library.SetActive(false);
             panel.SetActive(true);
             this.validationCallBack = validationCallBack;
         }

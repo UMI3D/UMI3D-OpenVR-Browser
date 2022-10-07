@@ -148,7 +148,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public void OpenParameterMenu(ControllerType controller, bool menuAsync= false)
         {
             Open(true);
-            CtrlToolMenu.DisplayParameterMenu(controller, menuAsync: menuAsync);
+            CtrlToolMenu.DisplayParameterMenu(controller, menuAsync: true);
         }
 
         public void DisplayActionBinding(ControllerType controller)
@@ -162,6 +162,11 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             Open(true);
             ToolboxesMenu.Open();
             ToolboxesMenu.NavigateTo(menu);
+        }
+
+        public void RefreshBackground()
+        {
+            CtrlToolMenu.RefreshBackground();
         }
     }
 

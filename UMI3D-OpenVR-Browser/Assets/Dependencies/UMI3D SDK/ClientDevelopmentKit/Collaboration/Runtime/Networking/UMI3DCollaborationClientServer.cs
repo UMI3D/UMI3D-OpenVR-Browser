@@ -351,15 +351,7 @@ namespace umi3d.cdk.collaboration
             idsToSend.Clear();
             foreach (ulong id in ids)
             {
-                if (loadingEntities.Add(id))
-                {
-                    idsToSend.Add(id);
-                }
-                else
-                {
-                    UMI3DLogger.Log($"Cancel GetEntity {id}", scope);
-                }
-
+                idsToSend.Add(id);
             }
             UMI3DLogger.Log($"GetEntity {idsToSend.ToString<ulong>()}", scope);
             return await (environmentClient?.GetEntity(idsToSend) ?? Task.FromResult<LoadEntityDto>(null));

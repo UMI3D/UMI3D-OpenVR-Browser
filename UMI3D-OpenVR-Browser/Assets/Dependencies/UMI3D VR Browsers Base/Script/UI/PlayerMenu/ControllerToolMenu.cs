@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 using umi3d.cdk.menu;
+using umi3d.common;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
 using UnityEngine;
@@ -136,6 +137,16 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public void SetToolName(string toolName)
         {
             toolParametersMenu.SetToolName(toolName);
+        }
+
+        /// <summary>
+        /// Hides/shows the menu to refresh UI dislay to fix some Unity bugs.
+        /// </summary>
+        public async void RefreshBackground()
+        {
+            root.SetActive(!IsOpen);
+            await UMI3DAsyncManager.Yield();
+            root.SetActive(IsOpen);
         }
 
         #region Binding Menu

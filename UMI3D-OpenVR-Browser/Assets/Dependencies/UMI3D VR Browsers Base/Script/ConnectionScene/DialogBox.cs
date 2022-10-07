@@ -93,7 +93,7 @@ namespace umi3dVRBrowsersBase.connection
             IsDisplayed = true;
 
             foreach (GameObject laser in lasers)
-                laser.SetActive(true);
+                laser?.SetActive(true);
         }
 
         /// <summary>

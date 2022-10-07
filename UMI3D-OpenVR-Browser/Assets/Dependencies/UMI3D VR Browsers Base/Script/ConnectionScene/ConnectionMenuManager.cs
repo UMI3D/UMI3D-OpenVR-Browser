@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System.Collections;
+using System.Threading.Tasks;
 using umi3d;
 using umi3d.cdk;
 using umi3dVRBrowsersBase.ui.keyboard;
@@ -66,6 +67,7 @@ namespace umi3dVRBrowsersBase.connection
         public ConnectionErrorPanel errorPanel;
         [Tooltip("Panel to ask users their heights")]
         public AvatarHeightPanel avatarHeightPanel;
+        public GameObject Library;
 
         [Header("Navigation")]
         [SerializeField]
@@ -196,6 +198,7 @@ namespace umi3dVRBrowsersBase.connection
                 {
                     mainCanvas.SetActive(true);
                     homePanel.Display();
+                    Library.SetActive(true);
                 });
             }
 
@@ -255,6 +258,146 @@ namespace umi3dVRBrowsersBase.connection
                 yield return new WaitForEndOfFrame();
 
             UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(() => SceneManager.UnloadSceneAsync(connectionSceneName));
+            onlyOneConnection = false;
+        }
+
+
+
+
+        public static bool onlyOneConnection = false;
+        static bool? _mediaDtoFound = null;
+        static bool? _masterServerFound = null;
+        protected bool ShouldDisplaySessionScreen = false;
+
+        protected PlayerPrefsManager.FavoriteServerData currentServer = new PlayerPrefsManager.FavoriteServerData();
+        protected System.Collections.Generic.List<PlayerPrefsManager.FavoriteServerData> savedServers = new System.Collections.Generic.List<PlayerPrefsManager.FavoriteServerData>();
+
+        protected umi3d.cdk.collaboration.LaucherOnMasterServer masterServer = new umi3d.cdk.collaboration.LaucherOnMasterServer();
+
+        protected PlayerPrefsManager.Data currentConnectionData = new PlayerPrefsManager.Data();
+
+        static bool mediaDtoFound
+        {
+            get
+            {
+                return _mediaDtoFound ?? false;
+            }
+            set
+            {
+                _mediaDtoFound = value;
+            }
+        }
+
+        static bool masterServerFound
+        {
+            get
+            {
+                return _masterServerFound ?? false;
+            }
+            set
+            {
+                _masterServerFound = value;
+            }
+        }
+
+
+        public async Task _Connect(string url, bool saveInfo = false)
+        {
+            homePanel.Hide();
+            currentServer.serverUrl = url;
+
+            if (onlyOneConnection)
+            {
+                Debug.Log("Only one connection at a time");
+                return;
+            }
+
+            onlyOneConnection = true;
+            _mediaDtoFound = null;
+            _masterServerFound = null;
+
+            WaitForError();
+
+            void StoreServer()
+            {
+                if (savedServers.Find((server) => server.serverName == currentServer.serverName) == null) savedServers.Add(currentServer);
+                //ServerPreferences.StoreRegisteredServerData(savedServers);
+                PlayerPrefsManager.AddServerToFavorite(currentServer.serverUrl, currentServer.serverName);
+            }
+
+            //1. Try to find a master server
+            masterServer.ConnectToMasterServer(() =>
+            {
+                if (mediaDtoFound)
+                    return;
+
+                masterServer.RequestInfo((name, icon) =>
+                {
+                    if (mediaDtoFound) return;
+                    masterServerFound = true;
+
+                    currentServer.serverName = name;
+                    //currentServer.serverIcon = icon;
+                    //preferences.ServerPreferences.StoreUserData(currentServer);
+                    if (saveInfo) StoreServer();
+                },
+                () =>
+                {
+                    masterServerFound = false;
+                }
+                );
+
+                ShouldDisplaySessionScreen = true;
+            },
+            currentServer.serverUrl,
+            () =>
+            {
+                masterServerFound = false;
+            });
+
+            //2. try to get a mediaDto
+            var media = await Connecting.Instance.GetMedia(currentServer);
+            if (media == null || masterServerFound)
+            {
+                mediaDtoFound = false;
+                return;
+            }
+            mediaDtoFound = true;
+
+            currentServer.serverName = media.name;
+            //currentServer.serverIcon = media?.icon2D?.variants?.FirstOrDefault()?.url;
+            //preferences.ServerPreferences.StoreUserData(currentServer);
+            if (saveInfo) StoreServer();
+
+            currentConnectionData.environmentName = media.name;
+            currentConnectionData.ip = media.url;
+            currentConnectionData.port = null;
+            StoreCurrentConnectionDataAndConnect();
+
+        }
+
+        async void WaitForError()
+        {
+            while (onlyOneConnection)
+            {
+                await UMI3DAsyncManager.Yield();
+                if (masterServerFound || mediaDtoFound)
+                    return;
+                if (_masterServerFound != null && _mediaDtoFound != null)
+                {
+                    onlyOneConnection = false;
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Store current connection data and initiates the connection to the environment.
+        /// </summary>
+        protected void StoreCurrentConnectionDataAndConnect()
+        {
+            //preferences.ServerPreferences.StoreUserData(currentConnectionData);
+            ConnectionMenuManager.instance.ConnectToUmi3DEnvironement(currentConnectionData.ip, currentConnectionData.port);
         }
 
         #endregion

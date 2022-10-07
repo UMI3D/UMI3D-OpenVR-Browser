@@ -99,6 +99,12 @@ namespace umi3dVRBrowsersBase.connection
                 o.SetActive(false);
         }
 
+        public void DisplayObjectHidden()
+        {
+            foreach (GameObject o in objectsToHide)
+                o.SetActive(true);
+        }
+
         /// <summary>
         /// Hides panel
         /// </summary>

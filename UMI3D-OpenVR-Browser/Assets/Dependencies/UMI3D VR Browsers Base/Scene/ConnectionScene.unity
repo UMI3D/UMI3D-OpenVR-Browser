@@ -7249,6 +7249,7 @@ MonoBehaviour:
   connectionToSessionPanel: {fileID: 1214001846}
   errorPanel: {fileID: 1934962746}
   avatarHeightPanel: {fileID: 662424340}
+  Library: {fileID: 1562283588}
   previousButton: {fileID: 1190066424}
   nextButton: {fileID: 974744808}
   keyboard: {fileID: 402117390}
@@ -10442,6 +10443,7 @@ MonoBehaviour:
   info: {fileID: 865823935}
   accept: {fileID: 2137746678}
   deny: {fileID: 1620065175}
+  Background: {fileID: 408117372}
 --- !u!1 &1147884966
 GameObject:
   m_ObjectHideFlags: 0
@@ -11447,7 +11449,7 @@ MonoBehaviour:
   onDisplay:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1596876375}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: 
         m_MethodName: Rescale
         m_Mode: 1
@@ -14229,7 +14231,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1596876373}
   - component: {fileID: 1596876374}
-  - component: {fileID: 1596876375}
   m_Layer: 0
   m_Name: Content
   m_TagString: Untagged
@@ -14254,7 +14255,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.014762316, y: -0.00030517578}
+  m_AnchoredPosition: {x: 0.012111254, y: -0.00030517578}
   m_SizeDelta: {x: 0, y: 705}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1596876374
@@ -14283,21 +14284,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &1596876375
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1596876372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 960a1ee0a6c055a428dffdaca46cdcb4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  content: {fileID: 1596876373}
-  itemHeight: 150
-  spacing: 30
 --- !u!1 &1613678507
 GameObject:
   m_ObjectHideFlags: 0
@@ -16774,7 +16760,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1896157389
 Canvas:
   m_ObjectHideFlags: 0
@@ -17268,6 +17254,7 @@ MonoBehaviour:
   objectToHideWhenLoading:
   - {fileID: 221180306}
   - {fileID: 2105915454}
+  Background: {fileID: 408117372}
 --- !u!1 &1973976949
 GameObject:
   m_ObjectHideFlags: 0
