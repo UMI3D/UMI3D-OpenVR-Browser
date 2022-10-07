@@ -1259,6 +1259,7 @@ GameObject:
   - component: {fileID: 3542380241650242426}
   - component: {fileID: 7143870400363556948}
   - component: {fileID: 2604440083431539932}
+  - component: {fileID: 2436190500972998943}
   m_Layer: 0
   m_Name: VRCamera
   m_TagString: MainCamera
@@ -1416,6 +1417,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frameRate: 30
+--- !u!114 &2436190500972998943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3574216422171357672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0aa0e47305894f4ea13a82debadbd14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boneType: 58
+  isTracked: 1
 --- !u!1 &3574216422171365704
 GameObject:
   m_ObjectHideFlags: 0
@@ -3928,6 +3943,7 @@ MonoBehaviour:
   alwaysSendTrackingFrame: 0
   detectionPositionDelta: 0.1
   detectionRotationDelta: 5
+  maximumTimeBetweenFramesSent: 5
   EmotePlayedSelfEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -4109,6 +4125,7 @@ GameObject:
   - component: {fileID: 7289560753284016166}
   - component: {fileID: 7289560753284016165}
   - component: {fileID: 7289560753284016160}
+  - component: {fileID: 4387569826040570359}
   m_Layer: 0
   m_Name: TeleportingOpenVR
   m_TagString: Untagged
@@ -4185,6 +4202,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   components: []
+--- !u!114 &4387569826040570359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7289560753284016164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8b38180f9631c0244bf7b35b1608a32e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7289560753622272137
 GameObject:
   m_ObjectHideFlags: 0
