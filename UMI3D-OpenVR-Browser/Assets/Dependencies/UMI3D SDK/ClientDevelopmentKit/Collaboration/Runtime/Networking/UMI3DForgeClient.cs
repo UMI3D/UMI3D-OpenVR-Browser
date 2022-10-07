@@ -569,7 +569,7 @@ namespace umi3d.cdk.collaboration
             catch (Exception e)
             {
                 UMI3DLogger.Log("error on get local info : " + key, scope);
-                UMI3DLogger.LogExcetion(e, scope);
+                UMI3DLogger.LogException(e, scope);
             }
         }
 
@@ -582,7 +582,7 @@ namespace umi3d.cdk.collaboration
             catch (Exception e)
             {
                 UMI3DLogger.Log("error on upload file : " + fileName, scope);
-                UMI3DLogger.LogExcetion(e, scope);
+                UMI3DLogger.LogException(e, scope);
             }
         }
 
@@ -611,8 +611,7 @@ namespace umi3d.cdk.collaboration
                         {
                             MainThreadManager.Run(() =>
                             {
-                                if (client.Time.Timestep - frame.TimeStep < 500)
-                                    StartCoroutine((userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep));
+                                (userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep);
                             });
                         }
                         else
@@ -637,8 +636,7 @@ namespace umi3d.cdk.collaboration
                     {
                         MainThreadManager.Run(() =>
                         {
-                            if (client.Time.Timestep - frame.TimeStep < 500)
-                                StartCoroutine((userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep));
+                            (userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep);
                         });
                     }
                     else

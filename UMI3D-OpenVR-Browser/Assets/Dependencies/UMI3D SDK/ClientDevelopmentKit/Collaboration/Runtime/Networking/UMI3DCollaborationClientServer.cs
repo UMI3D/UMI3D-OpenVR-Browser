@@ -142,6 +142,7 @@ namespace umi3d.cdk.collaboration
                     if (await wc.Connect())
                     {
                         Instance.OnRedirection.Invoke();
+                        loadingEntities.Clear();
 
                         UMI3DEnvironmentClient env = environmentClient;
                         environmentClient = null;
@@ -348,17 +349,43 @@ namespace umi3d.cdk.collaboration
         ///<inheritdoc/>
         protected override async Task<LoadEntityDto> _GetEntity(List<ulong> ids)
         {
-            idsToSend.Clear();
+            List<ulong> idsToSend = new List<ulong>();
             foreach (ulong id in ids)
             {
-                idsToSend.Add(id);
+                if (loadingEntities.Add(id))
+                {
+                    idsToSend.Add(id);
+                }
+                else
+                {
+                    UMI3DLogger.Log($"Cancel GetEntity {id}", scope);
+                }
+
             }
+
             UMI3DLogger.Log($"GetEntity {idsToSend.ToString<ulong>()}", scope);
-            return await (environmentClient?.GetEntity(idsToSend) ?? Task.FromResult<LoadEntityDto>(null));
+            LoadEntityDto result = null;
+            try
+            {
+                result = idsToSend.Count > 0 ?
+                    await (environmentClient?.GetEntity(idsToSend) ?? Task.FromResult<LoadEntityDto>(null))
+                    : new LoadEntityDto() { entities = new List<IEntity>() };
+            }
+            finally
+            {
+
+                foreach (var id in idsToSend)
+                {
+                    loadingEntities.Remove(id);
+                }
+                UMI3DLogger.Log($"Remove GetEntity {idsToSend.ToString<ulong>()} {loadingEntities.ToString<ulong>()}", scope);
+            }
+
+
+            return result;
         }
 
-        private SortedSet<ulong> loadingEntities = new SortedSet<ulong>();
-        private List<ulong> idsToSend = new List<ulong>();
+        private static SortedSet<ulong> loadingEntities = new SortedSet<ulong>();
 
 
         ///<inheritdoc/>
