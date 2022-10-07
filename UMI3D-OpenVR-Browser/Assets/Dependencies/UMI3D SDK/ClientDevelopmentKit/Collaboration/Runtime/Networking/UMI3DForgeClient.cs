@@ -566,7 +566,7 @@ namespace umi3d.cdk.collaboration
                 byte[] bytes = await environmentClient.HttpClient.SendGetLocalInfo(key);
                 LocalInfoSender.SetLocalInfo(key, bytes);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 UMI3DLogger.Log("error on get local info : " + key, scope);
                 UMI3DLogger.LogExcetion(e, scope);
@@ -579,7 +579,7 @@ namespace umi3d.cdk.collaboration
             {
                 await environmentClient.HttpClient.SendPostFile(token, fileName, bytesToUpload);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 UMI3DLogger.Log("error on upload file : " + fileName, scope);
                 UMI3DLogger.LogExcetion(e, scope);
@@ -630,26 +630,25 @@ namespace umi3d.cdk.collaboration
                 var container = new ByteContainer(frame.StreamData.byteArr);
                 try
                 {
-                    System.Collections.Generic.List<UserTrackingFrameDto> frames = UMI3DNetworkingHelper.ReadList<UserTrackingFrameDto>(container);
+                    var trackingFrame = UMI3DNetworkingHelper.Read<UserTrackingFrameDto>(container);
 
-                    foreach (UserTrackingFrameDto trackingFrame in frames)
+
+                    if (UMI3DClientUserTracking.Instance.embodimentDict.TryGetValue(trackingFrame.userId, out UserAvatar userAvatar))
                     {
-                        if (UMI3DClientUserTracking.Instance.embodimentDict.TryGetValue(trackingFrame.userId, out UserAvatar userAvatar))
+                        MainThreadManager.Run(() =>
                         {
-                            MainThreadManager.Run(() =>
-                            {
-                                if (client.Time.Timestep - frame.TimeStep < 500)
-                                    StartCoroutine((userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep));
-                            });
-                        }
-                        else
-                        {
-                            MainThreadManager.Run(() =>
-                            {
-                                UMI3DLogger.LogWarning("User Avatar not found.", scope);
-                            });
-                        }
+                            if (client.Time.Timestep - frame.TimeStep < 500)
+                                StartCoroutine((userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep));
+                        });
                     }
+                    else
+                    {
+                        MainThreadManager.Run(() =>
+                        {
+                            UMI3DLogger.LogWarning("User Avatar not found.", scope);
+                        });
+                    }
+
                 }
                 catch (Exception e)
                 {
