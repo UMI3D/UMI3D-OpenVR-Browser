@@ -18,6 +18,7 @@ using inetum.unityUtils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using umi3d.cdk;
 using umi3d.cdk.collaboration;
 using umi3d.common;
@@ -104,27 +105,49 @@ namespace umi3dVRBrowsersBase.connection
             FormAsker.Instance.Display(form, callback);
         }
 
+        protected static string FormatUrl(string ip, string port)
+        {
+            string url = ip + (string.IsNullOrEmpty(port) ? "" : (":" + port));
+
+            if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+                return "http://" + url;
+            return url;
+        }
+
+        public async Task<MediaDto> GetMedia(PlayerPrefsManager.FavoriteServerData connectionData)
+        {
+            LoadingPanel.Instance.Display("Connecting ...");
+            //this.data = data;
+            LoginPasswordAsker.Instance.Hide();
+
+            var curentUrl = FormatUrl(connectionData.serverUrl, null) + UMI3DNetworkingKeys.media;
+            url = curentUrl;
+            try
+            {
+                return await UMI3DCollaborationClientServer.GetMedia(url, (e) => url == curentUrl && e.count < 3);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+
         /// <summary>
         /// Tries to connect to the server.
         /// </summary>
         /// <param name="data"></param>
-        public async void Connect(AdvancedConnectionPanel.Data data)
+        public void Connect(AdvancedConnectionPanel.Data connectionData)
         {
             LoadingPanel.Instance.Display("Connecting ...");
-            this.data = data;
+            this.data = connectionData;
             LoginPasswordAsker.Instance.Hide();
 
-            var currentUrl = "http://" + data.ip + ":" + data.port + UMI3DNetworkingKeys.media;
-            url = currentUrl;
-
-            try
-            {
-                GetMediaSucces(await UMI3DCollaborationClientServer.GetMedia(url, (e) => url == currentUrl && e.count < 3));
-            }
-            catch (Exception e)
-            {
-                GetMediaFailed(e.Message);
-            }
+            var baseUrl = FormatUrl(connectionData.ip, connectionData.port);
+            var curentUrl = baseUrl + UMI3DNetworkingKeys.media;
+            url = curentUrl;
+            
+            GetMediaSucces(new MediaDto() { url = baseUrl, name =/* connectionData.environmentName ??*/ connectionData.ip }, (s) => GetMediaFailed(s));
         }
 
         /// <summary>
@@ -143,10 +166,11 @@ namespace umi3dVRBrowsersBase.connection
         /// <summary>
         /// Called if the connection succeded.
         /// </summary>
-        private void GetMediaSucces(MediaDto media)
+        private void GetMediaSucces(MediaDto media, System.Action<string> failed)
         {
-            UMI3DCollaborationClientServer.Connect(media);
             PlayerMenuManager.Instance.MenuHeader.SetEnvironmentName(media);
+            UMI3DCollaborationClientServer.Connect(media, failed);
+            
         }
 
         /// <summary>

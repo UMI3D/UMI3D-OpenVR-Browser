@@ -49,9 +49,9 @@ namespace umi3dVRBrowsersBase.connection
         {
             label.text = name;
             button.onClick.RemoveAllListeners();
-            button.onClick.AddListener(() =>
+            button.onClick.AddListener(async () =>
             {
-                ConnectionMenuManager.instance.ConnectToMasterServer(url);
+                await ConnectionMenuManager.instance._Connect(url);
             });
 
             deleteButton.onClick.RemoveAllListeners();

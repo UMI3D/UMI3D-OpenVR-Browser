@@ -200,6 +200,19 @@ namespace umi3dVRBrowsersBase.connection
         }
 
         /// <summary>
+        /// Contains : environment name, ip and port.
+        /// </summary>
+        [System.Serializable]
+        public class Data
+        {
+            public string environmentName;
+            public string ip;
+            public string port;
+
+            public override string ToString() => $"name = {environmentName}, ip = {ip}, port = {port}";
+        }
+
+        /// <summary>
         /// Stores data about a favorite server.
         /// </summary>
         [System.Serializable]

@@ -57,7 +57,7 @@ namespace umi3dVRBrowsersBase.connection
 
             yield return new WaitUntil(() => indicator.isDone);
 
-            ; SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(sceneToLoad));
         }
     }
 }

@@ -62,7 +62,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <param name="editionCallback"></param>
         public void SetEditionCallback(Action<string> editionCallback)
         {
-            this.editionCallback = (res) => { editionCallback?.Invoke(res); PlayerMenuManager.Instance.gameObject.SetActive(true); StartCoroutine(UnSelectAllSelectable()); };
+            this.editionCallback = (res) => { editionCallback?.Invoke(res); PlayerMenuManager.Instance.gameObject.SetActive(true); StartCoroutine(UnSelectAllSelectable()); PlayerMenuManager.Instance.RefreshBackground(); };
         }
 
         /// <summary>
@@ -87,7 +87,12 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             {
                 Transform playerMenuTransform = PlayerMenuManager.Instance.MenuCanvasTransform;
 
-                keyboard.OpenKeyboard(this.text, editionCallback, () => { PlayerMenuManager.Instance.gameObject.SetActive(true); StartCoroutine(UnSelectAllSelectable()); }, playerMenuTransform.position, playerMenuTransform.forward);
+                keyboard.OpenKeyboard(this.text, editionCallback, () => {
+                    PlayerMenuManager.Instance.gameObject.SetActive(true);
+                    PlayerMenuManager.Instance.RefreshBackground();
+                    StartCoroutine(UnSelectAllSelectable());
+                }, playerMenuTransform.position, playerMenuTransform.forward);
+
                 currentController = PlayerMenuManager.Instance.CurrentController;
                 PlayerMenuManager.Instance.gameObject.SetActive(false);
             }

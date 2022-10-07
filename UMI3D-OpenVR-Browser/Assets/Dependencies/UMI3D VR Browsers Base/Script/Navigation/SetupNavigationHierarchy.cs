@@ -1,5 +1,5 @@
-﻿/*
-Copyright 2019 - 2021 Inetum
+/*
+Copyright 2019 - 2022 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,15 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using umi3d.cdk.collaboration;
+using umi3d.cdk;
+using umi3d.common;
 
-namespace umi3d
+public class SetupNavigationHierarchy : MonoBehaviour
 {
-    public static class UMI3DVersion
+    private void Awake()
     {
-        public static string version => major + "." + minor + "." + status + "." + date;
-        public static readonly string major = "2";
-        public static readonly string minor = "5";
-        public static readonly string status = "b";
-        public static readonly string date = "220930";
+        transform.parent = UMI3DCollaborationEnvironmentLoader.Instance.transform;
     }
 }

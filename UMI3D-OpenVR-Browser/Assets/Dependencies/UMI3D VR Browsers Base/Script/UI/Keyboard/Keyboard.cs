@@ -189,12 +189,14 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
         private void SetEditedInputField()
         {
-            editedField.shouldHideMobileInput = true;
+            if (editedField != null)
+                editedField.shouldHideMobileInput = true;
         }
 
         private void BindEditedField(InputField inputField)
         {
-            editedField = inputField;
+            if (editedField != null)
+                editedField = inputField;
             SetEditedInputField();
         }
 
@@ -268,8 +270,11 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             }
 
             OnValueChanged.Invoke(previewField.text);
-            editedField.text = previewField.text;
-            editedField.ForceLabelUpdate();
+            if (editedField != null)
+            {
+                editedField.text = previewField.text;
+                editedField.ForceLabelUpdate();
+            }
 
             pressSource.Play();
         }
@@ -303,8 +308,12 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                     return;
 
                 OnValueChanged.Invoke(previewField.text);
-                editedField.text = previewField.text;
-                editedField.ForceLabelUpdate();
+
+                if (editedField != null)
+                {
+                    editedField.text = previewField.text;
+                    editedField.ForceLabelUpdate();
+                }
             }
         }
 
@@ -338,8 +347,6 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             this.onEditCanceled = onEditCanceled;
 
             IsOpen = true;
-
-            StartCoroutine(WaitAndSelectField());
         }
 
         /// <summary>

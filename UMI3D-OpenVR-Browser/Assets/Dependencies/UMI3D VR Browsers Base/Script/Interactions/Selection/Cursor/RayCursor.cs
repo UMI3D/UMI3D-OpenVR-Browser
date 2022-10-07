@@ -109,8 +109,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 trackingInfo.targetContainer.Interactable.HoverEnter(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
-                    trackingInfo.raycastHit.point,
-                    trackingInfo.raycastHit.normal,
+                    trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
+                    trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
             });
 
@@ -119,11 +119,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (controller != (trackingInfo.controller as VRController))
                     return;
 
+
                 trackingInfo.targetContainer.Interactable.HoverExit(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
-                    trackingInfo.raycastHit.point,
-                    trackingInfo.raycastHit.normal,
+                    trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
+                    trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
             });
 
@@ -135,8 +136,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 trackingInfo.targetContainer.Interactable.Hovered(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
-                    trackingInfo.raycastHit.point,
-                    trackingInfo.raycastHit.normal,
+                    trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
+                    trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
             });
         }
@@ -241,7 +242,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         {
             if (container == null || container.Interactable == null)
                 return false;
-            return (container.Interactable.InteractionDistance < 0) || 
+            return (container.Interactable.InteractionDistance < 0) ||
                 (container.Interactable.InteractionDistance >= (container.transform.position - controller.transform.position).magnitude);
         }
 

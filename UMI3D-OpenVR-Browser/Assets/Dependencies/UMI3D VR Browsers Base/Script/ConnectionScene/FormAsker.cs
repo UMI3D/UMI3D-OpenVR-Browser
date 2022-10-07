@@ -58,112 +58,6 @@ namespace umi3dVRBrowsersBase.connection
         }
 
         /// <summary>
-        /// Creates the right MenuItem according to the dto type.
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        private static (MenuItem, ParameterSettingRequestDto) GetInteractionItem(AbstractInteractionDto dto)
-        {
-            MenuItem result = null;
-            ParameterSettingRequestDto requestDto = null;
-            switch (dto)
-            {
-                case BooleanParameterDto booleanParameterDto:
-                    var b = new BooleanInputMenuItem() { dto = booleanParameterDto };
-                    b.NotifyValueChange(booleanParameterDto.value);
-                    requestDto = new ParameterSettingRequestDto()
-                    {
-                        toolId = dto.id,
-                        id = booleanParameterDto.id,
-                        parameter = booleanParameterDto.value,
-                        hoveredObjectId = 0
-                    };
-                    b.Subscribe((x) =>
-                    {
-                        booleanParameterDto.value = x;
-                        requestDto.parameter = x;
-                    });
-                    result = b;
-                    break;
-                case FloatRangeParameterDto floatRangeParameterDto:
-                    var f = new FloatRangeInputMenuItem() { dto = floatRangeParameterDto, max = floatRangeParameterDto.max, min = floatRangeParameterDto.min, value = floatRangeParameterDto.value, increment = floatRangeParameterDto.increment };
-                    requestDto = new ParameterSettingRequestDto()
-                    {
-                        toolId = dto.id,
-                        id = floatRangeParameterDto.id,
-                        parameter = floatRangeParameterDto.value,
-                        hoveredObjectId = 0
-                    };
-                    f.Subscribe((x) =>
-                    {
-                        floatRangeParameterDto.value = x;
-                        requestDto.parameter = x;
-                    });
-                    result = f;
-                    break;
-                case EnumParameterDto<string> enumParameterDto:
-                    var en = new DropDownInputMenuItem() { dto = enumParameterDto, options = enumParameterDto.possibleValues };
-                    en.NotifyValueChange(enumParameterDto.value);
-                    requestDto = new ParameterSettingRequestDto()
-                    {
-                        toolId = dto.id,
-                        id = enumParameterDto.id,
-                        parameter = enumParameterDto.value,
-                        hoveredObjectId = 0
-                    };
-                    en.Subscribe((x) =>
-                    {
-                        enumParameterDto.value = x;
-                        requestDto.parameter = x;
-                    });
-                    result = en;
-                    break;
-                case StringParameterDto stringParameterDto:
-                    var s = new TextInputMenuItem() { dto = stringParameterDto };
-                    s.NotifyValueChange(stringParameterDto.value);
-                    requestDto = new ParameterSettingRequestDto()
-                    {
-                        toolId = dto.id,
-                        id = stringParameterDto.id,
-                        parameter = stringParameterDto.value,
-                        hoveredObjectId = 0
-                    };
-                    s.Subscribe((x) =>
-                    {
-                        stringParameterDto.value = x;
-                        requestDto.parameter = x;
-                    });
-                    result = s;
-                    break;
-                case LocalInfoRequestParameterDto localInfoRequestParameterDto:
-                    var localReq = new LocalInfoRequestInputMenuItem() { dto = localInfoRequestParameterDto };
-                    localReq.NotifyValueChange(localInfoRequestParameterDto.value);
-                    requestDto = new ParameterSettingRequestDto()
-                    {
-                        toolId = dto.id,
-                        id = localInfoRequestParameterDto.id,
-                        parameter = localInfoRequestParameterDto.value,
-                        hoveredObjectId = 0
-                    };
-                    localReq.Subscribe((x) =>
-                    {
-                        localInfoRequestParameterDto.value = x;
-                        requestDto.parameter = x;
-                    }
-                    );
-                    result = localReq;
-                    break;
-                default:
-                    result = new MenuItem();
-                    result.Subscribe(() => Debug.Log($"Missing case for {dto?.GetType()}"));
-                    break;
-            }
-            result.Name = dto.name;
-
-            return (result, requestDto);
-        }
-
-        /// <summary>
         /// Generates the MenuItems according to the parameters contained by form.
         /// </summary>
         /// <param name="form"></param>
@@ -191,13 +85,16 @@ namespace umi3dVRBrowsersBase.connection
                     answers = new List<ParameterSettingRequestDto>()
                 };
 
+                LoadingPanel.Instance.HideLoadingScreen();
                 LoadingPanel.Instance.Hide();
+                LoadingPanel.Instance.DisplayObjectHidden();
                 this.gameObject.SetActive(true);
                 menu.menu.RemoveAll();
+                menu.menu.Name = form.name;
 
                 foreach (AbstractParameterDto param in form.fields)
                 {
-                    (MenuItem, ParameterSettingRequestDto) c = GetInteractionItem(param);
+                    (MenuItem, ParameterSettingRequestDto) c = umi3d.cdk.interaction.GlobalToolMenuManager.GetInteractionItem(param);
                     menu.menu.Add(c.Item1);
                     answer.answers.Add(c.Item2);
                 }
@@ -205,24 +102,26 @@ namespace umi3dVRBrowsersBase.connection
                 var send = new EventMenuItem() { Name = "Join", hold = false };
                 UnityAction<bool> action = (bool b) =>
                 {
+                    Hide();
+                    ConnectionMenuManager.instance.keyboard.Hide();
                     menuDisplayer.Hide(true);
                     menu.menu.RemoveAll();
-                    ConnectionMenuManager.instance.keyboard.Hide();
 
                     callback.Invoke(answer);
                     LoadingPanel.Instance.SetLoadingScreen();
                     LoadingPanel.Instance.Display("Loading environment ...");
                     HideObjects();
-                    Hide();
+
                     LocalInfoSender.CheckFormToUpdateAuthorizations(form);
                 };
                 send.Subscribe(action);
                 menu.menu.Add(send);
-                menuDisplayer.Display(true);
+                menuDisplayer.CreateMenuAndDisplay(true, false);
 
                 ConnectionMenuManager.instance.ShowPreviousNavigationButton(() =>
                 {
                     Hide();
+                    ConnectionMenuManager.onlyOneConnection = false;
                     ConnectionMenuManager.instance.DisplayHome();
                 });
 

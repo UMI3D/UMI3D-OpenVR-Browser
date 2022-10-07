@@ -63,6 +63,10 @@ namespace umi3dVRBrowsersBase.rendering
         {
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Skybox;
             RenderSettings.ambientIntensity = 1;
+
+#if PLATFORM_ANDROID
+            RenderSettings.reflectionIntensity = 0;
+#endif
             RenderSettings.fog = false;
             RenderSettings.skybox = instance?.defaultSkyboxMat;
         }

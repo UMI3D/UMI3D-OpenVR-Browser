@@ -410,6 +410,7 @@ MonoBehaviour:
   selectionFeedbackHandler: {fileID: 1344738551367691293}
   pointingDetectors:
   - {fileID: 4984395139596033644}
+  - {fileID: 5538973729607222011}
   proximityDetectors:
   - {fileID: 313899135494070758}
 --- !u!114 &5538973729607222011

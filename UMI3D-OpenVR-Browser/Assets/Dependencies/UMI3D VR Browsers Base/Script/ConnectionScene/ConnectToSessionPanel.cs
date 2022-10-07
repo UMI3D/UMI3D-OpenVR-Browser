@@ -16,6 +16,7 @@ limitations under the License.
 
 using MainThreadDispatcher;
 using System.Collections;
+using System.Threading.Tasks;
 using umi3d.cdk.collaboration;
 using umi3dVRBrowsersBase.ui.keyboard;
 using UnityEngine;
@@ -139,6 +140,14 @@ namespace umi3dVRBrowsersBase.connection
                 });
             });
         }
+
+
+
+        
+
+
+
+
 
         /// <summary>
         /// Waits for the connection with a master server to be done.
