@@ -629,24 +629,25 @@ namespace umi3d.cdk.collaboration
                 var container = new ByteContainer(frame.StreamData.byteArr);
                 try
                 {
-                    var trackingFrame = UMI3DNetworkingHelper.Read<UserTrackingFrameDto>(container);
+                    System.Collections.Generic.List<UserTrackingFrameDto> frames = UMI3DNetworkingHelper.ReadList<UserTrackingFrameDto>(container);
 
-
-                    if (UMI3DClientUserTracking.Instance.embodimentDict.TryGetValue(trackingFrame.userId, out UserAvatar userAvatar))
+                    foreach (UserTrackingFrameDto trackingFrame in frames)
                     {
-                        MainThreadManager.Run(() =>
+                        if (UMI3DClientUserTracking.Instance.embodimentDict.TryGetValue(trackingFrame.userId, out UserAvatar userAvatar) && userAvatar is UMI3DCollaborativeUserAvatar user)
                         {
-                            (userAvatar as UMI3DCollaborativeUserAvatar).UpdateAvatarPosition(trackingFrame, frame.TimeStep);
-                        });
-                    }
-                    else
-                    {
-                        MainThreadManager.Run(() =>
+                            MainThreadManager.Run(() =>
+                            {
+                                user.UpdateAvatarPosition(trackingFrame, frame.TimeStep);
+                            });
+                        }
+                        else
                         {
-                            UMI3DLogger.LogWarning("User Avatar not found.", scope);
-                        });
+                            MainThreadManager.Run(() =>
+                            {
+                                UMI3DLogger.LogWarning("User Avatar not found.", scope);
+                            });
+                        }
                     }
-
                 }
                 catch (Exception e)
                 {

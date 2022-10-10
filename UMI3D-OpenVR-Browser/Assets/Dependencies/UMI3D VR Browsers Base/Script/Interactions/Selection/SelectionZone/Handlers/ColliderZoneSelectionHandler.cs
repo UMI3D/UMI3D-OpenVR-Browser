@@ -46,6 +46,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             {
                 if (obj.Equals(null)
                     || (obj.collider == null)
+                    || (!obj.collider.gameObject.activeInHierarchy)
                     || (obj.obj == null)
                     || Vector3.Distance(transform.position, obj.collider.ClosestPoint(transform.position)) > zoneCollider.radius)
                 {

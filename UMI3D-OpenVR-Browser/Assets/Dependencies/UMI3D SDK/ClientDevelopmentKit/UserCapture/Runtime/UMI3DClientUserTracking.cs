@@ -129,6 +129,9 @@ namespace umi3d.cdk.userCapture
 
         private float lastTimeFrameSent = 0;
 
+        private ulong parentId = 0;
+
+        public ulong avatarSceneId = 0;
 
         public class HandPoseEvent : UnityEvent<UMI3DHandPoseDto> { };
         public class BodyPoseEvent : UnityEvent<UMI3DBodyPoseDto> { };
@@ -233,7 +236,7 @@ namespace umi3d.cdk.userCapture
             if (emoteConfig == null) //no emote support in the scene
                 return;
 
-            if (emoteCoroutineDict.ContainsKey(userId) 
+            if (emoteCoroutineDict.ContainsKey(userId)
                 && emoteCoroutineDict[userId] != null)
             {
                 StopCoroutine(emoteCoroutineDict[userId]);
@@ -313,6 +316,8 @@ namespace umi3d.cdk.userCapture
             UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(() => StartCoroutine(DispatchCamera()));
             UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(() => { if (sendTracking) StartCoroutine(DispatchTracking()); });
             UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(() => trackingReception = true);
+            UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(InitParentId);
+            UMI3DNavigation.onEmbarkVehicleDelegate += UpdateParentId;
             EmotesLoadedEvent.AddListener((UMI3DEmotesConfigDto dto) => { emoteConfig = dto; });
             EmotePlayedSelfEvent.AddListener(delegate
             {
@@ -324,6 +329,27 @@ namespace umi3d.cdk.userCapture
                 IgnoreBones = false;
                 IsEmotePlaying = false;
             });
+        }
+
+        private async void InitParentId()
+        {
+            while (!embodimentDict.ContainsKey(UMI3DClientServer.Instance.GetUserId()))
+            {
+                await UMI3DAsyncManager.Yield();
+            }
+
+            var avatarScene = embodimentDict[UMI3DClientServer.Instance.GetUserId()].transform.parent;
+
+            parentId = UMI3DEnvironmentLoader.GetNodeID(avatarScene);
+            avatarSceneId = parentId;
+        }
+
+        private void UpdateParentId(ulong vehicleId)
+        {
+            if (vehicleId != 0)
+                parentId = vehicleId;
+            else
+                Debug.LogError("Parent id not valid.");
         }
 
         /// <summary>
@@ -420,6 +446,7 @@ namespace umi3d.cdk.userCapture
                         rotation = rotation, //rotation relative to UMI3DEnvironmentLoader node
                         refreshFrequency = targetTrackingFPS,
                         userId = UMI3DClientServer.Instance.GetUserId(),
+                        parentId = parentId
                     };
                 }
 

@@ -30,13 +30,13 @@ namespace umi3dVRBrowsersBase.settings
         /// </summary>
         public bool IsOn
         {
-            get => !MicrophoneListener.isMute;
+            get => !MicrophoneListener.mute;
             set
             {
-                if (value == MicrophoneListener.isMute)
+                if (value == MicrophoneListener.mute)
                 {
-                    MicrophoneListener.isMute = !value;
-                    OnValueChanged?.Invoke(!MicrophoneListener.isMute);
+                    MicrophoneListener.mute = !value;
+                    OnValueChanged?.Invoke(!MicrophoneListener.mute);
                 }
             }
         }
