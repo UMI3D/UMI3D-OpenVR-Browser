@@ -6178,7 +6178,7 @@ PrefabInstance:
     - target: {fileID: 2423794756521151748, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2439902099852269835, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
@@ -6203,12 +6203,12 @@ PrefabInstance:
     - target: {fileID: 5721242110318173664, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6703912113532768241, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6983789213951145499, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
@@ -7243,17 +7243,17 @@ PrefabInstance:
     - target: {fileID: 2804195366849795432, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3784848031777195897, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5200641389016139148, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5211555095825158531, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
