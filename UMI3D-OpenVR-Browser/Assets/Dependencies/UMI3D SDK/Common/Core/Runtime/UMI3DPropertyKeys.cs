@@ -16,6 +16,11 @@ limitations under the License.
 
 namespace umi3d.common
 {
+    /// <summary>
+    /// Contains the keys for the available properties within the UMI3D protocol.
+    /// </summary>
+    /// Those keys are used when exchaning DTOs between the server and clients to identify 
+    /// which property is affected by an operation or a request.
     public static class UMI3DPropertyKeys
     {
         public const uint None = 0;
@@ -65,6 +70,8 @@ namespace umi3d.common
         public const uint AmbientGroundColor = 2104;
         public const uint AmbientIntensity = 2105;
         public const uint AmbientSkyboxImage = 2106;
+        public const uint AmbientSkyboxRotation = 2107;
+        public const uint AmbientSkyboxExposure = 2108;
         #endregion
 
         #region Model
@@ -82,6 +89,9 @@ namespace umi3d.common
         public const uint LineEndColor = 3011;
         public const uint LineStartWidth = 3012;
         public const uint LineEndWidth = 3013;
+
+        public const uint IsTraversable = 3020;
+        public const uint IsPartOfNavmesh = 3021;
 
         #endregion
 
@@ -115,6 +125,8 @@ namespace umi3d.common
 
         public const uint InteractableHoverEnterAnimation = 5301;
         public const uint InteractableHoverExitAnimation = 5302;
+        public const uint EventTriggerAnimation = 5303;
+        public const uint EventReleaseAnimation = 5304;
         #endregion
 
         #region UI

@@ -43,7 +43,7 @@ namespace umi3dVRBrowsersBase.navigation
         public float raySpeed = 6;
 
         [Tooltip("Max angle authorized to teleport")]
-        public float maxVerticalAngle;
+        public float maxVerticalAngle = 45f;
 
         /// <summary>
         /// Arc discrete subdivision length.
@@ -157,9 +157,9 @@ namespace umi3dVRBrowsersBase.navigation
                     RaycastHit hit;
                     if (Physics.Raycast(previousArcPoint, point - previousArcPoint, out hit, (nextPoint - point).magnitude, navmeshLayer))
                     {
-
                         TeleportArea area = hit.transform.GetComponent<TeleportArea>();
-                        if (area != null)
+
+                        if (area != null && Vector3.Angle(hit.normal, Vector3.up) <= maxVerticalAngle)
                         {
                             impactPoint.SetActive(true);
                             impactPoint.transform.position = hit.point;

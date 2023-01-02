@@ -16,9 +16,13 @@ limitations under the License.
 
 namespace umi3d.common
 {
+    /// <summary>
+    /// Essential data to enable the connection to an environment using a Forge server.
+    /// </summary>
     [System.Serializable]
     public class ForgeConnectionDto : UMI3DDto
     {
+        public string name;
         public string httpUrl;
         public string resourcesUrl;
         public bool authorizationInHeader;

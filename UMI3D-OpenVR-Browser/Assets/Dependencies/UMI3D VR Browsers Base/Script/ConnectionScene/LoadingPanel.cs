@@ -75,14 +75,14 @@ namespace umi3dVRBrowsersBase.connection
                 OnLoadingEnvironmentFinish?.Invoke();
                 AudioListener.volume = 1.0f;
             });
-            UMI3DEnvironmentLoader.Instance.onProgressChange.AddListener(v =>
-            {
-                if (v == 0)
-                {
-                    OnLoadingEnvironmentStart?.Invoke();
-                    AudioListener.volume = 0.0f;
-                }
-            });
+            //UMI3DEnvironmentLoader.Instance.onProgressChange.AddListener(v =>
+            //{
+            //    if (v == 0)
+            //    {
+            //        OnLoadingEnvironmentStart?.Invoke();
+            //        AudioListener.volume = 0.0f;
+            //    }
+            //});
         }
 
         /// <summary>

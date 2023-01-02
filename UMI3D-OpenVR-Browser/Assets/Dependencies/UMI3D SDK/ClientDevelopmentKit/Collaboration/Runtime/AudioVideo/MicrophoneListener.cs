@@ -43,6 +43,7 @@ namespace umi3d.cdk.collaboration
 
             UMI3DCollaborationClientServer.Instance.OnRedirectionStarted.AddListener(Reset);
             UMI3DCollaborationClientServer.Instance.OnLeavingEnvironment.AddListener(Reset);
+            UMI3DCollaborationClientServer.Instance.OnLeaving.AddListener(Reset);
 
             UMI3DCollaborationClientServer.Instance.OnRedirectionAborted.AddListener(Heartbeat);
             UMI3DEnvironmentClient.EnvironementLoaded.AddListener(Heartbeat);
@@ -221,6 +222,22 @@ namespace umi3d.cdk.collaboration
 
         #endregion
         #endregion
+
+#if UNITY_STANDALONE
+        public bool UseNoiseReduction
+        {
+            get
+            {
+                if (!(mumbleMic is NAudioMicrophone nAudio)) return false;
+                return nAudio.UseNoiseReducer;
+            }
+            set
+            {
+                if (!(mumbleMic is NAudioMicrophone nAudio)) return;
+                nAudio.UseNoiseReducer = value;
+            }
+        }
+#endif
 
         public List<DebugInfo> GetInfos()
         {

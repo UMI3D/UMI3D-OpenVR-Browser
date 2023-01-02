@@ -16,6 +16,7 @@ limitations under the License.
 
 using System.Collections;
 using umi3d.cdk;
+using umi3d.common;
 using umi3d.common.interaction;
 using umi3dVRBrowsersBase.ui;
 using umi3dVRBrowsersBase.ui.keyboard;
@@ -78,7 +79,7 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// <see cref="Associate(AbstractInteractionDto)"/>
         private void VRInput_onStateUp()
         {
-            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered
                 || PlayerMenuManager.Instance.IsMenuHovered
                 || (Keyboard.Instance?.IsOpen ?? false))
                 return;
@@ -94,7 +95,7 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// <see cref="Associate(AbstractInteractionDto)"/>
         private void VRInput_onStateDown()
         {
-            if (PlayerMenuManager.Instance.parameterGear.IsHovered 
+            if (PlayerMenuManager.Instance.parameterGear.IsHovered
                 || PlayerMenuManager.Instance.IsMenuHovered
                 || (Keyboard.Instance?.IsOpen ?? false))
                 return;
@@ -149,13 +150,22 @@ namespace umi3dVRBrowsersBase.interactions.input
                         (controller as VRController).IsInputPressed = true;
                         isDown = true;
 
-                        BooleanEvent.Invoke(boneType);
 
                         if ((interaction as EventDto).TriggerAnimationId != 0)
                         {
+                            BooleanEvent.Invoke(boneType);
                             var anim = UMI3DNodeAnimation.Get((interaction as EventDto).TriggerAnimationId);
                             if (anim != null)
+                            {
+                                anim.SetUMI3DProperty(UMI3DEnvironmentLoader.GetEntity((interaction as EventDto).TriggerAnimationId), new SetEntityPropertyDto()
+                                {
+                                    entityId = (interaction as EventDto).TriggerAnimationId,
+                                    property = UMI3DPropertyKeys.AnimationPlaying,
+                                    value = true
+                                });
+
                                 anim.Start();
+                            }
                         }
 
                         onInputDown.Invoke();
@@ -180,13 +190,22 @@ namespace umi3dVRBrowsersBase.interactions.input
                         isDown = false;
                         onInputUp.Invoke();
 
-                        BooleanEvent.Invoke(boneType);
 
                         if ((interaction as EventDto).ReleaseAnimationId != 0)
                         {
+                            BooleanEvent.Invoke(boneType);
                             var anim = UMI3DNodeAnimation.Get((interaction as EventDto).ReleaseAnimationId);
                             if (anim != null)
+                            {
+                                anim.SetUMI3DProperty(UMI3DEnvironmentLoader.GetEntity((interaction as EventDto).ReleaseAnimationId), new SetEntityPropertyDto()
+                                {
+                                    entityId = (interaction as EventDto).ReleaseAnimationId,
+                                    property = UMI3DPropertyKeys.AnimationPlaying,
+                                    value = true
+                                });
+
                                 anim.Start();
+                            }
                         }
                     }
                 };

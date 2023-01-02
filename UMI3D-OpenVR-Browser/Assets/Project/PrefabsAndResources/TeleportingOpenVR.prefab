@@ -2948,6 +2948,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda69d6602aa3f44e99c0700f3af9310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputType: 1
+  debugSampling: 0
 --- !u!81 &4810254922834385287
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3944,6 +3946,7 @@ MonoBehaviour:
   detectionPositionDelta: 0.1
   detectionRotationDelta: 5
   maximumTimeBetweenFramesSent: 5
+  avatarSceneId: 0
   EmotePlayedSelfEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -4463,7 +4466,7 @@ MonoBehaviour:
   errorPoint: {fileID: 3062910661664101786}
   rayStartPoint: {fileID: 7289560753973707075}
   raySpeed: 6
-  maxVerticalAngle: 0
+  maxVerticalAngle: 45
   stepLength: 0.1
   arcMaxLength: 100
   updateRate: 0.1
@@ -4522,7 +4525,7 @@ MonoBehaviour:
   errorPoint: {fileID: 3062910660879061576}
   rayStartPoint: {fileID: 7289560754043300594}
   raySpeed: 6
-  maxVerticalAngle: 0
+  maxVerticalAngle: 45
   stepLength: 0.1
   arcMaxLength: 100
   updateRate: 0.1

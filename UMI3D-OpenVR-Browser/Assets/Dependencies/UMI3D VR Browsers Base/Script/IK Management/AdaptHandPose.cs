@@ -24,6 +24,7 @@ using umi3dBrowsers.interaction.selection.cursor;
 using umi3dVRBrowsersBase.interactions;
 using umi3dVRBrowsersBase.interactions.input;
 using umi3dVRBrowsersBase.interactions.selection;
+using umi3dVRBrowsersBase.interactions.selection.cursor;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ikManagement
@@ -48,19 +49,13 @@ namespace umi3dVRBrowsersBase.ikManagement
 
         private AbstractPointingCursor selectionmanager;
 
-        protected void Awake()
-        {
-            
-        }
-
-        // Start is called before the first frame update
         private void Start()
         {
-            UMI3DClientUserTracking.Instance.handPoseEvent.AddListener((dto) => SetupHandPose(dto, lastBoneId));
+            RayCursor.changelastBone.AddListener(val => { lastBoneId = val; });
+            UMI3DClientUserTracking.Instance.handPoseEvent.AddListener((dto) => { SetupHandPose(dto, lastBoneId); });
             AbstractPointingCursor.OnCursorEnter.AddListener((PointingInfo poitingInfo) =>
             {
                 var controller = (poitingInfo.controller as VRController);
-                lastBoneId = controller.bone.boneType;
                 if (poitingInfo.target != null)
                 {
                     if (controller.type == ControllerType.RightHandController)
@@ -68,26 +63,28 @@ namespace umi3dVRBrowsersBase.ikManagement
                     else
                         currentLeftHoverId = poitingInfo.target.id;
                 }
-
             });
             AbstractPointingCursor.OnCursorExit.AddListener((PointingInfo poitingInfo) =>
             {
                 var controller = (poitingInfo.controller as VRController);
-                lastBoneId = controller.bone.boneType;
                 if (poitingInfo.target != null)
                 {
                     if (controller.type == ControllerType.RightHandController)
+                    {
                         if (currentRightHoverId != 0 && poitingInfo.target.id.Equals(currentRightHoverId))
                         {
                             currentRightHoverId = 0;
                             passiveRightHoverPose = null;
                         }
-                        else
+                    }
+                    else
+                    {
                         if (currentLeftHoverId != 0 && poitingInfo.target.id.Equals(currentLeftHoverId))
                         {
                             currentLeftHoverId = 0;
                             passiveLeftHoverPose = null;
                         }
+                    }
                 }
             });
             BooleanInput.BooleanEvent.AddListener(boneId => lastBoneId = boneId);
@@ -138,28 +135,38 @@ namespace umi3dVRBrowsersBase.ikManagement
             if (dto.IsActive)
             {
                 if (boneId.Equals(BoneType.RightHand))
+                {
                     if (currentRightPose != null && currentRightPose.HoverPose == false && dto.HoverPose == true)
                     {
                         passiveRightHoverPose = dto;
                         return;
                     }
-                    else
+                }
+                else
+                {
                     if (currentLeftPose != null && currentLeftPose.HoverPose == false && dto.HoverPose == true)
                     {
                         passiveLeftHoverPose = dto;
                         return;
                     }
+                }
+
 
                 if (boneId.Equals(BoneType.RightHand))
+                {
                     if (currentRightPose != null && currentRightPose.HoverPose == true && dto.HoverPose == false)
                     {
                         passiveRightHoverPose = currentRightPose;
                     }
-                    else
+                }
+                else
+                {
                     if (currentLeftPose != null && currentLeftPose.HoverPose == true && dto.HoverPose == false)
                     {
                         passiveLeftHoverPose = currentLeftPose;
                     }
+                }
+
 
                 if (boneId.Equals(BoneType.RightHand))
                 {
@@ -210,7 +217,7 @@ namespace umi3dVRBrowsersBase.ikManagement
                         {
                             StopCoroutine(rightHandPlacement);
                             currentRightPose = passiveRightHoverPose;
-
+                            passiveRightHoverPose = null;
                             rightPhalanxRotations = GetHandedRotations(currentRightPose.PhalanxRotations, boneId);
 
                             Transform relativeNode = (currentRightHoverId != 0 && currentRightPose.isRelativeToNode) ? (UMI3DEnvironmentLoader.GetEntity(currentRightHoverId) as UMI3DNodeInstance).transform : null;
@@ -233,7 +240,7 @@ namespace umi3dVRBrowsersBase.ikManagement
                         {
                             StopCoroutine(leftHandPlacement);
                             currentLeftPose = passiveLeftHoverPose;
-
+                            passiveLeftHoverPose = null;
                             leftPhalanxRotations = GetHandedRotations(currentLeftPose.PhalanxRotations, boneId);
 
                             Transform relativeNode = (currentLeftHoverId != 0 && currentLeftPose.isRelativeToNode) ? (UMI3DEnvironmentLoader.GetEntity(currentLeftHoverId) as UMI3DNodeInstance).transform : null;

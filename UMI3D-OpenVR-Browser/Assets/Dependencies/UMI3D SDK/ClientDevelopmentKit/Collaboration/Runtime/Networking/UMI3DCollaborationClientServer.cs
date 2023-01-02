@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright 2019 - 2021 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,15 +27,22 @@ namespace umi3d.cdk.collaboration
 
     public class OnForceLogoutEvent : UnityEvent<string> { }
 
+    public class OnProgressEvent : UnityEvent<Progress> { }
+
     /// <summary>
-    /// Collaboration Extension of the UMI3DClientServer
+    /// UMI3D server on the browser, in a collaborative context.
     /// </summary>
     public class UMI3DCollaborationClientServer : UMI3DClientServer
     {
         private const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
 
         public static new UMI3DCollaborationClientServer Instance { get => UMI3DClientServer.Instance as UMI3DCollaborationClientServer; set => UMI3DClientServer.Instance = value; }
+        /// <summary>
+        /// Should serialization be done using json DTOs rather than byte containers?
+        /// </summary>
         public static bool useDto => environmentClient?.useDto ?? false;
+
+        public static PendingTransactionDto transactionPending = null;
 
         private static UMI3DWorldControllerClient worldControllerClient;
         private static UMI3DEnvironmentClient environmentClient;
@@ -43,6 +50,8 @@ namespace umi3d.cdk.collaboration
         public static PublicIdentityDto PublicIdentity => worldControllerClient?.PublicIdentity;
 
         protected override ForgeConnectionDto connectionDto => environmentClient?.connectionDto;
+
+        public static Func<MultiProgress> EnvironmentProgress = null;
 
         public UnityEvent OnLeaving = new UnityEvent();
         public UnityEvent OnLeavingEnvironment = new UnityEvent();
@@ -56,6 +65,8 @@ namespace umi3d.cdk.collaboration
 
         public UnityEvent OnConnectionCheck = new UnityEvent();
         public UnityEvent OnConnectionRetreived = new UnityEvent();
+
+        static public OnProgressEvent onProgress = new OnProgressEvent();
 
         public OnForceLogoutEvent OnForceLogoutMessage = new OnForceLogoutEvent();
 
@@ -73,12 +84,19 @@ namespace umi3d.cdk.collaboration
             }
         }
 
+        public string environementName => environmentClient?.connectionDto?.name;
+        public string worldName => worldControllerClient?.name;
+
+        /// <inheritdoc/>
         protected override void OnDestroy()
         {
             base.OnDestroy();
             Clear();
         }
 
+        /// <summary>
+        /// Makes all client log out and delete references to them.
+        /// </summary>
         public async void Clear()
         {
             if (Exists)
@@ -87,6 +105,7 @@ namespace umi3d.cdk.collaboration
                 if (environmentClient != null) await environmentClient?.Clear();
                 worldControllerClient = null;
                 environmentClient = null;
+                IsRedirectionInProgress = false;
             }
         }
 
@@ -115,7 +134,11 @@ namespace umi3d.cdk.collaboration
             {
                 Instance.OnReconnect.Invoke();
                 UMI3DEnvironmentLoader.Clear(false);
-                environmentClient = await worldControllerClient.ConnectToEnvironment();
+
+                MultiProgress progress = new MultiProgress("Reconnect");
+                onProgress.Invoke(progress);
+
+                environmentClient = await worldControllerClient.ConnectToEnvironment(progress);
                 environmentClient.status = StatusType.CREATED;
             }
         }
@@ -125,6 +148,12 @@ namespace umi3d.cdk.collaboration
         /// </summary>
         public static async void Connect(RedirectionDto redirection, Action<string> failed = null)
         {
+            if (!Exists)
+            {
+                failed?.Invoke("No Intance of UMI3DCollaborationServer");
+                return;
+            }
+
             if (UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress)
             {
                 failed?.Invoke("Redirection already in progress");
@@ -133,6 +162,7 @@ namespace umi3d.cdk.collaboration
             bool aborted = false;
             UMI3DCollaborationClientServer.Instance.IsRedirectionInProgress = true;
             Instance.OnRedirectionStarted.Invoke();
+
             try
             {
                 if (Exists)
@@ -156,8 +186,11 @@ namespace umi3d.cdk.collaboration
                         //Connection will not restart without this...
                         await Task.Yield();
 
+                        MultiProgress progress = EnvironmentProgress?.Invoke() ?? new MultiProgress("Joinning Environment");
+                        onProgress.Invoke(progress);
+
                         worldControllerClient = wc;
-                        environmentClient = await wc.ConnectToEnvironment();
+                        environmentClient = await wc.ConnectToEnvironment(progress);
                         environmentClient.status = StatusType.CREATED;
                     }
                 }
@@ -169,7 +202,8 @@ namespace umi3d.cdk.collaboration
             }
             catch (Exception e)
             {
-                UnityEngine.Debug.Log($"Error in connection process : {e.Message} \n{e.StackTrace}");
+                UMI3DLogger.Log($"Error in connection process", scope);
+                UMI3DLogger.LogException(e, scope);
                 failed?.Invoke(e.Message);
                 aborted = true;
             }
@@ -201,7 +235,9 @@ namespace umi3d.cdk.collaboration
             {
                 Instance.OnLeavingEnvironment.Invoke();
                 Instance.OnLeaving.Invoke();
+                Instance.IsRedirectionInProgress = false;
             }
+
         }
 
 
@@ -329,7 +365,11 @@ namespace umi3d.cdk.collaboration
             environmentClient?.SendTracking(dto);
         }
 
-
+        /// <summary>
+        /// Send a vocal message through VoIP.
+        /// </summary>
+        /// <param name="length"></param>
+        /// <param name="sample"></param>
         public static void SendVOIP(int length, byte[] sample)
         {
             if (Exists && Connected()
@@ -339,14 +379,14 @@ namespace umi3d.cdk.collaboration
 
 
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         protected override async Task<byte[]> _GetFile(string url, bool useParameterInsteadOfHeader)
         {
             UMI3DLogger.Log($"GetFile {url}", scope);
             return await (environmentClient?.GetFile(url, useParameterInsteadOfHeader) ?? Task.FromResult<byte[]>(null));
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         protected override async Task<LoadEntityDto> _GetEntity(List<ulong> ids)
         {
             List<ulong> idsToSend = new List<ulong>();
@@ -388,21 +428,22 @@ namespace umi3d.cdk.collaboration
         private static SortedSet<ulong> loadingEntities = new SortedSet<ulong>();
 
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override ulong GetUserId() { return worldControllerClient?.GetUserID() ?? 0; }
 
+        /// <inheritdoc/>
         public UMI3DEnvironmentClient.UserInfo GetUser() { return environmentClient?.UserDto; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override ulong GetTime()
         {
             return environmentClient?.TimeStep ?? 0;
         }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         public override double GetRoundTripLAtency() { return environmentClient?.ForgeClient?.RoundTripLatency ?? 0; }
 
-        ///<inheritdoc/>
+        /// <inheritdoc/>
         protected override string _getAuthorization() { return environmentClient?.HttpClient.HeaderToken; }
 
         /// <summary>

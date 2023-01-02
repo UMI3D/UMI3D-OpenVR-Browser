@@ -21,8 +21,12 @@ using umi3d.common;
 
 namespace umi3d.cdk
 {
+    /// <summary>
+    /// UMI3D server on the browser.
+    /// </summary>
     public class UMI3DClientServer : inetum.unityUtils.PersistentSingleBehaviour<UMI3DClientServer>
     {
+        private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Networking;
         /// <summary>
         /// Environment connected to.
         /// </summary>
@@ -46,7 +50,7 @@ namespace umi3d.cdk
         /// </summary>
         public static ForgeConnectionDto Environement => Exists ? Instance.connectionDto : null;
 
-
+        // Enable to access the Collaboration implementation. Should not be there and will be reworked.
         public static string getAuthorization()
         {
             if (Exists)
@@ -65,6 +69,11 @@ namespace umi3d.cdk
             return await Task.FromResult(false);
         }
 
+        /// <summary>
+        /// Send a browser request to the server.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="reliable">Should the request be reliable? Reliable are more expensive but are always delivered.</param>
         public static void SendData(AbstractBrowserRequestDto dto, bool reliable)
         {
             if (Exists)
@@ -73,6 +82,7 @@ namespace umi3d.cdk
 
         protected virtual void _Send(AbstractBrowserRequestDto dto, bool reliable) { }
 
+        // Enable to access the Collaboration implementation. Should not be there and will be reworked.
         public static void SendTracking(AbstractBrowserRequestDto dto)
         {
             if (Exists)
@@ -80,17 +90,26 @@ namespace umi3d.cdk
         }
         protected virtual void _SendTracking(AbstractBrowserRequestDto dto) { }
 
-
-        public static async void GetFile(string url, Action<byte[]> callback, Action<string> onError, bool useParameterInsteadOfHeader)
+        // Enable to access the Collaboration implementation. Should not be there and will be reworked.
+        public static async Task<byte[]> GetFile(string url, bool useParameterInsteadOfHeader)
         {
-            if (Exists)
+            try
             {
-                byte[] bytes = await Instance._GetFile(url, useParameterInsteadOfHeader);
-                if (bytes != null)
-                    callback.Invoke(bytes);
-            }
-            else
+                if (Exists)
+                {
+                    byte[] bytes = await Instance._GetFile(url, useParameterInsteadOfHeader);
+                    if (bytes != null)
+                        return (bytes);
+                    throw new Umi3dLoadingException($"No Data in response for {url}");
+                }
                 throw new Exception($"Instance of UMI3DClientServer is null");
+            }
+            catch (Exception e)
+            {
+                UMI3DLogger.LogException(e, scope);
+                throw;
+            }
+
         }
 
         protected virtual Task<byte[]> _GetFile(string url, bool useParameterInsteadOfHeader)
@@ -98,13 +117,13 @@ namespace umi3d.cdk
             throw new NotImplementedException();
         }
 
-        public static async void GetEntity(List<ulong> ids, Action<LoadEntityDto> callback)
+        // Enable to access the Collaboration implementation. Should not be there and will be reworked.
+        public static async Task<LoadEntityDto> GetEntity(List<ulong> ids)
         {
             if (Exists)
             {
                 LoadEntityDto dto = await Instance._GetEntity(ids);
-                if (dto != null)
-                    callback.Invoke(dto);
+                return (dto);
             }
             else
                 throw new Exception($"Instance of UMI3DClientServer is null");
@@ -115,6 +134,11 @@ namespace umi3d.cdk
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Return the user ID attributed by the server.
+        /// </summary>
+        /// <returns></returns>
+        /// Default is 0.
         public virtual ulong GetUserId() { return 0; }
 
         /// <summary>
@@ -128,6 +152,7 @@ namespace umi3d.cdk
         /// </summary>
         public virtual Object GetHttpClient() { return null; }
 
+        // Enable to access the Collaboration implementation. Should not be there and will be reworked.
         public virtual double GetRoundTripLAtency() { return 0; }
     }
 }

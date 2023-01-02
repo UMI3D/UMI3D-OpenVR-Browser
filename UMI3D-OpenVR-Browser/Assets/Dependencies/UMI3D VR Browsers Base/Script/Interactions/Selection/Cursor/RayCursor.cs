@@ -14,12 +14,16 @@ limitations under the License.
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.interaction;
+using umi3d.cdk;
+using umi3d.common;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
 using umi3dBrowsers.interaction.selection.zoneselection;
 using umi3dVRBrowsersBase.ui;
 using UnityEngine;
 using UnityEngine.UI;
+using umi3dVRBrowsersBase.ikManagement;
+using UnityEngine.Events;
 
 namespace umi3dVRBrowsersBase.interactions.selection.cursor
 {
@@ -87,6 +91,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// </summary>
         public PointingInfo lastTrackingInfo = new PointingInfo();
 
+        public static UnityEvent<uint> changelastBone = new UnityEvent<uint>();
+
         protected virtual void Awake()
         {
             controller = GetComponentInParent<VRController>();
@@ -112,6 +118,23 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
                     trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
+
+                if (trackingInfo.target.dto.HoverEnterAnimationId != 0)
+                {
+                    changelastBone.Invoke(controller.bone.boneType);
+                    var anim = UMI3DNodeAnimation.Get(trackingInfo.target.dto.HoverEnterAnimationId);
+                    if (anim != null)
+                    {
+                        anim.SetUMI3DProperty(UMI3DEnvironmentLoader.GetEntity(trackingInfo.target.dto.HoverEnterAnimationId), new SetEntityPropertyDto()
+                        {
+                            entityId = trackingInfo.target.dto.HoverEnterAnimationId,
+                            property = UMI3DPropertyKeys.AnimationPlaying,
+                            value = true
+                        });
+
+                        anim.Start();
+                    }
+                }
             });
 
             OnCursorExit.AddListener((PointingInfo trackingInfo) =>
@@ -119,13 +142,29 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (controller != (trackingInfo.controller as VRController))
                     return;
 
-
                 trackingInfo.targetContainer.Interactable.HoverExit(
                     controller.bone.boneType,
                     trackingInfo.targetContainer.Interactable.id,
                     trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
                     trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
+
+                if (trackingInfo.target.dto.HoverExitAnimationId != 0)
+                {
+                    changelastBone.Invoke(controller.bone.boneType);
+                    var anim = UMI3DNodeAnimation.Get(trackingInfo.target.dto.HoverExitAnimationId);
+                    if (anim != null)
+                    {
+                        anim.SetUMI3DProperty(UMI3DEnvironmentLoader.GetEntity(trackingInfo.target.dto.HoverExitAnimationId), new SetEntityPropertyDto()
+                        {
+                            entityId = trackingInfo.target.dto.HoverExitAnimationId,
+                            property = UMI3DPropertyKeys.AnimationPlaying,
+                            value = true
+                        });
+
+                        anim.Start();
+                    }
+                }
             });
 
             OnCursorStay.AddListener((PointingInfo trackingInfo) =>
