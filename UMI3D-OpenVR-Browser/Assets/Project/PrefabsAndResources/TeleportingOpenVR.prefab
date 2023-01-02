@@ -4129,6 +4129,7 @@ GameObject:
   - component: {fileID: 7289560753284016165}
   - component: {fileID: 7289560753284016160}
   - component: {fileID: 4387569826040570359}
+  - component: {fileID: 952246254594119033}
   m_Layer: 0
   m_Name: TeleportingOpenVR
   m_TagString: Untagged
@@ -4217,6 +4218,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b38180f9631c0244bf7b35b1608a32e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &952246254594119033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7289560753284016164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7947d07c4bd2e4498d4c967956e170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapTurnAngle: 45
+  onSnapTurnStart:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7289560753622272137
 GameObject:
   m_ObjectHideFlags: 0
@@ -4758,7 +4775,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a753d697b6290408411f19ff79a837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action: 3
+  action: 5
   controller: 0
   onActionDown:
     m_PersistentCalls:
@@ -4865,7 +4882,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a753d697b6290408411f19ff79a837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action: 3
+  action: 5
   controller: 1
   onActionDown:
     m_PersistentCalls:
