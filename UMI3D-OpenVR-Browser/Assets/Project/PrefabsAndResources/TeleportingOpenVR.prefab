@@ -2784,7 +2784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 1
 --- !u!1 &4810254922834385280
 GameObject:
   m_ObjectHideFlags: 0

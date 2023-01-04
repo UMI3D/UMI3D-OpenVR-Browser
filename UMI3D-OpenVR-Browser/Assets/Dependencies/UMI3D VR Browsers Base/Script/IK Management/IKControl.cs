@@ -358,7 +358,7 @@ namespace umi3dVRBrowsersBase.ikManagement
             {
                 Transform leftKnee = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
                 Transform rightKnee = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
-                leftKnee.localRotation = rightKnee.localRotation;
+                //leftKnee.localRotation = rightKnee.localRotation;
             }
 
             if (animator)

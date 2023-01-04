@@ -32,8 +32,8 @@ namespace umi3dVRBrowsersBase.ikManagement
 
         private void Update()
         {
-            this.transform.position = new Vector3(FollowedAvatarNode.position.x, OVRRig.position.y, FollowedAvatarNode.position.z);
-            this.transform.rotation = FollowedAvatarNode.rotation;
+            //this.transform.position = new Vector3(FollowedAvatarNode.position.x, OVRRig.position.y, FollowedAvatarNode.position.z);
+            //this.transform.rotation = FollowedAvatarNode.rotation;
         }
 
         public void SetFootTargets()
