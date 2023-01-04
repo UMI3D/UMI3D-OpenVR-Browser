@@ -6567,7 +6567,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 2
 --- !u!1 &8087883337364206195 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3673981092504156441, guid: c95999b4e970d984db2324d70298aff0,
@@ -6587,7 +6587,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 3
 --- !u!1001 &4810254922390261527
 PrefabInstance:
   m_ObjectHideFlags: 0
