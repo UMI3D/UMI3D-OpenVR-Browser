@@ -41,7 +41,7 @@ public class FootMover : MonoBehaviour
         RightHand = objects.Find(x => x.goal == AvatarIKGoal.RightHand);
         head = bones.Find(x => x.boneType == BoneType.Head);
 
-        var frequency = 1 / 30f;
+        var frequency = 1f / 30f;
         InvokeRepeating(nameof(UpdateHips), 0, frequency);
     }
 
@@ -128,7 +128,7 @@ public class FootMover : MonoBehaviour
     public List<Tensor> ExecuteModel()
     {
         List<Tensor> outputs = new List<Tensor>();
-        mainWorker.Execute(modelInput);
+        mainWorker.Execute(GetHipsInputs());
 
         outputs.Add(mainWorker.PeekOutput());
         return outputs;
@@ -137,10 +137,12 @@ public class FootMover : MonoBehaviour
     public Quaternion GetPrediction()
     {
         var output = ExecuteModel();
-        return new Quaternion(output[0][0, 0, 0, 3], output[0][0, 0, 0, 4], output[0][0, 0, 0, 5],
-                    output[0][0, 0, 0, 6]);
+        return new Quaternion(output[0][0, 0, 0, 3], 
+                              output[0][0, 0, 0, 4], 
+                              output[0][0, 0, 0, 5],
+                              output[0][0, 0, 0, 6]);
     }
-
+    
     void OnApplicationQuit()
     {
         modelInput?.Dispose();
@@ -150,5 +152,6 @@ public class FootMover : MonoBehaviour
     {
         hipsPredicted.transform.rotation = GetPrediction();
     }
+
 
 }
