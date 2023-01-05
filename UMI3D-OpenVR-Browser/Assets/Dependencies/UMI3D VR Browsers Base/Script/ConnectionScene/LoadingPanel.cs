@@ -58,6 +58,18 @@ namespace umi3dVRBrowsersBase.connection
         {
             StartCoroutine(WaitForLoader());
             Hide();
+
+            LoadingScreenDisplayer.OnLoadingScreenDislayed.AddListener(() =>
+            {
+                foreach (GameObject o in objectsToHide)
+                    o.SetActive(false);
+            });
+
+            LoadingScreenDisplayer.OnLoadingScreenHidden.AddListener(() =>
+            {
+                foreach (GameObject o in objectsToHide)
+                    o.SetActive(true);
+            });
         }
 
         /// <summary>

@@ -17,6 +17,7 @@ using inetum.unityUtils;
 using umi3d.cdk;
 using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.connection
@@ -41,6 +42,18 @@ namespace umi3dVRBrowsersBase.connection
         [SerializeField]
         Text LoadingText;
 
+        /// <summary>
+        /// Event raised when loading screen is displayed.
+        /// </summary>
+        public static UnityEvent OnLoadingScreenDislayed = new UnityEvent();
+
+        /// <summary>
+        /// Event raised when loading screen is hidden.
+        /// </summary>
+        public static UnityEvent OnLoadingScreenHidden = new UnityEvent();
+
+        private bool isVisible = false;
+
         private void Start()
         {
             cam = Camera.main;
@@ -57,7 +70,6 @@ namespace umi3dVRBrowsersBase.connection
         Progress _progress = null;
         void NewProgress(Progress progress)
         {
-
             if (_progress != null)
             {
                 _progress.OnCompleteUpdated.RemoveListener(OnCompleteUpdated);
@@ -103,7 +115,12 @@ namespace umi3dVRBrowsersBase.connection
                     loadingLabel.transform.LookAt(PlayerMenuManager.Instance.PlayerCameraTransform.position);
                     loadingLabel.transform.Rotate(0, 180, 0);
                 }
+            }
 
+            if (!isVisible)
+            {
+                OnLoadingScreenDislayed?.Invoke();
+                isVisible = true;
             }
         }
 
@@ -112,10 +129,14 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         public void Hide()
         {
+            isVisible = false;
+
             loadingSphere.enabled = false;
             cam.cullingMask = defaultCullingMask;
             cam.clearFlags = CameraClearFlags.Skybox;
             loadingLabel.SetActive(false);
+
+            OnLoadingScreenHidden?.Invoke();
         }
 
         private void OnProgressChange(float val)
