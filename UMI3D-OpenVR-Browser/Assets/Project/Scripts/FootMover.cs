@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using umi3d.cdk.userCapture;
 using umi3d.common.userCapture;
 using umi3dVRBrowsersBase.ikManagement;
@@ -18,11 +16,11 @@ public class FootMover : MonoBehaviour
 
     private UMI3DClientUserTrackingBone head;
 
-    HipsPredictor hipsPredictor;
+    private HipsPredictor hipsPredictor;
 
     public GameObject hipsPredictedMarker;
 
-    void Start()
+    private void Start()
     {
         var objects = new List<VirtualObjectBodyInteraction>(FindObjectsOfType<VirtualObjectBodyInteraction>());
         var bones = new List<UMI3DClientUserTrackingBone>(FindObjectsOfType<UMI3DClientUserTrackingBone>());
@@ -38,24 +36,22 @@ public class FootMover : MonoBehaviour
         //InvokeRepeating(nameof(UpdateHips), 0, frequency);
     }
 
-    void Update()
+    protected void Update()
     {
         //LeftFoot.transform.position = new Vector3(LeftHand.transform.position.x, LeftFoot.transform.position.y, LeftHand.transform.position.z);
         //RightFoot.transform.position = new Vector3(RightHand.transform.position.x, RightFoot.transform.position.y, RightHand.transform.position.z);
         UpdateHips();
     }
 
-    void OnApplicationQuit()
+    private void OnApplicationQuit()
     {
         hipsPredictor.Clean();
     }
 
     public void UpdateHips()
     {
-        hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));        
+        hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
         var pred = hipsPredictor.GetPrediction();
         hipsPredictedMarker.transform.rotation = pred;
     }
-
-
 }

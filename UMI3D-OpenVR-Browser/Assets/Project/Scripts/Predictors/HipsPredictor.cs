@@ -1,13 +1,9 @@
-﻿
-using System.Collections.Generic;
-using umi3d.cdk.userCapture;
-using umi3dVRBrowsersBase.ikManagement;
+﻿using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
 
 public class HipsPredictor : AbstractPredictor<Quaternion>
 {
-
     public HipsPredictor(NNModel modelAsset) : base(modelAsset)
     { }
 

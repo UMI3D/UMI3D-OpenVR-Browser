@@ -1,8 +1,4 @@
-﻿
-using System.Collections.Generic;
-using Unity.Barracuda;
-using UnityEngine;
-using Valve.VR;
+﻿using Unity.Barracuda;
 
 public abstract class AbstractPredictor<T>
 {
@@ -41,5 +37,4 @@ public abstract class AbstractPredictor<T>
     {
         modelInput?.Dispose();
     }
-
 }
