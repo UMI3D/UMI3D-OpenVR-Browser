@@ -7,7 +7,14 @@ using UnityEngine;
 
 public class FootMover : MonoBehaviour
 {
+    private HipsPredictor hipsPredictor;
     public NNModel hipsPredictorModel;
+    public GameObject hipsPredictedMarker;
+
+    private HipsPredictor feetPredictor;
+    public NNModel feetPredictorModel;
+    public GameObject lFootPredictedMarker;
+    public GameObject rFootPredictedMarker;
 
     private VirtualObjectBodyInteraction LeftFoot;
     private VirtualObjectBodyInteraction RightFoot;
@@ -16,9 +23,6 @@ public class FootMover : MonoBehaviour
 
     private UMI3DClientUserTrackingBone head;
 
-    private HipsPredictor hipsPredictor;
-
-    public GameObject hipsPredictedMarker;
 
     private void Start()
     {
@@ -52,6 +56,15 @@ public class FootMover : MonoBehaviour
     {
         hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
         var pred = hipsPredictor.GetPrediction();
-        hipsPredictedMarker.transform.rotation = pred;
+        hipsPredictedMarker.transform.position = pred.pos;
+        hipsPredictedMarker.transform.rotation = pred.rot;
+    }
+
+    public void UpdateFeet()
+    {
+        //hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
+        //var pred = hipsPredictor.GetPrediction();
+        //lFootPredictedMarker.transform.position = pred.Item1;
+        //rFootPredictedMarker.transform.position = pred.Item2;
     }
 }
