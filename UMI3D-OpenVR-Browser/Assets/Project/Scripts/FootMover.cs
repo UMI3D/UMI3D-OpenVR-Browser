@@ -52,7 +52,7 @@ public class FootMover : MonoBehaviour
 
     public void UpdateHips()
     {
-        hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, RightFoot.transform));        
+        hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));        
         var pred = hipsPredictor.GetPrediction();
         hipsPredictedMarker.transform.rotation = pred;
     }
