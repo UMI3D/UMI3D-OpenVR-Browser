@@ -8,10 +8,21 @@ using UnityEngine;
 public class FootMover : MonoBehaviour
 {
     private HipsPredictor hipsPredictor;
-    public NNModel hipsPredictorModel;
+    [Header("Hips prediction")]
+    public NNModel hipsPredictorModelV1;
+    public NNModel hipsPredictorModelV3;
     public GameObject hipsPredictedMarker;
 
+    public enum ModelToUse
+    {
+        V1,
+        V3
+    }
+
+    public ModelToUse modelToUse;
+
     private HipsPredictor feetPredictor;
+    [Header("LoBSTr")]
     public NNModel feetPredictorModel;
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
@@ -23,7 +34,6 @@ public class FootMover : MonoBehaviour
 
     private UMI3DClientUserTrackingBone head;
 
-
     private void Start()
     {
         var objects = new List<VirtualObjectBodyInteraction>(FindObjectsOfType<VirtualObjectBodyInteraction>());
@@ -34,7 +44,10 @@ public class FootMover : MonoBehaviour
         RightHand = objects.Find(x => x.goal == AvatarIKGoal.RightHand);
         head = bones.Find(x => x.boneType == BoneType.Head);
 
-        hipsPredictor = new HipsPredictor(hipsPredictorModel);
+        if (modelToUse == ModelToUse.V1)
+            hipsPredictor = new HipsPredictor(hipsPredictorModelV1);
+        else
+            hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3);
 
         //var frequency = 1f / 30f;
         //InvokeRepeating(nameof(UpdateHips), 0, frequency);
@@ -54,9 +67,9 @@ public class FootMover : MonoBehaviour
 
     public void UpdateHips()
     {
-        hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
+        hipsPredictor.AddFrameInput(hipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
         var pred = hipsPredictor.GetPrediction();
-        hipsPredictedMarker.transform.position = pred.pos;
+        //hipsPredictedMarker.transform.position = pred.pos;
         hipsPredictedMarker.transform.rotation = pred.rot;
     }
 

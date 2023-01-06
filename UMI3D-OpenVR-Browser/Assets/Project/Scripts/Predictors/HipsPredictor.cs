@@ -13,7 +13,7 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         modelInput = new Tensor(1, 1, 21, 45); //initializing
     }
 
-    public static Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
+    public virtual Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
     {
         Tensor frameTensor = new Tensor(1, 1, 21, 1);
 
@@ -98,7 +98,13 @@ public class HipsPredictorV3 : HipsPredictor
     {
     }
 
-    public new static Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
+    protected override void Init()
+    {
+        base.Init();
+        modelInput = new Tensor(1, 1, 27, 45); //initializing
+    }
+
+    public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
     {
         var frameTensor = new Tensor(1, 1, 27, 1);
 
