@@ -2706,9 +2706,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92a078c3152529e41af9eea20ca80c25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  modelAsset: {fileID: 5022602860645237092, guid: 4e87cdcbd1d76c64baa230bbf8fcd8b6,
+  hipsPredictorModel: {fileID: 5022602860645237092, guid: 4e87cdcbd1d76c64baa230bbf8fcd8b6,
     type: 3}
-  hipsPredicted: {fileID: 4872788813383075812}
+  hipsPredictedMarker: {fileID: 4872788813383075812}
 --- !u!1 &4810254922466982063
 GameObject:
   m_ObjectHideFlags: 0
