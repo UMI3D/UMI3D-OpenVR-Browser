@@ -17,12 +17,16 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using umi3d.common;
 using umi3d.common.collaboration;
 using UnityEngine;
 
 namespace umi3d.cdk.collaboration
 {
+    /// <summary>
+    /// Loader for <see cref="UMI3DCollaborationEnvironmentDto"/>.
+    /// </summary>
     public class UMI3DCollaborationEnvironmentLoader : UMI3DEnvironmentLoader
     {
         public static new UMI3DCollaborationEnvironmentLoader Instance { get => UMI3DEnvironmentLoader.Instance as UMI3DCollaborationEnvironmentLoader; set => UMI3DEnvironmentLoader.Instance = value; }
@@ -32,6 +36,8 @@ namespace umi3d.cdk.collaboration
 
         public List<UMI3DUser> JoinnedUserList => UserList.Where(u => u.status >= StatusType.AWAY || (UMI3DCollaborationClientServer.Exists && u.id == UMI3DCollaborationClientServer.Instance.GetUserId())).ToList();
         public static event Action OnUpdateJoinnedUserList;
+
+        private ulong lastTimeUserMessageListReceived = 0;
 
         public UMI3DUser GetClientUser()
         {
@@ -43,10 +49,19 @@ namespace umi3d.cdk.collaboration
             return UserList.FirstOrDefault(u => u.id == dto.id);
         }
 
-        ///<inheritdoc/>
-        public override void ReadUMI3DExtension(GlTFEnvironmentDto _dto, GameObject node)
+        /// <inheritdoc/>
+        protected override async Task WaitForFirstTransaction()
         {
-            base.ReadUMI3DExtension(_dto, node);
+            while (UMI3DCollaborationClientServer.transactionPending != null
+                && (UMI3DCollaborationClientServer.transactionPending.areTransactionPending
+                    || UMI3DCollaborationClientServer.transactionPending.areDispatchableRequestPending))
+                await UMI3DAsyncManager.Yield();
+        }
+
+        ///<inheritdoc/>
+        public override async Task ReadUMI3DExtension(GlTFEnvironmentDto _dto, GameObject node)
+        {
+            await base.ReadUMI3DExtension(_dto, node);
             var dto = (_dto?.extensions)?.umi3d as UMI3DCollaborationEnvironmentDto;
             if (dto == null) return;
             UserList = dto.userList.Select(u => new UMI3DUser(u)).ToList();
@@ -55,6 +70,11 @@ namespace umi3d.cdk.collaboration
             AudioManager.Instance.OnUserSpeaking.AddListener(OnUserSpeaking);
         }
 
+        /// <summary>
+        /// Called when a user starts to speak.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="isSpeaking"></param>
         void OnUserSpeaking(UMI3DUser user, bool isSpeaking)
         {
             if (isSpeaking)
@@ -71,14 +91,26 @@ namespace umi3d.cdk.collaboration
 
         private void StartAnim(ulong id)
         {
-            UMI3DAbstractAnimation.Get(id)?.Start();
+            var anim = UMI3DAbstractAnimation.Get(id);
+
+            if (anim != null)
+            {
+                anim.SetUMI3DProperty(UMI3DEnvironmentLoader.GetEntity(id), new SetEntityPropertyDto()
+                {
+                    entityId = id,
+                    property = UMI3DPropertyKeys.AnimationPlaying,
+                    value = true
+                });
+
+                anim.Start();
+            }
         }
 
 
-        ///<inheritdoc/>
-        protected override bool _SetUMI3DPorperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
+        /// <inheritdoc/>
+        protected override bool _SetUMI3DProperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
         {
-            if (base._SetUMI3DPorperty(entity, property)) return true;
+            if (base._SetUMI3DProperty(entity, property)) return true;
             if (entity == null) return false;
 
             switch (property.property)
@@ -103,9 +135,10 @@ namespace umi3d.cdk.collaboration
             }
         }
 
-        protected override bool _SetUMI3DPorperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        /// <inheritdoc/>
+        protected override bool _SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
         {
-            if (base._SetUMI3DPorperty(entity, operationId, propertyKey, container)) return true;
+            if (base._SetUMI3DProperty(entity, operationId, propertyKey, container)) return true;
             if (entity == null) return false;
 
             switch (propertyKey)
@@ -149,6 +182,7 @@ namespace umi3d.cdk.collaboration
         private bool SetUserList(UMI3DCollaborationEnvironmentDto dto, SetEntityPropertyDto property)
         {
             if (dto == null) return false;
+
             switch (property)
             {
                 case SetEntityListAddPropertyDto add:
@@ -176,6 +210,16 @@ namespace umi3d.cdk.collaboration
         private bool SetUserList(UMI3DCollaborationEnvironmentDto dto, uint operationId, uint propertyKey, ByteContainer container)
         {
             if (dto == null) return false;
+
+            if (lastTimeUserMessageListReceived < container.timeStep)
+            {
+                lastTimeUserMessageListReceived = container.timeStep;
+            }
+            else
+            {
+                return true;
+            }
+
             switch (operationId)
             {
                 case UMI3DOperationKeys.SetEntityListAddProperty:
@@ -205,21 +249,35 @@ namespace umi3d.cdk.collaboration
         private void InsertUser(UMI3DCollaborationEnvironmentDto dto, int index, UserDto userDto)
         {
             if (UserList.Exists((user) => user.id == userDto.id)) return;
-            UserList.Insert(index, new UMI3DUser(userDto));
-            dto.userList.Insert(index, userDto);
-            OnUpdateUserList?.Invoke();
-            OnUpdateJoinnedUserList?.Invoke();
+
+            if (index >= 0 && index <= UserList.Count)
+            {
+                UserList.Insert(index, new UMI3DUser(userDto));
+                OnUpdateUserList?.Invoke();
+                OnUpdateJoinnedUserList?.Invoke();
+            }
+            else
+            {
+                UMI3DLogger.LogWarning("Impossible to insert new user into user list, index out of range " + index, DebugScope.CDK);
+            }
         }
 
         private void RemoveUserAt(UMI3DCollaborationEnvironmentDto dto, int index)
         {
             if (UserList.Count <= index) return;
-            UMI3DUser Olduser = UserList[index];
-            UserList.RemoveAt(index);
-            dto.userList.RemoveAt(index);
-            Olduser.Destroy();
-            OnUpdateUserList?.Invoke();
-            OnUpdateJoinnedUserList?.Invoke();
+
+            if (index >= 0 && index < UserList.Count)
+            {
+                UMI3DUser Olduser = UserList[index];
+                UserList.RemoveAt(index);
+                Olduser.Destroy();
+                OnUpdateUserList?.Invoke();
+                OnUpdateJoinnedUserList?.Invoke();
+            }
+            else
+            {
+                UMI3DLogger.LogWarning("Impossible to remove user from user list, index out of range " + index, DebugScope.CDK);
+            }
         }
 
         private void ReplaceUser(UMI3DCollaborationEnvironmentDto dto, int index, UserDto userNew)
@@ -228,7 +286,6 @@ namespace umi3d.cdk.collaboration
 
             if (index < UserList.Count)
             {
-
                 bool userWasReady = UserList[index].status < StatusType.AWAY;
                 bool userIsReady = userNew.status < StatusType.AWAY;
                 bool userReadyListUpdated = userWasReady != userIsReady;
@@ -245,10 +302,16 @@ namespace umi3d.cdk.collaboration
         private void ReplaceAllUser(UMI3DCollaborationEnvironmentDto dto, List<UserDto> usersNew)
         {
             foreach (UMI3DUser user in UserList) user.Destroy();
-            dto.userList = usersNew;
-            UserList = dto.userList.Select(u => new UMI3DUser(u)).ToList();
+            UserList = usersNew.Select(u => new UMI3DUser(u)).ToList();
             OnUpdateUserList?.Invoke();
             OnUpdateJoinnedUserList?.Invoke();
+        }
+
+        protected override void InternalClear()
+        {
+            base.InternalClear();
+
+            lastTimeUserMessageListReceived = 0;
         }
     }
 }

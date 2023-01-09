@@ -141,6 +141,8 @@ namespace umi3dVRBrowsersBase.interactions
 
         protected virtual void Awake()
         {
+            Physics.queriesHitBackfaces = true;
+
             foreach (AbstractUMI3DInput input in manipulationInputs)
                 input.Init(this);
             foreach (AbstractUMI3DInput input in booleanInputs)

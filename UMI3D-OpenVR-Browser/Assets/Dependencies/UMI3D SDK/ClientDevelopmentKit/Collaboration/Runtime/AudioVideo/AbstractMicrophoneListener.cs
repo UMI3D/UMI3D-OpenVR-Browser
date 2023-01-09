@@ -17,7 +17,6 @@ limitations under the License.
 using inetum.unityUtils;
 using Mumble;
 using System;
-using System.CodeDom;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -60,6 +59,12 @@ namespace umi3d.cdk.collaboration
         MicrophoneConnecting,
         MicrophoneReady,
         RemovingMicrophone,
+    }
+
+    public enum MicrophoneInputType
+    {
+        Unity,
+        NAudio
     }
 
     [RequireComponent(typeof(AudioSource))]
@@ -152,10 +157,13 @@ namespace umi3d.cdk.collaboration
                 OnMicrophoneStatusUpdateUpdater.SetValue(value);
             }
         }
+
+        public MicrophoneInputType inputType;
+
         protected string channel { get; private set; } = null;
         protected string pendingChannel { get; private set; } = null;
 
-        protected  MumbleClient mumbleClient { get; private set; } = null;
+        protected MumbleClient mumbleClient { get; private set; } = null;
         protected MumbleMicrophone mumbleMic { get; private set; } = null;
 
         private bool sendPosition = false;
@@ -294,7 +302,18 @@ namespace umi3d.cdk.collaboration
             OnMumbleStatusUpdateUpdater = new EventUpdater<MumbleStatus>(mumbleStatus, OnMumbleStatusUpdate);
             OnMicrophoneStatusUpdateUpdater = new EventUpdater<MicrophoneStatus>(microphoneStatus, OnMicrophoneStatusUpdate);
 
-            mumbleMic = gameObject.AddComponent<MumbleMicrophone>();
+            switch (inputType)
+            {
+                case MicrophoneInputType.Unity:
+                    mumbleMic = gameObject.AddComponent<MumbleMicrophone>();
+                    break;
+                case MicrophoneInputType.NAudio:
+                    mumbleMic = gameObject.AddComponent<NAudioMicrophone>();
+                    break;
+                default:
+                    break;
+            }
+
             SetMicrophone();
             gameObject.GetOrAddComponent<EventProcessor>();
 
@@ -332,7 +351,7 @@ namespace umi3d.cdk.collaboration
             running = true;
 
             await Delay(millisecondsHeartBeat);
-            while (running)
+            while (running && Exists && UMI3DCollaborationClientServer.Exists)
             {
                 switch (mumbleStatus)
                 {
@@ -356,6 +375,7 @@ namespace umi3d.cdk.collaboration
                 }
                 await Delay(millisecondsHeartBeat);
             }
+            Reset();
         }
 
         protected void Reset()
@@ -524,6 +544,12 @@ namespace umi3d.cdk.collaboration
             if (this.isMute != isMute)
             {
                 this.isMute = isMute;
+
+                UMI3DUser user = UMI3DCollaborationEnvironmentLoader.Instance.GetClientUser();
+
+                if (user.microphoneStatus == isMute)
+                    user.SetMicrophoneStatus(!isMute);
+
                 if (microphoneStatus == MicrophoneStatus.MicrophoneReady)
                     mumbleClient.SetSelfMute(isMute);
             }
@@ -559,7 +585,7 @@ namespace umi3d.cdk.collaboration
         }
 
         /// <summary>
-        /// An example of how to serialize the positional data that you're interested in
+        /// An example of how to serialize the positional data that you're interested in. <br/>
         /// NOTE: this function, in the current implementation, is called regardless
         /// of if the user is speaking
         /// </summary>
@@ -739,7 +765,11 @@ namespace umi3d.cdk.collaboration
                 $"------------------------------------";
 
             Log(debug);
-            playerToDestroy?.Reset();
+
+            if (!AudioManager.Instance.DeletePending(playerToDestroy?.GetUsername(), session))
+            {
+                playerToDestroy?.Reset();
+            }
         }
         #endregion
 

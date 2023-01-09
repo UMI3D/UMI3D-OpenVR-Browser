@@ -1334,7 +1334,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.05
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1508,7 +1508,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3574216422171281462}
-  - component: {fileID: 1739979456313694800}
   - component: {fileID: 1229929254172595262}
   m_Layer: 0
   m_Name: Player
@@ -1537,25 +1536,6 @@ Transform:
   m_Father: {fileID: 7289560753284016167}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1739979456313694800
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3574216422171375694}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 27991c206a5e66147bb8ee3ef31c8bac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  actionSet:
-    actionSetPath: /actions/UMI3D
-  forSources: 0
-  disableAllOtherActionSets: 0
-  activateOnStart: 1
-  deactivateOnDestroy: 1
-  initialPriority: 0
 --- !u!114 &1229929254172595262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1660,7 +1640,7 @@ MonoBehaviour:
   forSources: 0
   disableAllOtherActionSets: 0
   activateOnStart: 1
-  deactivateOnDestroy: 1
+  deactivateOnDestroy: 0
   initialPriority: 0
 --- !u!1 &3574216422171586224
 GameObject:
@@ -2804,7 +2784,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 1
 --- !u!1 &4810254922834385280
 GameObject:
   m_ObjectHideFlags: 0
@@ -2948,6 +2928,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dda69d6602aa3f44e99c0700f3af9310, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  inputType: 1
+  debugSampling: 0
 --- !u!81 &4810254922834385287
 AudioListener:
   m_ObjectHideFlags: 0
@@ -3944,6 +3926,7 @@ MonoBehaviour:
   detectionPositionDelta: 0.1
   detectionRotationDelta: 5
   maximumTimeBetweenFramesSent: 5
+  avatarSceneId: 0
   EmotePlayedSelfEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -4126,6 +4109,7 @@ GameObject:
   - component: {fileID: 7289560753284016165}
   - component: {fileID: 7289560753284016160}
   - component: {fileID: 4387569826040570359}
+  - component: {fileID: 952246254594119033}
   m_Layer: 0
   m_Name: TeleportingOpenVR
   m_TagString: Untagged
@@ -4214,6 +4198,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b38180f9631c0244bf7b35b1608a32e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &952246254594119033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7289560753284016164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf7947d07c4bd2e4498d4c967956e170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapTurnAngle: 45
+  onSnapTurnStart:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7289560753622272137
 GameObject:
   m_ObjectHideFlags: 0
@@ -4463,7 +4463,7 @@ MonoBehaviour:
   errorPoint: {fileID: 3062910661664101786}
   rayStartPoint: {fileID: 7289560753973707075}
   raySpeed: 6
-  maxVerticalAngle: 0
+  maxVerticalAngle: 45
   stepLength: 0.1
   arcMaxLength: 100
   updateRate: 0.1
@@ -4522,7 +4522,7 @@ MonoBehaviour:
   errorPoint: {fileID: 3062910660879061576}
   rayStartPoint: {fileID: 7289560754043300594}
   raySpeed: 6
-  maxVerticalAngle: 0
+  maxVerticalAngle: 45
   stepLength: 0.1
   arcMaxLength: 100
   updateRate: 0.1
@@ -4755,7 +4755,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a753d697b6290408411f19ff79a837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action: 3
+  action: 5
   controller: 0
   onActionDown:
     m_PersistentCalls:
@@ -4862,7 +4862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 76a753d697b6290408411f19ff79a837, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  action: 3
+  action: 5
   controller: 1
   onActionDown:
     m_PersistentCalls:
@@ -6158,7 +6158,7 @@ PrefabInstance:
     - target: {fileID: 2423794756521151748, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 2439902099852269835, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
@@ -6183,12 +6183,12 @@ PrefabInstance:
     - target: {fileID: 5721242110318173664, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6703912113532768241, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 6983789213951145499, guid: 43814b73dafd4b74a8ea50e94293f12b,
         type: 3}
@@ -6565,7 +6565,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 2
 --- !u!1 &8087883337364206195 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3673981092504156441, guid: c95999b4e970d984db2324d70298aff0,
@@ -6585,7 +6585,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionType: 0
-  goal: 0
+  goal: 3
 --- !u!1001 &4810254922390261527
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7223,17 +7223,17 @@ PrefabInstance:
     - target: {fileID: 2804195366849795432, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3784848031777195897, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5200641389016139148, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}
       propertyPath: networkFrameRate
-      value: 1
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5211555095825158531, guid: 6bf64b155464cb34dbf0eb2c2a6423b7,
         type: 3}

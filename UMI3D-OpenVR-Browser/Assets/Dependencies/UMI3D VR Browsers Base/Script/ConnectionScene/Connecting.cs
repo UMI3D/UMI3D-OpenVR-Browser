@@ -84,12 +84,15 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="callback"></param>
         private void ShouldDlLibraries(List<string> ids, Action<bool> callback)
         {
-            LoadingPanel.Instance.Hide();
+            if (LoadingPanel.Exists)
+                LoadingPanel.Instance.Hide();
 
             if (ids.Count == 0)
             {
                 callback.Invoke(true);
-                LoadingPanel.Instance?.Display("Loading environment ...");
+
+                if (LoadingPanel.Exists)
+                    LoadingPanel.Instance?.Display("Loading environment ...");
             }
 
             else DisplayAccept(ids.Count, callback);
@@ -116,7 +119,9 @@ namespace umi3dVRBrowsersBase.connection
 
         public async Task<MediaDto> GetMedia(PlayerPrefsManager.FavoriteServerData connectionData)
         {
-            LoadingPanel.Instance.Display("Connecting ...");
+            if (LoadingPanel.Exists)
+                LoadingPanel.Instance.Display("Connecting ...");
+
             //this.data = data;
             LoginPasswordAsker.Instance.Hide();
 
@@ -139,14 +144,16 @@ namespace umi3dVRBrowsersBase.connection
         /// <param name="data"></param>
         public void Connect(AdvancedConnectionPanel.Data connectionData)
         {
-            LoadingPanel.Instance.Display("Connecting ...");
+            if (LoadingPanel.Exists)
+                LoadingPanel.Instance.Display("Connecting ...");
+
             this.data = connectionData;
             LoginPasswordAsker.Instance.Hide();
 
             var baseUrl = FormatUrl(connectionData.ip, connectionData.port);
             var curentUrl = baseUrl + UMI3DNetworkingKeys.media;
             url = curentUrl;
-            
+
             GetMediaSucces(new MediaDto() { url = baseUrl, name =/* connectionData.environmentName ??*/ connectionData.ip }, (s) => GetMediaFailed(s));
         }
 
@@ -170,7 +177,7 @@ namespace umi3dVRBrowsersBase.connection
         {
             PlayerMenuManager.Instance.MenuHeader.SetEnvironmentName(media);
             UMI3DCollaborationClientServer.Connect(media, failed);
-            
+
         }
 
         /// <summary>
@@ -178,7 +185,8 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void DisplayLoginPassword(Action<string, string> callback = null)
         {
-            LoadingPanel.Instance.Hide();
+            if (LoadingPanel.Exists)
+                LoadingPanel.Instance.Hide();
 
             LoginPasswordAsker.Instance.Display();
             LoginPasswordAsker.Instance.UnregisterAll();
@@ -204,7 +212,8 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void DisplayPassword(Action<string> callback)
         {
-            LoadingPanel.Instance.Hide();
+            if (LoadingPanel.Exists)
+                LoadingPanel.Instance.Hide();
 
             LoginPasswordAsker.Instance.Display(false);
             LoginPasswordAsker.Instance.UnregisterAll();
@@ -262,10 +271,14 @@ namespace umi3dVRBrowsersBase.connection
             DialogBox.Instance.Display($"Connection to the server lost", "Leave to the connection menu or try again ?", "Try again", (b) =>
             {
                 callback.Invoke(b);
-                if (b)
-                    LoadingPanel.Instance.Display("Connecting ...");
-                else
-                    LoadingPanel.Instance.Display("Loading ...");
+
+                if (LoadingPanel.Exists)
+                {
+                    if (b)
+                        LoadingPanel.Instance.Display("Connecting ...");
+                    else
+                        LoadingPanel.Instance.Display("Loading ...");
+                }
                 DialogBox.Instance.Hide();
             });
         }

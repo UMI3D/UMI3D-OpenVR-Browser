@@ -304,7 +304,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90c129385bbcf744c85ac848e2fcfa0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  navmeshLayerName: Navmesh
+  defaultLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  navmeshLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &5627216354287875340
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,9 +392,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseMaterial: {fileID: 2100000, guid: 7b15e0d9f27093d4ba530b4923bac4e6, type: 2}
-  onProgressChange:
-    m_PersistentCalls:
-      m_Calls: []
   onResourcesLoaded:
     m_PersistentCalls:
       m_Calls: []
@@ -564,7 +566,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &5220243159181313142
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -983,7 +985,7 @@ PrefabInstance:
     - target: {fileID: 4876867055538472026, guid: ef00aa862b8b03444b612bbaaabaa689,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.000044806548
+      value: 0.00002840891
       objectReference: {fileID: 0}
     - target: {fileID: 4910200445073554615, guid: ef00aa862b8b03444b612bbaaabaa689,
         type: 3}
@@ -4172,3 +4174,4 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 32
   loadingLabel: {fileID: 6451300367320068560}
+  LoadingText: {fileID: 9035366892109336454}

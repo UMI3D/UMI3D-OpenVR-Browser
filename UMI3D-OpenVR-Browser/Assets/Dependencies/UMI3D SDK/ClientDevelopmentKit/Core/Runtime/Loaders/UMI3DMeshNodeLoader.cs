@@ -18,13 +18,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using umi3d.common;
 using UnityEngine;
 
 namespace umi3d.cdk
 {
     /// <summary>
-    /// Loader for UMI3D Mesh
+    /// Loader for <see cref="UMI3DMeshNodeDto"/>.
     /// </summary>
     public class UMI3DMeshNodeLoader : AbstractRenderedNodeLoader
     {
@@ -43,55 +44,92 @@ namespace umi3d.cdk
         /// <param name="node">gameObject on which the abstract node will be loaded.</param>
         /// <param name="finished">Finish callback.</param>
         /// <param name="failed">error callback.</param>
-        public override void ReadUMI3DExtension(UMI3DDto dto, GameObject node, Action finished, Action<Umi3dException> failed)
+        public override async Task ReadUMI3DExtension(UMI3DDto dto, GameObject node)
         {
             var nodeDto = dto as UMI3DAbstractNodeDto;
             if (node == null)
             {
-                failed.Invoke(new Umi3dException("Dto should be an UMI3DAbstractNodeDto"));
-                return;
+                throw (new Umi3dException("Dto should be an UMI3DAbstractNodeDto"));
             }
 
-            base.ReadUMI3DExtension(dto, node, () =>
-            {
+            await base.ReadUMI3DExtension(dto, node);
 
-                //MeshRenderer nodeMesh = node.AddComponent<MeshRenderer>();
-                FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(((UMI3DMeshNodeDto)dto).mesh.variants);  // Peut etre ameliore
-                string url = fileToLoad.url;
-                string ext = fileToLoad.extension;
-                string authorization = fileToLoad.authorization;
-                string pathIfInBundle = fileToLoad.pathIfInBundle;
-                IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(ext);
-                Vector3 offset = Vector3.zero;
-                if (loader is AbstractMeshDtoLoader meshLoader)
-                    offset = meshLoader.GetRotationOffset();
-                if (loader != null)
-                {
-                    UMI3DResourcesManager.LoadFile(
-                        nodeDto.id,
-                        fileToLoad,
-                        loader.UrlToObject,
-                        loader.ObjectFromCache,
-                        (o) =>
-                        {
-                            if (o is GameObject g && dto is UMI3DMeshNodeDto meshDto)
-                            {
-                                CallbackAfterLoadingForMesh(g, meshDto, node.transform, offset, finished);
-                            }
-                            else
-                            {
-                                failed?.Invoke(new Umi3dException($"Cast not valid for {o.GetType()} into GameObject or {dto.GetType()} into UMI3DMeshNodeDto"));
-                            }
-                        },
-                        failed,
-                        loader.DeleteObject
-                        );
-                }
+
+            FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(((UMI3DMeshNodeDto)dto).mesh.variants);  // Peut etre ameliore
+            string url = fileToLoad.url;
+            string ext = fileToLoad.extension;
+            string authorization = fileToLoad.authorization;
+            string pathIfInBundle = fileToLoad.pathIfInBundle;
+            IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(ext);
+            Vector3 offset = Vector3.zero;
+            if (loader is AbstractMeshDtoLoader meshLoader)
+                offset = meshLoader.GetRotationOffset();
+            if (loader != null)
+            {
+                var o = await UMI3DResourcesManager.LoadFile(nodeDto.id, fileToLoad, loader);
+                if (o is GameObject g && dto is UMI3DMeshNodeDto meshDto)
+                    await CallbackAfterLoadingForMesh(g, meshDto, node.transform, offset);
                 else
-                    failed.Invoke(new Umi3dException($"No loader found for {ext}"));
-            }, failed);
+                    throw (new Umi3dException($"Cast not valid for {o.GetType()} into GameObject or {dto.GetType()} into UMI3DMeshNodeDto"));
+            }
+            else
+                throw (new Umi3dException($"No loader found for {ext}"));
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        public override bool SetUMI3DProperty(UMI3DEntityInstance entity, SetEntityPropertyDto property)
+        {
+            if (base.SetUMI3DProperty(entity, property)) return true;
+
+            var extension = (entity?.dto as GlTFNodeDto)?.extensions?.umi3d as UMI3DMeshNodeDto;
+            if (extension == null || entity as UMI3DNodeInstance == null) return false;
+
+            switch (property.property)
+            {
+                case UMI3DPropertyKeys.IsPartOfNavmesh:
+                    (entity as UMI3DNodeInstance).IsPartOfNavmesh = (bool)property.value;
+                    return true;
+                case UMI3DPropertyKeys.IsTraversable:
+                    (entity as UMI3DNodeInstance).IsTraversable = (bool)property.value;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="operationId"></param>
+        /// <param name="propertyKey"></param>
+        /// <param name="container"></param>
+        /// <returns></returns>
+        public override bool SetUMI3DProperty(UMI3DEntityInstance entity, uint operationId, uint propertyKey, ByteContainer container)
+        {
+            if (base.SetUMI3DProperty(entity, operationId, propertyKey, container)) return true;
+
+            var extension = (entity?.dto as GlTFNodeDto)?.extensions?.umi3d as UMI3DMeshNodeDto;
+            if (extension == null) return false;
+            var node = entity as UMI3DNodeInstance;
+
+            switch (propertyKey)
+            {
+                case UMI3DPropertyKeys.IsPartOfNavmesh:
+                    (entity as UMI3DNodeInstance).IsPartOfNavmesh = UMI3DNetworkingHelper.Read<bool>(container);
+                    return true;
+                case UMI3DPropertyKeys.IsTraversable:
+                    (entity as UMI3DNodeInstance).IsTraversable = UMI3DNetworkingHelper.Read<bool>(container);
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         /// <summary>
         ///  Set Sub Objects References.
@@ -168,12 +206,14 @@ namespace umi3d.cdk
             }
         }
 
-        private void CallbackAfterLoadingForMesh(GameObject go, UMI3DMeshNodeDto dto, Transform parent, Vector3 rotationOffsetByLoader, Action finished)
+        private async Task CallbackAfterLoadingForMesh(GameObject go, UMI3DMeshNodeDto dto, Transform parent, Vector3 rotationOffsetByLoader)
         {
+            var modelTracker = parent.gameObject.AddComponent<ModelTracker>();
             GameObject root = null;
             if (dto.areSubobjectsTracked)
             {
                 root = SetSubObjectsReferences(go, dto, rotationOffsetByLoader);
+                modelTracker.areSubObjectTracked = true;
             }
             else
             {
@@ -185,6 +225,15 @@ namespace umi3d.cdk
             AbstractMeshDtoLoader.ShowModelRecursively(instance);
             Renderer[] renderers = instance.GetComponentsInChildren<Renderer>();
             nodeInstance.renderers = renderers.ToList();
+
+            if (dto.areSubobjectsTracked)
+            {
+                nodeInstance.mainInstance = instance;
+                if(instance.GetComponent<Animator>())
+                {
+                    modelTracker.animatorsToRebind.Add(instance.GetComponent<Animator>());
+                }
+            }
 
             foreach (Renderer renderer in renderers)
             {
@@ -200,7 +249,8 @@ namespace umi3d.cdk
             SetMaterialOverided(dto, nodeInstance);
             SetLightMap(instance, nodeInstance);
 
-            finished?.Invoke();
+            nodeInstance.IsPartOfNavmesh = dto.isPartOfNavmesh;
+            nodeInstance.IsTraversable = dto.isTraversable;
         }
 
         /// <summary>

@@ -60,6 +60,24 @@ namespace umi3dVRBrowsersBase.connection
             Hide();
         }
 
+        private void OnEnable()
+        {
+            LoadingScreenDisplayer.OnLoadingScreenDislayed.AddListener(HideObjects);
+            LoadingScreenDisplayer.OnLoadingScreenHidden.AddListener(DisplayObjectHidden);
+        }
+
+        private void OnDisable()
+        {
+            LoadingScreenDisplayer.OnLoadingScreenDislayed.RemoveListener(HideObjects);
+            LoadingScreenDisplayer.OnLoadingScreenHidden.RemoveListener(DisplayObjectHidden);
+        }
+
+        private void HideObjects()
+        {
+            foreach (GameObject o in objectsToHide)
+                o.SetActive(false);
+        }
+
         /// <summary>
         /// Waits for <see cref="UMI3DEnvironmentLoader"/> existence before listening to its events.
         /// </summary>
@@ -75,14 +93,14 @@ namespace umi3dVRBrowsersBase.connection
                 OnLoadingEnvironmentFinish?.Invoke();
                 AudioListener.volume = 1.0f;
             });
-            UMI3DEnvironmentLoader.Instance.onProgressChange.AddListener(v =>
-            {
-                if (v == 0)
-                {
-                    OnLoadingEnvironmentStart?.Invoke();
-                    AudioListener.volume = 0.0f;
-                }
-            });
+            //UMI3DEnvironmentLoader.Instance.onProgressChange.AddListener(v =>
+            //{
+            //    if (v == 0)
+            //    {
+            //        OnLoadingEnvironmentStart?.Invoke();
+            //        AudioListener.volume = 0.0f;
+            //    }
+            //});
         }
 
         /// <summary>

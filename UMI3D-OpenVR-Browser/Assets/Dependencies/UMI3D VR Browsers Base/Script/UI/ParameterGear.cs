@@ -199,14 +199,25 @@ namespace umi3dVRBrowsersBase.ui
                 }
                 else
                 {
-                    Collider icCollider = interactableContainer.GetComponentInChildren<Collider>();
-                    float closestDist = hits.Where(x => x.collider == icCollider).Min(x => x.distance);
-                    RaycastHit closest = hits.Find(x => x.distance == closestDist);
-                    rootPosition = closest.point;
+                    //TODO : remove try catch later for a better test
+                    try
+                    {
+                        Collider icCollider = interactableContainer.GetComponentInChildren<Collider>();
+                        float closestDist = hits.Where(x => x.collider == icCollider).Min(x => x.distance);
+                        RaycastHit closest = hits.Find(x => x.distance == closestDist);
+                        rootPosition = closest.point;
+                        normal = closest.normal;
+                    }
+                    catch
+                    {
+                        rootPosition = interactableContainer.transform.position;
+                        normal = (lookAtPoint - rootPosition).normalized;
+                    }
+
                     rayDirection = (rootPosition - lookAtPoint).normalized;
-                    normal = closest.normal;
                 }
             }
+
             Display(interactableContainer.Interactable, rootPosition, normal, rayDirection);
         }
 

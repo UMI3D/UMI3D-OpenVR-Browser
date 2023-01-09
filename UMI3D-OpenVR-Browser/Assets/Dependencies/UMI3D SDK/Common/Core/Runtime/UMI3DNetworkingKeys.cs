@@ -16,6 +16,9 @@ limitations under the License.
 
 namespace umi3d.common
 {
+    /// <summary>
+    /// Contains all the URI required for HTTP requests within the UMI3D protocol. 
+    /// </summary>
     public static class UMI3DNetworkingKeys
     {
         //users
@@ -25,8 +28,6 @@ namespace umi3d.common
         public const string logout = "/logout";
         public const string localData = "/LocalData/key/:param";
         public const string uploadFile = "/uploadFile/:param";
-
-
 
         //MEDIA
         public const string root = "/";
@@ -51,16 +52,7 @@ namespace umi3d.common
         public const string playerCount = "/environment/player_count";
 
         //Prefix
-        /*
-        public const string websocket = "/socket";
-        public const string websocket_reliable_data = "/reliabledata";
-        public const string websocket_unreliable_data = "/unreliabledata";
-        public const string websocket_reliable_tracking = "/reliabletracking";
-        public const string websocket_unreliable_tracking = "/unreliabletracking";
-        public const string websocket_audio = "/audio";
-        public const string websocket_video = "/video";
-        */
-        public const string websocketProtocol = "echo-protocol";//"access_token";
+        public const string websocketProtocol = "echo-protocol";
         public const string Authorization = "AUTHORIZATION";
         public const string ResourceServerAuthorization = "umi3dResourceToken";
         public const string bearer = "BEARER";

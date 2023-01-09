@@ -135,6 +135,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (obj != trackedObject) //new object case
                 {
                     selectedObjectCollider = obj.GetComponentInChildren<Collider>();
+                    isConvexOverrided = false;
+
                     if (selectedObjectCollider is MeshCollider)
                     {
                         if (!(selectedObjectCollider as MeshCollider).convex)
@@ -155,8 +157,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     Hide();
                 if (isTrackingSelectedObject)
                 {
-                    if (isConvexOverrided)
-                        (selectedObjectCollider as MeshCollider).convex = false;
+                    if (isConvexOverrided && selectedObjectCollider is MeshCollider meshCollider)
+                        meshCollider.convex = false;
                     isTrackingSelectedObject = false;
                     HideContactSphereHint();
 

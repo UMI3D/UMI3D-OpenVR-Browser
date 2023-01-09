@@ -20,6 +20,7 @@ using umi3d.cdk.collaboration;
 using umi3d.cdk.volumes;
 using umi3d.common;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.navigation
 {
@@ -30,16 +31,11 @@ namespace umi3dVRBrowsersBase.navigation
     {
         #region Fields
 
-        /// <summary>
-        ///LayerMask name used by the navigation system.
-        /// </summary>
+        [Tooltip("Default layer for traversable objets")]
+        public LayerMask defaultLayer;
 
-        public string navmeshLayerName = "Navmesh";
-
-        /// <summary>
-        /// Layer associated to <see cref="navmeshLayerName"/>.
-        /// </summary>
-        private LayerMask layer;
+        [Tooltip("Layer for objects part of the navmesh")]
+        public LayerMask navmeshLayer;
 
         /// <summary>
         /// Association between volume id and gameobject.
@@ -52,8 +48,8 @@ namespace umi3dVRBrowsersBase.navigation
 
         private void Start()
         {
-            layer = LayerMask.NameToLayer(navmeshLayerName);
-            UMI3DEnvironmentLoader.Instance.onEnvironmentLoaded.AddListener(InitNavMesh);
+            UMI3DEnvironmentLoader.Instance.onNodePartOfNavmeshSet += SetPartOfNavmesh;
+            UMI3DEnvironmentLoader.Instance.onNodeTraversableSet += SetTraversable;
 
             UMI3DCollaborationClientServer.Instance.OnLeaving.AddListener(Reset);
             VolumePrimitiveManager.SubscribeToPrimitiveCreation(OnPrimitiveCreated, false);
@@ -61,113 +57,150 @@ namespace umi3dVRBrowsersBase.navigation
         }
 
         /// <summary>
-        /// Once the environment is loaded, generates the navmesh.
+        /// Sets <paramref name="node"/> as part of the navmesh.
         /// </summary>
-        private void InitNavMesh()
+        /// <param name="node"></param>
+        private void SetPartOfNavmesh(UMI3DNodeInstance node)
         {
-            foreach (UMI3DEntityInstance entity in UMI3DEnvironmentLoader.Entities())
+            if (node.IsPartOfNavmesh)
             {
-                if (entity is UMI3DNodeInstance nodeInstance)
+                if (node.gameObject.GetComponent<Collider>() != null)
                 {
-                    UMI3DDto dto = (nodeInstance.dto as GlTFNodeDto)?.extensions.umi3d;
-
-                    if (dto is UMI3DMeshNodeDto && !(dto is SubModelDto)) //subModels will be initialized with their associated UMI3DModel.
-                        InitModel(nodeInstance);
+                    AddTeleportArea(node.gameObject);
                 }
-            }
-        }
 
-        /// <summary>
-        /// Inits navmesh according to the data stored by nodeInstance and its children.
-        /// </summary>
-        /// <param name="nodeInstance"></param>
-        private void InitModel(UMI3DNodeInstance nodeInstance)
-        {
-            var meshNodeDto = (nodeInstance.dto as GlTFNodeDto)?.extensions.umi3d as UMI3DMeshNodeDto;
-
-            if (meshNodeDto != null)
-                SetUpGameObject(nodeInstance, meshNodeDto);
-            else
-            {
-                var subModelDto = (nodeInstance.dto as GlTFNodeDto)?.extensions.umi3d as SubModelDto;
-                if (subModelDto != null)
-                    SetUpGameObject(nodeInstance, subModelDto);
-            }
-
-            foreach (UMI3DNodeInstance child in nodeInstance.subNodeInstances)
-            {
-                InitModel(child);
-            }
-        }
-
-        /// <summary>
-        /// Sets up associated <see cref="GameObject"/> of <paramref name="nodeInstance"/> according to its navmesh properties.
-        /// </summary>
-        /// <param name="nodeInstance"></param>
-        /// <param name="meshDto"></param>
-        private void SetUpGameObject(UMI3DNodeInstance nodeInstance, UMI3DMeshNodeDto meshDto)
-        {
-            SetUpGameObject(nodeInstance, meshDto.isPartOfNavmesh, meshDto.isTraversable);
-        }
-
-        /// <summary>
-        /// Sets up associated <see cref="GameObject"/> of <paramref name="nodeInstance"/> according to its navmesh properties.
-        /// </summary>
-        /// <param name="nodeInstance"></param>
-        /// <param name="subModelDto"></param>
-        private void SetUpGameObject(UMI3DNodeInstance nodeInstance, SubModelDto subModelDto)
-        {
-            SetUpGameObject(nodeInstance, subModelDto.isPartOfNavmesh, subModelDto.isTraversable);
-        }
-
-        /// <summary>
-        /// If a gameobject is part of the navmesh or not traversable, sets it up.
-        /// </summary>
-        /// <param name="nodeInstance"></param>
-        /// <param name="isPartOfNavMesh"></param>
-        /// <param name="isTraversable"></param>
-        private void SetUpGameObject(UMI3DNodeInstance nodeInstance, bool isPartOfNavmesh, bool isTraversable)
-        {
-            if (isPartOfNavmesh || !isTraversable)
-            {
-                Collider collider;
-                foreach (Renderer r in nodeInstance.renderers)
+                foreach (var renderer in node.renderers)
                 {
-                    if (!r.TryGetComponent(out collider))
+                    if (renderer.TryGetComponent<Collider>(out Collider c))
                     {
-                        MeshFilter filter;
-                        if (r.TryGetComponent<MeshFilter>(out filter))
-                        {
-                            if (filter.sharedMesh != null && filter.sharedMesh.isReadable)
-                                AddCollider(r.gameObject);
-                            else
-                                Debug.LogWarning(nodeInstance.gameObject.name + " can't be used for the navemesh or to limit it because its mesh is not readable.");
-                        }
-                        else
-                        {
-                            AddCollider(r.gameObject);
-                        }
+                        AddTeleportArea(renderer.gameObject);
                     }
                     else
                     {
-                        r.gameObject.layer = layer;
-                    }
-                    if (isPartOfNavmesh)
-                    {
-                        r.gameObject.AddComponent<TeleportArea>();
+                        Debug.LogWarning(renderer.gameObject.name + " is set as part of the navmesh but it does not have colliders");
                     }
                 }
+            }
+            else if (node.IsTraversable)
+            {
+                SetDefaultSettings(node);
+            } else
+            {
+                DeleteTeleportArea(node);
             }
         }
 
         /// <summary>
-        /// Adds a collider to a gameobject and changes its layer.
+        /// Sets colliders and layers according to <see cref="node.IsTraversable"/>
         /// </summary>
-        /// <param name="obj"></param>
-        private void AddCollider(GameObject obj)
+        /// <param name="node"></param>
+        private void SetTraversable(UMI3DNodeInstance node)
         {
-            obj.AddComponent<MeshCollider>();
-            obj.layer = layer;
+            if (node.IsPartOfNavmesh)
+                return;
+            if (node.IsTraversable)
+            {
+                SetDefaultSettings(node);
+                return;
+            } else
+            {
+                TeleportArea tpArea;
+
+                if (node.gameObject.TryGetComponent<TeleportArea>(out tpArea))
+                {
+                    GameObject.Destroy(tpArea);
+                }
+
+                node.gameObject.layer = ToLayer(navmeshLayer);
+
+                foreach (var renderer in node.renderers)
+                {
+                    if (renderer.gameObject.TryGetComponent<TeleportArea>(out tpArea))
+                    {
+                        GameObject.Destroy(tpArea);
+                    }
+
+                    renderer.gameObject.layer = ToLayer(navmeshLayer);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Adds a <see cref="TeleportArea"/> to <paramref name="go"/>.
+        /// </summary>
+        /// <param name="go"></param>
+        private void AddTeleportArea(GameObject go)
+        {
+            if (go.GetComponent<TeleportArea>() == null)
+            {
+                go.AddComponent<TeleportArea>();
+            }
+
+            go.layer = ToLayer(navmeshLayer);
+        }
+
+        /// <summary>
+        /// Sets <paramref name="node"/> to default layer and removes its <see cref="TeleportArea"/>.
+        /// </summary>
+        /// <param name="node"></param>
+        private void SetDefaultSettings(UMI3DNodeInstance node)
+        {
+            SetLayer(node, defaultLayer);
+
+            DeleteTeleportArea(node);
+        }
+
+        /// <summary>
+        /// Sets a node and its renderers to layer <see cref="mask"/>.
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="mask"></param>
+        private void SetLayer(UMI3DNodeInstance node, LayerMask mask)
+        {
+            if (node.gameObject.GetComponent<Collider>() != null)
+            {
+                node.gameObject.layer = ToLayer(navmeshLayer);
+            }
+
+            foreach (var renderer in node.renderers)
+            {
+                renderer.gameObject.layer = ToLayer(mask);
+            }
+        }
+
+        /// <summary>
+        /// Deletes all <see cref="TeleportArea"/> set to <paramref name="node"/> and its renderers.
+        /// </summary>
+        /// <param name="node"></param>
+        private void DeleteTeleportArea(UMI3DNodeInstance node)
+        {
+            TeleportArea tpArea;
+            if (node.gameObject.TryGetComponent<TeleportArea>(out tpArea))
+            {
+                GameObject.Destroy(tpArea);
+            }
+
+            foreach (var renderer in node.renderers)
+            {
+                if (renderer.gameObject.TryGetComponent<TeleportArea>(out tpArea))
+                {
+                    GameObject.Destroy(tpArea);
+                }
+            }
+        }
+
+        /// <summary> Converts given bitmask to layer number </summary>
+        /// <returns> layer number </returns>
+        public static int ToLayer(int bitmask)
+        {
+            int result = bitmask > 0 ? 0 : 31;
+            while (bitmask > 1)
+            {
+                bitmask = bitmask >> 1;
+                result++;
+            }
+            return result;
         }
 
         #region Volume
@@ -203,9 +236,6 @@ namespace umi3dVRBrowsersBase.navigation
                     Debug.LogError("Primitive of type " + primitive?.GetType() + " not supported.");
                     break;
             }
-
-            if (go != null)
-                go.layer = layer;
         }
 
         /// <summary>

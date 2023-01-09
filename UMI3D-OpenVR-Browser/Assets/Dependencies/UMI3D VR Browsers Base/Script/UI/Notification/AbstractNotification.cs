@@ -115,22 +115,22 @@ namespace umi3dVRBrowsersBase.ui.notification
 
                 if (loader != null)
                 {
-                    UMI3DResourcesManager.LoadFile(
-                        id,
-                        fileToLoad,
-                        loader.UrlToObject,
-                        loader.ObjectFromCache,
-                        (o) =>
-                        {
-                            res = o as Texture2D;
-                            image.sprite = Sprite.Create(res, new Rect(0.0f, 0.0f, res.width, res.height), new Vector2(0.5f, 0.5f));
-                        },
-                        (Umi3dException error) =>
-                        {
-                            Debug.LogWarning($"Icon not loadable : {url} [{error.errorCode}:{error.Message}]");
-                        },
-                        loader.DeleteObject
-                        );
+                    //UMI3DResourcesManager.LoadFile(
+                    //    id,
+                    //    fileToLoad,
+                    //    loader.UrlToObject,
+                    //    loader.ObjectFromCache,
+                    //    (o) =>
+                    //    {
+                    //        res = o as Texture2D;
+                    //        image.sprite = Sprite.Create(res, new Rect(0.0f, 0.0f, res.width, res.height), new Vector2(0.5f, 0.5f));
+                    //    },
+                    //    (Umi3dException error) =>
+                    //    {
+                    //        Debug.LogWarning($"Icon not loadable : {url} [{error.errorCode}:{error.Message}]");
+                    //    },
+                    //    loader.DeleteObject
+                    //    );
                 }
                 else
                     Debug.LogWarning("No loader was found to load this icon " + url);
