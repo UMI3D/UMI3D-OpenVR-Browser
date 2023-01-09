@@ -51,29 +51,19 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         return frameTensor;
     }
 
-
-
-    protected List<Tensor> ExecuteModel()
-    {
-        List<Tensor> outputs = new List<Tensor>();
-        mainWorker.Execute(modelInput);
-
-        outputs.Add(mainWorker.PeekOutput());
-        return outputs;
-    }
-
     public override (Vector3 pos, Quaternion rot) GetPrediction()
     {
         var output = ExecuteModel();
 
+        int idx = 0;
         (Vector3 pos, Quaternion rot) results = (
-                                                new Vector3(output[0][0, 0, 0, 0],
-                                                            output[0][0, 0, 0, 1],
-                                                            output[0][0, 0, 0, 2]),
-                                                new Quaternion(output[0][0, 0, 0, 3],
-                                                               output[0][0, 0, 0, 4],
-                                                               output[0][0, 0, 0, 5],
-                                                               output[0][0, 0, 0, 6]));
+                                                new Vector3(output[0][0, 0, 0, idx++],
+                                                            output[0][0, 0, 0, idx++],
+                                                            output[0][0, 0, 0, idx++]),
+                                                new Quaternion(output[0][0, 0, 0, idx++],
+                                                               output[0][0, 0, 0, idx++],
+                                                               output[0][0, 0, 0, idx++],
+                                                               output[0][0, 0, 0, idx++]));
 
         return results;
     }
@@ -120,11 +110,14 @@ public class HipsPredictorV3 : HipsPredictor
     {
         var output = ExecuteModel();
 
-        Vector3 pos = new Vector3(output[0][0, 0, 0, 0],
-                                  output[0][0, 0, 0, 1],
-                                  output[0][0, 0, 0, 2]);
+        int i = 0;
+        Vector3 pos = new Vector3(output[0][0, 0, 0, i++],
+                                  output[0][0, 0, 0, i++],
+                                  output[0][0, 0, 0, i++]);
 
-        var zAxis = new Vector3(output[0][0, 0, 0, 3], output[0][0, 0, 0, 4], output[0][0, 0, 0, 5]).normalized;
+        var zAxis = new Vector3(output[0][0, 0, 0, i++],
+                                output[0][0, 0, 0, i++],
+                                output[0][0, 0, 0, i++]).normalized;
 
         /*
          * Simpler alternative :

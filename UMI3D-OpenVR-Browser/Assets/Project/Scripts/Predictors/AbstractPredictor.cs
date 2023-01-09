@@ -1,4 +1,5 @@
-﻿using Unity.Barracuda;
+﻿using System.Collections.Generic;
+using Unity.Barracuda;
 
 public abstract class AbstractPredictor<T>
 {
@@ -53,6 +54,15 @@ public abstract class AbstractPredictor<T>
 
             idNextFrame++;
         }
+    }
+
+    protected virtual List<Tensor> ExecuteModel()
+    {
+        List<Tensor> outputs = new List<Tensor>();
+        mainWorker.Execute(modelInput);
+
+        outputs.Add(mainWorker.PeekOutput());
+        return outputs;
     }
 
     public abstract T GetPrediction();

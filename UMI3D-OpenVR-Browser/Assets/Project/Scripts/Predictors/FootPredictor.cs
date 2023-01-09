@@ -50,6 +50,19 @@ public class FootPredictor : AbstractPredictor<(Vector3 posLFoot, Vector3 posRFo
 
     public override (Vector3 posLFoot, Vector3 posRFoot) GetPrediction()
     {
-        throw new System.NotImplementedException();
+        var output = ExecuteModel();
+
+        int index=0;
+        Vector3 posLFoot = new Vector3(output[0][0, 0, 0, index++],
+                                       output[0][0, 0, 0, index++],
+                                       output[0][0, 0, 0, index++]);
+
+        Vector3 posRFoot = new Vector3(output[0][0, 0, 0, index++],
+                                       output[0][0, 0, 0, index++],
+                                       output[0][0, 0, 0, index++]);
+
+
+        (Vector3 posLFoot, Vector3 posRFoot) result = (posLFoot, posRFoot);
+        return result;
     }
 }
