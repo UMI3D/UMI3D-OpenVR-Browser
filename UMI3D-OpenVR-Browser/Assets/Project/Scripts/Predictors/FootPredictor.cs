@@ -6,6 +6,13 @@ public class FootPredictor : AbstractPredictor<(Vector3, Vector3)>
     public FootPredictor(NNModel modelAsset) : base(modelAsset)
     { }
 
+    protected override void Init()
+    {
+        base.Init();
+        modelInput = new Tensor(1, 1, 3 * 7, 45); //initializing
+    }
+
+
     public override void AddFrameInput(Tensor tensor)
     {
         throw new System.NotImplementedException();
