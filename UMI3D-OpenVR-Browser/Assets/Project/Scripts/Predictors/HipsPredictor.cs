@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.Barracuda;
+﻿using Unity.Barracuda;
 using UnityEngine;
 
 public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
@@ -30,14 +29,14 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index, 0] = go.position.x;
-            frameTensor[0, 0, ++index, 0] = go.position.y;
-            frameTensor[0, 0, ++index, 0] = go.position.z;
+            frameTensor[0, 0, index++, 0] = go.position.x;
+            frameTensor[0, 0, index++, 0] = go.position.y;
+            frameTensor[0, 0, index++, 0] = go.position.z;
 
-            frameTensor[0, 0, ++index, 0] = go.rotation.x;
-            frameTensor[0, 0, ++index, 0] = go.rotation.y;
-            frameTensor[0, 0, ++index, 0] = go.rotation.z;
-            frameTensor[0, 0, ++index, 0] = go.rotation.w;
+            frameTensor[0, 0, index++, 0] = go.rotation.x;
+            frameTensor[0, 0, index++, 0] = go.rotation.y;
+            frameTensor[0, 0, index++, 0] = go.rotation.z;
+            frameTensor[0, 0, index++, 0] = go.rotation.w;
 
             endIndex = index;
         }
@@ -81,18 +80,18 @@ public class HipsPredictorV3 : HipsPredictor
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index, 0] = go.position.x;
-            frameTensor[0, 0, ++index, 0] = go.position.y;
-            frameTensor[0, 0, ++index, 0] = go.position.z;
+            frameTensor[0, 0, index++, 0] = go.position.x;
+            frameTensor[0, 0, index++, 0] = go.position.y;
+            frameTensor[0, 0, index++, 0] = go.position.z;
 
             var rightNormalized = go.right.normalized;
             var upNormalized = go.up.normalized;
-            frameTensor[0, 0, ++index, 0] = rightNormalized.x;
-            frameTensor[0, 0, ++index, 0] = rightNormalized.y;
-            frameTensor[0, 0, ++index, 0] = rightNormalized.z;
-            frameTensor[0, 0, ++index, 0] = upNormalized.x;
-            frameTensor[0, 0, ++index, 0] = upNormalized.y;
-            frameTensor[0, 0, ++index, 0] = upNormalized.z;
+            frameTensor[0, 0, index++, 0] = rightNormalized.x;
+            frameTensor[0, 0, index++, 0] = rightNormalized.y;
+            frameTensor[0, 0, index++, 0] = rightNormalized.z;
+            frameTensor[0, 0, index++, 0] = upNormalized.x;
+            frameTensor[0, 0, index++, 0] = upNormalized.y;
+            frameTensor[0, 0, index++, 0] = upNormalized.z;
 
             endIndex = index;
         }

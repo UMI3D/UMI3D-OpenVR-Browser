@@ -24,14 +24,14 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index, 0] = go.position.x;
-            frameTensor[0, 0, ++index, 0] = go.position.y;
-            frameTensor[0, 0, ++index, 0] = go.position.z;
+            frameTensor[0, 0, index++, 0]   = go.position.x;
+            frameTensor[0, 0, index++, 0] = go.position.y;
+            frameTensor[0, 0, index++, 0] = go.position.z;
 
-            frameTensor[0, 0, ++index, 0] = go.rotation.x;
-            frameTensor[0, 0, ++index, 0] = go.rotation.y;
-            frameTensor[0, 0, ++index, 0] = go.rotation.z;
-            frameTensor[0, 0, ++index, 0] = go.rotation.w;
+            frameTensor[0, 0, index++, 0] = go.rotation.x;
+            frameTensor[0, 0, index++, 0] = go.rotation.y;
+            frameTensor[0, 0, index++, 0] = go.rotation.z;
+            frameTensor[0, 0, index++, 0] = go.rotation.w;
 
             endIndex = index;
         }
