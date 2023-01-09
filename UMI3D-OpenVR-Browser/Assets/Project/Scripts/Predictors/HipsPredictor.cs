@@ -29,16 +29,17 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
-            frameTensor[0, 0, startIndex, 0] = go.position.x;
-            frameTensor[0, 0, ++startIndex, 0] = go.position.y;
-            frameTensor[0, 0, ++startIndex, 0] = go.position.z;
+            int index = startIndex;
+            frameTensor[0, 0, index, 0] = go.position.x;
+            frameTensor[0, 0, ++index, 0] = go.position.y;
+            frameTensor[0, 0, ++index, 0] = go.position.z;
 
-            frameTensor[0, 0, ++startIndex, 0] = go.rotation.x;
-            frameTensor[0, 0, ++startIndex, 0] = go.rotation.y;
-            frameTensor[0, 0, ++startIndex, 0] = go.rotation.z;
-            frameTensor[0, 0, ++startIndex, 0] = go.rotation.w;
+            frameTensor[0, 0, ++index, 0] = go.rotation.x;
+            frameTensor[0, 0, ++index, 0] = go.rotation.y;
+            frameTensor[0, 0, ++index, 0] = go.rotation.z;
+            frameTensor[0, 0, ++index, 0] = go.rotation.w;
 
-            endIndex = startIndex;
+            endIndex = index;
         }
 
         // head
@@ -50,31 +51,7 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         return frameTensor;
     }
 
-    protected bool isTensorFull => idNextFrame == modelInput.channels;
-    protected int idNextFrame;
 
-    public override void AddFrameInput(Tensor frame)
-    {
-        if (isTensorFull)
-        {
-            for (int i = 0; i < modelInput.channels - 1; i++)
-            {
-                // move a frame to the left
-                for (int j = 0; j < modelInput.width; j++)
-                    modelInput[0, 0, j, i] = modelInput[0, 0, j, i + 1];
-            }
-            // replace the last frame
-            for (int j = 0; j < modelInput.width; j++)
-                modelInput[0, 0, j, modelInput.channels - 1] = frame[0, 0, j, 0];
-        }
-        else
-        {
-            for (int i = 0; i < modelInput.width; i++)
-                modelInput[0, 0, i, idNextFrame] = frame[0, 0, i, 0];
-
-            idNextFrame++;
-        }
-    }
 
     protected List<Tensor> ExecuteModel()
     {
@@ -105,8 +82,7 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
 public class HipsPredictorV3 : HipsPredictor
 {
     public HipsPredictorV3(NNModel modelAsset) : base(modelAsset, nbParameters: 9, nbTrackedLimbs: 3)
-    {
-    }
+    { }
 
     public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
     {
@@ -114,20 +90,21 @@ public class HipsPredictorV3 : HipsPredictor
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
-            frameTensor[0, 0, startIndex, 0] = go.position.x;
-            frameTensor[0, 0, ++startIndex, 0] = go.position.y;
-            frameTensor[0, 0, ++startIndex, 0] = go.position.z;
+            int index = startIndex;
+            frameTensor[0, 0, index, 0] = go.position.x;
+            frameTensor[0, 0, ++index, 0] = go.position.y;
+            frameTensor[0, 0, ++index, 0] = go.position.z;
 
             var rightNormalized = go.right.normalized;
             var upNormalized = go.up.normalized;
-            frameTensor[0, 0, ++startIndex, 0] = rightNormalized.x;
-            frameTensor[0, 0, ++startIndex, 0] = rightNormalized.y;
-            frameTensor[0, 0, ++startIndex, 0] = rightNormalized.z;
-            frameTensor[0, 0, ++startIndex, 0] = upNormalized.x;
-            frameTensor[0, 0, ++startIndex, 0] = upNormalized.y;
-            frameTensor[0, 0, ++startIndex, 0] = upNormalized.z;
+            frameTensor[0, 0, ++index, 0] = rightNormalized.x;
+            frameTensor[0, 0, ++index, 0] = rightNormalized.y;
+            frameTensor[0, 0, ++index, 0] = rightNormalized.z;
+            frameTensor[0, 0, ++index, 0] = upNormalized.x;
+            frameTensor[0, 0, ++index, 0] = upNormalized.y;
+            frameTensor[0, 0, ++index, 0] = upNormalized.z;
 
-            endIndex = startIndex;
+            endIndex = index;
         }
 
         // head

@@ -29,7 +29,31 @@ public abstract class AbstractPredictor<T>
         mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, runtimeModel);
     }
 
-    public abstract void AddFrameInput(Tensor tensor);
+    protected bool isTensorFull => idNextFrame == modelInput.channels;
+    protected int idNextFrame;
+
+    public virtual void AddFrameInput(Tensor frame)
+    {
+        if (isTensorFull)
+        {
+            for (int i = 0; i < modelInput.channels - 1; i++)
+            {
+                // move a frame to the left
+                for (int j = 0; j < modelInput.width; j++)
+                    modelInput[0, 0, j, i] = modelInput[0, 0, j, i + 1];
+            }
+            // replace the last frame
+            for (int j = 0; j < modelInput.width; j++)
+                modelInput[0, 0, j, modelInput.channels - 1] = frame[0, 0, j, 0];
+        }
+        else
+        {
+            for (int i = 0; i < modelInput.width; i++)
+                modelInput[0, 0, i, idNextFrame] = frame[0, 0, i, 0];
+
+            idNextFrame++;
+        }
+    }
 
     public abstract T GetPrediction();
 
