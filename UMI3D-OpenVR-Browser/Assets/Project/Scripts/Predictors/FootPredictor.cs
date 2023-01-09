@@ -92,4 +92,24 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         (Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact) result = (positions, contact);
         return result;
     }
+
+    public Dictionary<HumanBodyBones, Quaternion> ComputeForwardKinematics(Vector3 hips, Dictionary<HumanBodyBones, Vector3> positions)
+    {
+         //not necessary with Unity parenting. Needs to be parented in the right order though.
+
+        var rotations = new Dictionary<HumanBodyBones, Quaternion>()
+        {
+            { HumanBodyBones.RightUpperLeg, Quaternion.FromToRotation(hips,                                     positions[HumanBodyBones.RightUpperLeg]) },
+            { HumanBodyBones.RightLowerLeg, Quaternion.FromToRotation(positions[HumanBodyBones.RightUpperLeg],  positions[HumanBodyBones.RightLowerLeg]) },
+            { HumanBodyBones.RightFoot,     Quaternion.FromToRotation(positions[HumanBodyBones.RightLowerLeg],  positions[HumanBodyBones.RightFoot]) },
+            { HumanBodyBones.RightToes,     Quaternion.FromToRotation(positions[HumanBodyBones.RightFoot],      positions[HumanBodyBones.RightToes]) },
+
+            { HumanBodyBones.LeftUpperLeg,  Quaternion.FromToRotation(hips,                                     positions[HumanBodyBones.LeftUpperLeg]) },
+            { HumanBodyBones.LeftLowerLeg,  Quaternion.FromToRotation(positions[HumanBodyBones.LeftUpperLeg],   positions[HumanBodyBones.LeftLowerLeg]) },
+            { HumanBodyBones.LeftFoot,      Quaternion.FromToRotation(positions[HumanBodyBones.LeftLowerLeg],   positions[HumanBodyBones.LeftFoot]) },
+            { HumanBodyBones.LeftToes,      Quaternion.FromToRotation(positions[HumanBodyBones.LeftFoot],       positions[HumanBodyBones.LeftToes]) },
+        };
+
+        return rotations;
+    }
 }
