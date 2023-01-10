@@ -142,12 +142,29 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (controller != (trackingInfo.controller as VRController))
                     return;
 
-                trackingInfo.targetContainer.Interactable.HoverExit(
-                    controller.bone.boneType,
-                    trackingInfo.targetContainer.Interactable.id,
-                    trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
-                    trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
-                    trackingInfo.directionWorld);
+                if (!IsNullOrDestroyed(trackingInfo.targetContainer))
+                {
+                    trackingInfo.targetContainer.Interactable.HoverExit(
+                        controller.bone.boneType,
+                        trackingInfo.targetContainer.Interactable.id,
+                        trackingInfo.targetContainer.transform.InverseTransformPoint(trackingInfo.raycastHit.point),
+                        trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
+                        trackingInfo.directionWorld);
+                }
+                else // It means the object hovered has been destroyed
+                {
+                    var hoverDto = new umi3d.common.interaction.HoverStateChangedDto()
+                    {
+                        toolId = trackingInfo.targetContainer.Interactable.id,
+                        hoveredObjectId = trackingInfo.targetContainer.Interactable.id,
+                        boneType = controller.bone.boneType,
+                        state = false,
+                        normal = Vector3.zero,
+                        position = Vector3.zero,
+                        direction = Vector3.zero
+                    };
+                    UMI3DClientServer.SendData(hoverDto, true);
+                }
 
                 if (trackingInfo.target.dto.HoverExitAnimationId != 0)
                 {
@@ -179,6 +196,15 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     trackingInfo.targetContainer.transform.InverseTransformDirection(trackingInfo.raycastHit.normal),
                     trackingInfo.directionWorld);
             });
+        }
+
+        public static bool IsNullOrDestroyed(System.Object obj)
+        {
+            if (object.ReferenceEquals(obj, null)) return true;
+
+            if (obj is UnityEngine.Object) return (obj as UnityEngine.Object) == null;
+
+            return false;
         }
 
         /// <summary>
