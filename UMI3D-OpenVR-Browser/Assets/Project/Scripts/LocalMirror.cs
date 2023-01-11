@@ -9,7 +9,7 @@ public class LocalMirror : MonoBehaviour
 
     private Vector3 prevPos;
     private float prevTime;
-    private float maxSpeed = 5f;
+    private float maxSpeed = 0.5f;
 
     public void Start()
     {
