@@ -147,20 +147,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetRightSnapTurn(ControllerType controller)
     {
-        var res = false;
-
-        switch (controller)
-        {
-            case ControllerType.LeftHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
-                break;
-            case ControllerType.RightHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
-                break;
-            default:
-                res = false;
-                break;
-        }
+        var res = GetJoystickDown(controller);
 
         if (res)
         {
@@ -181,20 +168,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetLeftSnapTurn(ControllerType controller)
     {
-        var res = false;
-
-        switch (controller)
-        {
-            case ControllerType.LeftHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
-                break;
-            case ControllerType.RightHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
-                break;
-            default:
-                res = false;
-                break;
-        }
+        var res = GetJoystickDown(controller);
 
         if (res)
         {
@@ -376,20 +350,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetTeleportDown(ControllerType controller)
     {
-        var res = false;
-
-        switch (controller)
-        {
-            case ControllerType.LeftHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
-                break;
-            case ControllerType.RightHandController:
-                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
-                break;
-            default:
-                res = false;
-                break;
-        }
+        var res = GetJoystickDown(controller);
 
         if (res)
         {
@@ -412,20 +373,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetTeleportUp(ControllerType controller)
     {
-        var res = false;
-
-        switch (controller)
-        {
-            case ControllerType.LeftHandController:
-                res = SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
-                break;
-            case ControllerType.RightHandController:
-                res = SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
-                break;
-            default:
-                res = false;
-                break;
-        }
+        var res = GetJoystickUp(controller) && isTeleportDown[controller];
 
         if (res)
         {
