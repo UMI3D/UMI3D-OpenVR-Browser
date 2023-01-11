@@ -20,6 +20,10 @@ public class LocalMirror : MonoBehaviour
 
     public void Update()
     {
+        var speed = (transform.position - prevPos).magnitude / (Time.time - prevTime);
+        prevPos = transform.position;
+        prevTime = Time.time;
+
         if (mirrorAvatar == null)
             mirrorAvatar = GameObject.Find("Player mirror");
         if (mirrorAvatar == null)
@@ -28,7 +32,8 @@ public class LocalMirror : MonoBehaviour
             animator = mirrorAvatar.GetComponentInChildren<Animator>();
         if (animator == null)
             return;
-        var speed = (transform.position - prevPos).magnitude / (Time.time - prevTime);
+
+        Debug.Log($"Speed: {speed}");
         if (speed < maxSpeed)
             animator.SetFloat("Speed", speed / maxSpeed);
         else
