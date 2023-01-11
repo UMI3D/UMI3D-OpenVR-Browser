@@ -5218,12 +5218,19 @@ MonoBehaviour:
   SecondaryButtonAction:
     actionPath: /actions/UMI3D/in/SecondaryButton
     needsReinit: 0
+  SnapTurnLeftButtonAction:
+    actionPath: /actions/UMI3D/in/SnapTurnLeft
+    needsReinit: 0
+  SnapTurnRightButtonAction:
+    actionPath: /actions/UMI3D/in/SnapTurnRight
+    needsReinit: 0
   TriggerAction:
     actionPath: /actions/UMI3D/in/Trigger
     needsReinit: 0
   HapticAction:
     actionPath: /actions/default/out/Haptic
     needsReinit: 0
+  minSnapTurnMagnitude: 0.5
 --- !u!1 &7289560754815008402
 GameObject:
   m_ObjectHideFlags: 0
