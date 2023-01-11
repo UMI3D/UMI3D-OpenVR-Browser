@@ -33,6 +33,10 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public Dictionary<ControllerType, bool> isTeleportDown = new Dictionary<ControllerType, bool>();
 
+    [Space]
+    [SerializeField, Tooltip("Minimum joystick magnitude to consider a user wants to perform a snap turn")]
+    private float minSnapTurnMagnitude = .5f;
+
     protected override void Awake()
     {
         base.Awake();
@@ -140,6 +144,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
         }
     }
 
+
     public override bool GetRightSnapTurn(ControllerType controller)
     {
         var res = false;
@@ -159,9 +164,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
         if (res)
         {
-            float pole = GetJoystickPole(controller);
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
 
-            if ((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360))
+            if (((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360)) && (magnitude >= minSnapTurnMagnitude))
             {
                 return true;
             }
@@ -193,9 +198,9 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
         if (res)
         {
-            float pole = GetJoystickPole(controller);
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
 
-            if (pole > 160 && pole <= 200)
+            if (pole > 160 && pole <= 200 && magnitude >= minSnapTurnMagnitude)
             {
                 return true;
             }
@@ -208,9 +213,11 @@ public class OpenVRInputManager : AbstractControllerInputManager
         return res;
     }
 
-    private float GetJoystickPole(ControllerType controller)
+    private (float, float) GetJoystickPoleAndMagnitude(ControllerType controller)
     {
-        Vector2 axis = GetJoystickAxis(controller).normalized;
+        var getAxis = GetJoystickAxis(controller);
+
+        Vector2 axis = getAxis.normalized;
         float pole = 0.0f;
 
         if (axis.x != 0)
@@ -233,7 +240,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
         else if (axis.y < 0)
             pole = 360 + pole;
 
-        return pole;
+        return (pole, getAxis.magnitude);
     }
 
     #endregion
@@ -386,10 +393,10 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
         if (res)
         {
-            
-            float pole = GetJoystickPole(controller);
 
-            if (pole > 20 && pole < 160)
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
+
+            if ((pole > 20 && pole < 160) || magnitude < minSnapTurnMagnitude)
             {
                 isTeleportDown[controller] = true;
                 return true;
