@@ -49,6 +49,8 @@ public class FootMover : MonoBehaviour
         else
             hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3);
 
+        
+
         //var frequency = 1f / 30f;
         //InvokeRepeating(nameof(UpdateHips), 0, frequency);
     }
@@ -57,7 +59,10 @@ public class FootMover : MonoBehaviour
     {
         //LeftFoot.transform.position = new Vector3(LeftHand.transform.position.x, LeftFoot.transform.position.y, LeftHand.transform.position.z);
         //RightFoot.transform.position = new Vector3(RightHand.transform.position.x, RightFoot.transform.position.y, RightHand.transform.position.z);
+
+
         UpdateHips();
+
     }
 
     private void OnApplicationQuit()
