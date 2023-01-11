@@ -28,12 +28,14 @@ public class OpenVRInputManager : AbstractControllerInputManager
     public SteamVR_Action_Boolean JoystickButtonAction;
     public SteamVR_Action_Boolean PrimaryButtonAction;
     public SteamVR_Action_Boolean SecondaryButtonAction;
-    public SteamVR_Action_Boolean SnapTurnLeftButtonAction;
-    public SteamVR_Action_Boolean SnapTurnRightButtonAction;
     public SteamVR_Action_Boolean TriggerAction;
     public SteamVR_Action_Vibration HapticAction;
 
     public Dictionary<ControllerType, bool> isTeleportDown = new Dictionary<ControllerType, bool>();
+
+    [Space]
+    [SerializeField, Tooltip("Minimum joystick magnitude to consider a user wants to perform a snap turn")]
+    private float minSnapTurnMagnitude = .5f;
 
     protected override void Awake()
     {
@@ -150,11 +152,28 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                res = SnapTurnRightButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
                 break;
             case ControllerType.RightHandController:
-                res = SnapTurnRightButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
                 break;
+            default:
+                res = false;
+                break;
+        }
+
+        if (res)
+        {
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
+
+            if (((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360)) && (magnitude >= minSnapTurnMagnitude))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         return res;
@@ -167,14 +186,61 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                res = SnapTurnLeftButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
                 break;
             case ControllerType.RightHandController:
-                res = SnapTurnLeftButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
+                break;
+            default:
+                res = false;
                 break;
         }
 
+        if (res)
+        {
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
+
+            if (pole > 160 && pole <= 200 && magnitude >= minSnapTurnMagnitude)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         return res;
+    }
+
+    private (float, float) GetJoystickPoleAndMagnitude(ControllerType controller)
+    {
+        var getAxis = GetJoystickAxis(controller);
+
+        Vector2 axis = getAxis.normalized;
+        float pole = 0.0f;
+
+        if (axis.x != 0)
+            pole = Mathf.Atan(axis.y / axis.x);
+        else
+            if (axis.y == 0)
+            pole = 0;
+        else if (axis.y > 0)
+            pole = Mathf.PI / 2;
+        else
+            pole = -Mathf.PI / 2;
+
+        pole *= Mathf.Rad2Deg;
+
+        if (axis.x < 0)
+            if (axis.y >= 0)
+                pole = 180 - Mathf.Abs(pole);
+            else
+                pole = 180 + Mathf.Abs(pole);
+        else if (axis.y < 0)
+            pole = 360 + pole;
+
+        return (pole, getAxis.magnitude);
     }
 
     #endregion
@@ -315,11 +381,30 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                res = JoystickButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.LeftHand);
                 break;
             case ControllerType.RightHandController:
-                res = JoystickButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
+                res = SecondaryButtonAction.GetStateDown(SteamVR_Input_Sources.RightHand);
                 break;
+            default:
+                res = false;
+                break;
+        }
+
+        if (res)
+        {
+
+            (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
+
+            if ((pole > 20 && pole < 160) || magnitude < minSnapTurnMagnitude)
+            {
+                isTeleportDown[controller] = true;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         return res;
@@ -332,10 +417,13 @@ public class OpenVRInputManager : AbstractControllerInputManager
         switch (controller)
         {
             case ControllerType.LeftHandController:
-                res = JoystickButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
+                res = SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.LeftHand);
                 break;
             case ControllerType.RightHandController:
-                res = JoystickButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
+                res = SecondaryButtonAction.GetStateUp(SteamVR_Input_Sources.RightHand);
+                break;
+            default:
+                res = false;
                 break;
         }
 
