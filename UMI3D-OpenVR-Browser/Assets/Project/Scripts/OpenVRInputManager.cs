@@ -33,10 +33,6 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public Dictionary<ControllerType, bool> isTeleportDown = new Dictionary<ControllerType, bool>();
 
-    [Space]
-    [SerializeField, Tooltip("Minimum joystick magnitude to consider a user wants to perform a snap turn")]
-    private float minSnapTurnMagnitude = .5f;
-
     protected override void Awake()
     {
         base.Awake();
@@ -147,13 +143,13 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetRightSnapTurn(ControllerType controller)
     {
-        var res = GetJoystickDown(controller);
+        var res = GetJoystick(controller);
 
         if (res)
         {
             (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
 
-            if (((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360)) && (magnitude >= minSnapTurnMagnitude))
+            if ((pole >= 0 && pole < 20) || (pole > 340 && pole <= 360))
             {
                 return true;
             }
@@ -168,13 +164,13 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
     public override bool GetLeftSnapTurn(ControllerType controller)
     {
-        var res = GetJoystickDown(controller);
+        var res = GetJoystick(controller);
 
         if (res)
         {
             (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
 
-            if (pole > 160 && pole <= 200 && magnitude >= minSnapTurnMagnitude)
+            if (pole > 160 && pole <= 200)
             {
                 return true;
             }
@@ -357,7 +353,7 @@ public class OpenVRInputManager : AbstractControllerInputManager
 
             (float pole, float magnitude) = GetJoystickPoleAndMagnitude(controller);
 
-            if ((pole > 20 && pole < 160) || magnitude < minSnapTurnMagnitude)
+            if ((pole > 20 && pole < 160))
             {
                 isTeleportDown[controller] = true;
                 return true;
