@@ -69,21 +69,36 @@ public class LocalMirror : MonoBehaviour
             return children.FirstOrDefault(x => x.gameObject.name == mixamoBase + name)?.gameObject;
         }
         LeftFootMirror = GetLimb("LeftFoot");
-        Debug.Log(LeftFootMirror);
         LeftHandMirror = GetLimb("LeftHand");
+        RightFootMirror = GetLimb("RightFoot");
+        RightHandMirror = GetLimb("RightHand");
     }
 
     private void MoveLimbs()
     {
         Copy(LeftFoot, LeftFootMirror);
         Copy(LeftHand, LeftHandMirror);
+        Copy(RightFoot, RightFootMirror);
+        Copy(RightHand, RightHandMirror);
     }
 
     private void Copy(VirtualObjectBodyInteraction original, GameObject copy)
     {
-        animator.SetIKPosition(original.goal, copy.transform.position);
-        animator.SetIKRotation(original.goal, copy.transform.rotation);
-        copy.transform.position = original.transform.position;
-        copy.transform.rotation = original.transform.rotation;
+        var (pos, rot) = Mirror(original.transform);
+        animator.SetIKPosition(original.goal, pos);
+        animator.SetIKRotation(original.goal, rot);
+        copy.transform.position = pos;
+        copy.transform.rotation = rot;
+    }
+
+    private (Vector3 pos, Quaternion rot) Mirror(Transform transform)
+    {
+        (Vector3 pos, Quaternion rot) result;
+
+        result.pos = transform.position;
+        result.pos.z = -transform.position.z;
+        result.rot = transform.rotation;
+        result.rot = Quaternion.Euler(transform.rotation.eulerAngles.x, -transform.rotation.eulerAngles.y + 180, transform.rotation.eulerAngles.z);
+        return result;
     }
 }
