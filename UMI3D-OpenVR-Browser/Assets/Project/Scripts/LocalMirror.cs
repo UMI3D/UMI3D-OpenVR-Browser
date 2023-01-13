@@ -8,6 +8,7 @@ using umi3dVRBrowsersBase.ikManagement;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.Universal.Internal;
+using UnityEngine.XR;
 using static UnityEditor.PlayerSettings;
 using static UnityEngine.UI.Image;
 
@@ -19,10 +20,10 @@ public class LocalMirror : MonoBehaviour
     private GameObject mirrorAvatar;
     private Animator animator;
 
-    private VirtualObjectBodyInteraction LeftFoot;
-    private VirtualObjectBodyInteraction RightFoot;
-    private VirtualObjectBodyInteraction LeftHand;
-    private VirtualObjectBodyInteraction RightHand;
+    private UMI3DClientUserTrackingBone LeftFoot;
+    private UMI3DClientUserTrackingBone RightFoot;
+    private UMI3DClientUserTrackingBone LeftHand;
+    private UMI3DClientUserTrackingBone RightHand;
 
     private UMI3DClientUserTrackingBone head;
     private UMI3DClientUserTrackingBone hips;
@@ -33,16 +34,23 @@ public class LocalMirror : MonoBehaviour
     private GameObject LeftHandMirror;
     private GameObject RightHandMirror;
 
+    private Dictionary<uint, AvatarIKGoal> goals = new Dictionary<uint, AvatarIKGoal>()
+    {
+        { BoneType.LeftHand, AvatarIKGoal.LeftHand },
+        { BoneType.RightHand, AvatarIKGoal.RightHand },
+        { BoneType.LeftToeBase, AvatarIKGoal.LeftFoot },
+        { BoneType.RightToeBase, AvatarIKGoal.RightFoot },
+    };
+
     public void Start()
     {
-        var objects = new List<VirtualObjectBodyInteraction>(FindObjectsOfType<VirtualObjectBodyInteraction>());
         var bones = new List<UMI3DClientUserTrackingBone>(FindObjectsOfType<UMI3DClientUserTrackingBone>());
-        LeftFoot = objects.Find(x => x.goal == AvatarIKGoal.LeftFoot);
-        RightFoot = objects.Find(x => x.goal == AvatarIKGoal.RightFoot);
-        LeftHand = objects.Find(x => x.goal == AvatarIKGoal.LeftHand);
-        RightHand = objects.Find(x => x.goal == AvatarIKGoal.RightHand);
         head = bones.Find(x => x.boneType == BoneType.Head);
         hips = bones.Find(x => x.boneType == BoneType.Hips);
+        LeftFoot = bones.Find(x => x.boneType == BoneType.LeftToeBase);
+        RightFoot = bones.Find(x => x.boneType == BoneType.RightToeBase);
+        LeftHand = bones.Find(x => x.boneType == BoneType.LeftHand);
+        RightHand = bones.Find(x => x.boneType == BoneType.RightHand);
 
     }
 
@@ -85,9 +93,7 @@ public class LocalMirror : MonoBehaviour
         {
             return children.FirstOrDefault(x => x.gameObject.name == mixamoBase + name)?.gameObject;
         }
-        //LeftFootMirror = GetLimb("LeftFoot");
         LeftHandMirror = GetLimb("LeftHand");
-        //RightFootMirror = GetLimb("RightFoot");
         RightHandMirror = GetLimb("RightHand");
         HipsMirror = GetLimb("Hips").transform.parent.parent.gameObject;
     }
@@ -97,10 +103,10 @@ public class LocalMirror : MonoBehaviour
         HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, hips.transform.position.z);
         HipsMirror.transform.rotation = hips.transform.rotation;
 
-        
-
-
         HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, -hips.transform.position.z);
+
+        Copy(LeftHand, LeftHandMirror);
+        Copy(RightHand, RightHandMirror);
     }
 
     public void MoveLimbs()
@@ -108,38 +114,37 @@ public class LocalMirror : MonoBehaviour
         if (!isMirrorLoaded)
             return;
 
-        //Copy(hips, HipsMirror);
 
-        Copy(LeftHand, LeftHandMirror);
-        Copy(RightHand, RightHandMirror);
 
         //HipsMirror.transform.localScale = new Vector3(1, 1, -1);
         SetIK(LeftHand, LeftHandMirror);
         SetIK(RightHand, RightHandMirror);
     }
 
-    private void SetIK(VirtualObjectBodyInteraction original, GameObject copy)
+    private void SetIK(UMI3DClientUserTrackingBone original, GameObject copy)
     {
         var (pos, rot) = (copy.transform.position, copy.transform.rotation);
 
-        animator.SetIKPositionWeight(original.goal, 1);
-        animator.SetIKRotationWeight(original.goal, 1);
-        animator.SetIKPosition(original.goal, pos);
-        animator.SetIKRotation(original.goal, rot);
+        animator.SetIKPositionWeight(goals[original.boneType], 1);
+        animator.SetIKPosition(goals[original.boneType], pos);
+        //animator.SetIKRotationWeight(goals[original.boneType], 1);
+        //animator.SetIKRotation(goals[original.boneType], rot);
     }
+
+    //private void Copy(UMI3DClientUserTrackingBone bone, GameObject copy)
+    //{
+    //    var (pos, rot) = Mirror(bone.transform);
+    //    copy.transform.SetPositionAndRotation(pos, rot);
+    //}
 
     private void Copy(UMI3DClientUserTrackingBone bone, GameObject copy)
     {
-        var (pos, rot) = Mirror(bone.transform);
-        copy.transform.SetPositionAndRotation(pos, rot);
-    }
-
-    private void Copy(VirtualObjectBodyInteraction bone, GameObject copy)
-    {
-        var (pos, rot) = Mirror(bone.transform);
-        var posInc = bone.transform.position - hips.transform.position;
-        var rotInc =  Quaternion.Inverse(hips.transform.rotation) * bone.transform.rotation;
-        copy.transform.SetPositionAndRotation(copy.transform.position + posInc, rotInc * bone.transform.rotation );
+        //var (pos, rot) = Mirror(bone.transform);
+        var posInc = bone.transform.position - hips.transform.position + new Vector3(0, hips.transform.position.y, 0);
+        //var rotInc =  Quaternion.Inverse(hips.transform.rotation) * bone.transform.rotation;
+        copy.transform.position = HipsMirror.transform.position + posInc;
+        copy.transform.rotation = bone.transform.rotation;
+        //copy.transform.SetPositionAndRotation(copy.transform.position + posInc, bone.transform.rotation);
     }
 
     private (Vector3 pos, Quaternion rot) Mirror(Transform transform)
