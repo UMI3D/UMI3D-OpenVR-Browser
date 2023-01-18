@@ -49,8 +49,6 @@ public class FootMover : MonoBehaviour
         else
             hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3);
 
-        
-
         //var frequency = 1f / 30f;
         //InvokeRepeating(nameof(UpdateHips), 0, frequency);
     }
@@ -67,7 +65,7 @@ public class FootMover : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        hipsPredictor.Clean();
+        hipsPredictor?.Clean();
     }
 
     public void UpdateHips()

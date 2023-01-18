@@ -21,10 +21,13 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
     {
         Tensor frameTensor = new Tensor(1, 1, w: NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
 
+
+        var jointRef = PredictorUtils.ComputeRefJointRot(hips.forward);
+
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index++, 0]   = go.position.x;
+            frameTensor[0, 0, index++, 0] = go.position.x;
             frameTensor[0, 0, index++, 0] = go.position.y;
             frameTensor[0, 0, index++, 0] = go.position.z;
 

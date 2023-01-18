@@ -1,4 +1,5 @@
-﻿using Unity.Barracuda;
+﻿using System.Collections.Generic;
+using Unity.Barracuda;
 using UnityEngine;
 
 public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
@@ -86,10 +87,10 @@ public class HipsPredictorV3 : HipsPredictor
 
             var rightNormalized = go.right.normalized;
             var upNormalized = go.up.normalized;
-            frameTensor[0, 0, index++, 0] = rightNormalized.x;
+            frameTensor[0, 0, index++, 0] = rightNormalized.x; //first column of the rotation matrix
             frameTensor[0, 0, index++, 0] = rightNormalized.y;
             frameTensor[0, 0, index++, 0] = rightNormalized.z;
-            frameTensor[0, 0, index++, 0] = upNormalized.x;
+            frameTensor[0, 0, index++, 0] = upNormalized.x; //second column of the rotation matrix
             frameTensor[0, 0, index++, 0] = upNormalized.y;
             frameTensor[0, 0, index++, 0] = upNormalized.z;
 
@@ -120,118 +121,23 @@ public class HipsPredictorV3 : HipsPredictor
 
         /*
          * Simpler alternative :
-         *  Quaternion rot = Quaternion.FromToRotation(Vector3.up, zAxis);
+         *  Quaternion rot = Quaternion.FromToRotation(Vector3.foward, zAxis);
+         *  Quaternion rot = Quaternion.LookRotation(zAxis, Vector3.up);
          */
 
-        Vector3 zXZ = ProjOnPlan(zAxis, Vector3.up);
+        Vector3 zXZ = PredictorUtils.ProjOnPlan(zAxis, Vector3.up);
         float angleY = Vector3.SignedAngle(Vector3.forward, zXZ, Vector3.up);
         float angleX = Vector3.SignedAngle(zXZ, zAxis, Vector3.Cross(Vector3.up, zXZ));
-        Matrix4x4 mat = RotationMatrix(angleX, angleY, 0f);
+        Matrix4x4 mat = PredictorUtils.RotationMatrix(angleX, angleY, 0f);
         var yAxis = (mat * Vector3.up).normalized;
 
         var xAxis = Vector3.Cross(yAxis, zAxis);
 
-        Quaternion rot = MatrixToQuaternion(LocalRotationMatrix(xAxis, yAxis, zAxis));
+        Quaternion rot = PredictorUtils.MatrixToQuaternion(PredictorUtils.LocalRotationMatrix(xAxis, yAxis, zAxis));
 
         (Vector3 pos, Quaternion rot) result = (pos, rot);
         return result;
     }
 
-    /// <summary>
-    /// compute the projected value of a vector onto a plane
-    /// </summary>
-    private Vector3 ProjOnPlan(Vector3 u, Vector3 n)
-    {
-        float num = Vector3.Dot(u, n);
-        float den = Mathf.Pow(VecNorm(n), 2f);
-        Vector3 vertComp = (num / den) * n;
 
-        Vector3 proj = u - vertComp;
-        return proj;
-    }
-
-    private Matrix4x4 RotationMatrix(float rX, float rY, float rZ)
-    {
-        Matrix4x4 matZ = Matrix4x4.identity;
-        matZ[0, 0] = Mathf.Cos(rZ * Mathf.Deg2Rad); matZ[0, 1] = -Mathf.Sin(rZ * Mathf.Deg2Rad);
-        matZ[1, 0] = Mathf.Sin(rZ * Mathf.Deg2Rad); matZ[1, 1] = Mathf.Cos(rZ * Mathf.Deg2Rad);
-
-        Matrix4x4 matX = Matrix4x4.identity;
-        matX[1, 1] = Mathf.Cos(rX * Mathf.Deg2Rad); matX[1, 2] = -Mathf.Sin(rX * Mathf.Deg2Rad);
-        matX[2, 1] = Mathf.Sin(rX * Mathf.Deg2Rad); matX[2, 2] = Mathf.Cos(rX * Mathf.Deg2Rad);
-
-        Matrix4x4 matY = Matrix4x4.identity;
-        matY[0, 0] = Mathf.Cos(rY * Mathf.Deg2Rad); matY[0, 2] = Mathf.Sin(rY * Mathf.Deg2Rad);
-        matY[2, 0] = -Mathf.Sin(rY * Mathf.Deg2Rad); matY[2, 2] = Mathf.Cos(rY * Mathf.Deg2Rad);
-
-        return matY * matX * matZ;
-    }
-
-    private float VecNorm(Vector3 v)
-    {
-        return Mathf.Sqrt(Mathf.Pow(v.x, 2f) + Mathf.Pow(v.y, 2f) + Mathf.Pow(v.z, 2f));
-    }
-
-    private Matrix4x4 LocalRotationMatrix(Vector3 x, Vector3 y, Vector3 z)
-    {
-        Matrix4x4 mat = Matrix4x4.identity;
-
-        mat[0, 0] = x.x;
-        mat[1, 0] = x.y;
-        mat[2, 0] = x.z;
-
-        mat[0, 1] = y.x;
-        mat[1, 1] = y.y;
-        mat[2, 1] = y.z;
-
-        mat[0, 2] = z.x;
-        mat[1, 2] = z.y;
-        mat[2, 2] = z.z;
-
-        return mat;
-    }
-
-    private Quaternion MatrixToQuaternion(Matrix4x4 mat)
-    {
-        Quaternion quat = new Quaternion();
-        float c = mat[0, 0], a = mat[0, 1], d = mat[0, 2];
-        float e = mat[1, 0], f = mat[1, 1], g = mat[1, 2];
-        float h = mat[2, 0], k = mat[2, 1], b = mat[2, 2];
-
-        float l = c + f + b;
-        if (0 < l)
-        {
-            c = 0.5f / Mathf.Sqrt(l + 1);
-            quat.x = (k - g) * c;
-            quat.y = (d - h) * c;
-            quat.z = (e - a) * c;
-            quat.w = 0.25f / c;
-        }
-        else if (c > f && c > b)
-        {
-            c = 2 * Mathf.Sqrt(1 + c - f - b);
-            quat.x = 0.25f * c;
-            quat.y = (a + e) / c;
-            quat.z = (d + h) / c;
-            quat.w = (k - g) / c;
-        }
-        else if (f > b)
-        {
-            c = 2 * Mathf.Sqrt(1 + f - c - b);
-            quat.x = (a + e) / c;
-            quat.y = 0.25f * c;
-            quat.z = (g + k) / c;
-            quat.w = (d - h) / c;
-        }
-        else
-        {
-            c = 2 * Mathf.Sqrt(1 + b - c - f);
-            quat.x = (d + h) / c;
-            quat.y = (g + k) / c;
-            quat.z = 0.25f * c;
-            quat.w = (e - a) / c;
-        }
-
-        return quat;
-    }
 }
