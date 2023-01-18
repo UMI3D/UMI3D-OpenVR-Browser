@@ -1,17 +1,8 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.userCapture;
 using umi3d.common.userCapture;
-using umi3dVRBrowsersBase.ikManagement;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.Rendering.Universal.Internal;
-using UnityEngine.XR;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.UI.Image;
-
 
 public class LocalMirror : MonoBehaviour
 {
@@ -22,7 +13,7 @@ public class LocalMirror : MonoBehaviour
     private UMI3DClientUserTrackingBone hips;
     private GameObject HipsMirror;
 
-    private Dictionary<string, (GameObject go, UMI3DClientUserTrackingBone bone)> mirrorLimbs 
+    private Dictionary<string, (GameObject go, UMI3DClientUserTrackingBone bone)> mirrorLimbs
         = new Dictionary<string, (GameObject go, UMI3DClientUserTrackingBone bone)>();
 
     private Dictionary<uint, AvatarIKGoal> goals = new Dictionary<uint, AvatarIKGoal>()
@@ -38,7 +29,6 @@ public class LocalMirror : MonoBehaviour
         "Spine",
         "Spine1",
         "Spine2",
-
 
         "LeftShoulder",
         "LeftArm",
@@ -70,24 +60,21 @@ public class LocalMirror : MonoBehaviour
                 mirrorAvatar = GameObject.Find("Player mirror");
             if (mirrorAvatar == null)
                 return;
-            if (mirrorAvatar.transform.GetComponentsInChildren<Transform>().FirstOrDefault(t=>t.name=="mixamorig:LeftFoot") == default)
+            if (mirrorAvatar.transform.GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name == "mixamorig:LeftFoot") == default)
                 return;
 
             avatar = FindObjectsOfType<UMI3DClientUserTrackingBone>()
-                        .Where(x=>x.boneType == BoneType.CenterFeet)
+                        .Where(x => x.boneType == BoneType.CenterFeet)
                         .FirstOrDefault()
                         .gameObject;
 
             mirrorAvatar.transform.localScale = avatar.transform.localScale;
-            
+
             GetMirrorLimbs();
             isMirrorLoaded = true;
         }
         else
-        {
-            MoveLimbsNoIK();
             MoveLimbs();
-        }
     }
 
     private void GetMirrorLimbs()
@@ -110,45 +97,16 @@ public class LocalMirror : MonoBehaviour
         HipsMirror = GetLimb("Hips").go.transform.parent.parent.gameObject;
     }
 
-    public void MoveLimbsNoIK()
-    {
-        HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, hips.transform.position.z);
-        HipsMirror.transform.rotation = hips.transform.rotation;
-        HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, -hips.transform.position.z);
-    }
-
     public void MoveLimbs()
     {
         if (!isMirrorLoaded)
             return;
-        //HipsMirror.transform.localScale = new Vector3(1, 1, -1);
-        foreach(var limbMirrored in mirrorLimbs.Values)
-        {
-            var (pos, rot) = Copy(limbMirrored.bone, limbMirrored.go);
-            limbMirrored.go.transform.localRotation = rot;
-        }
-    }
 
+        HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, hips.transform.position.z);
+        HipsMirror.transform.rotation = hips.transform.rotation;
+        HipsMirror.transform.position = new Vector3(hips.transform.position.x, 0, -hips.transform.position.z);
 
-    private (Vector3 pos, Quaternion rot) Copy(UMI3DClientUserTrackingBone bone, GameObject copy)
-    {
-        //var posInc = bone.transform.position - hips.transform.position + new Vector3(0, hips.transform.position.y, 0);
-        //Vector3 pos = HipsMirror.transform.position + posInc;
-        Vector3 pos = copy.transform.position;
-        Quaternion rot = bone.transform.localRotation;
-
-        return (pos, rot);
-    }
-
-    private (Vector3 pos, Quaternion rot) Mirror(Transform transform)
-    {
-        (Vector3 pos, Quaternion rot) result;
-
-        result.pos = transform.position;
-        result.pos.z = -transform.position.z;
-        result.rot = transform.rotation;
-        //result.rot = Quaternion.Euler(transform.rotation.eulerAngles.x -90, transform.rotation.eulerAngles.y , transform.rotation.eulerAngles.z);
-        //transform.localScale = new Vector3(1, 1, -1);
-        return result;
+        foreach (var limbMirrored in mirrorLimbs.Values)
+            limbMirrored.go.transform.localRotation = limbMirrored.bone.transform.localRotation;
     }
 }
