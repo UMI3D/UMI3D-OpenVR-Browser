@@ -141,9 +141,8 @@ public static class PredictorUtils
 
     public static Tensor ComputeVelocities(List<Vector3> jointPositions, List<Quaternion> jointRotations, List<List<float>> trackedJoints, Tensor frame)
     {
-        int lastFrameIndex = jointPositions.Count - 1;
-        Vector3 posRef = jointPositions[lastFrameIndex];
-        Quaternion rotRef = jointRotations[lastFrameIndex];
+        Vector3 posRef = jointPositions[^1];
+        Quaternion rotRef = jointRotations[^1];
         Vector3 posRefBef = new Vector3();
         Quaternion rotRefBef = new Quaternion();
 
@@ -170,15 +169,19 @@ public static class PredictorUtils
 
         if (jointPositions.Count == 1)
         {
-            vRef = MultQuatVec(InvQuat(rotRef), posRef - posRef);
+            vRef = MultQuatVec(InvQuat(rotRef), posRef - posRef); //? what
             wRef = MultQuat(MultQuat(InvQuat(rotRef), InvQuat(rotRef)), rotRef);
+            //vRef = Quaternion.Inverse(rotRef) * (posRef - posRef);
+            //wRef = (Quaternion.Inverse(rotRef) * Quaternion.Inverse(rotRef)) * rotRef;
         }
         else
         {
-            posRefBef = jointPositions[lastFrameIndex - 1];
-            rotRefBef = jointRotations[lastFrameIndex - 1];
+            posRefBef = jointPositions[^2];
+            rotRefBef = jointRotations[^2];
             vRef = MultQuatVec(InvQuat(rotRef), posRef - posRefBef);
             wRef = MultQuat(MultQuat(InvQuat(rotRef), InvQuat(rotRefBef)), rotRef);
+            //vRef = Quaternion.Inverse(rotRef) * (posRef - posRefBef);
+            //wRef = (Quaternion.Inverse(rotRef) * Quaternion.Inverse(rotRefBef)) * rotRef;
         }
 
         int index = 0;
@@ -195,33 +198,53 @@ public static class PredictorUtils
 
         for (int i = 0; i < 3; i++)
         {
-            posJoint = new Vector3(trackedJoints[lastFrameIndex][0 + (i * 7)], trackedJoints[lastFrameIndex][1 + (i * 7)], trackedJoints[lastFrameIndex][2 + (i * 7)]);
-            rotJoint = new Quaternion(trackedJoints[lastFrameIndex][3 + (i * 7)], trackedJoints[lastFrameIndex][4 + (i * 7)], trackedJoints[lastFrameIndex][5 + (i * 7)],
-                trackedJoints[lastFrameIndex][6 + (i * 7)]);
+            posJoint = new Vector3(trackedJoints[^1][0 + (i * 7)], 
+                                   trackedJoints[^1][1 + (i * 7)], 
+                                   trackedJoints[^1][2 + (i * 7)]);
+            rotJoint = new Quaternion(trackedJoints[^1][3 + (i * 7)], 
+                                      trackedJoints[^1][4 + (i * 7)], 
+                                      trackedJoints[^1][5 + (i * 7)],
+                                      trackedJoints[^1][6 + (i * 7)]);
             if (jointPositions.Count == 1)
             {
                 pp = MultQuatVec(InvQuat(rotRef), posJoint - posRef);
+                // pp = Quaternion.Inverse(rotRef) * (posJoint - posRef);
                 vJoint = pp - pp;
                 qp = MultQuat(InvQuat(rotRef), rotJoint);
-                wJoint = MultQuat(InvQuat(qp), qp);
+                wJoint = MultQuat(InvQuat(qp), qp); //? WHAT
+                // qp = Quaternion.Inverse(rotRef) * RotJoint;
+                // wJoint = Quaternion.Inverse(qp) * qp;
             }
             else
             {
-                posJointBef = new Vector3(trackedJoints[lastFrameIndex - 1][0 + (i * 7)], trackedJoints[lastFrameIndex - 1][1 + (i * 7)], trackedJoints[lastFrameIndex - 1][2 + (i * 7)]);
-                rotJointBef = new Quaternion(trackedJoints[lastFrameIndex - 1][3 + (i * 7)], trackedJoints[lastFrameIndex - 1][4 + (i * 7)], trackedJoints[lastFrameIndex - 1][5 + (i * 7)],
-                    trackedJoints[lastFrameIndex - 1][6 + (i * 7)]);
+                posJointBef = new Vector3(trackedJoints[^2][0 + (i * 7)], 
+                                          trackedJoints[^2][1 + (i * 7)], 
+                                          trackedJoints[^2][2 + (i * 7)]);
+                rotJointBef = new Quaternion(trackedJoints[^2][3 + (i * 7)], 
+                                             trackedJoints[^2][4 + (i * 7)], 
+                                             trackedJoints[^2][5 + (i * 7)],
+                                             trackedJoints[^2][6 + (i * 7)]);
+
                 pp = MultQuatVec(InvQuat(rotRef), posJoint - posRef);
                 ppBef = MultQuatVec(InvQuat(rotRefBef), posJointBef - posRefBef);
+                // pp = Quaternion.Inverse(rotRef) * (posJoint - posRef);
+                // ppBef = Quaternion.Inverse(rotRefBef) * (posJointBef - posRefBef);
                 vJoint = pp - ppBef;
                 qp = MultQuat(InvQuat(rotRef), rotJoint);
                 qpBef = MultQuat(InvQuat(rotRefBef), rotJointBef);
                 wJoint = MultQuat(InvQuat(qpBef), qp);
+                // qp = Quaternion.Inverse(rotRef) * RotJoint;
+                // qpBef = Quaternion.Inverse(rotRefBef) * rotJointBef;
+                // wJoint = Quaternion.Inverse(qp) * qp;
             }
 
             frame[0, 0, w: index++, 0] = vJoint.x;
             frame[0, 0, w: index++, 0] = vJoint.y;
             frame[0, 0, w: index++, 0] = vJoint.z;
             matJoint = QuaternionToMatrix(wJoint);
+            // var right = wJoint * Vector3.right;
+            // var up = wJoint * Vector3.up;
+
             frame[0, 0, w: index++, 0] = matJoint[0, 0];
             frame[0, 0, w: index++, 0] = matJoint[1, 0];
             frame[0, 0, w: index++, 0] = matJoint[2, 0];
@@ -229,23 +252,23 @@ public static class PredictorUtils
             frame[0, 0, w: index++, 0] = matJoint[1, 1];
             frame[0, 0, w: index++, 0] = matJoint[2, 1];
         }
-        frame[0, 0, w: index++, 0] = jointPositions[lastFrameIndex].y;
+        frame[0, 0, w: index++, 0] = jointPositions[^1].y;
         return frame;
     }
 
-    public static Vector3 MultQuatVec(Quaternion q, Vector3 v)
+    public static Vector3 MultQuatVec(Quaternion q, Vector3 v) // q * v
     {
         Vector3 qXYZ = new Vector3(q.x, q.y, q.z);
         Vector3 prod = v + 2 * q.w * Vector3.Cross(qXYZ, v) + 2 * Vector3.Cross(qXYZ, Vector3.Cross(qXYZ, v));
         return prod;
     }
 
-    public static Quaternion ConjQuat(Quaternion q)
+    public static Quaternion ConjQuat(Quaternion q) // no need with Quaternion.Inverse
     {
         return new Quaternion(-q.x, -q.y, -q.z, q.w);
     }
 
-    public static Quaternion InvQuat(Quaternion q)
+    public static Quaternion InvQuat(Quaternion q) // Quaternion.Inverse(q)
     {
         Quaternion conj = ConjQuat(q);
         float magn = q.x * q.x + q.y * q.y + q.z * q.z + q.w * q.w; // no Mathf.Pow() 'cause of the sqr
@@ -256,7 +279,7 @@ public static class PredictorUtils
         return new Quaternion(conj.x / magn, conj.y / magn, conj.z / magn, conj.w / magn);
     }
 
-    public static Quaternion MultQuat(Quaternion q1, Quaternion q2)
+    public static Quaternion MultQuat(Quaternion q1, Quaternion q2) // q1 * q2
     {
         Quaternion mult = new Quaternion();
         mult.x = q2.w * q1.x + q2.x * q1.w - q2.y * q1.z + q2.z * q1.y;

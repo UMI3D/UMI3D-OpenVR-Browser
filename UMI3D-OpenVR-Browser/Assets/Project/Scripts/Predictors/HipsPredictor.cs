@@ -23,17 +23,21 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         modelInput = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, NB_FRAMES_MAX); //initializing
     }
 
-    public virtual Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
+    public virtual Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
     {
         Tensor frameTensor = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index++, 0] = go.position.x;
-            frameTensor[0, 0, index++, 0] = go.position.y;
-            frameTensor[0, 0, index++, 0] = go.position.z;
 
+            // global position for each tracked limb
+            var pos = go.position; // - referencePoint.position;
+            frameTensor[0, 0, index++, 0] = pos.x;
+            frameTensor[0, 0, index++, 0] = pos.y;
+            frameTensor[0, 0, index++, 0] = pos.z;
+
+            // global rotation as quaternion coordinates for each tracked limb
             frameTensor[0, 0, index++, 0] = go.rotation.x;
             frameTensor[0, 0, index++, 0] = go.rotation.y;
             frameTensor[0, 0, index++, 0] = go.rotation.z;
@@ -74,17 +78,21 @@ public class HipsPredictorV3 : HipsPredictor
     public HipsPredictorV3(NNModel modelAsset) : base(modelAsset, nbParameters: 9, nbTrackedLimbs: 3)
     { }
 
-    public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand)
+    public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
     {
         var frameTensor = new Tensor(1, 1,  NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
             int index = startIndex;
-            frameTensor[0, 0, index++, 0] = go.position.x;
-            frameTensor[0, 0, index++, 0] = go.position.y;
-            frameTensor[0, 0, index++, 0] = go.position.z;
 
+            // global position for each tracked limb
+            var pos = go.position; // - referencePoint.position;
+            frameTensor[0, 0, index++, 0] = pos.x;
+            frameTensor[0, 0, index++, 0] = pos.y;
+            frameTensor[0, 0, index++, 0] = pos.z;
+
+            // global rotation as rotation matrix columns for each tracked limb
             var rightNormalized = go.right.normalized;
             var upNormalized = go.up.normalized;
             frameTensor[0, 0, index++, 0] = rightNormalized.x; //first column of the rotation matrix
@@ -97,7 +105,6 @@ public class HipsPredictorV3 : HipsPredictor
             endIndex = index;
         }
 
-        // head
         int index = 0;
         FillUp(index, head, out index);
         FillUp(index, rHand, out index);

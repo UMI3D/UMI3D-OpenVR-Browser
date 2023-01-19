@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using umi3d.cdk.userCapture;
 using umi3d.common.userCapture;
-using umi3dVRBrowsersBase.ikManagement;
 using Unity.Barracuda;
 using UnityEngine;
 
-public class FootMover : MonoBehaviour
+public class LegsMover : MonoBehaviour
 {
     // HIPS
     private HipsPredictor hipsPredictor;
@@ -28,13 +27,13 @@ public class FootMover : MonoBehaviour
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
 
-
+    // references to skeleton joints
     private Dictionary<HumanBodyBones, UMI3DClientUserTrackingBone> jointReferences = new();
 
     private void Start()
     {
+        // gather all bones and reference them by Unity bonetype (for use in a dictionnary)
         var bones = new List<UMI3DClientUserTrackingBone>(FindObjectsOfType<UMI3DClientUserTrackingBone>());
-
         foreach (var bone in bones)
         {
             var boneType = BoneTypeConverter.ConvertToBoneType(bone.boneType);
@@ -43,6 +42,8 @@ public class FootMover : MonoBehaviour
                  jointReferences.Add(boneType.Value, bone);
         }
 
+
+        // Init hips predictor
         if (hipsModelToUse == HipsModelToUse.V1)
             hipsPredictor = new HipsPredictor(hipsPredictorModelV1);
         else
@@ -50,6 +51,7 @@ public class FootMover : MonoBehaviour
 
         hipsPredictor.Init();
 
+        // Init legs predictor
         if (shouldPredictLegs)
         {
             legsPredictor = new FootPredictor(legsPredictorModel);
@@ -66,31 +68,36 @@ public class FootMover : MonoBehaviour
         UpdateHips();
         UpdateFeet();
 
-        var message = $"HEAD pos: {jointReferences[HumanBodyBones.Head].transform.position}, rot {jointReferences[HumanBodyBones.Head].transform.rotation.eulerAngles} \n" +
-            $"HIPS pred pos: {hipsPredicted.pos}, rot {hipsPredicted.rot.eulerAngles} \n" +
-            $"RFoot pred pos: {rFootPredictedMarker.transform.position} \n" +
-            $"RFoot comp pos: {jointReferences[HumanBodyBones.RightFoot].transform.position} \n" +
-            $"LFoot pred pos: {lFootPredictedMarker.transform.position} \n" +
-            $"LFoot comp pos: {jointReferences[HumanBodyBones.LeftFoot].transform.position}";
+        static string PrintRotPos(string name, Transform t) => $"{name} \t | \t pos: {t.position}, \t rot {t.rotation.eulerAngles}," +
+                                                                $" \t posRel: {t.localPosition}, \t rotRel: {t.localRotation.eulerAngles}\n";
+
+        var message = "=== INPUT === \n" +
+                      PrintRotPos("HEAD", jointReferences[HumanBodyBones.Head].transform) +
+                      PrintRotPos("R_HAND", jointReferences[HumanBodyBones.RightHand].transform) +
+                      PrintRotPos("L_HAND", jointReferences[HumanBodyBones.LeftHand].transform) +
+                      "=== OUTPUT === \n" +
+                      PrintRotPos("HIPS", hipsPredictedMarker.transform) +
+                      PrintRotPos("R_FOOT", rFootPredictedMarker.transform) +
+                      PrintRotPos("L_FOOT", lFootPredictedMarker.transform);
+
         Debug.Log(message);
     }
 
-    private void OnApplicationQuit()
-    {
-        hipsPredictor?.Clean();
-        legsPredictor?.Clean();
-    }
-
+    /// <summary>
+    /// Compute Hips prediction and place marker
+    /// </summary>
     public void UpdateHips()
     {
         // get prediction of hips rotatio through hips predictor
         hipsPredictor.AddFrameInput(hipsPredictor.FormatInputTensor(jointReferences[HumanBodyBones.Head].transform,
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
-                                                                    jointReferences[HumanBodyBones.LeftHand].transform));
+                                                                    jointReferences[HumanBodyBones.LeftHand].transform,
+                                                                    jointReferences[HumanBodyBones.Hips].transform));
         hipsPredicted = hipsPredictor.GetPrediction();
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
+        hipsPredictedMarker.transform.position = hipsPredicted.pos;
     }
 
     /// <summary>
@@ -102,6 +109,9 @@ public class FootMover : MonoBehaviour
         HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot
     };
 
+    /// <summary>
+    /// Compute Legs prediction and place marker
+    /// </summary>
     public void UpdateFeet()
     {
         // get prediction of position of legs joints from LoBSTr
@@ -109,16 +119,22 @@ public class FootMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     hipsPredicted));
-        var lowerBodyPredictionPosition = legsPredictor.GetPrediction();
+        var (positions, _) = legsPredictor.GetPrediction();
 
-        // get local rotations from position through foward kinematics
-        var lowerBodyPredictionRotation = legsPredictor.ComputeForwardKinematics(hipsPredicted.pos, lowerBodyPredictionPosition.positions);
+        //// get local rotations from position through foward kinematics
+        //var lowerBodyPredictionRotation = legsPredictor.ComputeForwardKinematics(hipsPredicted.pos, positions);
 
-        // apply local rotations
+        // apply global positoon and hips offset
         foreach (var joint in orderToApply)
-            jointReferences[joint].transform.localRotation = lowerBodyPredictionRotation[joint];
+            jointReferences[joint].transform.position = hipsPredicted.pos + positions[joint];
 
-        lFootPredictedMarker.transform.position = lowerBodyPredictionPosition.positions[HumanBodyBones.LeftFoot];
-        rFootPredictedMarker.transform.position = lowerBodyPredictionPosition.positions[HumanBodyBones.RightFoot];
+        lFootPredictedMarker.transform.position = hipsPredicted.pos + positions[HumanBodyBones.LeftFoot];
+        rFootPredictedMarker.transform.position = hipsPredicted.pos + positions[HumanBodyBones.RightFoot];
+    }
+
+    private void OnApplicationQuit()
+    {
+        hipsPredictor?.Clean();
+        legsPredictor?.Clean();
     }
 }

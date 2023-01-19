@@ -32,10 +32,15 @@ public abstract class AbstractPredictor<T>
     protected bool isTensorFull => idNextFrame == (modelInput?.channels ?? -1); // tensor not full when not initialized
     protected int idNextFrame;
 
+    /// <summary>
+    /// Add a new frame state to the registered state
+    /// </summary>
+    /// <param name="frame"></param>
     public virtual void AddFrameInput(Tensor frame)
     {
         if (isTensorFull)
         {
+            // move all frames to the left
             for (int i = 0; i < modelInput.channels - 1; i++)
             {
                 // move a frame to the left

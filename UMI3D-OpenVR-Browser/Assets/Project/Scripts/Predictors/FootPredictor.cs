@@ -128,8 +128,8 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         }
     }
 
-    private List<LoBSTrFrameData> recordedFrames = new List<LoBSTrFrameData>();
-    private List<List<float>> recordedFramesSerialized = new List<List<float>>();
+    private List<LoBSTrFrameData> recordedFrames = new ();
+    private List<List<float>> recordedFramesSerialized = new ();
     private List<Vector3> recordedjointRefPositions = new();
     private List<Quaternion> recordedjointRefRotations = new();
 
@@ -137,20 +137,30 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
     {
         Tensor frameTensor = new Tensor(1, 1, w: NbChannels, 1);
 
+        // recording joint reference
+        var jointRefPos = hips.pos;
+        var jointRefRot = PredictorUtils.ComputeRefJointRot(hips.rot * Vector3.forward);
+        recordedjointRefPositions.Add(hips.pos);
+        recordedjointRefRotations.Add(jointRefRot);
+
         // recording frame
         recordedFrames.Add(new LoBSTrFrameData()
         {
-            head = head,
-            rHand = rHand,
-            lHand = lHand,
+            head = (head.pos - jointRefPos, head.rot),
+            rHand = (rHand.pos - jointRefPos, rHand.rot),
+            lHand = (lHand.pos - jointRefPos, lHand.rot),
             hips = hips
         });
         recordedFramesSerialized.Add(recordedFrames[^1].Serialize());
 
-        // recording joint reference
-        var jointRefRot = PredictorUtils.ComputeRefJointRot(hips.rot * Vector3.forward);
-        recordedjointRefPositions.Add(hips.pos);
-        recordedjointRefRotations.Add(jointRefRot);
+        // if number or recorded frames too long, discard
+        if (recordedFrames.Count > NB_FRAMES_MAX)
+        {
+            recordedFrames.RemoveAt(0);
+            recordedFramesSerialized.RemoveAt(0);
+            recordedjointRefPositions.RemoveAt(0);
+            recordedjointRefRotations.RemoveAt(0);
+        }
 
         // computing full input with velocities
         var fullInput = PredictorUtils.ComputeVelocities(recordedjointRefPositions, recordedjointRefRotations, recordedFramesSerialized, frameTensor);
@@ -163,6 +173,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         var output = ExecuteModel();
 
         int index = 0;
+        // Get relative position from the reference joint for each joint
         var positions = new Dictionary<HumanBodyBones, Vector3>()
         {
             { HumanBodyBones.RightUpperLeg, new Vector3(output[0][0, 0, 0, index++],
