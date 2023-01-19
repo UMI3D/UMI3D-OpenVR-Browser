@@ -4,49 +4,158 @@ using UnityEngine;
 
 public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact)>
 {
-    protected readonly int NB_PARAMETERS = 7;
-    protected readonly int NB_TRACKED_LIMBS = 4;
+    protected readonly int NB_PARAMETERS = 9;
+    protected readonly int NB_TRACKED_LIMBS = 3;
     protected const int NB_FRAMES_MAX = 45;
+
+    //tracked limbs (head, lhand, rhand) in rotation (9 each) and predicted hips, +1 for the height
+    protected int NbChannels => NB_PARAMETERS * (NB_TRACKED_LIMBS + 1) + 1;
 
     public FootPredictor(NNModel modelAsset) : base(modelAsset)
     { }
 
-    protected override void Init()
+    public override void Init()
     {
         base.Init();
-        modelInput = new Tensor(1, 1, w: NB_PARAMETERS * NB_TRACKED_LIMBS, c: NB_FRAMES_MAX); //initializing
+        modelInput = new Tensor(1, 1, w: NbChannels, c: NB_FRAMES_MAX); //initializing
     }
 
-    public virtual Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform hips)
+    public class PosRot
     {
-        Tensor frameTensor = new Tensor(1, 1, w: NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
+        public Vector3 pos;
+        public Quaternion rot;
 
-
-        var jointRef = PredictorUtils.ComputeRefJointRot(hips.forward);
-
-        void FillUp(int startIndex, Transform go, out int endIndex)
+        public static implicit operator PosRot(Transform t)
         {
-            int index = startIndex;
-            frameTensor[0, 0, index++, 0] = go.position.x;
-            frameTensor[0, 0, index++, 0] = go.position.y;
-            frameTensor[0, 0, index++, 0] = go.position.z;
-
-            frameTensor[0, 0, index++, 0] = go.rotation.x;
-            frameTensor[0, 0, index++, 0] = go.rotation.y;
-            frameTensor[0, 0, index++, 0] = go.rotation.z;
-            frameTensor[0, 0, index++, 0] = go.rotation.w;
-
-            endIndex = index;
+            return new PosRot()
+            {
+                pos = t.position,
+                rot = t.rotation
+            };
         }
 
-        // head
-        int index = 0;
-        FillUp(index, head, out index);
-        FillUp(index, rHand, out index);
-        FillUp(index, lHand, out index);
-        FillUp(index, hips, out _);
+        public static implicit operator PosRot((Vector3 pos, Quaternion rot) ts)
+        {
+            return new PosRot()
+            {
+                pos = ts.pos,
+                rot = ts.rot
+            };
+        }
 
-        return frameTensor;
+        public enum RotationSerializationMode
+        {
+            QUATERNION,
+            EULER,
+            MATRIX2,
+            MATRIX3
+        }
+
+        public List<float> Serialize(bool serializePos= true, bool serializeRot= true, 
+                                    RotationSerializationMode rotationSerializationMode = RotationSerializationMode.QUATERNION)
+        {
+            var data = new List<float>();
+
+            if (serializePos)
+            {
+                data.Add(pos.x);
+                data.Add(pos.y);
+                data.Add(pos.z);
+            }
+            if (serializeRot)
+            {
+                switch (rotationSerializationMode)
+                {
+                    case RotationSerializationMode.QUATERNION:
+                        data.Add(rot.x);
+                        data.Add(rot.y);
+                        data.Add(rot.z);
+                        data.Add(rot.w);
+                        break;
+                    case RotationSerializationMode.EULER:
+                        data.Add(rot.eulerAngles.x);
+                        data.Add(rot.eulerAngles.y);
+                        data.Add(rot.eulerAngles.z);
+                        break;
+                    case RotationSerializationMode.MATRIX2:
+                        var right = rot * Vector3.right;
+                        var up = rot * Vector3.up;
+                        data.Add(right.x);
+                        data.Add(right.y);
+                        data.Add(right.z);
+                        data.Add(up.x);
+                        data.Add(up.y);
+                        data.Add(up.z);
+                        break;
+                    case RotationSerializationMode.MATRIX3:
+                        var forward = rot * Vector3.forward;
+                        right = rot * Vector3.right;
+                        up = rot * Vector3.up;
+                        data.Add(forward.x);
+                        data.Add(forward.y);
+                        data.Add(forward.z);
+                        data.Add(right.x);
+                        data.Add(right.y);
+                        data.Add(right.z);
+                        data.Add(up.x);
+                        data.Add(up.y);
+                        data.Add(up.z);
+                        break;
+                }
+            }
+            return data;
+        }
+    }
+
+    public class LoBSTrFrameData
+    {
+        public PosRot head;
+        public PosRot rHand;
+        public PosRot lHand;
+        public PosRot hips;
+
+        public List<float> Serialize()
+        {
+            var data = new List<float>();
+
+            var memberList = new List<PosRot>() { head, rHand, lHand, hips };
+
+            foreach (var posRot in memberList)
+            {
+                data.AddRange(posRot.Serialize());
+            }
+            return data;
+        }
+    }
+
+    private List<LoBSTrFrameData> recordedFrames = new List<LoBSTrFrameData>();
+    private List<List<float>> recordedFramesSerialized = new List<List<float>>();
+    private List<Vector3> recordedjointRefPositions = new();
+    private List<Quaternion> recordedjointRefRotations = new();
+
+    public virtual Tensor FormatInputTensor(PosRot head, PosRot rHand, PosRot lHand, PosRot hips)
+    {
+        Tensor frameTensor = new Tensor(1, 1, w: NbChannels, 1);
+
+        // recording frame
+        recordedFrames.Add(new LoBSTrFrameData()
+        {
+            head = head,
+            rHand = rHand,
+            lHand = lHand,
+            hips = hips
+        });
+        recordedFramesSerialized.Add(recordedFrames[^1].Serialize());
+
+        // recording joint reference
+        var jointRefRot = PredictorUtils.ComputeRefJointRot(hips.rot * Vector3.forward);
+        recordedjointRefPositions.Add(hips.pos);
+        recordedjointRefRotations.Add(jointRefRot);
+
+        // computing full input with velocities
+        var fullInput = PredictorUtils.ComputeVelocities(recordedjointRefPositions, recordedjointRefRotations, recordedFramesSerialized, frameTensor);
+
+        return fullInput;
     }
 
     public override (Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact) GetPrediction()

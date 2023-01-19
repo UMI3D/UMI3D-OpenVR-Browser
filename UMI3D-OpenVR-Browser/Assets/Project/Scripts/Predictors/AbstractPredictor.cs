@@ -21,16 +21,15 @@ public abstract class AbstractPredictor<T>
     public AbstractPredictor(NNModel modelAsset)
     {
         this.modelAsset = modelAsset;
-        Init();
     }
 
-    protected virtual void Init()
+    public virtual void Init()
     {
         runtimeModel = ModelLoader.Load(modelAsset);
         mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, runtimeModel);
     }
 
-    protected bool isTensorFull => idNextFrame == modelInput.channels;
+    protected bool isTensorFull => idNextFrame == (modelInput?.channels ?? -1); // tensor not full when not initialized
     protected int idNextFrame;
 
     public virtual void AddFrameInput(Tensor frame)

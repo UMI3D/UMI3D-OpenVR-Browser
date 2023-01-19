@@ -16,14 +16,6 @@ public class LocalMirror : MonoBehaviour
     private Dictionary<string, (GameObject go, UMI3DClientUserTrackingBone bone)> mirrorLimbs
         = new Dictionary<string, (GameObject go, UMI3DClientUserTrackingBone bone)>();
 
-    private Dictionary<uint, AvatarIKGoal> goals = new Dictionary<uint, AvatarIKGoal>()
-    {
-        { BoneType.LeftHand, AvatarIKGoal.LeftHand },
-        { BoneType.RightHand, AvatarIKGoal.RightHand },
-        { BoneType.LeftToeBase, AvatarIKGoal.LeftFoot },
-        { BoneType.RightToeBase, AvatarIKGoal.RightFoot },
-    };
-
     private List<string> limbsToTrack = new List<string>()
     {
         "Spine",

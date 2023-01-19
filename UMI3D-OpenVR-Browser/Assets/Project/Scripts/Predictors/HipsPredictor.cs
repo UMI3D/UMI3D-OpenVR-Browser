@@ -17,7 +17,7 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         NB_TRACKED_LIMBS = nbTrackedLimbs;
     }
 
-    protected override void Init()
+    public override void Init()
     {
         base.Init();
         modelInput = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, NB_FRAMES_MAX); //initializing

@@ -7,80 +7,118 @@ using UnityEngine;
 
 public class FootMover : MonoBehaviour
 {
+    // HIPS
     private HipsPredictor hipsPredictor;
     [Header("Hips prediction")]
     public NNModel hipsPredictorModelV1;
     public NNModel hipsPredictorModelV3;
     public GameObject hipsPredictedMarker;
 
-    public enum ModelToUse
-    {
-        V1,
-        V3
-    }
+    public enum HipsModelToUse { V1, V3 }
+    public HipsModelToUse hipsModelToUse;
 
-    public ModelToUse modelToUse;
+    private (Vector3 pos, Quaternion rot) hipsPredicted;
 
-    private HipsPredictor feetPredictor;
+    // LEGS
+
     [Header("LoBSTr")]
-    public NNModel feetPredictorModel;
+    public bool shouldPredictLegs;
+    private FootPredictor legsPredictor;
+    public NNModel legsPredictorModel;
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
 
-    private VirtualObjectBodyInteraction LeftFoot;
-    private VirtualObjectBodyInteraction RightFoot;
-    private VirtualObjectBodyInteraction LeftHand;
-    private VirtualObjectBodyInteraction RightHand;
 
-    private UMI3DClientUserTrackingBone head;
+    private Dictionary<HumanBodyBones, UMI3DClientUserTrackingBone> jointReferences = new();
 
     private void Start()
     {
-        var objects = new List<VirtualObjectBodyInteraction>(FindObjectsOfType<VirtualObjectBodyInteraction>());
         var bones = new List<UMI3DClientUserTrackingBone>(FindObjectsOfType<UMI3DClientUserTrackingBone>());
-        LeftFoot = objects.Find(x => x.goal == AvatarIKGoal.LeftFoot);
-        RightFoot = objects.Find(x => x.goal == AvatarIKGoal.RightFoot);
-        LeftHand = objects.Find(x => x.goal == AvatarIKGoal.LeftHand);
-        RightHand = objects.Find(x => x.goal == AvatarIKGoal.RightHand);
-        head = bones.Find(x => x.boneType == BoneType.Head);
 
-        if (modelToUse == ModelToUse.V1)
+        foreach (var bone in bones)
+        {
+            var boneType = BoneTypeConverter.ConvertToBoneType(bone.boneType);
+
+            if (boneType.HasValue)
+                 jointReferences.Add(boneType.Value, bone);
+        }
+
+        if (hipsModelToUse == HipsModelToUse.V1)
             hipsPredictor = new HipsPredictor(hipsPredictorModelV1);
         else
             hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3);
 
+        hipsPredictor.Init();
+
+        if (shouldPredictLegs)
+        {
+            legsPredictor = new FootPredictor(legsPredictorModel);
+            legsPredictor.Init();
+        }
+
+        /* to use to lower the frequency of updates, at the cost of not being synchronized with Unity lifecycle */
         //var frequency = 1f / 30f;
         //InvokeRepeating(nameof(UpdateHips), 0, frequency);
     }
 
     protected void Update()
     {
-        //LeftFoot.transform.position = new Vector3(LeftHand.transform.position.x, LeftFoot.transform.position.y, LeftHand.transform.position.z);
-        //RightFoot.transform.position = new Vector3(RightHand.transform.position.x, RightFoot.transform.position.y, RightHand.transform.position.z);
-
-
         UpdateHips();
+        UpdateFeet();
 
+        var message = $"HEAD pos: {jointReferences[HumanBodyBones.Head].transform.position}, rot {jointReferences[HumanBodyBones.Head].transform.rotation.eulerAngles} \n" +
+            $"HIPS pred pos: {hipsPredicted.pos}, rot {hipsPredicted.rot.eulerAngles} \n" +
+            $"RFoot pred pos: {rFootPredictedMarker.transform.position} \n" +
+            $"RFoot comp pos: {jointReferences[HumanBodyBones.RightFoot].transform.position} \n" +
+            $"LFoot pred pos: {lFootPredictedMarker.transform.position} \n" +
+            $"LFoot comp pos: {jointReferences[HumanBodyBones.LeftFoot].transform.position}";
+        Debug.Log(message);
     }
 
     private void OnApplicationQuit()
     {
         hipsPredictor?.Clean();
+        legsPredictor?.Clean();
     }
 
     public void UpdateHips()
     {
-        hipsPredictor.AddFrameInput(hipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
-        var pred = hipsPredictor.GetPrediction();
-        //hipsPredictedMarker.transform.position = pred.pos;
-        hipsPredictedMarker.transform.rotation = pred.rot;
+        // get prediction of hips rotatio through hips predictor
+        hipsPredictor.AddFrameInput(hipsPredictor.FormatInputTensor(jointReferences[HumanBodyBones.Head].transform,
+                                                                    jointReferences[HumanBodyBones.RightHand].transform,
+                                                                    jointReferences[HumanBodyBones.LeftHand].transform));
+        hipsPredicted = hipsPredictor.GetPrediction();
+
+        // apply predicted hips global rotation
+        hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
     }
+
+    /// <summary>
+    /// Order in which to apply foward kinematics
+    /// </summary>
+    private readonly HumanBodyBones[] orderToApply = new HumanBodyBones[6] 
+    {
+        HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot,
+        HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot
+    };
 
     public void UpdateFeet()
     {
-        //hipsPredictor.AddFrameInput(HipsPredictor.FormatInputTensor(head.transform, RightHand.transform, LeftHand.transform));
-        //var pred = hipsPredictor.GetPrediction();
-        //lFootPredictedMarker.transform.position = pred.Item1;
-        //rFootPredictedMarker.transform.position = pred.Item2;
+        // get prediction of position of legs joints from LoBSTr
+        legsPredictor.AddFrameInput(legsPredictor.FormatInputTensor(jointReferences[HumanBodyBones.Head].transform,
+                                                                    jointReferences[HumanBodyBones.RightHand].transform,
+                                                                    jointReferences[HumanBodyBones.LeftHand].transform,
+                                                                    hipsPredicted));
+        var lowerBodyPredictionPosition = legsPredictor.GetPrediction();
+
+        // get local rotations from position through foward kinematics
+        var lowerBodyPredictionRotation = legsPredictor.ComputeForwardKinematics(hipsPredicted.pos, lowerBodyPredictionPosition.positions);
+
+        // apply local rotations
+        foreach (var joint in orderToApply)
+            jointReferences[joint].transform.localRotation = lowerBodyPredictionRotation[joint];
+
+        lFootPredictedMarker.transform.position = lowerBodyPredictionPosition.positions[HumanBodyBones.LeftFoot];
+        rFootPredictedMarker.transform.position = lowerBodyPredictionPosition.positions[HumanBodyBones.RightFoot];
     }
 }

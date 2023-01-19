@@ -139,9 +139,8 @@ public static class PredictorUtils
         return res;
     }
 
-    public static Tensor ComputeVelocities(List<Vector3> jointPositions, List<Quaternion> jointRotations, List<List<float>> otherInputs)
+    public static Tensor ComputeVelocities(List<Vector3> jointPositions, List<Quaternion> jointRotations, List<List<float>> trackedJoints, Tensor frame)
     {
-        Tensor frame = new Tensor(1, 1, 37, 1);
         int lastFrameIndex = jointPositions.Count - 1;
         Vector3 posRef = jointPositions[lastFrameIndex];
         Quaternion rotRef = jointRotations[lastFrameIndex];
@@ -196,9 +195,9 @@ public static class PredictorUtils
 
         for (int i = 0; i < 3; i++)
         {
-            posJoint = new Vector3(otherInputs[lastFrameIndex][0 + (i * 7)], otherInputs[lastFrameIndex][1 + (i * 7)], otherInputs[lastFrameIndex][2 + (i * 7)]);
-            rotJoint = new Quaternion(otherInputs[lastFrameIndex][3 + (i * 7)], otherInputs[lastFrameIndex][4 + (i * 7)], otherInputs[lastFrameIndex][5 + (i * 7)],
-                otherInputs[lastFrameIndex][6 + (i * 7)]);
+            posJoint = new Vector3(trackedJoints[lastFrameIndex][0 + (i * 7)], trackedJoints[lastFrameIndex][1 + (i * 7)], trackedJoints[lastFrameIndex][2 + (i * 7)]);
+            rotJoint = new Quaternion(trackedJoints[lastFrameIndex][3 + (i * 7)], trackedJoints[lastFrameIndex][4 + (i * 7)], trackedJoints[lastFrameIndex][5 + (i * 7)],
+                trackedJoints[lastFrameIndex][6 + (i * 7)]);
             if (jointPositions.Count == 1)
             {
                 pp = MultQuatVec(InvQuat(rotRef), posJoint - posRef);
@@ -208,9 +207,9 @@ public static class PredictorUtils
             }
             else
             {
-                posJointBef = new Vector3(otherInputs[lastFrameIndex - 1][0 + (i * 7)], otherInputs[lastFrameIndex - 1][1 + (i * 7)], otherInputs[lastFrameIndex - 1][2 + (i * 7)]);
-                rotJointBef = new Quaternion(otherInputs[lastFrameIndex - 1][3 + (i * 7)], otherInputs[lastFrameIndex - 1][4 + (i * 7)], otherInputs[lastFrameIndex - 1][5 + (i * 7)],
-                    otherInputs[lastFrameIndex - 1][6 + (i * 7)]);
+                posJointBef = new Vector3(trackedJoints[lastFrameIndex - 1][0 + (i * 7)], trackedJoints[lastFrameIndex - 1][1 + (i * 7)], trackedJoints[lastFrameIndex - 1][2 + (i * 7)]);
+                rotJointBef = new Quaternion(trackedJoints[lastFrameIndex - 1][3 + (i * 7)], trackedJoints[lastFrameIndex - 1][4 + (i * 7)], trackedJoints[lastFrameIndex - 1][5 + (i * 7)],
+                    trackedJoints[lastFrameIndex - 1][6 + (i * 7)]);
                 pp = MultQuatVec(InvQuat(rotRef), posJoint - posRef);
                 ppBef = MultQuatVec(InvQuat(rotRefBef), posJointBef - posRefBef);
                 vJoint = pp - ppBef;
