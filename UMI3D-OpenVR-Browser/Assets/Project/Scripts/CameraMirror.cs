@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class CameraMirror : MonoBehaviour
@@ -15,12 +13,11 @@ public class CameraMirror : MonoBehaviour
     public RawImage displayFront;
     public RawImage displayTop;
 
-    void Start()
+    private void Start()
     {
-        
     }
 
-    void Update()
+    private void Update()
     {
         if (cameraAnchor == null)
         {
@@ -40,6 +37,5 @@ public class CameraMirror : MonoBehaviour
                 isCameraSetUp = true;
             }
         }
-           
     }
 }

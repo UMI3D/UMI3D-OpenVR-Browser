@@ -51,7 +51,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
             MATRIX3
         }
 
-        public List<float> Flatten(bool serializePos= true, bool serializeRot= true, 
+        public List<float> Flatten(bool serializePos = true, bool serializeRot = true,
                                     RotationFlattenMode rotationFlattenMode = RotationFlattenMode.QUATERNION)
         {
             var data = new List<float>();
@@ -72,11 +72,13 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
                         data.Add(rot.z);
                         data.Add(rot.w);
                         break;
+
                     case RotationFlattenMode.EULER:
                         data.Add(rot.eulerAngles.x);
                         data.Add(rot.eulerAngles.y);
                         data.Add(rot.eulerAngles.z);
                         break;
+
                     case RotationFlattenMode.MATRIX2:
                         var right = rot * Vector3.right;
                         var up = rot * Vector3.up;
@@ -87,6 +89,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
                         data.Add(up.y);
                         data.Add(up.z);
                         break;
+
                     case RotationFlattenMode.MATRIX3:
                         var forward = rot * Vector3.forward;
                         right = rot * Vector3.right;
@@ -128,8 +131,8 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         }
     }
 
-    private List<LoBSTrFrameData> recordedFrames = new ();
-    private List<List<float>> recordedFramesSerialized = new ();
+    private List<LoBSTrFrameData> recordedFrames = new();
+    private List<List<float>> recordedFramesSerialized = new();
     private List<Vector3> recordedjointRefPositions = new();
     private List<Quaternion> recordedjointRefRotations = new();
 
@@ -205,5 +208,4 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) result = (rotations, contact);
         return result;
     }
-
 }

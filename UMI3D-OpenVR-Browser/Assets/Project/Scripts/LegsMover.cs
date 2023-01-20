@@ -8,12 +8,16 @@ public class LegsMover : MonoBehaviour
 {
     // HIPS
     private HipsPredictor hipsPredictor;
+
     [Header("Hips prediction")]
     public NNModel hipsPredictorModelV1;
+
     public NNModel hipsPredictorModelV3;
     public GameObject hipsPredictedMarker;
 
-    public enum HipsModelToUse { V1, V3 }
+    public enum HipsModelToUse
+    { V1, V3 }
+
     public HipsModelToUse hipsModelToUse;
 
     private (Vector3 pos, Quaternion rot) hipsPredicted;
@@ -22,6 +26,7 @@ public class LegsMover : MonoBehaviour
 
     [Header("LoBSTr")]
     public bool shouldPredictLegs;
+
     private FootPredictor legsPredictor;
     public NNModel legsPredictorModel;
     public GameObject lFootPredictedMarker;
@@ -39,9 +44,8 @@ public class LegsMover : MonoBehaviour
             var boneType = BoneTypeConverter.ConvertToBoneType(bone.boneType);
 
             if (boneType.HasValue)
-                 jointReferences.Add(boneType.Value, bone);
+                jointReferences.Add(boneType.Value, bone);
         }
-
 
         // Init hips predictor
         if (hipsModelToUse == HipsModelToUse.V1)
@@ -98,7 +102,7 @@ public class LegsMover : MonoBehaviour
         if (!hipsPredictor.isTensorFull) // force to wait 45 frames
             return;
 
-        hipsPredicted = hipsPredictor.GetPrediction(); 
+        hipsPredicted = hipsPredictor.GetPrediction();
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
@@ -132,7 +136,6 @@ public class LegsMover : MonoBehaviour
         // apply global positoon and hips offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
             jointReferences[joint].transform.localRotation = rotations[joint];
-
 
         lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftFoot].transform.position;
         rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightFoot].transform.position;

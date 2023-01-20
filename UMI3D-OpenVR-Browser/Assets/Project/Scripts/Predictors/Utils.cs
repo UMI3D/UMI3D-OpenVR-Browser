@@ -1,6 +1,4 @@
-﻿
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
 
@@ -168,19 +166,17 @@ public static class PredictorUtils
         frame[0, 0, w: index++, 0] = rotRefUp.y;
         frame[0, 0, w: index++, 0] = rotRefUp.z;
 
-
         // TRACKED JOINTS
         const int NB_PARAMETER = 7; // because its pos and rot in quaternions
         for (int i = 0; i < 3; i++)
         {
-            Vector3 posJoint = new Vector3(trackedJoints[^1][0 + (i * NB_PARAMETER)], 
-                                           trackedJoints[^1][1 + (i * NB_PARAMETER)], 
+            Vector3 posJoint = new Vector3(trackedJoints[^1][0 + (i * NB_PARAMETER)],
+                                           trackedJoints[^1][1 + (i * NB_PARAMETER)],
                                            trackedJoints[^1][2 + (i * NB_PARAMETER)]);
-            Quaternion rotJoint = new Quaternion(trackedJoints[^1][3 + (i * NB_PARAMETER)], 
-                                                 trackedJoints[^1][4 + (i * NB_PARAMETER)], 
+            Quaternion rotJoint = new Quaternion(trackedJoints[^1][3 + (i * NB_PARAMETER)],
+                                                 trackedJoints[^1][4 + (i * NB_PARAMETER)],
                                                  trackedJoints[^1][5 + (i * NB_PARAMETER)],
                                                  trackedJoints[^1][6 + (i * NB_PARAMETER)]);
-
 
             Vector3 velocityJoint;
             Quaternion rotVelocityJoint;
@@ -195,11 +191,11 @@ public static class PredictorUtils
             }
             else
             {
-                Vector3 posJointBefore = new Vector3(trackedJoints[^2][0 + (i * NB_PARAMETER)], 
-                                                     trackedJoints[^2][1 + (i * NB_PARAMETER)], 
+                Vector3 posJointBefore = new Vector3(trackedJoints[^2][0 + (i * NB_PARAMETER)],
+                                                     trackedJoints[^2][1 + (i * NB_PARAMETER)],
                                                      trackedJoints[^2][2 + (i * NB_PARAMETER)]);
-                Quaternion rotJointBefore = new Quaternion(trackedJoints[^2][3 + (i * NB_PARAMETER)], 
-                                                           trackedJoints[^2][4 + (i * NB_PARAMETER)], 
+                Quaternion rotJointBefore = new Quaternion(trackedJoints[^2][3 + (i * NB_PARAMETER)],
+                                                           trackedJoints[^2][4 + (i * NB_PARAMETER)],
                                                            trackedJoints[^2][5 + (i * NB_PARAMETER)],
                                                            trackedJoints[^2][6 + (i * NB_PARAMETER)]);
 

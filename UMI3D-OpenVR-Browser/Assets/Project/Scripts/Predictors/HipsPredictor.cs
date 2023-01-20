@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Unity.Barracuda;
+﻿using Unity.Barracuda;
 using UnityEngine;
 
 public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
@@ -7,12 +6,12 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
     protected readonly int NB_PARAMETERS = 7;
     protected readonly int NB_TRACKED_LIMBS = 3;
     protected const int NB_FRAMES_MAX = 45;
-    
+
     public HipsPredictor(NNModel modelAsset) : base(modelAsset)
     { }
 
     public HipsPredictor(NNModel modelAsset, int nbParameters, int nbTrackedLimbs) : base(modelAsset)
-    { 
+    {
         NB_PARAMETERS = nbParameters;
         NB_TRACKED_LIMBS = nbTrackedLimbs;
     }
@@ -80,7 +79,7 @@ public class HipsPredictorV3 : HipsPredictor
 
     public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
     {
-        var frameTensor = new Tensor(1, 1,  NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
+        var frameTensor = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
@@ -145,6 +144,4 @@ public class HipsPredictorV3 : HipsPredictor
         (Vector3 pos, Quaternion rot) result = (pos, rot);
         return result;
     }
-
-
 }
