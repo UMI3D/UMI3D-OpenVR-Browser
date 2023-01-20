@@ -2,7 +2,7 @@
 using Unity.Barracuda;
 using UnityEngine;
 
-public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact)>
+public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact)>
 {
     protected readonly int NB_PARAMETERS = 9;
     protected readonly int NB_TRACKED_LIMBS = 3;
@@ -168,71 +168,42 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         return fullInput;
     }
 
-    public override (Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact) GetPrediction()
+    public override (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) GetPrediction()
     {
         var output = ExecuteModel();
 
+        Quaternion ExtractRotation(int startIndex, out int endIndex)
+        {
+            int index = startIndex;
+            Vector3 right = new Vector3(output[0][0, 0, 0, index++],
+                                        output[0][0, 0, 0, index++],
+                                        output[0][0, 0, 0, index++]).normalized;
+            Vector3 up = new Vector3(output[0][0, 0, 0, index++],
+                                     output[0][0, 0, 0, index++],
+                                     output[0][0, 0, 0, index++]).normalized;
+            endIndex = index;
+            return PredictorUtils.MatrixToQuaternion(right, up);
+        }
+
         int index = 0;
         // Get relative position from the reference joint for each joint
-        var positions = new Dictionary<HumanBodyBones, Vector3>() // matrice columns right and up in rotation
+        var rotations = new Dictionary<HumanBodyBones, Quaternion>() // matrice columns right and up in rotation
         {
-            { HumanBodyBones.RightUpperLeg, new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.RightLowerLeg, new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.RightFoot,     new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.RightToes,     new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.LeftUpperLeg,  new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.LeftLowerLeg,  new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.LeftFoot,      new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            },
-            { HumanBodyBones.LeftToes,      new Vector3(output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++],
-                                                        output[0][0, 0, 0, index++])
-            }
+            { HumanBodyBones.RightUpperLeg, ExtractRotation(index, out index) },
+            { HumanBodyBones.RightLowerLeg, ExtractRotation(index, out index) },
+            { HumanBodyBones.RightFoot,     ExtractRotation(index, out index) },
+            { HumanBodyBones.RightToes,     ExtractRotation(index, out index) },
+
+            { HumanBodyBones.LeftUpperLeg,  ExtractRotation(index, out index) },
+            { HumanBodyBones.LeftLowerLeg,  ExtractRotation(index, out index) },
+            { HumanBodyBones.LeftFoot,      ExtractRotation(index, out index) },
+            { HumanBodyBones.LeftToes,      ExtractRotation(index, out index) },
         };
 
         (float rightOnFloor, float leftOnFloor) contact = (output[0][0, 0, 0, index++], output[0][0, 0, 0, index++]);
 
-        (Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact) result = (positions, contact);
+        (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) result = (rotations, contact);
         return result;
     }
 
-    public Dictionary<HumanBodyBones, Quaternion> ComputeForwardKinematics(Vector3 hips, Dictionary<HumanBodyBones, Vector3> positions)
-    {
-         //not necessary with Unity parenting. Needs to be parented in the right order though.
-
-        var rotations = new Dictionary<HumanBodyBones, Quaternion>()
-        {
-            { HumanBodyBones.RightUpperLeg, Quaternion.FromToRotation(hips,                                     positions[HumanBodyBones.RightUpperLeg]) },
-            { HumanBodyBones.RightLowerLeg, Quaternion.FromToRotation(positions[HumanBodyBones.RightUpperLeg],  positions[HumanBodyBones.RightLowerLeg]) },
-            { HumanBodyBones.RightFoot,     Quaternion.FromToRotation(positions[HumanBodyBones.RightLowerLeg],  positions[HumanBodyBones.RightFoot]) },
-            { HumanBodyBones.RightToes,     Quaternion.FromToRotation(positions[HumanBodyBones.RightFoot],      positions[HumanBodyBones.RightToes]) },
-
-            { HumanBodyBones.LeftUpperLeg,  Quaternion.FromToRotation(hips,                                     positions[HumanBodyBones.LeftUpperLeg]) },
-            { HumanBodyBones.LeftLowerLeg,  Quaternion.FromToRotation(positions[HumanBodyBones.LeftUpperLeg],   positions[HumanBodyBones.LeftLowerLeg]) },
-            { HumanBodyBones.LeftFoot,      Quaternion.FromToRotation(positions[HumanBodyBones.LeftLowerLeg],   positions[HumanBodyBones.LeftFoot]) },
-            { HumanBodyBones.LeftToes,      Quaternion.FromToRotation(positions[HumanBodyBones.LeftFoot],       positions[HumanBodyBones.LeftToes]) },
-        };
-
-        return rotations;
-    }
 }

@@ -104,20 +104,10 @@ public static class PredictorUtils
         return quat;
     }
 
-    public static Matrix4x4 QuaternionToMatrix(Quaternion quat)
+    public static Quaternion MatrixToQuaternion(Vector3 right, Vector3 up)
     {
-        Matrix4x4 mat = new Matrix4x4();
-        float c = quat.x, d = quat.y, e = quat.z, f = quat.w;
-        float g = c + c, h = d + d, k = e + e, a = c * g;
-        float l = c * h; c = c * k;
-        float m = d * h; d = d * k;
-        e = e * k; g = f * g;
-        h = f * h; f = f * k;
-        mat[0, 0] = 1 - (m + e); mat[0, 1] = l - f; mat[0, 2] = c + h; mat[0, 3] = 0;
-        mat[1, 0] = l + f; mat[1, 1] = 1 - (a + e); mat[1, 2] = d - g; mat[1, 3] = 0;
-        mat[2, 0] = c - h; mat[2, 1] = d + g; mat[2, 2] = 1 - (a + m); mat[2, 3] = 0;
-        mat[3, 0] = 0; mat[3, 1] = 0; mat[3, 2] = 0; mat[3, 3] = 1;
-        return mat;
+        var forward = Vector3.Cross(right.normalized, up.normalized);
+        return Quaternion.LookRotation(forward.normalized, up.normalized);
     }
 
     public static Quaternion ComputeRefJointRot(Matrix4x4 rot)

@@ -29,7 +29,7 @@ public abstract class AbstractPredictor<T>
         mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, runtimeModel);
     }
 
-    protected bool isTensorFull => idNextFrame == (modelInput?.channels ?? -1); // tensor not full when not initialized
+    public bool isTensorFull => idNextFrame == (modelInput?.channels ?? -1); // tensor not full when not initialized
     protected int idNextFrame;
 
     /// <summary>

@@ -66,7 +66,8 @@ public class LegsMover : MonoBehaviour
     protected void Update()
     {
         UpdateHips();
-        UpdateFeet();
+        if (hipsPredictor.isTensorFull)
+            UpdateFeet();
 
         static string PrintRotPos(string name, Transform t) => $"{name} \t | \t pos: {t.position}, \t rot {t.rotation.eulerAngles}," +
                                                                 $" \t posRel: {t.localPosition}, \t rotRel: {t.localRotation.eulerAngles}\n";
@@ -93,7 +94,11 @@ public class LegsMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     jointReferences[HumanBodyBones.Hips].transform));
-        hipsPredicted = hipsPredictor.GetPrediction(); //! force to wait 45 frames
+
+        if (!hipsPredictor.isTensorFull) // force to wait 45 frames
+            return;
+
+        hipsPredicted = hipsPredictor.GetPrediction(); 
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
@@ -103,10 +108,10 @@ public class LegsMover : MonoBehaviour
     /// <summary>
     /// Order in which to apply foward kinematics
     /// </summary>
-    private readonly HumanBodyBones[] orderToApply = new HumanBodyBones[6] 
+    private readonly HumanBodyBones[] orderToApplyFK = new HumanBodyBones[8]
     {
-        HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot,
-        HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot
+        HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes,
+        HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot, HumanBodyBones.RightToes,
     };
 
     /// <summary>
@@ -119,17 +124,18 @@ public class LegsMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     hipsPredicted));
-        var (positions, _) = legsPredictor.GetPrediction();
+        if (!legsPredictor.isTensorFull) // force to wait 45 frames
+            return;
 
-        //// get local rotations from position through foward kinematics
-        //var lowerBodyPredictionRotation = legsPredictor.ComputeForwardKinematics(hipsPredicted.pos, positions);
+        var (rotations, _) = legsPredictor.GetPrediction();
 
-        // apply global positoon and hips offset
-        foreach (var joint in orderToApply)
-            jointReferences[joint].transform.position = hipsPredicted.pos + positions[joint];
+        // apply global positoon and hips offset (forward kinematics)
+        foreach (var joint in orderToApplyFK)
+            jointReferences[joint].transform.localRotation = rotations[joint];
 
-        lFootPredictedMarker.transform.position = hipsPredicted.pos + positions[HumanBodyBones.LeftFoot];
-        rFootPredictedMarker.transform.position = hipsPredicted.pos + positions[HumanBodyBones.RightFoot];
+
+        lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftFoot].transform.position;
+        rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightFoot].transform.position;
     }
 
     private void OnApplicationQuit()
