@@ -136,6 +136,7 @@ public class LegsMover : MonoBehaviour
             return;
 
         var (rotations, contact) = legsPredictor.GetPrediction();
+        this.contact = contact; 
 
         // apply global positoon and hips offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
