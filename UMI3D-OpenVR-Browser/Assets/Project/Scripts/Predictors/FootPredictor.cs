@@ -124,9 +124,8 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
             var memberList = new List<PosRot>() { head, rHand, lHand, hips };
 
             foreach (var posRot in memberList)
-            {
                 data.AddRange(posRot.Flatten());
-            }
+
             return data;
         }
     }
@@ -171,6 +170,17 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         return fullInput;
     }
 
+    protected override List<Tensor> ExecuteModel()
+    {
+        List<Tensor> outputs = new List<Tensor>();
+        mainWorker.Execute(modelInput);
+
+        outputs.Add(mainWorker.PeekOutput("Lfk"));
+        outputs.Add(mainWorker.PeekOutput("Lleft"));
+        outputs.Add(mainWorker.PeekOutput("Lright"));
+        return outputs;
+    }
+
     public override (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) GetPrediction()
     {
         var output = ExecuteModel();
@@ -203,9 +213,11 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
             { HumanBodyBones.LeftToes,      ExtractRotation(index, out index) },
         };
 
-        (float rightOnFloor, float leftOnFloor) contact = (output[0][0, 0, 0, index++], output[0][0, 0, 0, index++]);
+        (float rightOnFloor, float leftOnFloor) contact = (output[1][0, 0, 0, 0], output[2][0, 0, 0, 0]);
 
         (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) result = (rotations, contact);
         return result;
     }
+
+
 }

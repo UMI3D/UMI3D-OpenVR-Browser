@@ -32,6 +32,8 @@ public class LegsMover : MonoBehaviour
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
 
+    private (float rightfoot, float leftfoot) contact = new ();
+
     // references to skeleton joints
     private Dictionary<HumanBodyBones, UMI3DClientUserTrackingBone> jointReferences = new();
 
@@ -83,7 +85,9 @@ public class LegsMover : MonoBehaviour
                       "=== OUTPUT === \n" +
                       PrintRotPos("HIPS", hipsPredictedMarker.transform) +
                       PrintRotPos("R_FOOT", rFootPredictedMarker.transform) +
-                      PrintRotPos("L_FOOT", lFootPredictedMarker.transform);
+                      PrintRotPos("L_FOOT", lFootPredictedMarker.transform) +
+                      $"R_FOOT_CONTACT {contact.rightfoot} \n" +
+                      $"L_FOOT_CONTACT {contact.leftfoot} \n";
 
         Debug.Log(message);
     }
@@ -114,8 +118,8 @@ public class LegsMover : MonoBehaviour
     /// </summary>
     private readonly HumanBodyBones[] orderToApplyFK = new HumanBodyBones[8]
     {
-        HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes,
         HumanBodyBones.RightUpperLeg, HumanBodyBones.RightLowerLeg, HumanBodyBones.RightFoot, HumanBodyBones.RightToes,
+        HumanBodyBones.LeftUpperLeg, HumanBodyBones.LeftLowerLeg, HumanBodyBones.LeftFoot, HumanBodyBones.LeftToes,
     };
 
     /// <summary>
@@ -131,14 +135,15 @@ public class LegsMover : MonoBehaviour
         if (!legsPredictor.isTensorFull) // force to wait 45 frames
             return;
 
-        var (rotations, _) = legsPredictor.GetPrediction();
+        var (rotations, contact) = legsPredictor.GetPrediction();
 
         // apply global positoon and hips offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
             jointReferences[joint].transform.localRotation = rotations[joint];
 
-        lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftFoot].transform.position;
-        rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightFoot].transform.position;
+        lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftToes].transform.position;
+        rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightToes].transform.position;
+
     }
 
     private void OnApplicationQuit()
