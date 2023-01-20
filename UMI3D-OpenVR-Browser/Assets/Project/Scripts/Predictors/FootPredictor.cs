@@ -43,7 +43,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
             };
         }
 
-        public enum RotationSerializationMode
+        public enum RotationFlattenMode
         {
             QUATERNION,
             EULER,
@@ -51,8 +51,8 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
             MATRIX3
         }
 
-        public List<float> Serialize(bool serializePos= true, bool serializeRot= true, 
-                                    RotationSerializationMode rotationSerializationMode = RotationSerializationMode.QUATERNION)
+        public List<float> Flatten(bool serializePos= true, bool serializeRot= true, 
+                                    RotationFlattenMode rotationFlattenMode = RotationFlattenMode.QUATERNION)
         {
             var data = new List<float>();
 
@@ -64,20 +64,20 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
             }
             if (serializeRot)
             {
-                switch (rotationSerializationMode)
+                switch (rotationFlattenMode)
                 {
-                    case RotationSerializationMode.QUATERNION:
+                    case RotationFlattenMode.QUATERNION:
                         data.Add(rot.x);
                         data.Add(rot.y);
                         data.Add(rot.z);
                         data.Add(rot.w);
                         break;
-                    case RotationSerializationMode.EULER:
+                    case RotationFlattenMode.EULER:
                         data.Add(rot.eulerAngles.x);
                         data.Add(rot.eulerAngles.y);
                         data.Add(rot.eulerAngles.z);
                         break;
-                    case RotationSerializationMode.MATRIX2:
+                    case RotationFlattenMode.MATRIX2:
                         var right = rot * Vector3.right;
                         var up = rot * Vector3.up;
                         data.Add(right.x);
@@ -87,7 +87,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
                         data.Add(up.y);
                         data.Add(up.z);
                         break;
-                    case RotationSerializationMode.MATRIX3:
+                    case RotationFlattenMode.MATRIX3:
                         var forward = rot * Vector3.forward;
                         right = rot * Vector3.right;
                         up = rot * Vector3.up;
@@ -114,7 +114,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         public PosRot lHand;
         public PosRot hips;
 
-        public List<float> Serialize()
+        public List<float> Flattent()
         {
             var data = new List<float>();
 
@@ -122,7 +122,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
 
             foreach (var posRot in memberList)
             {
-                data.AddRange(posRot.Serialize());
+                data.AddRange(posRot.Flatten());
             }
             return data;
         }
@@ -151,7 +151,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
             lHand = (lHand.pos, lHand.rot),
             hips = hips
         });
-        recordedFramesSerialized.Add(recordedFrames[^1].Serialize());
+        recordedFramesSerialized.Add(recordedFrames[^1].Flattent());
 
         // if number or recorded frames too long, discard
         if (recordedFrames.Count > NB_FRAMES_MAX)
