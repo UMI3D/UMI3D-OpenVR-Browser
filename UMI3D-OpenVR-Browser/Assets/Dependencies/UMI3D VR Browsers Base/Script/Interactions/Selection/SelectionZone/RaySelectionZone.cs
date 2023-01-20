@@ -84,7 +84,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                 return null;
 
             var activeObjects = objList.Where(obj => (obj != null && obj.isActiveAndEnabled)).DefaultIfEmpty();
-            if (activeObjects == default)
+            if (activeObjects == default || activeObjects.Count() == 0)
                 return null;
 
             var minDist = (from obj in activeObjects

@@ -49,7 +49,29 @@ namespace umi3dVRBrowsersBase.ui
         /// <see cref="Interactable"/> which contains the parameters.
         /// </summary>
         private Interactable currentAssociatedInteractable;
-        public Interactable CurrentAssociatedInteractable => currentAssociatedInteractable;
+        public Interactable CurrentAssociatedInteractable
+        {
+            get => currentAssociatedInteractable;
+            set
+            {
+                currentAssociatedInteractable = value;
+
+                if (value == null)
+                {
+                    container = null;
+                }
+                else
+                {
+                    container = InteractableContainer.containers.Find(c => c.Interactable == currentAssociatedInteractable);
+                    Debug.Assert(container != null, "No container found for an Interactable, should not happen.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Container associated to <see cref="CurrentAssociatedInteractable"/>.
+        /// </summary>
+        private InteractableContainer container;
 
         [SerializeField]
         [Tooltip("Should this gear display on top of every other objects ?")]
@@ -163,7 +185,7 @@ namespace umi3dVRBrowsersBase.ui
         {
             gameObject.SetActive(true);
 
-            this.currentAssociatedInteractable = interactable;
+            this.CurrentAssociatedInteractable = interactable;
 
             this.transform.position = position;
             this.transform.rotation = Quaternion.LookRotation(normal, Vector3.up);
@@ -227,7 +249,7 @@ namespace umi3dVRBrowsersBase.ui
         public void Hide()
         {
             gameObject.SetActive(false);
-            this.currentAssociatedInteractable = null;
+            this.CurrentAssociatedInteractable = null;
         }
 
         public override void Select(VRController controller)
@@ -238,6 +260,13 @@ namespace umi3dVRBrowsersBase.ui
         {
         }
 
+        private void Update()
+        {
+            if (container == null && gameObject.activeInHierarchy)
+            {
+                Hide();
+            }
+        }
 
         #endregion
     }

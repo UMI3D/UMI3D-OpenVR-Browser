@@ -145,7 +145,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             CtrlToolMenu.Hide();
         }
 
-        public void OpenParameterMenu(ControllerType controller, bool menuAsync= false)
+        public void OpenParameterMenu(ControllerType controller, bool menuAsync = false)
         {
             Open(true);
             CtrlToolMenu.DisplayParameterMenu(controller, menuAsync: true);
@@ -183,7 +183,16 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         private void Start()
         {
+            gameObject.AddComponent<SelectablePlayerMenu>();
             MenuHeader.Initialize();
         }
     }
+
+    /// <summary>
+    /// Only to prevent users from selecting Interactable behing the menu.
+    /// </summary>
+    public class SelectablePlayerMenu : UnityEngine.UI.Selectable
+    {
+    }
+
 }

@@ -95,7 +95,7 @@ namespace umi3dVRBrowsersBase.interactions.input
                 throw new System.Exception("This input is already associated to another interaction (" + currentInteraction + ")");
             }
 
-            if (interaction is ParameterType)
+            if (interaction is ParameterType paramType)
             {
                 menuItem = new InputMenuItem()
                 {
@@ -108,21 +108,28 @@ namespace umi3dVRBrowsersBase.interactions.input
 
                 var param = interaction as ParameterType;
 
-                callback = x => UMI3DClientServer.SendData(new ParameterSettingRequestDto()
+                UnityEngine.Debug.Log(interaction.GetType());
+
+                callback = x =>
                 {
-                    boneType = bone.boneType,
-                    toolId = toolId,
-                    parameter = new ParameterType()
+                    paramType.value = x;
+
+                    UMI3DClientServer.SendData(new ParameterSettingRequestDto()
                     {
-                        id = param.id,
-                        description = param.description,
-                        name = param.name,
-                        icon2D = param.icon2D,
-                        icon3D = param.icon3D,
-                        value = x
-                    },
-                    id = interaction.id
-                }, true);
+                        boneType = bone.boneType,
+                        toolId = toolId,
+                        parameter = new ParameterType()
+                        {
+                            id = param.id,
+                            description = param.description,
+                            name = param.name,
+                            icon2D = param.icon2D,
+                            icon3D = param.icon3D,
+                            value = x
+                        },
+                        id = interaction.id
+                    }, true);
+                };
                 menuItem.Subscribe(callback);
 
                 currentInteraction = interaction;
