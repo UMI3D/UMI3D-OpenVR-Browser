@@ -127,7 +127,6 @@ public class HipsPredictorV3 : HipsPredictor
 
         /*
          * Simpler alternative :
-         *  Quaternion rot = Quaternion.FromToRotation(Vector3.foward, zAxis);
          *  Quaternion rot = Quaternion.LookRotation(zAxis, Vector3.up);
          */
 
