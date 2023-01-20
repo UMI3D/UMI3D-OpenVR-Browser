@@ -146,9 +146,9 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
         // recording frame
         recordedFrames.Add(new LoBSTrFrameData()
         {
-            head = (head.pos - jointRefPos, head.rot),
-            rHand = (rHand.pos - jointRefPos, rHand.rot),
-            lHand = (lHand.pos - jointRefPos, lHand.rot),
+            head = (head.pos, head.rot), //! changed from local pos to global (correction form the original paper)
+            rHand = (rHand.pos, rHand.rot),
+            lHand = (lHand.pos, lHand.rot),
             hips = hips
         });
         recordedFramesSerialized.Add(recordedFrames[^1].Serialize());
@@ -174,7 +174,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
 
         int index = 0;
         // Get relative position from the reference joint for each joint
-        var positions = new Dictionary<HumanBodyBones, Vector3>()
+        var positions = new Dictionary<HumanBodyBones, Vector3>() // matrice columns right and up in rotation
         {
             { HumanBodyBones.RightUpperLeg, new Vector3(output[0][0, 0, 0, index++],
                                                         output[0][0, 0, 0, index++],
@@ -210,7 +210,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Vecto
             }
         };
 
-        (float rightOnFloor, float leftOnFloot) contact = (output[0][0, 0, 0, index++], output[0][0, 0, 0, index++]);
+        (float rightOnFloor, float leftOnFloor) contact = (output[0][0, 0, 0, index++], output[0][0, 0, 0, index++]);
 
         (Dictionary<HumanBodyBones, Vector3> positions, (float, float) contact) result = (positions, contact);
         return result;

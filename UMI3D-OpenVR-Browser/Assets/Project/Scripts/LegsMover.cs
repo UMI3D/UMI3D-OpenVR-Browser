@@ -93,11 +93,11 @@ public class LegsMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     jointReferences[HumanBodyBones.Hips].transform));
-        hipsPredicted = hipsPredictor.GetPrediction();
+        hipsPredicted = hipsPredictor.GetPrediction(); //! force to wait 45 frames
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
-        hipsPredictedMarker.transform.position = hipsPredicted.pos;
+        hipsPredictedMarker.transform.position = hipsPredicted.pos; //! should be relative ? Try in (0,0,0) | maybe process data with a reference point at the projected position of the headset onto the ground
     }
 
     /// <summary>
