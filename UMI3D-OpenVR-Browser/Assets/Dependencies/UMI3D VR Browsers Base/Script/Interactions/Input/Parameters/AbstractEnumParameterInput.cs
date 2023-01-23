@@ -43,12 +43,14 @@ namespace umi3dVRBrowsersBase.interactions.input
                 throw new System.Exception("This input is already associated to another interaction (" + currentInteraction + ")");
             }
 
-            if (interaction is EnumParameterDto<ValueType>)
+            if (interaction is EnumParameterDto<ValueType> enumParameterDto)
             {
                 var stringEnum = interaction as EnumParameterDto<ValueType>;
 
                 callback = newValue =>
                 {
+                    enumParameterDto.value = newValue;
+
                     UMI3DClientServer.SendData(new ParameterSettingRequestDto()
                     {
                         toolId = toolId,

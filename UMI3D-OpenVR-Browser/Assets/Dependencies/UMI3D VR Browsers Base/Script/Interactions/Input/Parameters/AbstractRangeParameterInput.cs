@@ -46,7 +46,7 @@ namespace umi3dVRBrowsersBase.interactions.input
                 throw new System.Exception("This input is already associated to another interaction (" + currentInteraction + ")");
             }
 
-            if (interaction is ParameterType)
+            if (interaction is ParameterType parameterType)
             {
                 var param = interaction as ParameterType;
                 menuItem = new InputMenuItem()
@@ -62,6 +62,8 @@ namespace umi3dVRBrowsersBase.interactions.input
                 {
                     if ((x.CompareTo(param.min) >= 0) && (x.CompareTo(param.max) <= 0))
                     {
+                        parameterType.value = x;
+
                         UMI3DClientServer.SendData(new ParameterSettingRequestDto()
                         {
                             id = param.id,
