@@ -35,7 +35,7 @@ public class LegsMover : MonoBehaviour
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
     public Dictionary<HumanBodyBones, Quaternion> legsRotPrediction = new();
-    private (float rightfoot, float leftfoot) contact = new ();
+    private (float rightfoot, float leftfoot) contact = new();
 
     // references to skeleton joints
     public Dictionary<HumanBodyBones, UMI3DClientUserTrackingBone> jointReferences = new();
@@ -143,7 +143,6 @@ public class LegsMover : MonoBehaviour
         var (rotations, contact) = legsPredictor.GetPrediction();
 
         legsRotPrediction = rotations;
-        this.contact = contact; 
         this.contact = contact;
 
         // apply global positoon and hips offset (forward kinematics)
