@@ -86,7 +86,7 @@ public class HipsPredictorV3 : HipsPredictor
             int index = startIndex;
 
             // global position for each tracked limb
-            var pos = go.position; // - referencePoint.position;
+            var pos = go.position - referencePoint.position; // - referencePoint.position;
             frameTensor[0, 0, index++, 0] = pos.x;
             frameTensor[0, 0, index++, 0] = pos.y;
             frameTensor[0, 0, index++, 0] = pos.z;

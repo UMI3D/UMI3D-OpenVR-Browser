@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using umi3d.cdk.userCapture;
 using umi3d.common.userCapture;
+using umi3dVRBrowsersBase.ikManagement;
 using Unity.Barracuda;
 using UnityEngine;
 
@@ -29,6 +30,8 @@ public class LegsMover : MonoBehaviour
 
     private FootPredictor legsPredictor;
     public NNModel legsPredictorModel;
+    private GameObject referenceObject;
+    public Vector3 ReferencePoint => referenceObject.transform.position;
     public GameObject lFootPredictedMarker;
     public GameObject rFootPredictedMarker;
     public Dictionary<HumanBodyBones, Quaternion> legsRotPrediction = new();
@@ -48,6 +51,8 @@ public class LegsMover : MonoBehaviour
             if (boneType.HasValue)
                 jointReferences.Add(boneType.Value, bone);
         }
+
+        referenceObject = FindObjectOfType<PlayerMovement>().gameObject;
 
         // Init hips predictor
         if (hipsModelToUse == HipsModelToUse.V1)
@@ -101,7 +106,7 @@ public class LegsMover : MonoBehaviour
         hipsPredictor.AddFrameInput(hipsPredictor.FormatInputTensor(jointReferences[HumanBodyBones.Head].transform,
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
-                                                                    jointReferences[HumanBodyBones.Hips].transform));
+                                                                    referenceObject.transform));
 
         if (!hipsPredictor.isTensorFull) // force to wait 45 frames
             return;
@@ -110,7 +115,7 @@ public class LegsMover : MonoBehaviour
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
-        hipsPredictedMarker.transform.position = hipsPredicted.pos; //! should be relative ? Try in (0,0,0) | maybe process data with a reference point at the projected position of the headset onto the ground
+        hipsPredictedMarker.transform.position = hipsPredicted.pos + ReferencePoint; //! should be relative ? Try in (0,0,0) | maybe process data with a reference point at the projected position of the headset onto the ground
     }
 
     /// <summary>
@@ -139,6 +144,7 @@ public class LegsMover : MonoBehaviour
 
         legsRotPrediction = rotations;
         this.contact = contact; 
+        this.contact = contact;
 
         // apply global positoon and hips offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
@@ -146,7 +152,6 @@ public class LegsMover : MonoBehaviour
 
         lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftToes].transform.position;
         rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightToes].transform.position;
-
     }
 
     private void OnApplicationQuit()
