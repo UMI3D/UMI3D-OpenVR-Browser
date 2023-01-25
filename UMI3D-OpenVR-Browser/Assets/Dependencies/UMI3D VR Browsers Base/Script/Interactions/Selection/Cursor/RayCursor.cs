@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2023 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,19 +11,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using umi3d.cdk.interaction;
 using umi3d.cdk;
+using umi3d.cdk.interaction;
 using umi3d.common;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
 using umi3dBrowsers.interaction.selection.zoneselection;
 using umi3dVRBrowsersBase.ui;
 using UnityEngine;
-using UnityEngine.UI;
-using umi3dVRBrowsersBase.ikManagement;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.interactions.selection.cursor
 {
@@ -47,7 +47,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <summary>
         /// True if the laser is currently displayed
         /// </summary>
-        public bool IsDisplayed { get => laserObjectRenderer.enabled; }
+        public bool IsDisplayed { get => _isDisplayed; }
+
+        private bool _isDisplayed = false;
 
         [Header("Materials")]
         /// <summary>
@@ -77,6 +79,23 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// </summary>
         private float maxLength = 500;
 
+        #region fading
+
+        /// <summary>
+        /// Duration of the fadingg animation.
+        /// </summary>
+        protected readonly float fadeDuration = 0.25f;
+
+        private float savedAlphaDefaultMaterial;
+        private Coroutine fadeDefaultMaterialCoroutine;
+
+        private float savedAlphaSelectedMaterial;
+        private Coroutine fadeSelectedMaterialCoroutine;
+
+        private bool fadeCoroutineRunning;
+
+        #endregion fading
+
         private RaySelectionZone<Selectable> raycastHelperSelectable;
         private RaySelectionZone<InteractableContainer> raycastHelperInteractable;
         private RaySelectionZone<AbstractClientInteractableElement> raycastHelperElement;
@@ -103,7 +122,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 impactPointRenderer.material = defaultMaterial;
 
             if (laserObjectRenderer != null)
+            {
                 laserObjectRenderer.material = defaultMaterial;
+                savedAlphaDefaultMaterial = defaultMaterial.color.a;
+                savedAlphaSelectedMaterial = selectionMaterial.color.a;
+            }
 
             SetInfinitePoint();
 
@@ -374,15 +397,83 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <inheritdoc/>
         public override void Display()
         {
+            if (_isDisplayed)
+                return;
+            _isDisplayed = true;
             laserObjectRenderer.enabled = true;
             impactPointRenderer.enabled = true;
+            FadeIn();
         }
 
         /// <inheritdoc/>
         public override void Hide()
         {
-            laserObjectRenderer.enabled = false;
-            impactPointRenderer.enabled = false;
+            if (!_isDisplayed)
+                return;
+            _isDisplayed = false;
+            FadeOut();
+        }
+
+        private void FadeOut()
+        {
+            if (fadeCoroutineRunning)
+            {
+                StopCoroutine(fadeDefaultMaterialCoroutine);
+                StopCoroutine(fadeSelectedMaterialCoroutine);
+                fadeCoroutineRunning = false;
+            }
+
+            fadeDefaultMaterialCoroutine = StartCoroutine(FadingCoroutine(fadeDuration, defaultMaterial, targetAlpha: 0f));
+            fadeSelectedMaterialCoroutine = StartCoroutine(FadingCoroutine(fadeDuration, selectionMaterial, targetAlpha: 0f));
+        }
+
+        private void FadeIn()
+        {
+            if (fadeCoroutineRunning)
+            {
+                StopCoroutine(fadeDefaultMaterialCoroutine);
+                StopCoroutine(fadeSelectedMaterialCoroutine);
+                fadeCoroutineRunning = false;
+            }
+
+            fadeDefaultMaterialCoroutine = StartCoroutine(FadingCoroutine(fadeDuration, defaultMaterial, targetAlpha: savedAlphaDefaultMaterial));
+            fadeSelectedMaterialCoroutine = StartCoroutine(FadingCoroutine(fadeDuration, selectionMaterial, targetAlpha: savedAlphaSelectedMaterial));
+        }
+
+        private IEnumerator FadingCoroutine(float duration, Material material, float targetAlpha)
+        {
+            fadeCoroutineRunning = true;
+            var timeStart = Time.time;
+            var baseAlpha = material.color.a;
+
+            while (Time.time < timeStart + duration && material.color.a != targetAlpha)
+            {
+                float value = baseAlpha + ((Time.time - timeStart) / duration) * (targetAlpha - baseAlpha);
+                material.color = new Color(material.color.r,
+                                            material.color.g,
+                                            material.color.b,
+                                            value);
+                yield return new WaitForEndOfFrame();
+            }
+            material.color = new Color(material.color.r,
+                                        material.color.g,
+                                        material.color.b,
+                                        targetAlpha);
+            fadeCoroutineRunning = false;
+        }
+
+        private void OnDestroy()
+        {
+            // Put back original values in materials because they are serialized.
+            selectionMaterial.color = new Color(selectionMaterial.color.r,
+                                       selectionMaterial.color.g,
+                                       selectionMaterial.color.b,
+                                       savedAlphaSelectedMaterial);
+
+            defaultMaterial.color = new Color(defaultMaterial.color.r,
+                                       defaultMaterial.color.g,
+                                       defaultMaterial.color.b,
+                                       savedAlphaDefaultMaterial);
         }
     }
 }

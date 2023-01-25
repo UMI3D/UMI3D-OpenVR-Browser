@@ -29,10 +29,11 @@ namespace umi3dBrowsers.interaction.selection.feedback
     {
         [SerializeField]
         private AbstractVRHapticSelectionFeedback hapticFeedback;
+
         [SerializeField]
         private VROutlineRenderSelectionFeedback highlightFeedback;
 
-        private AbstractCursor pointingCursor;
+        private AbstractPointingCursor pointingCursor;
         private AbstractCursor grabCursor;
 
         private DetectionOrigin lastOrigin;
@@ -53,10 +54,19 @@ namespace umi3dBrowsers.interaction.selection.feedback
                 hapticFeedback.Trigger();
                 highlightFeedback.Activate(iSelectionData);
                 lastOrigin = iSelectionData.detectionOrigin;
-                if (lastOrigin == DetectionOrigin.POINTING)
-                    pointingCursor.ChangeAccordingToSelection(iSelectionData);
-                else if (lastOrigin == DetectionOrigin.PROXIMITY)
-                    grabCursor.ChangeAccordingToSelection(iSelectionData);
+                switch (lastOrigin)
+                {
+                    case DetectionOrigin.POINTING:
+                        pointingCursor.Display();
+                        pointingCursor.ChangeAccordingToSelection(iSelectionData);
+                        break;
+
+                    case DetectionOrigin.PROXIMITY:
+                        pointingCursor.Hide();
+                        grabCursor.Display();
+                        grabCursor.ChangeAccordingToSelection(iSelectionData);
+                        break;
+                }
                 isRunning = true;
             }
         }
@@ -67,13 +77,17 @@ namespace umi3dBrowsers.interaction.selection.feedback
             var iSelectionData = selectionData as SelectionIntentData;
             if (lastOrigin == DetectionOrigin.POINTING && iSelectionData.detectionOrigin == DetectionOrigin.PROXIMITY)
             {
+                pointingCursor.Hide();
                 pointingCursor.ChangeAccordingToSelection(null);
+                grabCursor.Display();
                 grabCursor.ChangeAccordingToSelection(iSelectionData);
                 lastOrigin = DetectionOrigin.PROXIMITY;
             }
             else if (lastOrigin == DetectionOrigin.PROXIMITY && iSelectionData.detectionOrigin == DetectionOrigin.POINTING)
             {
+                grabCursor.Hide();
                 grabCursor.ChangeAccordingToSelection(null);
+                pointingCursor.Display();
                 pointingCursor.ChangeAccordingToSelection(iSelectionData);
                 lastOrigin = DetectionOrigin.POINTING;
             }
@@ -85,7 +99,9 @@ namespace umi3dBrowsers.interaction.selection.feedback
             if (isRunning)
             {
                 highlightFeedback.Deactivate(selectionData);
+                pointingCursor.Display();
                 pointingCursor.ChangeAccordingToSelection(null);
+                grabCursor.Hide();
                 grabCursor.ChangeAccordingToSelection(null);
                 isRunning = false;
             }

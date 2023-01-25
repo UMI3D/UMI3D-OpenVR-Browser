@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2021 Inetum
+Copyright 2019 - 2023 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Collections;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.cursor;
@@ -45,7 +46,24 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <summary>
         /// Is the cursor displayed?
         /// </summary>
-        public bool IsZoneHintDisplayed => cursorRenderer.enabled;
+        public bool IsZoneHintDisplayed { get => _isDisplayed; }
+
+        private bool _isDisplayed = false;
+
+        #region fading
+
+        /// <summary>
+        /// Duration of the fading growth animation.
+        /// </summary>
+        protected float fadeDuration = 0.1f;
+
+        private Vector3 defaultSphereScale;
+
+        private bool growCoroutineRunning;
+
+        private Coroutine growCoroutine;
+
+        #endregion fading
 
         private Collider selectedObjectCollider;
 
@@ -71,7 +89,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         {
             cursorRenderer.enabled = false;
             contactSphereRenderer.enabled = false;
-            cursorCollider = GetComponentInChildren<SphereCollider>();
+            defaultSphereScale = cursorSphere.transform.localScale;
+            cursorCollider = cursorSphere.GetComponentInChildren<SphereCollider>();
         }
 
         public void Update()
@@ -85,6 +104,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         /// <inheritdoc/>
         public override void Display()
         {
+            if (_isDisplayed)
+                return;
             DisplayZoneHint();
             DisplayContactSphereHint();
         }
@@ -92,6 +113,25 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
         public void DisplayZoneHint()
         {
             cursorRenderer.enabled = true;
+            _isDisplayed = true;
+
+            if (growCoroutineRunning)
+                StopCoroutine(growCoroutine);
+            growCoroutine = StartCoroutine(Grow(defaultSphereScale, fadeDuration));
+        }
+
+        public IEnumerator Grow(Vector3 targetScale, float duration)
+        {
+            growCoroutineRunning = true;
+            float startTime = Time.time;
+            Vector3 baseScale = cursorSphere.transform.localScale;
+            while (Time.time < startTime + duration && cursorSphere.transform.localScale != targetScale)
+            {
+                cursorSphere.transform.localScale = Vector3.Slerp(baseScale, targetScale, (Time.time - startTime) / fadeDuration);
+                yield return new WaitForEndOfFrame();
+            }
+            cursorSphere.transform.localScale = targetScale;
+            growCoroutineRunning = false;
         }
 
         public void DisplayContactSphereHint()
@@ -108,7 +148,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
         public void HideZoneHint()
         {
-            cursorRenderer.enabled = false;
+            _isDisplayed = false;
+
+            if (growCoroutineRunning)
+                StopCoroutine(growCoroutine);
+            growCoroutine = StartCoroutine(Grow(Vector3.zero, fadeDuration));
         }
 
         public void HideContactSphereHint()
@@ -117,7 +161,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
             contactSphere.transform.position = this.transform.position;
         }
 
-        #endregion
+        #endregion Display
 
         /// <inheritdoc/>
         public override void ChangeAccordingToSelection(AbstractSelectionData selectedObjectData)
@@ -166,7 +210,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 }
             }
         }
-
 
         /// <summary>
         /// Set the contact sphere on the closent point available on the contact collider
