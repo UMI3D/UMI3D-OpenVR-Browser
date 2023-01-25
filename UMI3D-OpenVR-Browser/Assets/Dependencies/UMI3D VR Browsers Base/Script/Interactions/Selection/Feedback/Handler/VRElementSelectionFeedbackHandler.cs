@@ -30,7 +30,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
         [SerializeField]
         private AbstractVRHapticSelectionFeedback hapticFeedback;
 
-        private AbstractCursor pointingCursor;
+        private AbstractPointingCursor pointingCursor;
         private AbstractCursor grabCursor;
 
         private void Awake()
@@ -48,7 +48,11 @@ namespace umi3dBrowsers.interaction.selection.feedback
                 var selectionDataTyped = selectionData as SelectionIntentData<AbstractClientInteractableElement>;
                 hapticFeedback.Trigger();
                 if (selectionDataTyped?.detectionOrigin == DetectionOrigin.POINTING)
+                {
+                    pointingCursor.Display();
                     pointingCursor.ChangeAccordingToSelection(selectionData);
+                }
+                   
                 //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
                 //    grabCursor.ChangeAccordingToSelection(selectionData);
                 isRunning = true;
@@ -66,7 +70,10 @@ namespace umi3dBrowsers.interaction.selection.feedback
             {
                 var selectionDataTyped = selectionData as SelectionIntentData<AbstractClientInteractableElement>;
                 if (selectionDataTyped.detectionOrigin == DetectionOrigin.POINTING)
+                {
                     pointingCursor.ChangeAccordingToSelection(null);
+                }
+                    
                 //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
                 //    grabCursor.ChangeAccordingToSelection(null);
                 isRunning = false;

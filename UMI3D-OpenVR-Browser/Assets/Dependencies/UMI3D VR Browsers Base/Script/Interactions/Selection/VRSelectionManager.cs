@@ -45,7 +45,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// Cursor associated with pointing selection.
         /// </summary>
         [Header("Cursor"), Tooltip("Cursor associated with pointing selection.")]
-        public AbstractCursor pointingCursor;
+        public AbstractPointingCursor pointingCursor;
 
         /// <summary>
         /// Cursor associated with proximity selection.

@@ -158,7 +158,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     && icToSelect.enabled
                     && icToSelect.Interactable != null
                     && icToSelect.Interactable.Active
-                    && ((icToSelect.Interactable.InteractionDistance < 0) 
+                    && ((icToSelect.Interactable.InteractionDistance < 0)
                         || icToSelect.Interactable.InteractionDistance >= (icToSelect.transform.position - controller.transform.position).magnitude)
                     && icToSelect.Interactable.dto.interactions != null
                     && icToSelect.Interactable.dto.interactions.Count > 0
@@ -217,7 +217,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 else if (IsObjectSelected(selectionInfo.selectedObject)) //  the selector was selecting the same target before
                 {
                     if (LastSelected != null && selectionInfo.detectionOrigin != LastSelected.detectionOrigin)
+                    {
                         selectionFeedbackHandler.UpdateFeedback(selectionInfo);
+                        LastSelected.detectionOrigin = selectionInfo.detectionOrigin;
+                    }
                     return;
                 }
             }
