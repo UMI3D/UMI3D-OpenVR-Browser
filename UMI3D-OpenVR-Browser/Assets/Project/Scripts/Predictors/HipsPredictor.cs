@@ -136,9 +136,7 @@ public class HipsPredictorV3 : HipsPredictor
         Matrix4x4 mat = PredictorUtils.RotationMatrix(angleX, angleY, 0f);
         var yAxis = (mat * Vector3.up).normalized;
 
-        var xAxis = Vector3.Cross(yAxis, zAxis);
-
-        Quaternion rot = PredictorUtils.MatrixToQuaternion(PredictorUtils.LocalRotationMatrix(xAxis, yAxis, zAxis));
+        Quaternion rot = Quaternion.LookRotation(zAxis, yAxis);
 
         (Vector3 pos, Quaternion rot) result = (pos, rot);
         return result;
