@@ -142,7 +142,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         // recording joint reference
         var jointRefPos = hips.pos;
         var jointRefRot = PredictorUtils.ComputeRefJointRot(hips.rot * Vector3.forward);
-        recordedjointRefPositions.Add(hips.pos);
+        recordedjointRefPositions.Add(jointRefPos);
         recordedjointRefRotations.Add(jointRefRot);
 
         // recording frame
@@ -211,7 +211,7 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
             { HumanBodyBones.LeftUpperLeg,  ExtractRotation(index, out index) },
             { HumanBodyBones.LeftLowerLeg,  ExtractRotation(index, out index) },
             { HumanBodyBones.LeftFoot,      ExtractRotation(index, out index) },
-            { HumanBodyBones.LeftToes,      ExtractRotation(index, out index) },
+            { HumanBodyBones.LeftToes,      ExtractRotation(index, out _) },
         };
 
         (float leftOnFloor, float rightOnFloor) contact = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1]);
