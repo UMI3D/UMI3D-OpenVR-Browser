@@ -2,7 +2,7 @@
 using Unity.Barracuda;
 using UnityEngine;
 
-public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact)>
+public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact)>
 {
     protected readonly int NB_PARAMETERS = 9;
     protected readonly int NB_TRACKED_LIMBS = 3;
@@ -176,12 +176,13 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         mainWorker.Execute(modelInput);
 
         outputs.Add(mainWorker.PeekOutput("Lfk"));
-        outputs.Add(mainWorker.PeekOutput("Lleft"));
-        outputs.Add(mainWorker.PeekOutput("Lright"));
+        outputs.Add(mainWorker.PeekOutput("footProba"));
+        //outputs.Add(mainWorker.PeekOutput("Lleft")); // previous version
+        //outputs.Add(mainWorker.PeekOutput("Lright"));
         return outputs;
     }
 
-    public override (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) GetPrediction()
+    public override (Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact) GetPrediction()
     {
         var output = ExecuteModel();
 
@@ -213,9 +214,9 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
             { HumanBodyBones.LeftToes,      ExtractRotation(index, out index) },
         };
 
-        (float rightOnFloor, float leftOnFloor) contact = (output[1][0, 0, 0, 0], output[2][0, 0, 0, 0]);
+        (float leftOnFloor, float rightOnFloor) contact = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1]);
 
-        (Dictionary<HumanBodyBones, Quaternion> rotations, (float, float) contact) result = (rotations, contact);
+        (Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact) result = (rotations, contact);
         return result;
     }
 

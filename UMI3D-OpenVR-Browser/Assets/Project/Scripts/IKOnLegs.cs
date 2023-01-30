@@ -31,7 +31,7 @@ public class IKOnLegs : MonoBehaviour
 
         animator.SetIKPositionWeight(AvatarIKGoal.RightFoot, 1);
         animator.SetIKPositionWeight(AvatarIKGoal.LeftFoot, 1);
-        animator.SetIKPosition(AvatarIKGoal.RightFoot, legsmover.jointReferences[HumanBodyBones.RightToes].transform.position);
-        animator.SetIKPosition(AvatarIKGoal.LeftFoot, legsmover.jointReferences[HumanBodyBones.LeftToes].transform.position);
+        animator.SetIKPosition(AvatarIKGoal.RightFoot, legsmover.rFootPredictedMarker.transform.position);
+        animator.SetIKPosition(AvatarIKGoal.LeftFoot, legsmover.lFootPredictedMarker.transform.position);
     }
 }

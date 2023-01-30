@@ -3272,7 +3272,7 @@ MonoBehaviour:
   hipsPredictedMarker: {fileID: 84380793159712748}
   hipsModelToUse: 1
   shouldPredictLegs: 1
-  legsPredictorModel: {fileID: 5022602860645237092, guid: d3b017f1d18fdca47b3e2b54cead8b3f,
+  legsPredictorModel: {fileID: 5022602860645237092, guid: d1d17f372ab45e0478a5e40cc10e3f65,
     type: 3}
   lFootPredictedMarker: {fileID: 2393638556717364987}
   rFootPredictedMarker: {fileID: 141018436458315963}

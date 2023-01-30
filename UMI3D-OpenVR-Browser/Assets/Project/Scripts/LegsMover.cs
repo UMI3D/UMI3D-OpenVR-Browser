@@ -140,10 +140,10 @@ public class LegsMover : MonoBehaviour
         if (!legsPredictor.isTensorFull) // force to wait 45 frames
             return;
 
-        var (rotations, contact) = legsPredictor.GetPrediction();
+        var (rotations, contactProba) = legsPredictor.GetPrediction();
 
         legsRotPrediction = rotations;
-        this.contact = contact;
+        this.contact = contactProba;
 
         // apply global positoon and hips offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
@@ -151,7 +151,19 @@ public class LegsMover : MonoBehaviour
 
         lFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.LeftToes].transform.position;
         rFootPredictedMarker.transform.position = jointReferences[HumanBodyBones.RightToes].transform.position;
+
+        void ForceOnFloor(Transform toForce)
+        {
+            toForce.position = new Vector3(toForce.transform.position.x, referenceObject.transform.position.y, toForce.transform.position.z);
+        }
+
+        if (contact.rightfoot > ON_FLOOR_THRESHOLD)
+            ForceOnFloor(rFootPredictedMarker.transform);
+        if (contact.leftfoot > ON_FLOOR_THRESHOLD)
+            ForceOnFloor(lFootPredictedMarker.transform);
     }
+
+    protected const float ON_FLOOR_THRESHOLD = 0.5f;
 
     private void OnApplicationQuit()
     {
