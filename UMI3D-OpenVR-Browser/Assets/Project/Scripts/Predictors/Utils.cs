@@ -105,6 +105,8 @@ public static class PredictorUtils
     public static Quaternion MatrixToQuaternion(Vector3 right, Vector3 up)
     {
         var forward = Vector3.Cross(right.normalized, up.normalized);
+        if (forward == Vector3.zero || up == Vector3.zero)
+            throw new System.Exception($"Impossible to compute rotation. Input {(up == Vector3.zero ? "Up" : "Right")} is zero.");
         return Quaternion.LookRotation(forward.normalized, up.normalized);
     }
 

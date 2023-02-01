@@ -26,7 +26,7 @@ public abstract class AbstractPredictor<T>
     public virtual void Init()
     {
         runtimeModel = ModelLoader.Load(modelAsset);
-        mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.CSharpBurst, runtimeModel);
+        mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.Compute, runtimeModel);
     }
 
     public bool isTensorFull => idNextFrame == (modelInput?.channels ?? -1); // tensor not full when not initialized

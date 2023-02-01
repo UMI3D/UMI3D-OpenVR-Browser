@@ -2,7 +2,8 @@
 using Unity.Barracuda;
 using UnityEngine;
 
-public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact)>
+
+public class FootPredictor : AbstractPredictor<FootPredictionResult>
 {
     protected readonly int NB_PARAMETERS = 9;
     protected readonly int NB_TRACKED_LIMBS = 3;
@@ -200,25 +201,38 @@ public class FootPredictor : AbstractPredictor<(Dictionary<HumanBodyBones, Quate
         }
 
         int index = 0;
-        // Get relative position from the reference joint for each joint
-        var rotations = new Dictionary<HumanBodyBones, Quaternion>() // matrice columns right and up in rotation
-        {
-            { HumanBodyBones.RightUpperLeg, ExtractRotation(index, out index) },
-            { HumanBodyBones.RightLowerLeg, ExtractRotation(index, out index) },
-            { HumanBodyBones.RightFoot,     ExtractRotation(index, out index) },
-            { HumanBodyBones.RightToes,     ExtractRotation(index, out index) },
 
-            { HumanBodyBones.LeftUpperLeg,  ExtractRotation(index, out index) },
-            { HumanBodyBones.LeftLowerLeg,  ExtractRotation(index, out index) },
-            { HumanBodyBones.LeftFoot,      ExtractRotation(index, out index) },
-            { HumanBodyBones.LeftToes,      ExtractRotation(index, out _) },
+        var result = new FootPredictionResult()
+        {
+            rotations = new Dictionary<HumanBodyBones, Quaternion>() // matrice columns right and up in rotation
+                {
+                    { HumanBodyBones.RightUpperLeg, ExtractRotation(index, out index) },
+                    { HumanBodyBones.RightLowerLeg, ExtractRotation(index, out index) },
+                    { HumanBodyBones.RightFoot,     ExtractRotation(index, out index) },
+                    { HumanBodyBones.RightToes,     ExtractRotation(index, out index) },
+
+                    { HumanBodyBones.LeftUpperLeg,  ExtractRotation(index, out index) },
+                    { HumanBodyBones.LeftLowerLeg,  ExtractRotation(index, out index) },
+                    { HumanBodyBones.LeftFoot,      ExtractRotation(index, out index) },
+                    { HumanBodyBones.LeftToes,      ExtractRotation(index, out _) },
+                },
+            contact  = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1])
         };
 
-        (float leftOnFloor, float rightOnFloor) contact = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1]);
-
-        (Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact) result = (rotations, contact);
         return result;
     }
 
 
+}
+
+public struct FootPredictionResult
+{
+    public Dictionary<HumanBodyBones, Quaternion> rotations;
+    public (float leftOnFloor, float rightOnFloor) contact;
+
+    public void Deconstruct(out Dictionary<HumanBodyBones, Quaternion> rotations, out (float leftOnFloor, float rightOnFloor) contact)
+    {
+        rotations = this.rotations;
+        contact = this.contact;
+    }
 }
