@@ -21,6 +21,8 @@ public class LegsMover : MonoBehaviour
 
     public HipsModelToUse hipsModelToUse;
 
+    private bool isAsync = true;
+
     private (Vector3 pos, Quaternion rot) hipsPredicted;
 
     // LEGS
@@ -56,16 +58,16 @@ public class LegsMover : MonoBehaviour
 
         // Init hips predictor
         if (hipsModelToUse == HipsModelToUse.V1)
-            hipsPredictor = new HipsPredictor(hipsPredictorModelV1);
+            hipsPredictor = new HipsPredictor(hipsPredictorModelV1, ownerMono: this);
         else
-            hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3);
+            hipsPredictor = new HipsPredictorV3(hipsPredictorModelV3, ownerMono: this);
 
         hipsPredictor.Init();
 
         // Init legs predictor
         if (shouldPredictLegs)
         {
-            legsPredictor = new FootPredictor(legsPredictorModel);
+            legsPredictor = new FootPredictor(legsPredictorModel, ownerMono: this);
             legsPredictor.Init();
         }
 
@@ -77,7 +79,7 @@ public class LegsMover : MonoBehaviour
     protected void Update()
     {
         UpdateHips();
-        if (hipsPredictor.isTensorFull)
+        if (hipsPredictor.IsTensorFull)
             UpdateFeet();
 
         static string PrintRotPos(string name, Transform t) => $"{name} \t | \t pos: {t.position}, \t rot {t.rotation.eulerAngles}," +
@@ -107,11 +109,13 @@ public class LegsMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     referenceObject.transform));
-
-        if (!hipsPredictor.isTensorFull) // force to wait 45 frames
+        if (!hipsPredictor.IsTensorFull) // force to wait 45 frames
             return;
 
-        hipsPredicted = hipsPredictor.GetPrediction();
+        var prediction = hipsPredictor.GetPrediction(isAsync: isAsync);
+        if (!prediction.HasValue)
+            return;
+        hipsPredicted = prediction.Value;
 
         // apply predicted hips global rotation
         hipsPredictedMarker.transform.rotation = hipsPredicted.rot;
@@ -137,12 +141,16 @@ public class LegsMover : MonoBehaviour
                                                                     jointReferences[HumanBodyBones.RightHand].transform,
                                                                     jointReferences[HumanBodyBones.LeftHand].transform,
                                                                     hipsPredicted));
-        if (!legsPredictor.isTensorFull) // force to wait 45 frames
+
+        if (!legsPredictor.IsTensorFull) // force to wait 45 frames
             return;
 
-        (legsRotPrediction, contact) = legsPredictor.GetPrediction();
+        var prediction = legsPredictor.GetPrediction(isAsync: isAsync);
+        if (!prediction.HasValue) //can happen at the start
+            return;
+        (legsRotPrediction, contact) = prediction.Value;
 
-        // apply global positoon and hips offset (forward kinematics)
+        // apply global positoon and hips  offset (forward kinematics)
         foreach (var joint in orderToApplyFK)
             jointReferences[joint].transform.localRotation = legsRotPrediction[joint];
 
@@ -163,6 +171,18 @@ public class LegsMover : MonoBehaviour
     protected const float ON_FLOOR_THRESHOLD = 0.5f;
 
     private void OnApplicationQuit()
+    {
+        hipsPredictor?.Clean();
+        legsPredictor?.Clean();
+    }
+
+    private void OnDestroy()
+    {
+        hipsPredictor?.Clean();
+        legsPredictor?.Clean();
+    }
+
+    private void OnDisable()
     {
         hipsPredictor?.Clean();
         legsPredictor?.Clean();

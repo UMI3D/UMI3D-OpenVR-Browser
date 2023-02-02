@@ -1,16 +1,17 @@
-﻿using Unity.Barracuda;
+﻿using System.Collections.Generic;
+using Unity.Barracuda;
 using UnityEngine;
 
-public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
+public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)?>
 {
     protected readonly int NB_PARAMETERS = 7;
     protected readonly int NB_TRACKED_LIMBS = 3;
     protected const int NB_FRAMES_MAX = 45;
 
-    public HipsPredictor(NNModel modelAsset) : base(modelAsset)
+    public HipsPredictor(NNModel modelAsset, MonoBehaviour ownerMono) : base(modelAsset, ownerMono)
     { }
 
-    public HipsPredictor(NNModel modelAsset, int nbParameters, int nbTrackedLimbs) : base(modelAsset)
+    public HipsPredictor(NNModel modelAsset, int nbParameters, int nbTrackedLimbs, MonoBehaviour mono) : base(modelAsset, mono)
     {
         NB_PARAMETERS = nbParameters;
         NB_TRACKED_LIMBS = nbTrackedLimbs;
@@ -22,9 +23,9 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         modelInput = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, NB_FRAMES_MAX); //initializing
     }
 
-    public virtual Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
+    public virtual float[] FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
     {
-        Tensor frameTensor = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
+        float[] frameTensor = new float[NB_PARAMETERS * NB_TRACKED_LIMBS];
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
@@ -32,15 +33,15 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
 
             // global position for each tracked limb
             var pos = go.position; // - referencePoint.position;
-            frameTensor[0, 0, index++, 0] = pos.x;
-            frameTensor[0, 0, index++, 0] = pos.y;
-            frameTensor[0, 0, index++, 0] = pos.z;
+            frameTensor[index++] = pos.x;
+            frameTensor[index++] = pos.y;
+            frameTensor[index++] = pos.z;
 
             // global rotation as quaternion coordinates for each tracked limb
-            frameTensor[0, 0, index++, 0] = go.rotation.x;
-            frameTensor[0, 0, index++, 0] = go.rotation.y;
-            frameTensor[0, 0, index++, 0] = go.rotation.z;
-            frameTensor[0, 0, index++, 0] = go.rotation.w;
+            frameTensor[index++] = go.rotation.x;
+            frameTensor[index++] = go.rotation.y;
+            frameTensor[index++] = go.rotation.z;
+            frameTensor[index++] = go.rotation.w;
 
             endIndex = index;
         }
@@ -54,9 +55,14 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
         return frameTensor;
     }
 
-    public override (Vector3 pos, Quaternion rot) GetPrediction()
+    public override (Vector3 pos, Quaternion rot)? GetPrediction(bool isAsync = false)
     {
-        var output = ExecuteModel();
+        List<Tensor> output = isAsync ? ExecuteModelAsync() : ExecuteModel();
+        if (output == null)
+        {
+            Debug.LogWarning("Prediction of hips requested before available");
+            return null;
+        }
 
         int idx = 0;
         (Vector3 pos, Quaternion rot) results = (
@@ -68,18 +74,21 @@ public class HipsPredictor : AbstractPredictor<(Vector3 pos, Quaternion rot)>
                                                                output[0][0, 0, 0, idx++],
                                                                output[0][0, 0, 0, idx++]));
 
+        foreach (var tensor in output)
+            tensor.Dispose();
+
         return results;
     }
 }
 
 public class HipsPredictorV3 : HipsPredictor
 {
-    public HipsPredictorV3(NNModel modelAsset) : base(modelAsset, nbParameters: 9, nbTrackedLimbs: 3)
+    public HipsPredictorV3(NNModel modelAsset, MonoBehaviour ownerMono) : base(modelAsset, 9, 3, ownerMono)
     { }
 
-    public override Tensor FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
+    public override float[] FormatInputTensor(Transform head, Transform rHand, Transform lHand, Transform referencePoint)
     {
-        var frameTensor = new Tensor(1, 1, NB_PARAMETERS * NB_TRACKED_LIMBS, 1);
+        float[] frameTensor = new float[NB_PARAMETERS * NB_TRACKED_LIMBS];
 
         void FillUp(int startIndex, Transform go, out int endIndex)
         {
@@ -87,19 +96,19 @@ public class HipsPredictorV3 : HipsPredictor
 
             // global position for each tracked limb
             var pos = go.position - referencePoint.position; // - referencePoint.position;
-            frameTensor[0, 0, index++, 0] = pos.x;
-            frameTensor[0, 0, index++, 0] = pos.y;
-            frameTensor[0, 0, index++, 0] = pos.z;
+            frameTensor[index++] = pos.x;
+            frameTensor[index++] = pos.y;
+            frameTensor[index++] = pos.z;
 
             // global rotation as rotation matrix columns for each tracked limb
             var rightNormalized = go.right.normalized;
             var upNormalized = go.up.normalized;
-            frameTensor[0, 0, index++, 0] = rightNormalized.x; //first column of the rotation matrix
-            frameTensor[0, 0, index++, 0] = rightNormalized.y;
-            frameTensor[0, 0, index++, 0] = rightNormalized.z;
-            frameTensor[0, 0, index++, 0] = upNormalized.x; //second column of the rotation matrix
-            frameTensor[0, 0, index++, 0] = upNormalized.y;
-            frameTensor[0, 0, index++, 0] = upNormalized.z;
+            frameTensor[index++] = rightNormalized.x; //first column of the rotation matrix
+            frameTensor[index++] = rightNormalized.y;
+            frameTensor[index++] = rightNormalized.z;
+            frameTensor[index++] = upNormalized.x; //second column of the rotation matrix
+            frameTensor[index++] = upNormalized.y;
+            frameTensor[index++] = upNormalized.z;
 
             endIndex = index;
         }
@@ -112,9 +121,14 @@ public class HipsPredictorV3 : HipsPredictor
         return frameTensor;
     }
 
-    public override (Vector3 pos, Quaternion rot) GetPrediction()
+    public override (Vector3 pos, Quaternion rot)? GetPrediction(bool isAsync = false)
     {
-        var output = ExecuteModel();
+        List<Tensor> output = isAsync ? ExecuteModelAsync() : ExecuteModel();
+        if (output == null)
+        {
+            Debug.LogWarning("Prediction of hips requested before available");
+            return null;
+        }
 
         int i = 0;
         Vector3 pos = new Vector3(output[0][0, 0, 0, i++],
@@ -139,6 +153,10 @@ public class HipsPredictorV3 : HipsPredictor
         Quaternion rot = Quaternion.LookRotation(zAxis, yAxis);
 
         (Vector3 pos, Quaternion rot) result = (pos, rot);
+
+        foreach (var tensor in output)
+            tensor.Dispose();
+
         return result;
     }
 }

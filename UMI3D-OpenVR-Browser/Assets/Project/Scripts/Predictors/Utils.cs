@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Unity.Barracuda;
 using UnityEngine;
 
 public static class PredictorUtils
@@ -105,8 +104,8 @@ public static class PredictorUtils
     public static Quaternion MatrixToQuaternion(Vector3 right, Vector3 up)
     {
         var forward = Vector3.Cross(right.normalized, up.normalized);
-        if (forward == Vector3.zero || up == Vector3.zero)
-            throw new System.Exception($"Impossible to compute rotation. Input {(up == Vector3.zero ? "Up" : "Right")} is zero.");
+        //if (forward == Vector3.zero || up == Vector3.zero)
+        //  throw new System.Exception($"Impossible to compute rotation. Input {(up == Vector3.zero ? "Up" : "Right")} is zero.");
         return Quaternion.LookRotation(forward.normalized, up.normalized);
     }
 
@@ -129,14 +128,14 @@ public static class PredictorUtils
         return res;
     }
 
-    public static Tensor ComputeVelocities(List<Vector3> jointRefPositions, List<Quaternion> jointRefRotations, List<List<float>> trackedJoints, Tensor frame)
+    public static float[] ComputeVelocities(List<Vector3> jointRefPositions, List<Quaternion> jointRefRotations, List<float[]> trackedJoints, float[] frame)
     {
         // REFERENCE JOINT
         Vector3 posRef = jointRefPositions[^1];
         Quaternion rotRef = jointRefRotations[^1];
 
-        Vector3 posRefBef = new Vector3();
-        Quaternion rotRefBef = new Quaternion();
+        Vector3 posRefBef = new();
+        Quaternion rotRefBef = new();
 
         Vector3 velocityRef;
         Quaternion rotVelocityRef;
@@ -155,18 +154,18 @@ public static class PredictorUtils
         }
 
         int index = 0;
-        frame[0, 0, w: index++, 0] = velocityRef.x;
-        frame[0, 0, w: index++, 0] = velocityRef.y;
-        frame[0, 0, w: index++, 0] = velocityRef.z;
+        frame[index++] = velocityRef.x;
+        frame[index++] = velocityRef.y;
+        frame[index++] = velocityRef.z;
 
         var rotRefRight = rotVelocityRef * Vector3.right;
         var rotRefUp = rotVelocityRef * Vector3.up;
-        frame[0, 0, w: index++, 0] = rotRefRight.x;
-        frame[0, 0, w: index++, 0] = rotRefRight.y;
-        frame[0, 0, w: index++, 0] = rotRefRight.z;
-        frame[0, 0, w: index++, 0] = rotRefUp.x;
-        frame[0, 0, w: index++, 0] = rotRefUp.y;
-        frame[0, 0, w: index++, 0] = rotRefUp.z;
+        frame[index++] = rotRefRight.x;
+        frame[index++] = rotRefRight.y;
+        frame[index++] = rotRefRight.z;
+        frame[index++] = rotRefUp.x;
+        frame[index++] = rotRefUp.y;
+        frame[index++] = rotRefUp.z;
 
         // TRACKED JOINTS
         const int NB_PARAMETER = 7; // because its pos and rot in quaternions
@@ -210,20 +209,20 @@ public static class PredictorUtils
                 rotVelocityJoint = Quaternion.Inverse(rotationDeltaJointBefore) * rotationDeltaJoint;
             }
 
-            frame[0, 0, w: index++, 0] = velocityJoint.x;
-            frame[0, 0, w: index++, 0] = velocityJoint.y;
-            frame[0, 0, w: index++, 0] = velocityJoint.z;
+            frame[index++] = velocityJoint.x;
+            frame[index++] = velocityJoint.y;
+            frame[index++] = velocityJoint.z;
 
             var right = rotVelocityJoint * Vector3.right;
             var up = rotVelocityJoint * Vector3.up;
-            frame[0, 0, w: index++, 0] = right.x;
-            frame[0, 0, w: index++, 0] = right.y;
-            frame[0, 0, w: index++, 0] = right.z;
-            frame[0, 0, w: index++, 0] = up.x;
-            frame[0, 0, w: index++, 0] = up.y;
-            frame[0, 0, w: index++, 0] = up.z;
+            frame[index++] = right.x;
+            frame[index++] = right.y;
+            frame[index++] = right.z;
+            frame[index++] = up.x;
+            frame[index++] = up.y;
+            frame[index++] = up.z;
         }
-        frame[0, 0, w: index++, 0] = jointRefPositions[^1].y;
+        frame[index++] = jointRefPositions[^1].y;
         return frame;
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Unity.Barracuda;
 using UnityEngine;
 
-
-public class FootPredictor : AbstractPredictor<FootPredictionResult>
+public class FootPredictor : AbstractPredictor<FootPredictionResult?>
 {
     protected readonly int NB_PARAMETERS = 9;
     protected readonly int NB_TRACKED_LIMBS = 3;
@@ -12,7 +12,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
     //tracked limbs (head, lhand, rhand) in rotation (9 each) and predicted hips, +1 for the height
     protected int NbChannels => NB_PARAMETERS * (NB_TRACKED_LIMBS + 1) + 1;
 
-    public FootPredictor(NNModel modelAsset) : base(modelAsset)
+    public FootPredictor(NNModel modelAsset, MonoBehaviour ownerMono) : base(modelAsset, ownerMono)
     { }
 
     public override void Init()
@@ -52,7 +52,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
             MATRIX3
         }
 
-        public List<float> Flatten(bool serializePos = true, bool serializeRot = true,
+        public float[] Flatten(bool serializePos = true, bool serializeRot = true,
                                     RotationFlattenMode rotationFlattenMode = RotationFlattenMode.QUATERNION)
         {
             var data = new List<float>();
@@ -107,7 +107,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
                         break;
                 }
             }
-            return data;
+            return data.ToArray();
         }
     }
 
@@ -118,7 +118,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
         public PosRot lHand;
         public PosRot hips;
 
-        public List<float> Flattent()
+        public float[] Flatten()
         {
             var data = new List<float>();
 
@@ -127,18 +127,18 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
             foreach (var posRot in memberList)
                 data.AddRange(posRot.Flatten());
 
-            return data;
+            return data.ToArray();
         }
     }
 
     private List<LoBSTrFrameData> recordedFrames = new();
-    private List<List<float>> recordedFramesSerialized = new();
+    private List<float[]> recordedFramesSerialized = new();
     private List<Vector3> recordedjointRefPositions = new();
     private List<Quaternion> recordedjointRefRotations = new();
 
-    public virtual Tensor FormatInputTensor(PosRot head, PosRot rHand, PosRot lHand, PosRot hips)
+    public virtual float[] FormatInputTensor(PosRot head, PosRot rHand, PosRot lHand, PosRot hips)
     {
-        Tensor frameTensor = new Tensor(1, 1, w: NbChannels, 1);
+        float[] frameTensor = new float[NbChannels];
 
         // recording joint reference
         var jointRefPos = hips.pos;
@@ -154,7 +154,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
             lHand = (lHand.pos, lHand.rot),
             hips = hips
         });
-        recordedFramesSerialized.Add(recordedFrames[^1].Flattent());
+        recordedFramesSerialized.Add(recordedFrames[^1].Flatten());
 
         // if number or recorded frames too long, discard
         if (recordedFrames.Count > NB_FRAMES_MAX)
@@ -166,7 +166,7 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
         }
 
         // computing full input with velocities
-        var fullInput = PredictorUtils.ComputeVelocities(recordedjointRefPositions, recordedjointRefRotations, recordedFramesSerialized, frameTensor);
+        float[] fullInput = PredictorUtils.ComputeVelocities(recordedjointRefPositions, recordedjointRefRotations, recordedFramesSerialized, frameTensor);
 
         return fullInput;
     }
@@ -183,9 +183,45 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
         return outputs;
     }
 
-    public override (Dictionary<HumanBodyBones, Quaternion> rotations, (float leftOnFloor, float rightOnFloor) contact) GetPrediction()
+    protected override List<Tensor> ExecuteModelAsync(int framesMaxBeforeSync = 5)
     {
-        var output = ExecuteModel();
+        if (!isModelRunning)
+        {
+            mainWorker = WorkerFactory.CreateWorker(WorkerFactory.Type.Compute, runtimeModel);
+
+            var executor = mainWorker.StartManualSchedule(modelInput);
+
+            IEnumerator ExecuteModelOnSeveralFrames(IWorker worker)
+            {
+                isModelRunning = true;
+                while (executor.MoveNext()) //normal to have null from the barracuda code
+                {
+                    Debug.Log($"Progress {worker.scheduleProgress}");
+                    yield return new WaitForEndOfFrame();
+                }
+                isModelRunning = false;
+                lastPrediction = new()
+                {
+                    worker.CopyOutput("Lfk"),
+                    worker.CopyOutput("footProba")
+                };
+                worker.Dispose();
+            }
+
+            coroutineOwnerMonoBehaviour.StartCoroutine(ExecuteModelOnSeveralFrames(mainWorker));
+        }
+        return lastPrediction;
+    }
+
+    public override FootPredictionResult? GetPrediction(bool isAsync = false)
+    {
+        List<Tensor> output = isAsync ? ExecuteModelAsync() : ExecuteModel();
+
+        if (output == null)
+        {
+            Debug.LogWarning("Prediction of feet requested before available");
+            return null;
+        }
 
         Quaternion ExtractRotation(int startIndex, out int endIndex)
         {
@@ -216,13 +252,14 @@ public class FootPredictor : AbstractPredictor<FootPredictionResult>
                     { HumanBodyBones.LeftFoot,      ExtractRotation(index, out index) },
                     { HumanBodyBones.LeftToes,      ExtractRotation(index, out _) },
                 },
-            contact  = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1])
+            contact = (output[1][0, 0, 0, 0], output[1][0, 0, 0, 1])
         };
+
+        foreach (var tensor in output)
+            tensor.Dispose();
 
         return result;
     }
-
-
 }
 
 public struct FootPredictionResult
