@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System.Collections.Generic;
+using System.Linq;
 using umi3d.cdk;
 using umi3d.cdk.interaction;
 using umi3d.common.interaction;
@@ -38,6 +39,7 @@ namespace umi3dVRBrowsersBase.tutorial.fakeServer
         private void Start()
         {
             var interactions = new List<AbstractInteractionDto>();
+            //ev might not be init properly. Might need to register it to the environment.
             foreach (AbstractFakeInteraction ev in events)
                 interactions.Add(ev.GetDto());
 
@@ -45,7 +47,7 @@ namespace umi3dVRBrowsersBase.tutorial.fakeServer
             {
                 id = (FakeEnvironmentLoader.Instance as FakeEnvironmentLoader).GenerateUniqueId(),
                 name = displayName,
-                interactions = interactions
+                interactions = interactions.Select(dto => dto.id).ToList()
             };
 
             var interactable = new Interactable(dto);

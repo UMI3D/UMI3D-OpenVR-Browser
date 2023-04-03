@@ -16,6 +16,7 @@ limitations under the License.
 
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
+using umi3d.cdk.menu;
 using umi3d.cdk.menu.interaction;
 using umi3d.cdk.userCapture;
 using umi3d.common.interaction;
@@ -25,9 +26,12 @@ using UnityEngine;
 
 namespace umi3dVRBrowsersBase.interactions
 {
-    public class VRController : AbstractController
+    public partial class VRController : AbstractController
     {
         #region Fields
+
+        [HideInInspector]
+        public MenuAsset ObjectMenu;
 
         /// <summary>
         /// Type of this controller
@@ -41,88 +45,10 @@ namespace umi3dVRBrowsersBase.interactions
 
         #region Inputs Fields
 
-        [Header("Manipulations")]
-        public List<ManipulationInput> manipulationInputs = new List<ManipulationInput>();
-
-        [Header("Other")]
-        public List<BooleanInput> booleanInputs = new List<BooleanInput>();
-
-        [Tooltip("Input used by default for an hold event")]
-        public BooleanInput HoldInput;
-
         /// <summary>
         /// Id of the current hovered UMI3DNode.
         /// </summary>
         public ulong hoveredObjectId;
-
-        private int inputhash = 0;
-
-        private List<AbstractUMI3DInput> lastComputedInputs = null;
-        private List<MenuInput> menuInputs = new List<MenuInput>();
-        private List<FormMenuInput> formInputs = new List<FormMenuInput>();
-
-        /// <summary>
-        /// Concatenation of all <see cref="AbstractUMI3DInput"/> stored by this controller.
-        /// </summary>
-        public override List<AbstractUMI3DInput> inputs
-        {
-            get
-            {
-                int newHash = manipulationInputs.GetHashCode() +
-                                booleanInputs.GetHashCode();
-                if ((lastComputedInputs != null) && (newHash == inputhash))
-                {
-                    return lastComputedInputs;
-                }
-                else
-                {
-                    var buffer = new List<AbstractUMI3DInput>();
-                    buffer.AddRange(manipulationInputs);
-                    buffer.AddRange(booleanInputs);
-                    buffer.AddRange(menuInputs);
-                    buffer.AddRange(formInputs);
-                    lastComputedInputs = buffer;
-                    inputhash = newHash;
-                    return buffer;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Instantiated float parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<FloatParameterInput> floatParameterInputs = new List<FloatParameterInput>();
-
-        /// <summary>
-        /// Instantiated float range parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<FloatRangeParameterInput> floatRangeParameterInputs = new List<FloatRangeParameterInput>();
-
-        /// <summary>
-        /// Instantiated int parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<IntParameterInput> intParameterInputs = new List<IntParameterInput>();
-
-        /// <summary>
-        /// Instantiated bool parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<BooleanParameterInput> boolParameterInputs = new List<BooleanParameterInput>();
-
-        /// <summary>
-        /// Instantiated string parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<StringParameterInput> stringParameterInputs = new List<StringParameterInput>();
-
-        /// <summary>
-        /// Instantiated string enum parameter inputs.
-        /// </summary>
-        /// <see cref="FindInput(AbstractParameterDto, bool)"/>
-        protected List<StringEnumParameterInput> stringEnumParameterInputs = new List<StringEnumParameterInput>();
 
         public bool IsInputPressed = false;
 
@@ -139,8 +65,12 @@ namespace umi3dVRBrowsersBase.interactions
 
         #region Methods
 
+        #region Monobehaviour Life Cycle
+
         protected virtual void Awake()
         {
+            ObjectMenu = Resources.Load<MenuAsset>("ParametersMenu");
+
             Physics.queriesHitBackfaces = true;
 
             foreach (AbstractUMI3DInput input in manipulationInputs)
@@ -155,275 +85,7 @@ namespace umi3dVRBrowsersBase.interactions
                 timeSinceLastInput += Time.deltaTime;
         }
 
-        [ContextMenu("SWIPE")]
-        private void Swipe()
-        {
-            ChangeInputMapping(booleanInputs[0], booleanInputs[1]);
-        }
-
-        /// <summary>
-        /// Clear all menus and the projected tools.
-        /// </summary>
-        public override void Clear()
-        {
-            Debug.LogError("TODO : Clear menu");
-
-            ReleaseCurrentTool();
-
-            foreach (BooleanInput input in booleanInputs)
-            {
-                if (!input.IsAvailable())
-                    input.Dissociate();
-            }
-            foreach (ManipulationInput input in manipulationInputs)
-            {
-                if (!input.IsAvailable())
-                    input.Dissociate();
-            }
-            foreach (MenuInput input in menuInputs)
-            {
-                if (!input.IsAvailable())
-                    input.Dissociate();
-            }
-            foreach (FormMenuInput input in formInputs)
-            {
-                if (!input.IsAvailable())
-                    input.Dissociate();
-            }
-
-            menuInputs.ForEach((a) => { Destroy(a); });
-            menuInputs = new List<MenuInput>();
-
-            formInputs.ForEach((i) => Destroy(i));
-            formInputs = new List<FormMenuInput>();
-        }
-
-        #region Find Input
-
-        /// <summary>
-        /// Find the best dof separation for this controller.
-        /// </summary>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public override DofGroupOptionDto FindBest(DofGroupOptionDto[] options)
-        {
-            return options[0];
-        }
-
-        /// <summary>
-        /// Find the best free input for a given manipulation dof.
-        /// </summary>
-        /// <param name="manip">Manipulation to associate input to</param>
-        /// <param name="dof">Degree of freedom to associate input to</param>
-        /// <returns></returns>
-        public override AbstractUMI3DInput FindInput(ManipulationDto manip, DofGroupDto dof, bool unused = true)
-        {
-            return FindInput(manip, dof.dofs, unused);
-        }
-
-        /// <summary>
-        /// Find the best free input for a given <see cref="ManipulationDto"/>.
-        /// </summary>
-        /// <param name="manip"></param>
-        /// <param name="dofs"></param>
-        /// <param name="unused"></param>
-        /// <returns></returns>
-        public AbstractUMI3DInput FindInput(ManipulationDto manip, DofGroupEnum dofs, bool unused = true)
-        {
-            AbstractVRInput result = null;
-
-            foreach (ManipulationInput input in manipulationInputs)
-            {
-                if (input.IsCompatibleWith(manip))
-                {
-                    if (input.IsAvailable() || !unused)
-                    {
-                        result = input;
-                        break;
-                    }
-                }
-            }
-
-            if (result == null)
-            {
-                //if no input was found
-                result = this.gameObject.AddComponent<MenuInput>();
-                result.Init(this);
-                menuInputs.Add(result as MenuInput);
-            }
-
-            PlayerMenuManager.Instance.CtrlToolMenu.AddBinding(result);
-
-            return result;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="evt"></param>
-        /// <param name="unused"></param>
-        /// <param name="tryToFindInputForHoldableEvent"></param>
-        /// <returns></returns>
-        public override AbstractUMI3DInput FindInput(EventDto evt, bool unused = true, bool tryToFindInputForHoldableEvent = false)
-        {
-            AbstractVRInput res = null;
-
-            if (HoldInput != null && tryToFindInputForHoldableEvent && HoldInput.IsAvailable())
-                res = HoldInput;
-
-            if (res == null)
-            {
-                foreach (BooleanInput input in booleanInputs)
-                {
-                    if (input.IsAvailable() || !unused)
-                    {
-                        res = input;
-                        break;
-                    }
-                }
-            }
-
-            if (res == null)
-            {
-                //if no boolean input was found
-                foreach (MenuInput menu in menuInputs)
-                {
-                    if (menu.IsAvailable())
-                    {
-                        res = menu;
-                        break;
-                    }
-                }
-            }
-
-            if (res == null)
-            {
-                MenuInput menuInput = this.gameObject.AddComponent<MenuInput>();
-                menuInput.Init(this);
-                menuInputs.Add(menuInput);
-                res = menuInput;
-            }
-
-            PlayerMenuManager.Instance.CtrlToolMenu.AddBinding(res);
-
-            return res;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="param"></param>
-        /// <param name="unused"></param>
-        /// <returns></returns>
-        public override AbstractUMI3DInput FindInput(AbstractParameterDto param, bool unused = true)
-        {
-            if (param is FloatRangeParameterDto)
-            {
-                FloatRangeParameterInput floatRangeInput = floatRangeParameterInputs.Find(i => i.IsAvailable());
-                if (floatRangeInput == null)
-                {
-                    floatRangeInput = this.gameObject.AddComponent<FloatRangeParameterInput>();
-                    floatRangeInput.Init(this);
-                    floatRangeParameterInputs.Add(floatRangeInput);
-                }
-                return floatRangeInput;
-            }
-            else if (param is FloatParameterDto)
-            {
-                FloatParameterInput floatInput = floatParameterInputs.Find(i => i.IsAvailable());
-                if (floatInput == null)
-                {
-                    floatInput = this.gameObject.AddComponent<FloatParameterInput>();
-                    floatInput.Init(this);
-                    floatParameterInputs.Add(floatInput);
-                }
-                return floatInput;
-            }
-            else if (param is IntegerParameterDto)
-            {
-                IntParameterInput intInput = intParameterInputs.Find(i => i.IsAvailable());
-                if (intInput == null)
-                {
-                    intInput = new IntParameterInput();
-                    intParameterInputs.Add(intInput);
-                }
-                return intInput;
-            }
-            else if (param is IntegerRangeParameterDto)
-            {
-                throw new System.NotImplementedException();
-            }
-            else if (param is BooleanParameterDto)
-            {
-                BooleanParameterInput boolInput = boolParameterInputs.Find(i => i.IsAvailable());
-                if (boolInput == null)
-                {
-                    boolInput = this.gameObject.AddComponent<BooleanParameterInput>();
-                    boolInput.Init(this);
-                    boolParameterInputs.Add(boolInput);
-                }
-                return boolInput;
-            }
-            else if (param is StringParameterDto)
-            {
-                StringParameterInput stringInput = stringParameterInputs.Find(i => i.IsAvailable());
-                if (stringInput == null)
-                {
-                    stringInput = this.gameObject.AddComponent<StringParameterInput>();
-                    stringInput.Init(this);
-                    stringParameterInputs.Add(stringInput);
-                }
-                return stringInput;
-            }
-            else if (param is EnumParameterDto<string>)
-            {
-                StringEnumParameterInput stringEnumInput = stringEnumParameterInputs.Find(i => i.IsAvailable());
-                if (stringEnumInput == null)
-                {
-                    stringEnumInput = this.gameObject.AddComponent<StringEnumParameterInput>();
-                    stringEnumInput.Init(this);
-                    stringEnumParameterInputs.Add(stringEnumInput);
-                }
-                return stringEnumInput;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="form"></param>
-        /// <param name="unused"></param>
-        /// <returns></returns>
-        public override AbstractUMI3DInput FindInput(FormDto form, bool unused = true)
-        {
-            foreach (FormMenuInput input in formInputs)
-            {
-                if (input.IsAvailable())
-                    return input;
-            }
-
-            FormMenuInput menuInput = this.gameObject.AddComponent<FormMenuInput>();
-            menuInput.Init(this);
-            formInputs.Add(menuInput);
-            return menuInput;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="link"></param>
-        /// <param name="unused"></param>
-        /// <returns></returns>
-        public override AbstractUMI3DInput FindInput(LinkDto link, bool unused = true)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        #endregion Find Input
+        #endregion
 
         #region Tool : projection and release
 
@@ -451,8 +113,8 @@ namespace umi3dVRBrowsersBase.interactions
         /// <returns></returns>
         public override bool IsCompatibleWith(AbstractTool tool)
         {
-            return tool.interactions.TrueForAll(inter =>
-                (inter is ManipulationDto) ?
+            return tool.interactionsLoaded.TrueForAll(inter =>
+                (inter is ManipulationDto ) ?
                 (inter as ManipulationDto).dofSeparationOptions.Exists(
                     group => !group.separations.Exists(
                         dof => (dof.dofs == DofGroupEnum.X_RX) || (dof.dofs == DofGroupEnum.Y_RY) || (dof.dofs == DofGroupEnum.Z_RZ)))
@@ -468,9 +130,9 @@ namespace umi3dVRBrowsersBase.interactions
         {
             return false;
 
-            List<AbstractInteractionDto> manips = tool.interactions.FindAll(x => x is ManipulationDto);
-            List<AbstractInteractionDto> events = tool.interactions.FindAll(x => x is EventDto);
-            List<AbstractInteractionDto> param = tool.interactions.FindAll(x => x is AbstractParameterDto);
+            List<AbstractInteractionDto> manips = tool.interactionsLoaded.FindAll(x => x is ManipulationDto);
+            List<AbstractInteractionDto> events = tool.interactionsLoaded.FindAll(x => x is EventDto);
+            List<AbstractInteractionDto> param = tool.interactionsLoaded.FindAll(x => x is AbstractParameterDto);
             return ((manips.Count > 1) || (events.Count > 3) || (param.Count > 0));
         }
 
@@ -491,7 +153,7 @@ namespace umi3dVRBrowsersBase.interactions
         /// <param name="interactions"></param>
         public override void CreateInteractionsMenuFor(AbstractTool tool)
         {
-            List<AbstractInteractionDto> interactions = tool.interactions;
+            List<AbstractInteractionDto> interactions = tool.interactionsLoaded;
             List<AbstractInteractionDto> manips = interactions.FindAll(inter => inter is ManipulationDto);
             foreach (AbstractInteractionDto manip in manips)
             {
@@ -621,7 +283,7 @@ namespace umi3dVRBrowsersBase.interactions
             PlayerMenuManager.Instance.MenuHeader.DisplayControllerButton(false, type, string.Empty);
         }
 
-        #endregion Tool : projection and release
+        #endregion
 
         #region Status
 
@@ -646,6 +308,12 @@ namespace umi3dVRBrowsersBase.interactions
         #endregion Status
 
         #region Change mapping
+
+        [ContextMenu("SWIPE")]
+        private void Swipe()
+        {
+            ChangeInputMapping(booleanInputs[0], booleanInputs[1]);
+        }
 
         /// <summary>
         /// Swipes the inputs of two interactions.

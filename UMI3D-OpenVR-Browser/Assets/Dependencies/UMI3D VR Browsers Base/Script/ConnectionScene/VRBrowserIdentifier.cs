@@ -33,7 +33,7 @@ namespace umi3dVRBrowsersBase.connection
         #region Fields
 
         public Action<List<string>, Action<bool>> ShouldDownloadLib;
-        public Action<FormDto, Action<FormAnswerDto>> GetParameters;
+        public Action<ConnectionFormDto, Action<FormAnswerDto>> GetParameters;
 
         #endregion
 
@@ -44,7 +44,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         /// <param name="parameter"></param>
         /// <param name="callback"></param>
-        public override async Task<FormAnswerDto> GetParameterDtos(FormDto parameter)
+        public override async Task<FormAnswerDto> GetParameterDtos(ConnectionFormDto parameter)
         {
             bool b = true;
             FormAnswerDto form = null;

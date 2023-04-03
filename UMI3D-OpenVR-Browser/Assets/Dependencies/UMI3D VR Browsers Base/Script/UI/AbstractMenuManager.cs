@@ -35,7 +35,7 @@ namespace umi3dVRBrowsersBase.ui
         /// <summary>
         /// Is the menu open ?
         /// </summary>
-        public bool IsOpen { get; private set; } = false;
+        public bool IsOpen { get; protected set; } = false;
 
         #endregion
 
