@@ -22,10 +22,45 @@ using UnityEngine.Events;
 
 namespace umi3d.baseBrowser.emotes
 {
+    public interface IEmoteManager
+    {
+        public void PlayEmote(Emote emote);
+
+        public void StopEmote(Emote emote);
+    }
+
+    /// <summary>
+    /// Describes an emote from the client side
+    /// </summary>
+    [System.Serializable]
+    public class Emote
+    {
+        /// <summary>
+        /// Emote's label
+        /// </summary>
+        public string Label => dto.label;
+        /// <summary>
+        /// Icon of the emote in the UI
+        /// </summary>
+        public Sprite icon;
+        /// <summary>
+        /// Should the emote be available or not
+        /// </summary>
+        public bool available;
+        /// <summary>
+        /// Emote order in UI
+        /// </summary>
+        public int uiOrder;
+        /// <summary>
+        /// Emote dto
+        /// </summary>
+        public UMI3DEmoteDto dto;
+    }
+
     /// <summary>
     /// Manager that handles emotes
     /// </summary>
-    public class EmoteManager : inetum.unityUtils.SingleBehaviour<EmoteManager>
+    public class EmoteManager : inetum.unityUtils.SingleBehaviour<EmoteManager>, IEmoteManager
     {
         #region Fields
         #region Events
@@ -34,34 +69,32 @@ namespace umi3d.baseBrowser.emotes
         public event System.Action<Emote> EmoteUpdated;
         #endregion
 
-        #region EmotesConfigManagement
+        #region AnimatorManagement
+        ///// <summary>
+        ///// AnimatorController that manages emotes from a bundle
+        ///// </summary>
+        //[HideInInspector]
+        //public RuntimeAnimatorController emoteAnimatorController;
+        private UserAvatar avatar;
         /// <summary>
-        /// Describes an emote from the client side
+        /// Cache to keep previous animator controller during emote animation
         /// </summary>
-        [System.Serializable]
-        public class Emote
-        {
-            /// <summary>
-            /// Emote's label
-            /// </summary>
-            public string Label => dto.label;
-            /// <summary>
-            /// Icon of the emote in the UI
-            /// </summary>
-            public Sprite icon;
-            /// <summary>
-            /// Should the emote be available or not
-            /// </summary>
-            public bool available;
-            /// <summary>
-            /// Emote order in UI
-            /// </summary>
-            public int uiOrder;
-            /// <summary>
-            /// Emote dto
-            /// </summary>
-            public UMI3DEmoteDto dto;
-        }
+        private RuntimeAnimatorController cachedAnimatorController;
+        /// <summary>
+        /// Reference to the skeleton animator
+        /// </summary>
+        private Animator skeletonAnimator;
+        /// <summary>
+        /// Reference to the avatar animator
+        /// </summary>
+        private Animator avatarAnimator;
+        /// <summary>
+        /// Default idle animation
+        /// </summary>
+        public AnimationClip idleAnimation;
+        #endregion AnimatorManagement
+
+        #region EmotesConfigManagement
 
         public Dictionary<Emote, Coroutine> runningCoroutines = new();
 
@@ -158,6 +191,19 @@ namespace umi3d.baseBrowser.emotes
                 yield return new WaitForSeconds(0.5f);
             }
             Debug.Log("Ended waiting");
+            if (!dirtyMode)
+            {
+                // todo : adapt for VR
+                //avatar = UMI3DClientUserTracking.Instance.embodimentDict[id];
+                //while (avatar.transform.childCount == 0
+                //    || (avatar.transform.childCount == 1 && avatar.transform.GetChild(0).transform.childCount == 0)) //wait for bundle loading
+                //{
+                //    yield return null;
+                //}
+                //Debug.Log("Got bundle");
+            }
+
+
             var i = 0;
             foreach (UMI3DEmoteDto emoteRefInConfig in emoteConfigDto.emotes)
             {
@@ -185,6 +231,27 @@ namespace umi3d.baseBrowser.emotes
             hasReceivedEmotes = true;
             EmotesLoaded?.Invoke(Emotes); //Display the Emote Button and add emotes in windows.
             UMI3DClientUserTracking.Instance.EmoteChangedEvent.AddListener(UpdateEmote);
+
+            if (dirtyMode)
+                yield break;
+
+            // todo : adapt for VR
+            //skeletonAnimator = UMI3DCollaborationClientUserTracking.Instance.GetComponentInChildren<Animator>();
+
+            //avatarAnimator = avatar.GetComponentInChildren<Animator>();
+            //if (avatarAnimator == null && transform.parent != null)
+            //    avatarAnimator = transform.GetComponentInParent<Animator>();
+            //if (avatarAnimator != null)
+            //{
+            //    avatarAnimator.enabled = false; //disabled because it causes interferences with avatar bindings
+            //    if (avatarAnimator.runtimeAnimatorController == null)
+            //    {
+            //        NoEmotesLoaded?.Invoke(); //no emotes support in the scene
+            //        yield break;
+            //    }
+            //}
+
+            dirtyMode = skeletonAnimator == null || avatarAnimator == null;
         }
 
         async void LoadFile(UMI3DEmoteDto emoteRefInConfig, Emote emote)
@@ -222,6 +289,12 @@ namespace umi3d.baseBrowser.emotes
         /// </summary>
         private void LoadEmotes()
         {
+            // todo : adapt for VR
+            //skeletonAnimator.enabled = false;
+            //avatarAnimator.enabled = true;
+            //skeletonAnimator.Update(0);
+            //avatarAnimator.Update(0);
+            //avatar.ForceDisablingBinding = true;
         }
 
         /// <summary>
@@ -229,12 +302,20 @@ namespace umi3d.baseBrowser.emotes
         /// </summary>
         private void UnloadEmotes()
         {
+            // todo : adapt for VR
+            //skeletonAnimator.enabled = true;
+            //skeletonAnimator.Play("Movement", layer: 0, 0f);
+            //avatarAnimator.enabled = false;
+            //skeletonAnimator.Update(0);
+            //avatarAnimator.Update(0);
+            //avatar.ForceDisablingBinding = false;
         }
 
         private UnityAction currentInterruptionAction;
 
         public void PlayEmote(Emote emote)
         {
+            Debug.Log($"Playing emote {emote.Label}");
             runningCoroutines[emote] = StartCoroutine(PlayEmoteAnimation(emote));
         }
 
@@ -268,13 +349,30 @@ namespace umi3d.baseBrowser.emotes
             }
             else
             {
-                float startTime = Time.time;
-                float expectedLength = default;
-                yield return new WaitForSeconds(3f); //wait for emote end of animation
+                // todo : adapt for VR
+                ////BaseFPSNavigation.PlayerMoved.AddListener(currentInterruptionAction);
+                //avatarAnimator.Play(emote.dto.stateName, layer: 0, 0f);
+
+                //float startTime = Time.time;
+                //float expectedLength = default;
+                //yield return new WaitUntil(() =>
+                //{
+                //    var stateInfo = avatarAnimator.GetCurrentAnimatorStateInfo(0);
+                //    if (stateInfo.IsName(emote.dto.stateName)) // the animation state is not transitionned to the played one directly
+                //    {
+                //        if (stateInfo.normalizedTime >= 1)
+                //            return true;
+                //        else if (expectedLength == default)
+                //            expectedLength = stateInfo.length;
+                //    }
+                //    else if (expectedLength != default && Time.time - startTime > expectedLength) //we are in another state but we went through the one we intended to
+                //        return true;
+                //    return false;
+                // }); //wait for emote end of animation
             }
 
             //? Possible to improve using a StateMachineBehaviour attached to the EmoteController & trigger events on OnStateExit on anim/OnStateEnter on AnyState
-            StopEmotePlayMode(emote);
+            StopEmote(emote);
 
             yield break;
         }
@@ -283,7 +381,7 @@ namespace umi3d.baseBrowser.emotes
         /// Stop the emote playing process.
         /// </summary>
         /// <param name="emote"></param>
-        private void StopEmotePlayMode(Emote emote)
+        public void StopEmote(Emote emote)
         {
             if (runningCoroutines.ContainsKey(emote))
             {
@@ -293,6 +391,8 @@ namespace umi3d.baseBrowser.emotes
 
             if (currentInterruptionAction is not null)
             {
+                // todo : adapt for VR
+                //BaseFPSNavigation.PlayerMoved.RemoveListener(currentInterruptionAction);
                 UMI3DClientUserTracking.Instance.EmotePlayedSelfEvent.RemoveListener(currentInterruptionAction);
                 currentInterruptionAction = null;
             }
@@ -318,7 +418,7 @@ namespace umi3d.baseBrowser.emotes
         /// <param name="emote"></param>
         private void InterruptEmote(Emote emote)
         {
-            StopEmotePlayMode(emote);
+            StopEmote(emote);
         }
 
         #endregion Emote Playing

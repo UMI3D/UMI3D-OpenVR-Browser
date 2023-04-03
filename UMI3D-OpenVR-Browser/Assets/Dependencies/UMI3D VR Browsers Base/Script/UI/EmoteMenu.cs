@@ -124,7 +124,7 @@ namespace umi3dVRBrowsersBase.ui
             EmoteManager.Instance.EmotesLoaded += EmoteConfigReceived;
         }
 
-        protected void EmoteConfigReceived(List<EmoteManager.Emote> emotes)
+        protected void EmoteConfigReceived(List<Emote> emotes)
         {
             UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"emote received");
             foreach (var emote in emotes)
