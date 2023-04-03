@@ -33,21 +33,16 @@ namespace umi3d.common.userCapture
         /// User id of the user planning to trigger an emote.
         /// </summary>
         public ulong sendingUserId;
-
-
-        /// <inheritdoc/>
         protected override uint GetOperationId()
         {
             return UMI3DOperationKeys.EmoteRequest;
         }
-
-        /// <inheritdoc/>
         public override Bytable ToBytableArray(params object[] parameters)
         {
             return base.ToBytableArray(parameters)
-                + UMI3DNetworkingHelper.Write(emoteId)
-                + UMI3DNetworkingHelper.Write(shouldTrigger)
-                + UMI3DNetworkingHelper.Write(sendingUserId);
+            + UMI3DSerializer.Write(emoteId)
+            + UMI3DSerializer.Write(shouldTrigger)
+            + UMI3DSerializer.Write(sendingUserId);
         }
     }
 }

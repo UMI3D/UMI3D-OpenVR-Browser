@@ -25,10 +25,13 @@ using UnityEngine;
 namespace umi3d.cdk
 {
 
-    public static class UMI3DTransactionDispatcher
+    public class UMI3DTransactionDispatcher 
     {
 
         private const DebugScope scope = DebugScope.CDK | DebugScope.Collaboration | DebugScope.Networking;
+
+        Func<AbstractOperationDto, Task<bool>> OperationDto;
+        Func<uint,ByteContainer, Task<bool>> Operation;
 
         /// <summary>
         /// Unpack the transaction and apply the operations.
@@ -37,7 +40,7 @@ namespace umi3d.cdk
         /// <returns></returns>
         ///  A transaction is composed of a set of operations to be performed on entities (e.g Scenes, Nodes, Materials).
         ///  Operations should be applied in the same order as stored in the transaction.
-        public static async Task PerformTransaction(TransactionDto transaction)
+        public async Task PerformTransaction(TransactionDto transaction)
         {
             int _transaction = count++;
             int opCount = 0;
@@ -66,6 +69,12 @@ namespace umi3d.cdk
         static int count = 0;
         const int secondBeforeError = 300;
 
+        public UMI3DTransactionDispatcher(Func<AbstractOperationDto, Task<bool>> operationDto, Func<uint, ByteContainer, Task<bool>> operation)
+        {
+            OperationDto = operationDto;
+            Operation = operation;
+        }
+
         /// <summary>
         /// Unpack the transaction from a <paramref name="container"/> and apply the operations.
         /// </summary>
@@ -73,11 +82,11 @@ namespace umi3d.cdk
         /// <returns></returns>
         ///  A transaction is composed of a set of operations to be performed on entities (e.g Scenes, Nodes, Materials).
         ///  Operations should be applied in the same order as stored in the transaction.
-        public static async Task PerformTransaction(ByteContainer container)
+        public async Task PerformTransaction(ByteContainer container)
         {
             int transaction = count++;
             int opCount = 0;
-            foreach (ByteContainer c in UMI3DNetworkingHelper.ReadIndexesList(container))
+            foreach (ByteContainer c in UMI3DSerializer.ReadIndexesList(container))
             {
                 bool performed = false;
                 var ErrorTime = Time.time + secondBeforeError;
@@ -107,7 +116,7 @@ namespace umi3d.cdk
         /// </summary>
         /// <param name="operation">Operation to apply.</param>
         /// <param name="performed">Callback.</param>
-        public static async Task PerformOperation(AbstractOperationDto operation)
+        public async Task PerformOperation(AbstractOperationDto operation)
         {
             switch (operation)
             {
@@ -124,17 +133,17 @@ namespace umi3d.cdk
                     UMI3DEnvironmentLoader.SetEntity(set);
                     break;
                 case MultiSetEntityPropertyDto multiSet:
-                    UMI3DEnvironmentLoader.SetMultiEntity(multiSet);
+                    await UMI3DEnvironmentLoader.SetMultiEntity(multiSet);
                     break;
                 case StartInterpolationPropertyDto interpolationStart:
-                    UMI3DEnvironmentLoader.StartInterpolation(interpolationStart);
+                    await UMI3DEnvironmentLoader.StartInterpolation(interpolationStart);
                     break;
                 case StopInterpolationPropertyDto interpolationStop:
-                    UMI3DEnvironmentLoader.StopInterpolation(interpolationStop);
+                    await UMI3DEnvironmentLoader.StopInterpolation(interpolationStop);
                     break;
-
                 default:
-                    await UMI3DEnvironmentLoader.Parameters.UnknownOperationHandler(operation);
+                    if(!await OperationDto(operation))
+                        await UMI3DEnvironmentLoader.Parameters.UnknownOperationHandler(operation);
                     break;
             }
         }
@@ -144,9 +153,9 @@ namespace umi3d.cdk
         /// </summary>
         /// <param name="container">Operation to apply as a container.</param>
         /// <param name="performed">Callback.</param>
-        public static async Task PerformOperation(ByteContainer container)
+        public async Task PerformOperation(ByteContainer container)
         { 
-            uint operationId = UMI3DNetworkingHelper.Read<uint>(container);
+            uint operationId = UMI3DSerializer.Read<uint>(container);
             switch (operationId)
             {
                 case UMI3DOperationKeys.LoadEntity:
@@ -154,28 +163,28 @@ namespace umi3d.cdk
                     break;
                 case UMI3DOperationKeys.DeleteEntity:
                     {
-                        ulong entityId = UMI3DNetworkingHelper.Read<ulong>(container);
+                        ulong entityId = UMI3DSerializer.Read<ulong>(container);
                         await UMI3DEnvironmentLoader.DeleteEntity(entityId);
                         break;
                     }
                 case UMI3DOperationKeys.MultiSetEntityProperty:
-                    UMI3DEnvironmentLoader.SetMultiEntity(container);
+                    await UMI3DEnvironmentLoader.SetMultiEntity(container);
                     break;
                 case UMI3DOperationKeys.StartInterpolationProperty:
-                    UMI3DEnvironmentLoader.StartInterpolation(container);
+                    await UMI3DEnvironmentLoader.StartInterpolation(container);
                     break;
                 case UMI3DOperationKeys.StopInterpolationProperty:
-                    UMI3DEnvironmentLoader.StopInterpolation(container);
+                    await UMI3DEnvironmentLoader.StopInterpolation(container);
                     break;
 
                 default:
                     if (UMI3DOperationKeys.SetEntityProperty <= operationId && operationId <= UMI3DOperationKeys.SetEntityMatrixProperty)
                     {
-                        ulong entityId = UMI3DNetworkingHelper.Read<ulong>(container);
-                        uint propertyKey = UMI3DNetworkingHelper.Read<uint>(container);
-                        UMI3DEnvironmentLoader.SetEntity(operationId, entityId, propertyKey, container);
+                        ulong entityId = UMI3DSerializer.Read<ulong>(container);
+                        uint propertyKey = UMI3DSerializer.Read<uint>(container);
+                        await UMI3DEnvironmentLoader.SetEntity(operationId, entityId, propertyKey, container);
                     }
-                    else
+                    else if (!await Operation(operationId, container))
                         await UMI3DEnvironmentLoader.Parameters.UnknownOperationHandler(operationId, container);
                     break;
             }
