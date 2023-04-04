@@ -14,8 +14,10 @@ limitations under the License.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using umi3d.cdk.menu;
 using umi3dVRBrowsersBase.interactions;
+using umi3dVRBrowsersBase.ui.displayers;
 
 namespace umi3dVRBrowsersBase.ui.playerMenu
 {
@@ -61,8 +63,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <param name="item"></param>
         public void AddParameter(ControllerType controller, AbstractMenuItem item, Action callbackOnDesynchronize)
         {
-            if (isAsync)
-                return;
+            if (isAsync) return;
 
             if (parameters.Count == 0) InitFields();
 
@@ -79,13 +80,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         /// <param name="item"></param>
         public void RemoveParameter(ControllerType controller, AbstractMenuItem item)
         {
-            if (isAsync)
-                return;
+            if (isAsync) return;
 
-            if (parameters.Count == 0)
-            {
-                InitFields();
-            }
+            if (parameters.Count == 0) InitFields();
 
             parameters[controller].Remove(item);
         }
@@ -105,9 +102,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             if (isAsync)
             {
                 foreach (var item in cachedParameters[controller].Values)
-                {
                     menuDisplayManager.menu.Add(item);
-                }
             }
             else
             {
@@ -118,6 +113,9 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             }
 
             menuDisplayManager.Display(true);
+
+            if (HasOnlyOneTextInput(out StringInputMenuItemDisplayerEnvironment input))
+                input.inputField.OnSelect(null);
         }
 
         public void Remember()
@@ -145,10 +143,8 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
             base.Close();
             menuDisplayManager.Hide();
             menuDisplayManager.menu.RemoveAll();
-            if (isAsync)
-                isAsync = false;
-            foreach (var callback in cachedCallbacks.Values)
-                callback();
+            if (isAsync) isAsync = false;
+            foreach (var callback in cachedCallbacks.Values) callback();
             cachedCallbacks.Clear();
             foreach (var controllerKey in cachedParameters.Keys)
                 cachedParameters[controllerKey].Clear();
@@ -161,6 +157,20 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
         public void SetToolName(string toolName)
         {
             menuDisplayManager.menu.Name = toolName;
+        }
+
+        /// <summary>
+        /// Whether or not the menu display only one textInput. If that's the case <paramref name="input"/> will be set, else null.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public bool HasOnlyOneTextInput(out StringInputMenuItemDisplayerEnvironment input)
+        {
+            var inputs = GetComponentsInChildren<StringInputMenuItemDisplayerEnvironment>();
+            if (inputs.Length == 0) input = null;
+            else input = inputs[0];
+
+            return input != null;
         }
 
         #endregion

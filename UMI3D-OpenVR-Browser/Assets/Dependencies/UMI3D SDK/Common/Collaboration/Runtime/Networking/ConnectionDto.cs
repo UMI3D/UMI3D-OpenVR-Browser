@@ -22,9 +22,19 @@ namespace umi3d.common.collaboration
     public class ConnectionDto : UMI3DDto
     {
         /// <summary>
+        /// String that state the langue of a user.
+        /// </summary>
+        public string language;
+
+        /// <summary>
         /// Globaltoken previously used in the media the client want to connect to.
         /// </summary>
         public string globalToken;
+
+        /// <summary>
+        /// metaData previously used in the media the client want to connect to.
+        /// </summary>
+        public byte[] metadata;
 
         /// <summary>
         /// Gate data to help the environment where to redirect the user.

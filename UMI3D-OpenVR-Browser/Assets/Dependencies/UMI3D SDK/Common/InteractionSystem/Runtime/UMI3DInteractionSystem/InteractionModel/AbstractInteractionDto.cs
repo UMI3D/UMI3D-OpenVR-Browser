@@ -20,7 +20,7 @@ namespace umi3d.common.interaction
     /// Abstract DTO to describe an interaction
     /// </summary>
     [System.Serializable]
-    public abstract class AbstractInteractionDto : AbstractEntityDto
+    public abstract class AbstractInteractionDto : AbstractEntityDto, IEntity
     {
         /// <summary>
         /// Name of the interaction
@@ -41,5 +41,11 @@ namespace umi3d.common.interaction
         /// 3D Icon that can be used to display the interaction
         /// </summary>
         public ResourceDto icon3D;
+
+        /// <summary>
+        /// Id of the ui to link to this interaction if any. 
+        /// Default is 0;
+        /// </summary>
+        public ulong uiLinkId; 
     }
 }

@@ -69,7 +69,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
 
         [Tooltip("Class which handle parameter edition")]
         [SerializeField]
-        private ToolParametersMenu toolParametersMenu;
+        public ToolParametersMenu toolParametersMenu;
 
         [Tooltip("Class which handle action bindings")]
         [SerializeField]

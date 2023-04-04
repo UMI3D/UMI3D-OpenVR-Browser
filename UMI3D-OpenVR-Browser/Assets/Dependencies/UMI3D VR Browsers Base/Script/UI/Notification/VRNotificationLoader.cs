@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System.Threading.Tasks;
 using umi3d.cdk;
 using umi3d.common;
 using umi3dVRBrowsersBase.ui.watchMenu;
@@ -41,19 +42,44 @@ namespace umi3dVRBrowsersBase.ui.notification
 
         #endregion
 
-        #region Methods
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="dto"></param>
-        public override void Load(NotificationDto dto)
+        public override AbstractLoader GetNotificationLoader()
         {
+            return new VrInternalNotificationLoader(this);
+        }
+
+        public AbstractNotification InstantiatePrefab(bool is3D)
+        {
+            if (is3D)
+            {
+                return Instantiate(notification3DPrefab);
+            }
+            else
+            {
+                return Instantiate(notificationPrefab);
+            }
+        }
+
+    }
+
+    public class VrInternalNotificationLoader : InternalNotificationLoader
+    {
+        public VRNotificationLoader loader;
+
+        public VrInternalNotificationLoader(VRNotificationLoader loader)
+        {
+            this.loader = loader;
+        }
+
+        public override async Task ReadUMI3DExtension(ReadUMI3DExtensionData value)
+        {
+            await base.ReadUMI3DExtension(value);
+            var dto = value.dto as NotificationDto;
             AbstractNotification notification;
 
             if (dto is NotificationOnObjectDto notificationOnObjectDto)
             {
-                notification = Instantiate(notification3DPrefab);
+                notification = loader.InstantiatePrefab(true);
 
                 UMI3DNodeInstance obj = UMI3DEnvironmentLoader.GetNode(notificationOnObjectDto.objectId);
 
@@ -67,7 +93,7 @@ namespace umi3dVRBrowsersBase.ui.notification
                 Debug.LogError("TODO : only display notification in one watch");
                 foreach (WatchMenu watch in WatchMenu.instances)
                 {
-                    notification = Instantiate(notificationPrefab);
+                    notification = loader.InstantiatePrefab(false);
                     notification.SetParent(watch.notificationContainer, Vector3.zero, Quaternion.identity);
 
                     notification.Init(dto);
@@ -75,7 +101,6 @@ namespace umi3dVRBrowsersBase.ui.notification
                 }
             }
         }
-
-        #endregion
     }
+
 }

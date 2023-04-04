@@ -175,6 +175,13 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             EnvironmentSettings.Instance.avatarSetting.OnValueChanged.AddListener(setAvatarButton.Toggle);
             PlayerMenuManager.Instance.onMenuClose.AddListener(() => { if (playerMenuButton.IsOn) playerMenuButton.Toggle(false);  });
             PlayerMenuManager.Instance.onMenuOpen.AddListener(() => { if (!playerMenuButton.IsOn) playerMenuButton.Toggle(true); });
+
+            EmoteMenu.EmoteButtonStatusChanged += value =>
+            {
+                pinMenuButton.Toggle(value);
+                IsOpen = value;
+            };
+
             SetMicStatus(false);
         }
 
@@ -187,7 +194,9 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         public override void Open()
         {
             base.Open();
-            menuDisplayManager.Display(true);
+            //menuDisplayManager.Display(true);
+            EmoteMenu.Instance.Display();
+            UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"open");
         }
 
         /// <summary>
@@ -196,7 +205,9 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
         public override void Close()
         {
             base.Close();
-            menuDisplayManager.Hide();
+            //menuDisplayManager.Hide();
+            EmoteMenu.Instance.Hide();
+            UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"close");
         }
 
         /// <summary>

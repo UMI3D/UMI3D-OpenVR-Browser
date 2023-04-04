@@ -103,7 +103,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         /// <param name="form"></param>
         /// <param name="callback"></param>
-        private void GetParameterDtos(FormDto form, Action<FormAnswerDto> callback)
+        private void GetParameterDtos(ConnectionFormDto form, Action<FormAnswerDto> callback)
         {
             FormAsker.Instance.Display(form, callback);
         }

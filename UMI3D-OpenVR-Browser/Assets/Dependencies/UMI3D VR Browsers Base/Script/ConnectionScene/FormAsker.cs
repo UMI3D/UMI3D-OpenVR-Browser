@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using inetum.unityUtils;
+using System;
 using System.Collections.Generic;
 using umi3d.cdk.collaboration;
 using umi3d.cdk.menu;
@@ -62,7 +63,7 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         /// <param name="form"></param>
         /// <param name="callback"></param>
-        public void Display(FormDto form, System.Action<FormAnswerDto> callback)
+        public void Display(ConnectionFormDto form, System.Action<FormAnswerDto> callback)
         {
             ConnectionMenuManager.instance.keyboard.Hide();
 
@@ -100,7 +101,7 @@ namespace umi3dVRBrowsersBase.connection
                 }
 
                 var send = new EventMenuItem() { Name = "Join", hold = false };
-                UnityAction<bool> action = (bool b) =>
+                Action<bool> action = (bool b) =>
                 {
                     Hide();
                     ConnectionMenuManager.instance.keyboard.Hide();
@@ -153,7 +154,7 @@ namespace umi3dVRBrowsersBase.connection
         /// Displays the content of a <see cref="FormDto"/> within Unity console.
         /// </summary>
         /// <param name="form"></param>
-        private void DebugForm(FormDto form)
+        private void DebugForm(ConnectionFormDto form)
         {
             if (form != null && form.fields != null)
                 foreach (AbstractParameterDto dto in form.fields)

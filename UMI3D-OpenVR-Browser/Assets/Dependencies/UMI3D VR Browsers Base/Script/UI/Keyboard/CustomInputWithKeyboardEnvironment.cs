@@ -17,6 +17,7 @@ limitations under the License.
 using System;
 using System.Collections;
 using umi3dVRBrowsersBase.interactions;
+using umi3dVRBrowsersBase.ui.displayers;
 using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -62,7 +63,18 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <param name="editionCallback"></param>
         public void SetEditionCallback(Action<string> editionCallback)
         {
-            this.editionCallback = (res) => { editionCallback?.Invoke(res); PlayerMenuManager.Instance.gameObject.SetActive(true); StartCoroutine(UnSelectAllSelectable()); PlayerMenuManager.Instance.RefreshBackground(); };
+            this.editionCallback = (res) => 
+            { 
+                editionCallback?.Invoke(res);
+                PlayerMenuManager.Instance.gameObject.SetActive(true);
+                StartCoroutine(UnSelectAllSelectable());
+                PlayerMenuManager.Instance.RefreshBackground();
+                if (PlayerMenuManager.Instance.CtrlToolMenu.toolParametersMenu.HasOnlyOneTextInput(out StringInputMenuItemDisplayerEnvironment input))
+                {
+                    PlayerMenuManager.Instance.CtrlToolMenu.toolParametersMenu.Close();
+                    PlayerMenuManager.Instance.Close();
+                }
+            };
         }
 
         /// <summary>
@@ -89,8 +101,13 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
                 keyboard.OpenKeyboard(this.text, editionCallback, () => {
                     PlayerMenuManager.Instance.gameObject.SetActive(true);
-                    PlayerMenuManager.Instance.RefreshBackground();
                     StartCoroutine(UnSelectAllSelectable());
+                    PlayerMenuManager.Instance.RefreshBackground();
+                    if (PlayerMenuManager.Instance.CtrlToolMenu.toolParametersMenu.HasOnlyOneTextInput(out StringInputMenuItemDisplayerEnvironment input))
+                    {
+                        PlayerMenuManager.Instance.CtrlToolMenu.toolParametersMenu.Close();
+                        PlayerMenuManager.Instance.Close();
+                    }
                 }, playerMenuTransform.position, playerMenuTransform.forward);
 
                 currentController = PlayerMenuManager.Instance.CurrentController;

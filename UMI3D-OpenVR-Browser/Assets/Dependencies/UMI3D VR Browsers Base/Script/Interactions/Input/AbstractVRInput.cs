@@ -38,6 +38,12 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// </summary>
         public uint boneType;
 
+        [HideInInspector]
+        /// <summary>
+        /// Avatar bone transform linked to this input.
+        /// </summary>
+        public Transform boneTransform;
+
         /// <summary>
         /// If associated to a tool, its id.
         /// </summary>
@@ -59,6 +65,7 @@ namespace umi3dVRBrowsersBase.interactions.input
             if (controller is VRController vrController)
             {
                 boneType = vrController.bone.boneType;
+                boneTransform = vrController.bone.transform;
             } else
             {
                 Debug.LogError("Internal error, controllers must be VRController");

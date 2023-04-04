@@ -106,7 +106,7 @@ namespace umi3dVRBrowsersBase.connection
                             if (b)
                             {
                                 lib.applications.Remove(app.Key);
-                                UMI3DResourcesManager.RemoveLibrary(lib.key);
+                                UMI3DResourcesManager.RemoveLibrary(lib.library);
                                 UpdateContent();
                             }
                         });

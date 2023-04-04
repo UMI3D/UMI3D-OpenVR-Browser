@@ -43,7 +43,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             Project(interactionTool, interactable.Interactable.dto.id, controller);
 
             // display the parameter gear if it is required to access the interactions
-            if (interactable.Interactable.interactions.FindAll(i => i is AbstractParameterDto).Count > 0)
+            if (interactable.Interactable.interactions.FindAll(i => i.Result is AbstractParameterDto).Count > 0)
             {
                 PlayerMenuManager.Instance.parameterGear.Display(interactable, controller.transform.position);
                 PlayerMenuManager.Instance.CtrlToolMenu.RememberParameters();
