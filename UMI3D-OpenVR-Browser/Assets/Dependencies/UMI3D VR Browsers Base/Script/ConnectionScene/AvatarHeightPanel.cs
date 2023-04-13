@@ -55,16 +55,19 @@ namespace umi3dVRBrowsersBase.connection
 
         private void Start()
         {
-            validateButton.onClick.AddListener(() =>
-            {
-                SetUpAvatarHeight setUp = GameObject.FindObjectOfType<SetUpAvatarHeight>();
-                Debug.Assert(setUp != null, "No avatar found to set up height. Should not happen");
-                setUp.objectsToActivate = objectsToActivate;
-                StartCoroutine(setUp.SetUpAvatar());
-                Hide();
-                validationCallBack?.Invoke();
-                isSetup = true;
-            });
+            validateButton.onClick.AddListener(ValidateButtonClicked);
+        }
+
+        [ContextMenu("Set Avatar Height")]
+        void ValidateButtonClicked()
+        {
+            SetUpAvatarHeight setUp = GameObject.FindObjectOfType<SetUpAvatarHeight>();
+            Debug.Assert(setUp != null, "No avatar found to set up height. Should not happen");
+            setUp.objectsToActivate = objectsToActivate;
+            StartCoroutine(setUp.SetUpAvatar());
+            Hide();
+            validationCallBack?.Invoke();
+            isSetup = true;
         }
 
         /// <summary>

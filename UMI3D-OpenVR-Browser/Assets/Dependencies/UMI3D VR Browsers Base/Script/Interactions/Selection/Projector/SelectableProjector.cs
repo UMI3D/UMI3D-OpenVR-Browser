@@ -21,8 +21,8 @@ using UnityEngine.UI;
 namespace umi3dBrowsers.interaction.selection.projector
 {
     /// <summary>
-    /// Projector for Selectable.
-    /// Identifies the Selectable type and interact with it.
+    /// Projector for UI Selectable.
+    /// Identifies the Selectable type and interacts with it.
     /// </summary>
     /// /// Does not really projects the UMI3D interactions but act like it is projecting the client own's interactions.
     public class SelectableProjector : IProjector<Selectable>
@@ -44,7 +44,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             if (selectable != null) //protects against cases when UI element is destroyed but not deselected
             {
                 selectable.OnPointerExit(pointerEventData);
-                if(!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
+                if (!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
         }

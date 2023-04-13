@@ -196,7 +196,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             base.Open();
             //menuDisplayManager.Display(true);
             EmoteMenu.Instance.Display();
-            UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"open");
         }
 
         /// <summary>
@@ -207,7 +206,6 @@ namespace umi3dVRBrowsersBase.ui.watchMenu
             base.Close();
             //menuDisplayManager.Hide();
             EmoteMenu.Instance.Hide();
-            UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"close");
         }
 
         /// <summary>

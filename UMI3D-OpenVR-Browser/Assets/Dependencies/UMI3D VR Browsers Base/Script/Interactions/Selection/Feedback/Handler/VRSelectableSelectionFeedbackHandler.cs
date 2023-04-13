@@ -27,7 +27,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
     /// </summary>
     public class VRSelectableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<Selectable>
     {
-        [SerializeField]
+        [SerializeField, Tooltip("Haptic feedback to trigger when selection occurs.")]
         private AbstractVRHapticSelectionFeedback hapticFeedback;
 
         private AbstractPointingCursor pointingCursor;
@@ -54,9 +54,7 @@ namespace umi3dBrowsers.interaction.selection.feedback
                     pointingCursor.Display();
                     pointingCursor.ChangeAccordingToSelection(selectionData);
                 }
-                    
-                //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
-                //    grabCursor.ChangeAccordingToSelection(selectionData);
+                // no support for proximity selection of UI selectables
                 isRunning = true;
             }
         }
@@ -75,13 +73,9 @@ namespace umi3dBrowsers.interaction.selection.feedback
                 {
                     pointingCursor.ChangeAccordingToSelection(null);
                 }
-                    
-                //else if (selectionDataTyped.detectionOrigin == DetectionOrigin.PROXIMITY)
-                //    grabCursor.ChangeAccordingToSelection(null);
+                // no support for proximity selection of UI selectables
                 isRunning = false;
             }
         }
     }
-
-
 }

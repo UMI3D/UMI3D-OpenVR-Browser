@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   deactivationRequesters: 
-  selectionFeedbackHandler: {fileID: 0}
+  selectionFeedbackHandler: {fileID: 1344738551367691293}
   pointingDetectors:
   - {fileID: 4984395139596033644}
   proximityDetectors:

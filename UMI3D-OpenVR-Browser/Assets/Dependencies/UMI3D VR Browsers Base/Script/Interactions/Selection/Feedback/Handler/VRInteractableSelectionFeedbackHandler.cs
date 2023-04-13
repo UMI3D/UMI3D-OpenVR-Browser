@@ -27,10 +27,10 @@ namespace umi3dBrowsers.interaction.selection.feedback
     /// </summary>
     public class VRInteractableSelectionFeedbackHandler : AbstractSelectionFeedbackHandler<InteractableContainer>
     {
-        [SerializeField]
+        [SerializeField, Tooltip("Haptic feedback to trigger when selection occurs.")]
         private AbstractVRHapticSelectionFeedback hapticFeedback;
 
-        [SerializeField]
+        [SerializeField, Tooltip("Hihlight feedback effect to trigger when selection occurs.")]
         private VROutlineRenderSelectionFeedback highlightFeedback;
 
         private AbstractPointingCursor pointingCursor;

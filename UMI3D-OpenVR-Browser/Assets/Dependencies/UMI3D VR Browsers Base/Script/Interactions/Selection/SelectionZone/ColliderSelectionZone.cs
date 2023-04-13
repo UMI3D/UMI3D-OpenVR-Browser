@@ -61,7 +61,8 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             ObjectInsideCollider<T> closestObj = objectsInZone[0];
             float minDist = float.MaxValue;
 
-            foreach (ObjectInsideCollider<T> obj in objectsInZone) //just looking for the closest one
+            // looking for the closest object in zone
+            foreach (ObjectInsideCollider<T> obj in objectsInZone)
             {
                 float distance = Vector3.Distance(handler.transform.position, obj.collider.ClosestPoint(handler.transform.position));
                 if (distance < minDist && distance > 0)
@@ -81,12 +82,20 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
     /// <typeparam name="T"></typeparam>
     public struct ObjectInsideCollider<T> where T : Component
     {
+        /// <summary>
+        /// Object to consider within the collider
+        /// </summary>
         public T obj;
+
+        /// <summary>
+        /// Reference to the collider of the object
+        /// </summary>
         public Collider collider;
+
         /// <summary>
         /// True when the convex property has been overriden to true.
         /// </summary>
-        /// To use <see cref="Collider.ClosestPoint(Vector3)"/> meshes are required to be convex, objects inside collider are then all convexes. 
+        /// To use <see cref="Collider.ClosestPoint(Vector3)"/> meshes are required to be convex, objects inside collider are then all convexes.
         /// Een if thickness is very low. Overriding the convex property results in a low thickness added by the engine.
         public bool hasRequiredConvexOverride;
     }

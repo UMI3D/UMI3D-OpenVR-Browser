@@ -114,7 +114,7 @@ namespace umi3dVRBrowsersBase.interactions
         public override bool IsCompatibleWith(AbstractTool tool)
         {
             return tool.interactionsLoaded.TrueForAll(inter =>
-                (inter is ManipulationDto ) ?
+                (inter is ManipulationDto) ?
                 (inter as ManipulationDto).dofSeparationOptions.Exists(
                     group => !group.separations.Exists(
                         dof => (dof.dofs == DofGroupEnum.X_RX) || (dof.dofs == DofGroupEnum.Y_RY) || (dof.dofs == DofGroupEnum.Z_RZ)))
