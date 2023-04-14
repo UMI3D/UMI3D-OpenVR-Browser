@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.10229354, g: 0.5479767, b: 0.5781661, a: 1}
+  m_IndirectSpecularColor: {r: 0.06994623, g: 0.06994623, b: 0.06994623, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1239,7 +1239,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 27.813686, y: 20.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -6499,7 +6499,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 4.31, y: 20.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -7466,7 +7466,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 21.27, y: 20.480682}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -9979,7 +9979,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 14.58, y: 20.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -10443,7 +10443,6 @@ MonoBehaviour:
   info: {fileID: 865823935}
   accept: {fileID: 2137746678}
   deny: {fileID: 1620065175}
-  Background: {fileID: 408117372}
 --- !u!1 &1147884966
 GameObject:
   m_ObjectHideFlags: 0
@@ -11414,7 +11413,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   containerPrefabs:
-  - {fileID: 1253850770}
+  - {fileID: 0}
   exceptions:
     keys: []
     values: []
@@ -11440,12 +11439,12 @@ MonoBehaviour:
   firstContainerInScene: 1
   containerSelector: {fileID: 1289773913}
   DisplayerPrefab:
-  - {fileID: 6652662328574254241, guid: 018d052a0a0596c48bb9a90f6d2fa249, type: 3}
-  - {fileID: 5348143446619856440, guid: acb3616bd7e3c90449db9892ae28defa, type: 3}
-  - {fileID: 9019132511487808674, guid: e956c5724799d644e8820bba4928fc84, type: 3}
-  - {fileID: 2027875620967027377, guid: 60f6eef9777acd540b7c486a88866189, type: 3}
-  - {fileID: 8801934974886613111, guid: 0a450d39278e62a4bb0e7deae618d3a1, type: 3}
-  - {fileID: 7851029036041233532, guid: f35966682b89ab241933f255b449a611, type: 3}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   onDisplay:
     m_PersistentCalls:
       m_Calls:
@@ -13084,7 +13083,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 14.85, y: 20.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -14255,7 +14254,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.012111254, y: -0.00030517578}
+  m_AnchoredPosition: {x: -0.0014353432, y: -0.00030517578}
   m_SizeDelta: {x: 0, y: 705}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1596876374
@@ -17254,7 +17253,6 @@ MonoBehaviour:
   objectToHideWhenLoading:
   - {fileID: 221180306}
   - {fileID: 2105915454}
-  Background: {fileID: 408117372}
 --- !u!1 &1973976949
 GameObject:
   m_ObjectHideFlags: 0
@@ -17917,7 +17915,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 32, y: 20.484375}
+  m_Size: {x: 27.813686, y: 20.48}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

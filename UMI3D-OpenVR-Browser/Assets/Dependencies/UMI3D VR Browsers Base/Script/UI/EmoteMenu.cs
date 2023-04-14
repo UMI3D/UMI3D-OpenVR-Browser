@@ -59,7 +59,7 @@ namespace umi3dVRBrowsersBase.ui
         {
             Canvas = new Canvas_C();
             Background = new Color_C() { Color = new Color(0.5215687f, 0.7686275f, 0.7686275f) };
-            
+
             WindowName = new Text_C("Reactions");
             var windowNameSize = Background.RectT.sizeDelta;
             windowNameSize /= 1.5f;
@@ -121,8 +121,16 @@ namespace umi3dVRBrowsersBase.ui
             if (EventSystem.current == null) UnityEngine.Debug.LogError($"Event System null.");
             Canvas.Scale = .005f;
             Hide();
+        }
 
+        private void OnEnable()
+        {
             EmoteManager.Instance.EmotesLoaded += EmoteConfigReceived;
+        }
+
+        private void OnDisable()
+        {
+            EmoteManager.Instance.EmotesLoaded -= EmoteConfigReceived;
         }
 
         protected void EmoteConfigReceived(List<Emote> emotes)
@@ -141,14 +149,14 @@ namespace umi3dVRBrowsersBase.ui
         public void Hide()
         {
             Canvas.Go.SetActive(false);
-            EmoteButtonStatusChanged.Invoke(false);
+            EmoteButtonStatusChanged?.Invoke(false);
         }
         [ContextMenu("Display")]
         public void Display()
         {
             Canvas.Go.SetActive(true);
             UpdateCanvasPosition();
-            EmoteButtonStatusChanged.Invoke(true);
+            EmoteButtonStatusChanged?.Invoke(true);
         }
 
         [ContextMenu("Look")]

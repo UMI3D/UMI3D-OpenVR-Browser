@@ -61,6 +61,12 @@ namespace umi3dVRBrowsersBase.connection
         {
             LoadingPanel.Instance.HideLoadingScreen();
             LoadingPanel.Instance.Hide();
+            // Fix for Laval
+            UnityEngine.Debug.Log("<color=red>For Laval: </color>" + $"To be updated");
+            callback(true);
+            return;
+
+
             LoadingPanel.Instance.DisplayObjectHidden();
             panel.SetActive(true);
             accept.onClick.RemoveAllListeners();

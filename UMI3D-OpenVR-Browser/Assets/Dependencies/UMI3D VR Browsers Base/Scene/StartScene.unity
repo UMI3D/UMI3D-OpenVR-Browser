@@ -15,7 +15,7 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 9
   m_Fog: 1
-  m_FogColor: {r: 0.18823531, g: 0.5019608, b: 0.50980395, a: 1}
+  m_FogColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
   m_FogMode: 2
   m_FogDensity: 0.005
   m_LinearFogStart: 0
@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.103149794, g: 0.53662056, b: 0.5659186, a: 1}
+  m_IndirectSpecularColor: {r: 0.06994623, g: 0.06994623, b: 0.06994623, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -152,9 +152,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3529d90292777b34c9ef2658994f5e4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  onLibrariesDownloaded:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!4 &320294113
 Transform:
   m_ObjectHideFlags: 0
@@ -260,7 +257,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _logScope: -1
-  _logLevel: 14
+  _logLevel: -1
   logPath: 
   log: 0
   infoPath: 

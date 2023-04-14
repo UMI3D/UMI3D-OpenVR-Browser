@@ -10,19 +10,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 using UnityEngine;
 
 namespace umi3dBrowsers.interaction.selection.feedback
 {
+    /// <summary>
+    /// Abstract class for haptic selection feedback.
+    /// </summary>
     public abstract class AbstractVRHapticSelectionFeedback : MonoBehaviour, IInstantaneousFeedback
     {
+        /// <summary>
+        /// Haptic settings for selection feedback.
+        /// </summary>
         public HapticSettings settings;
 
+        /// <summary>
+        /// Container for haptic chain of pulses parameters.
+        /// </summary>
         [System.Serializable]
         public struct HapticSettings
         {
+            [Tooltip("Duration of the chain of pulses in seconds.")]
             public float duration;
+
+            [Tooltip("Frequency of pulses in the chain.")]
             public float frequency;
+
+            [Tooltip("Amplitude of the pulse. An higher value will result in a stronger vibration.")]
             public float amplitude;
         }
 

@@ -144,7 +144,18 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         {
             controller = GetComponentInParent<VRSelectionManager>().controller; //controller is required before awake
             base.Awake();
-            UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
+        }
+
+        private void OnEnable()
+        {
+            if (UMI3DCollaborationClientServer.Exists)
+                UMI3DCollaborationClientServer.Instance.OnRedirection.AddListener(OnEnvironmentLeave);
+        }
+
+        private void OnDisable()
+        {
+            if (UMI3DCollaborationClientServer.Exists)
+                UMI3DCollaborationClientServer.Instance.OnRedirection.RemoveListener(OnEnvironmentLeave);
         }
 
         protected virtual void Update()
@@ -308,7 +319,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         }
 
         /// <summary>
-        /// Create an appropriate selection intent data.
+        /// Create an appropriate selection intent data container
+        /// used to keep track of the detection occurence in the selection process.
         /// </summary>
         /// <param name="obj">Object that is selection intent target.</param>
         /// <param name="origin">Paradigm of selection used.</param>
@@ -373,9 +385,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <param name="selectionInfo"></param>
         protected virtual void Select(SelectionIntentData<T> selectionInfo)
         {
+            //the selector was selecting something before
             if (isSelecting)
             {
-                if (selectionInfo == null && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
+                if (selectionInfo == null && LastSelected != null) //the selector should remember it choose to select nothing this time
                 {
                     Deselect(LastSelected);
                     LastSelected = null;
@@ -389,7 +402,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     if (PlayerMenuManager.Instance.parameterGear.IsDisplayed)
                         PlayerMenuManager.Instance.parameterGear.Hide();
                 }
-
             }
 
             projector.Project(selectionInfo.selectedObject, controller);

@@ -41,6 +41,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
 
         protected void FixedUpdate()
         {
+            // looks for all objects that do not match anymore the conditions to be considered
             var objectsToRemove = new List<ObjectInsideCollider<T>>();
             foreach (ObjectInsideCollider<T> obj in ObjectsInCollider)
             {
@@ -53,13 +54,14 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                     objectsToRemove.Add(obj);
                 }
             }
+
+            // remove them from the list of considered objects
             foreach (var obj in objectsToRemove)
             {
                 if (obj.hasRequiredConvexOverride)
-                    (obj.collider as MeshCollider).convex = false;
+                    (obj.collider as MeshCollider).convex = false; // back to normal mesh if overriden
                 ObjectsInCollider.Remove(obj);
             }
-
         }
 
         protected virtual void OnTriggerEnter(Collider other)
@@ -68,6 +70,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             if (neighbour == null)
                 neighbour = other.GetComponentInParent<T>();
 
+            // when a satisfying object T enters the collider, add it to the considered objects
             if (neighbour != null && neighbour.isActiveAndEnabled)
             {
                 if (!ObjectsInCollider.Exists(x => x.obj == neighbour))
@@ -95,6 +98,7 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
             if (neighbour == null)
                 neighbour = other.GetComponentInParent<T>();
 
+            // when an object T exits the collider, remove it from the considered objects
             if (neighbour != null)
             {
                 var objToRemove = ObjectsInCollider
@@ -106,7 +110,6 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
                     ObjectsInCollider.Remove(obj);
                 }
             }
-
         }
     }
 }

@@ -163,7 +163,7 @@ namespace umi3dVRBrowsersBase.connection
 
                 Vector3 virtualNeckPosition = OVRAnchor.TransformPoint(neckOffset);
 
-                transform.position = new Vector3(virtualNeckPosition.x, 0, virtualNeckPosition.z);
+                transform.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
 
                 skeletonContainer.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
 
