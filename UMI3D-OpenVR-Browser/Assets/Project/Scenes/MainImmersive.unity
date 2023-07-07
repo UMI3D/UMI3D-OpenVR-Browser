@@ -545,7 +545,7 @@ PrefabInstance:
     - target: {fileID: 5988314907380347006, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.0009851996
+      value: -0.0000039342212
       objectReference: {fileID: 0}
     - target: {fileID: 6093459749334264534, guid: 6d8cc188ac4cb49419e2616ed25f607d,
         type: 3}
@@ -853,6 +853,16 @@ PrefabInstance:
       propertyPath: lasers.Array.data[1]
       value: 
       objectReference: {fileID: 4810254922228200030}
+    - target: {fileID: 3542380241650242426, guid: 1a064008d5464ad4980d813a969780e8,
+        type: 3}
+      propertyPath: m_Cameras.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3542380241650242426, guid: 1a064008d5464ad4980d813a969780e8,
+        type: 3}
+      propertyPath: m_Cameras.Array.data[0]
+      value: 
+      objectReference: {fileID: 455919743}
     - target: {fileID: 4006740988216154192, guid: 1a064008d5464ad4980d813a969780e8,
         type: 3}
       propertyPath: selectionOutlineLayer.m_Bits
