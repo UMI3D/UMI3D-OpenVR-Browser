@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using inetum.unityUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,21 +66,21 @@ namespace umi3d.cdk
 
             public static Library? GetLibrary(string idVersion)
             {
-                return idVersion == null ? (Library?)null : new Library(idVersion); 
+                return idVersion == null ? (Library?)null : new Library(idVersion);
             }
 
             public override bool Equals(object obj)
             {
-                if(obj is Library lib)
+                if (obj is Library lib)
                     return id.Equals(lib.id) && version.Equals(lib.version);
                 return false;
             }
 
-            public static bool operator == (Library a, Library b)
+            public static bool operator ==(Library a, Library b)
                 => a.Equals(b);
 
             public static bool operator !=(Library a, Library b)
-                =>  !a.Equals(b);
+                => !a.Equals(b);
 
         }
 
@@ -353,11 +354,25 @@ namespace umi3d.cdk
                 this.authorization = ComputeAuthorization(authorization);
             }
 
+            public ObjectData(string url, string extension, string authorization, ulong entityId, Library library)
+            {
+                Debug.Log(entityId);
+                value = null;
+                entityIds = new HashSet<ulong>() { entityId };
+                libraryIds = new HashSet<Library>() { library };
+                state = Estate.NotLoaded;
+                downloadedPath = null;
+                this.url = url;
+                this.extension = extension;
+                a = rx.Match(url);
+                this.authorization = ComputeAuthorization(authorization);
+            }
+
             public ObjectData(string url, string extension, string authorization, Library library, string downloadedPath, string fileRelativePath)
             {
                 value = null;
                 entityIds = new HashSet<ulong>();
-                libraryIds = new HashSet<Library>(){ library };
+                libraryIds = new HashSet<Library>() { library };
                 state = Estate.NotLoaded;
                 this.downloadedPath = downloadedPath;
                 this.url = url;
@@ -478,12 +493,12 @@ namespace umi3d.cdk
             else
                 CacheCollection = new List<ObjectData>();
 
-            foreach (var item in subModelsCache.Values)
+            foreach (var item in NsubModelsCache.Values)
             {
                 item.Destroy();
             }
-
-            subModelsCache = NsubModelsCache;
+            NsubModelsCache.Clear();
+            Resources.UnloadUnusedAssets();
 
             StopAllCoroutines();
             libraries = new Dictionary<Library, KeyValuePair<DataFile, HashSet<ulong>>>();
@@ -554,22 +569,22 @@ namespace umi3d.cdk
             if (lib.Key != null && SceneId != 0)
                 lib.Value.Add(SceneId);
 
-            var downloaded = Instance.CacheCollection.Where((od) => { return od.state == ObjectData.Estate.NotLoaded && od.libraryIds.Any(c => c == library ); }).
+            var downloaded = Instance.CacheCollection.Where((od) => { return od.state == ObjectData.Estate.NotLoaded && od.libraryIds.Any(c => c == library); }).
                 Select(async pair =>
                 {
-                    
+
                     try
                     {
                         string extension = System.IO.Path.GetExtension(pair.url);
                         IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(extension);
-                        
+
                         if (loader != null)
                         {
                             await LoadFile(pair.entityIds.First(), pair, loader);
 
                         }
                     }
-                    catch(Exception e) { Debug.LogException(e); }
+                    catch (Exception e) { Debug.LogException(e); }
                 }).ToList();
             await Task.WhenAll(downloaded);
         }
@@ -577,7 +592,7 @@ namespace umi3d.cdk
 
         public static async Task LoadLibraries(List<string> ids, Progress progress)
         {
-            await LoadLibraries( ids.Select(id => Library.GetLibrary(id).Value).ToList(), progress);
+            await LoadLibraries(ids.Select(id => Library.GetLibrary(id).Value).ToList(), progress);
         }
 
         /// <summary>
@@ -615,6 +630,7 @@ namespace umi3d.cdk
                             if (id == null)
                                 throw new Exception("id should never be null");
                             var obj = await LoadFile(id ?? 0, data, loader);
+                            Debug.Log("load " + data.libraryIds.ToString(l => l.id) + " " + data.url);
                         }
                         progress.AddComplete();
                     }
@@ -725,7 +741,7 @@ namespace umi3d.cdk
             {
                 return await _UrlToObject1(loader, path, extension, objectData.authorization, bundlePath);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 var code = (e as Umi3dNetworkingException)?.errorCode ?? 0;
                 if (!await UMI3DClientServer.Instance.TryAgainOnHttpFail(
@@ -741,7 +757,7 @@ namespace umi3d.cdk
             return await UrlToObjectWithPolicy(path, extension, objectData, bundlePath, loader, ShouldTryAgain, tryCount + 1);
         }
 
-        protected virtual async Task<object> _UrlToObject1(IResourcesLoader loader ,string url, string extension, string authorization, string pathIfObjectInBundle, int count = 0)
+        protected virtual async Task<object> _UrlToObject1(IResourcesLoader loader, string url, string extension, string authorization, string pathIfObjectInBundle, int count = 0)
         {
             try
             {
@@ -754,22 +770,22 @@ namespace umi3d.cdk
                     throw;
             }
             await UMI3DAsyncManager.Delay(10000);
-            return await _UrlToObject1(loader ,url, extension, authorization, pathIfObjectInBundle, count + 1);
+            return await _UrlToObject1(loader, url, extension, authorization, pathIfObjectInBundle, count + 1);
         }
 
         private async Task<object> _LoadFile(ulong id, FileDto file, IResourcesLoader loader)
         {
             string fileName = System.IO.Path.GetFileName(file.url);
-
+            var library = Library.GetLibrary(file.libraryKey);
             Match matchUrl = ObjectData.rx.Match(file.url);
             ObjectData objectData = CacheCollection.Find((o) =>
             {
-                return o.MatchUrl(matchUrl, file.url, Library.GetLibrary(file.libraryKey));
+                return o.MatchUrl(matchUrl, file.url, library);
             });
 
             if (objectData == null)
             {
-                objectData = new ObjectData(file.url, file.extension, file.authorization, id);
+                objectData = (library == null) ? new ObjectData(file.url, file.extension, file.authorization, id) : new ObjectData(file.url, file.extension, file.authorization, id, library.Value);
                 CacheCollection.Insert(0, objectData);
             }
             return await _LoadFile(id, objectData, loader, file.pathIfInBundle);
@@ -916,8 +932,6 @@ namespace umi3d.cdk
                     RemoveLibrary(lib);
                 }
 
-                UnityEngine.Debug.Log($"{assetLibrary.id} {assetLibrary.version} add");
-
                 UMI3DLocalAssetDirectory variant = UMI3DEnvironmentLoader.Parameters.ChooseVariant(assetLibrary);
 
                 var bytes = await UMI3DClientServer.GetFile(Path.Combine(assetLibrary.baseUrl, variant.path), false);
@@ -942,7 +956,6 @@ namespace umi3d.cdk
                     SetData(data, directoryPath);
                 }
                 progress3.AddComplete();
-                UnityEngine.Debug.Log($"add end");
             }
             catch (Exception e)
             {
@@ -1056,15 +1069,10 @@ namespace umi3d.cdk
         private async Task DownloadFile(Library key, string directoryPath, string filePath, string url, string fileRelativePath, bool force = false)
         {
             Match matchUrl = ObjectData.rx.Match(url);
-            UnityEngine.Debug.Log($"find {url} {key.id} {key.version}");
             ObjectData objectData = force ? null : CacheCollection.Find((o) =>
             {
                 return o.MatchUrl(matchUrl, url, key);
             });
-
-            if (objectData != null)
-                foreach(var lib in objectData.libraryIds)
-                UnityEngine.Debug.Log($"<color=red>{lib.id} {lib.version} {lib == key}</color>");
 
             if (objectData != null)
             {
@@ -1086,7 +1094,7 @@ namespace umi3d.cdk
 
             UnityEngine.Debug.Log($"<color=green>{directoryPath} {filePath}</color>");
 
-            if (!Directory.Exists(directoryPath)) 
+            if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             File.WriteAllBytes(filePath, bytes);
         }
@@ -1189,6 +1197,7 @@ namespace umi3d.cdk
                 {
                     GameObject.Destroy(data.transform.gameObject);
                 }
+                datas.Clear();
             }
 
             private class SubmodelData
