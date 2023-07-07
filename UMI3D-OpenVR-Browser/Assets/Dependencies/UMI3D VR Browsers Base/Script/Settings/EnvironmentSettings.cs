@@ -52,6 +52,8 @@ namespace umi3dVRBrowsersBase.settings
         /// </summary>
         public MicSetting micSetting;
 
+        private SettingPreferences.AudioData Data;
+
         #endregion
 
         #region Methods
@@ -63,6 +65,30 @@ namespace umi3dVRBrowsersBase.settings
             audioSetting = new AudioSetting();
             avatarSetting = new AvatarSetting();
             micSetting = new MicSetting();
+
+            LinkWithBackEnd();
+        }
+
+        private void LinkWithBackEnd()
+        {
+            // Set settings saved
+            if (SettingPreferences.TryGetAudioData(out Data))
+            {
+                audioSetting.SetValue(Data.AudioOn);
+                micSetting.SetValue(Data.MicOn);
+            }
+
+            // Add listener to store data
+            audioSetting.OnValueChanged.AddListener(isOn =>
+            {
+                Data.AudioOn = isOn;
+                SettingPreferences.StoreAudioData(Data);
+            });
+            micSetting.OnValueChanged.AddListener(isOn =>
+            {
+                Data.MicOn = isOn;
+                SettingPreferences.StoreAudioData(Data);
+            });
         }
 
         protected void Start()

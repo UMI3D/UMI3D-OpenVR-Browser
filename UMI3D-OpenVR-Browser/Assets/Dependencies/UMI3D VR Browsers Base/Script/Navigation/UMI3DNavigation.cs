@@ -15,6 +15,8 @@ limitations under the License.
 */
 
 
+using UnityEngine;
+
 namespace umi3dVRBrowsersBase.navigation
 {
     /// <summary>
@@ -22,6 +24,9 @@ namespace umi3dVRBrowsersBase.navigation
     /// </summary>
     public class UMI3DNavigation : umi3d.cdk.AbstractNavigation
     {
+        [SerializeField]
+        Transform cameraTransform;
+
         /// <summary>
         /// Is player active ?
         /// </summary>
@@ -45,7 +50,17 @@ namespace umi3dVRBrowsersBase.navigation
         public override void Teleport(umi3d.common.TeleportDto data)
         {
             this.transform.position = data.position;
+            if (cameraTransform != null)
+            {
+                transform.Translate(Vector3.ProjectOnPlane(transform.position - cameraTransform.position, Vector3.up), Space.World);
+            }
             this.transform.rotation = data.rotation;
+
+            if (cameraTransform != null)
+            {
+                float angle = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up), Vector3.up);
+                this.transform.Rotate(0, -angle, 0);
+            }
         }
 
         /// <summary>
@@ -64,8 +79,18 @@ namespace umi3dVRBrowsersBase.navigation
             if (data.VehicleId == 0)
             {
                 this.transform.SetParent(umi3d.cdk.UMI3DEnvironmentLoader.Instance.transform, true);
+
                 this.transform.localPosition = data.position;
+                if (cameraTransform != null)
+                    transform.Translate(Vector3.ProjectOnPlane(transform.position - cameraTransform.position, Vector3.up), Space.World);
+
                 this.transform.localRotation = data.rotation;
+
+                if (cameraTransform != null)
+                {
+                    float angle = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up), Vector3.up);
+                    this.transform.Rotate(0, -angle, 0);
+                }
 
                 DontDestroyOnLoad(umi3d.cdk.UMI3DNavigation.Instance);
 
@@ -86,7 +111,16 @@ namespace umi3dVRBrowsersBase.navigation
 
                     this.transform.SetParent(vehicle.transform, true);
                     this.transform.localPosition = data.position;
+                    if (cameraTransform != null)
+                        transform.Translate(Vector3.ProjectOnPlane(transform.position - cameraTransform.position, Vector3.up), Space.World);
+
                     this.transform.localRotation = data.rotation;
+
+                    if (cameraTransform != null)
+                    {
+                        float angle = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(cameraTransform.forward, Vector3.up), Vector3.up);
+                        this.transform.Rotate(0, -angle, 0);
+                    }
 
                     globalVehicle.Delete += new System.Action(() => {
                         umi3d.cdk.UMI3DNavigation.Instance.transform.SetParent(umi3d.cdk.UMI3DEnvironmentLoader.Instance.transform, true);

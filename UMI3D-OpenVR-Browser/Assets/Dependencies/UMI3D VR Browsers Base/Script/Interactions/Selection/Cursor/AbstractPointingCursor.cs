@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2019 - 2022 Inetum
+Copyright 2019 - 2021 Inetum
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -20,9 +20,6 @@ namespace umi3dBrowsers.interaction.selection.cursor
     /// </summary>
     public abstract class AbstractPointingCursor : AbstractCursor
     {
-        /// <summary>
-        /// Category of events triggered when the cursor interacts with an UMI3D interactable
-        /// </summary>
         public class CursorTrackingEvent : UnityEvent<PointingInfo>
         { }
 

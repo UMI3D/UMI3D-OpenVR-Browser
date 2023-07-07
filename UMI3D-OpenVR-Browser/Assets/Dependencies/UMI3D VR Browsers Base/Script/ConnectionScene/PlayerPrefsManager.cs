@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.connection
@@ -30,14 +31,14 @@ namespace umi3dVRBrowsersBase.connection
 
         public static readonly string Umi3dPort = "umi3d-port";
 
-        public static readonly string Umi3dFavoriteServers = "umi3d-favorite-servers";
+        public static readonly string Umi3dVirtualWorlds = "umi3d-virtual-worlds";
 
         #endregion
 
         #region Methods
 
         /// <summary>
-        /// If an ip server is stored, returns it otherwise returns an empty string.
+        /// If an ip VirtualWorld is stored, returns it otherwise returns an empty string.
         /// </summary>
         /// <returns></returns>
         public static string GetUmi3dIp()
@@ -60,7 +61,7 @@ namespace umi3dVRBrowsersBase.connection
         }
 
         /// <summary>
-        /// If a port server is stored, returns it otherwise returns an empty string.
+        /// If a port VirtualWorld is stored, returns it otherwise returns an empty string.
         /// </summary>
         /// <returns></returns>
         public static string GetUmi3DPort()
@@ -83,120 +84,203 @@ namespace umi3dVRBrowsersBase.connection
         }
 
         /// <summary>
-        /// Returns true if at least one server was set as favorite by users.
+        /// Returns true if their is VirtualWorld store.
         /// </summary>
         /// <returns></returns>
-        public static bool HasFavoriteServersStored()
+        public static bool HasVirtualWorldsStored()
         {
-            bool res = false;
-
-            if (PlayerPrefs.HasKey(Umi3dFavoriteServers))
+            if (PlayerPrefs.HasKey(Umi3dVirtualWorlds))
             {
-                FavoriteServers data = JsonUtility.FromJson<FavoriteServers>(PlayerPrefs.GetString(Umi3dFavoriteServers));
+                VirtualWorlds data = JsonUtility.FromJson<VirtualWorlds>(PlayerPrefs.GetString(Umi3dVirtualWorlds));
                 if (data != null)
                 {
-                    res = data.favorites.Count > 0;
+                    return data.worlds.Count > 0;
                 }
             }
 
-            return res;
+            return false;
         }
 
         /// <summary>
-        /// Returns a list of all favorite servers.
+        /// Return true if at least one VirtualWorld is set to favorite;
         /// </summary>
         /// <returns></returns>
-        public static List<FavoriteServerData> GetFavoriteServers()
+        public static bool HasFavoriteVirtualWorldsStored()
         {
-            var fav = new List<FavoriteServerData>();
+            if (!HasFavoriteVirtualWorldsStored()) return false;
 
-            if (HasFavoriteServersStored())
+            if (PlayerPrefs.HasKey(Umi3dVirtualWorlds))
             {
-                string dataStr = PlayerPrefs.GetString(Umi3dFavoriteServers);
+                VirtualWorlds data = JsonUtility.FromJson<VirtualWorlds>(PlayerPrefs.GetString(Umi3dVirtualWorlds));
+                if (data != null)
+                {
+                    return data.worlds.Where(d => d.isFavorite).Count() > 0;
+                }
+            }
 
-                FavoriteServers data = JsonUtility.FromJson<FavoriteServers>(PlayerPrefs.GetString(Umi3dFavoriteServers));
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a list of all VirtualWorld.
+        /// </summary>
+        /// <returns></returns>
+        public static List<VirtualWorldData> GetVirtualWorlds()
+        {
+            if (HasVirtualWorldsStored())
+            {
+                string dataStr = PlayerPrefs.GetString(Umi3dVirtualWorlds);
+
+                VirtualWorlds data = JsonUtility.FromJson<VirtualWorlds>(PlayerPrefs.GetString(Umi3dVirtualWorlds));
 
                 if (data == null)
                 {
-                    Debug.LogError("Interal error, impossible to read favorite servers from preferences");
+                    Debug.LogError("Interal error, impossible to read VirtualWorlds from preferences");
                 }
                 else
                 {
-                    fav = data.favorites;
+                    return data.worlds;
                 }
             }
             else
             {
-                Debug.Log("No favorite server stored, you should use HasFavoriteServersStored() before calling this method");
+                Debug.Log("No VirtualWorlds stored, you should use HasVirtualWorldsStored() before calling this method");
             }
 
-            return fav;
+            return new();
         }
 
         /// <summary>
-        /// Add a new server to favorites if there is a server already stored with the same url.
+        /// Returns a list of all favorite VirtualWorld.
+        /// </summary>
+        /// <returns></returns>
+        public static List<VirtualWorldData> GetFavoriteVirtualWorlds()
+        {
+            if (HasVirtualWorldsStored())
+                return GetVirtualWorlds().Where(d => d.isFavorite)
+                                         .OrderBy(d => d.indexFavorite)
+                                         .ToList();
+
+            return new ();
+        }
+
+        /// <summary>
+        /// Add a new VirtualWorld, if there is a VirtualWorld already stored with the same url update isFavorite and DateLastConnection.
         /// </summary>
         /// <param name="url"></param>
         /// <param name="name"></param>
-        public static void AddServerToFavorite(string url, string name)
+        public static void SaveVirtualWorld(VirtualWorldData data)
         {
-            FavoriteServers data;
+            VirtualWorlds virtualWorlds;
 
-            if (HasFavoriteServersStored())
+            if (HasVirtualWorldsStored())
             {
-                data = JsonUtility.FromJson<FavoriteServers>(PlayerPrefs.GetString(Umi3dFavoriteServers));
+                virtualWorlds = JsonUtility.FromJson<VirtualWorlds>(PlayerPrefs.GetString(Umi3dVirtualWorlds));
 
-                if (data == null)
+                if (virtualWorlds == null)
                 {
-                    Debug.LogError("Interal error, impossible to read favorite servers from preferences");
+                    Debug.LogError("Interal error, impossible to read virtual world from preferences");
                     return;
                 }
-                else if (data.favorites.Find(d => d.serverUrl == url) != null)
+                else if (virtualWorlds.worlds.Find(d => d.worldUrl == data.worldUrl) is VirtualWorldData d && d != null)
                 {
-                    Debug.LogError("Impossible to add this server to favorites because there is already a server stored with this url");
-                    return;
+                    if (data.isFavorite)
+                    {
+                        d.isFavorite = true;
+                        d.indexFavorite = GetFavoriteVirtualWorlds().Count;
+                    }
+                    d.dateLastConnection = data.dateLastConnection;
                 }
                 else
                 {
-                    data.favorites.Add(new FavoriteServerData { serverName = name, serverUrl = url });
+                    data.dateFirstConnection = data.dateLastConnection;
+                    virtualWorlds.worlds.Add(data);
                 }
             }
             else
             {
-                data = new FavoriteServers { favorites = new List<FavoriteServerData> { new FavoriteServerData { serverName = name, serverUrl = url } } };
+                data.dateFirstConnection = data.dateLastConnection;
+                if (data.isFavorite)
+                    data.indexFavorite = 0;
+                virtualWorlds = new VirtualWorlds { worlds = new List<VirtualWorldData> { data } };
             }
-            PlayerPrefs.SetString(Umi3dFavoriteServers, JsonUtility.ToJson(data));
+            PlayerPrefs.SetString(Umi3dVirtualWorlds, JsonUtility.ToJson(virtualWorlds));
             PlayerPrefs.Save();
         }
 
         /// <summary>
-        /// If a server with <see cref="url"/> as url is currently stored, removes it.
+        /// If a VirtualWorld with <see cref="url"/> as url is currently stored, remove from favorite.
         /// </summary>
         /// <param name="url"></param>
         public static void RemoveServerFromFavorite(string url)
         {
-            FavoriteServers data;
+            if (!HasFavoriteVirtualWorldsStored()) return;
+            
+            var virtualWorlds = GetFavoriteVirtualWorlds();
+            var favoriteFound = false;
 
-            if (HasFavoriteServersStored())
+            for (int i = 0; i < virtualWorlds.Count; i++)
             {
-                data = JsonUtility.FromJson<FavoriteServers>(PlayerPrefs.GetString(Umi3dFavoriteServers));
-
-                if (data == null)
+                if (!favoriteFound)
                 {
-                    return;
+                    if (virtualWorlds[i].worldUrl != url) continue;
+                    favoriteFound = true;
+
+                    virtualWorlds[i].isFavorite = false;
                 }
-
-                FavoriteServerData entryToDelete = data.favorites.Find(d => d.serverUrl == url);
-
-                if (entryToDelete != null)
+                else
                 {
-                    data.favorites.Remove(entryToDelete);
-                    PlayerPrefs.SetString(Umi3dFavoriteServers, JsonUtility.ToJson(data));
-                    PlayerPrefs.Save();
+                    virtualWorlds[i].indexFavorite -= 1;
                 }
-
             }
+            PlayerPrefs.SetString(Umi3dVirtualWorlds, JsonUtility.ToJson(virtualWorlds));
+            PlayerPrefs.Save();
+        }
 
+        /// <summary>
+        /// Increment Favorite VirtualWorld index, if a favorite VirtualWorld with <see cref="url"/> as url is currently stored
+        /// </summary>
+        /// <param name="url"></param>
+        public static void IncrementFavorite(string url)
+        {
+            if (!HasFavoriteVirtualWorldsStored()) return;
+
+            var favoriteVirtualWorlds = GetFavoriteVirtualWorlds();
+
+            for (int i = 0; i < favoriteVirtualWorlds.Count; i++)
+            {
+                if (favoriteVirtualWorlds[i].worldUrl != url) continue;
+
+                if (i != favoriteVirtualWorlds.Count - 1)
+                {
+                    favoriteVirtualWorlds[i].indexFavorite += 1;
+                    favoriteVirtualWorlds[i+1].indexFavorite -= 1;
+                }
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Decrement Favorite VirtualWorld index, if a favorite VirtualWorld with <see cref="url"/> as url is currently stored
+        /// </summary>
+        /// <param name="url"></param>
+        public static void DecrementFavorite(string url)
+        {
+            if (!HasFavoriteVirtualWorldsStored()) return;
+
+            var favoriteVirtualWorlds = GetFavoriteVirtualWorlds();
+
+            for (int i = 0; i < favoriteVirtualWorlds.Count; i++)
+            {
+                if (favoriteVirtualWorlds[i].worldUrl != url) continue;
+
+                if (i != 0)
+                {
+                    favoriteVirtualWorlds[i].indexFavorite -= 1;
+                    favoriteVirtualWorlds[i - 1].indexFavorite += 1;
+                }
+                return;
+            }
         }
 
         /// <summary>
@@ -213,23 +297,28 @@ namespace umi3dVRBrowsersBase.connection
         }
 
         /// <summary>
-        /// Stores data about a favorite server.
+        /// Stores data about a VirtualWorld.
         /// </summary>
         [System.Serializable]
-        public class FavoriteServerData
+        public class VirtualWorldData
         {
-            public string serverName;
+            public string worldName;
+            public string worldUrl;
 
-            public string serverUrl;
+            public bool isFavorite;
+            public int indexFavorite;
+
+            public string dateFirstConnection;
+            public string dateLastConnection;
         }
 
         /// <summary>
-        /// Stores all favorite servers.
+        /// Stores all VirtualWorlds.
         /// </summary>
         [System.Serializable]
-        public class FavoriteServers
+        public class VirtualWorlds
         {
-            public List<FavoriteServerData> favorites = new List<FavoriteServerData>();
+            public List<VirtualWorldData> worlds = new ();
         }
 
         #endregion

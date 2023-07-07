@@ -32,6 +32,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
     /// </summary>
     public class RayCursor : AbstractPointingCursor
     {
+
         [Header("Laser"), SerializeField, Tooltip("Laser's cylindric part.")]
         public GameObject laserObject;
 
@@ -39,6 +40,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
         [Header("ImpactPoint"), SerializeField, Tooltip("Laser's impact sphere.")]
         private GameObject impactPoint;
+
+        [SerializeField]
+        private LayerMask _uiMask;
 
         private Renderer impactPointRenderer;
 
@@ -246,6 +250,14 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
         public void Update()
         {
+            // Priority on touch UI
+            var raycastHits = umi3d.common.Physics.RaycastAll(new Ray(transform.position, transform.up), maxLength, _uiMask);
+            if (raycastHits.Length > 0)
+            {
+                SetImpactOnClosest(raycastHits);
+                return;
+            }
+
             raycastHelperSelectable = new RaySelectionZone<Selectable>(transform.position, transform.up);
             raycastHelperInteractable = new RaySelectionZone<InteractableContainer>(transform.position, transform.up);
             raycastHelperElement = new RaySelectionZone<AbstractClientInteractableElement>(transform.position, transform.up);
@@ -264,7 +276,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
             var listReachableObjects = listObjects.Where(x => IsAtReach(x.Key, x.Value.distance));
 
-            if (listReachableObjects.Any())
+            if (listReachableObjects.Count() > 0)
                 SetImpactOnClosest(listReachableObjects.Select(x => x.Value));
             else
                 SetInfinitePoint();

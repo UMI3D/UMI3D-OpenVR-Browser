@@ -120,7 +120,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #endregion lifecycle
 
         #region detectors
-
         /// <inheritdoc/>
         public override List<AbstractDetector<InteractableContainer>> GetProximityDetectors()
         {
@@ -138,8 +137,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 l.Add(detector);
             return l;
         }
-
-        #endregion detectors
+        #endregion
 
         #region selection
 
@@ -206,10 +204,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <param name="selectionInfo"></param>
         protected override void Select(SelectionIntentData<InteractableContainer> selectionInfo)
         {
-            // The selector was selecting something before
             if (isSelecting)
             {
-                if (selectionInfo == null && LastSelected != null) //the selector should remember it choose to select nothing this time
+                if (selectionInfo == null && LastSelected != null) //the selector was selecting something before and should remember it choose to select nothing this time
                 {
                     Deselect(LastSelected);
                     LastSelected = null;
@@ -222,14 +219,12 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     if (LastSelected != null && selectionInfo.detectionOrigin != LastSelected.detectionOrigin)
                     {
                         selectionFeedbackHandler.UpdateFeedback(selectionInfo);
-                        selectionInfo.hasBeenSelected = true;
-                        LastSelected = selectionInfo;
+                        LastSelected.detectionOrigin = selectionInfo.detectionOrigin;
                     }
                     return;
                 }
             }
 
-            // Find out tool to project
             if (AbstractInteractionMapper.Instance == null) return;
             if 
             (
@@ -242,12 +237,10 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             if (selectionInfo is InteractableSelectionData)
                 (selectionInfo as InteractableSelectionData).tool = interactionTool;
 
-            // Free up the controller if needed
             if (isSelecting
                 && (LastSelected != null || (!controller.IsAvailableFor(interactionTool) && InteractionMapper.Instance.IsToolSelected(interactionTool.id)))) // second case happens when an object is destroyed but the tool is not released
                 Deselect(LastSelected);
 
-            // Project the tool if possible
             if (controller.IsAvailableFor(interactionTool))
             {
                 projector.Project(selectionInfo.selectedObject, controller);
@@ -273,7 +266,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 tool = obj == null ? null : obj.Interactable
             };
         }
-
         #endregion selection
     }
 }
