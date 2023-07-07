@@ -66,7 +66,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
 
         public void Update()
         {
-            // check that no selector is in a locked state, i.e. an object is being manipulated
             if (interactableSelector.LockedSelector
                 || selectableSelector.LockedSelector
                 || elementSelector.LockedSelector)
@@ -75,7 +74,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
             // Retrieves propositions from selectors
             var possibleSelec = new List<SelectionIntentData>();
             if (elementSelector.activated)
-                possibleSelec.AddRange(elementSelector.GetIntentDetections());  // Preference: Client Element > Selectable > Interactable
+                possibleSelec.AddRange(elementSelector.GetIntentDetections());  // Preference: Client Element > Selectable > Interactable 
 
             if (selectableSelector.activated)
                 possibleSelec.AddRange(selectableSelector.GetIntentDetections());
@@ -94,7 +93,6 @@ namespace umi3dVRBrowsersBase.interactions.selection
                     LastSelectorUsed = null;
                 }
             }
-            // selection of proposition
             else if (TrySelect(possibleSelec, DetectionOrigin.PROXIMITY)) // proximity prefered over pointing
                 return;
             else if (TrySelect(possibleSelec, DetectionOrigin.POINTING))
@@ -102,7 +100,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         }
 
         /// <summary>
-        /// Check if a possible selection is available through a detection <paramref name="origin"/> and select the first of this origin.
+        /// Give the order to the selector to select the best proposition if possible. <br/>
         /// </summary>
         /// <param name="possibleSelec"></param>
         /// <param name="origin"></param>
@@ -124,8 +122,7 @@ namespace umi3dVRBrowsersBase.interactions.selection
         /// <param name="preferedObjectData"></param>
         private void StartSelection(SelectionIntentData preferedObjectData)
         {
-            // getting the right selector for selection
-            IIntentSelector appropriateSelector;
+            IIntentSelector appropriateSelector; //getting the right selector for selection
             if (preferedObjectData is SelectionIntentData<Selectable>)
                 appropriateSelector = selectableSelector;
             else if (preferedObjectData is SelectionIntentData<AbstractClientInteractableElement>)
@@ -135,14 +132,14 @@ namespace umi3dVRBrowsersBase.interactions.selection
             else
                 throw new System.Exception("Unrecognized selectable object. No selector is available.");
 
-            // selector switching between two kind of selectable objects, deselection is normally handled when the selector remains the same
+            // selector switching, deselection is normally handled when the selector remains the same
             if (LastSelectedInfo != null && LastSelectorUsed != appropriateSelector)
                 LastSelectorUsed?.Select(null); //make the selector remember it cannot select something this time
 
-            // actual selection operation
             appropriateSelector.Select(preferedObjectData);
             LastSelectorUsed = appropriateSelector;
             LastSelectedInfo = preferedObjectData;
         }
+
     }
 }

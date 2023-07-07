@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using umi3d;
@@ -109,6 +110,19 @@ namespace umi3dVRBrowsersBase.connection
             {
                 Umi3DVersionLabel.text = Application.version;
             }
+
+            umi3d.cdk.collaboration.UMI3DCollaborationClientServer.EnvironmentProgress = () =>
+            {
+                var p = new MultiProgress("Join Environement");
+                p.ResumeAfterFail = async (e) =>
+                {
+                    UnityEngine.Debug.Log("<color=Orange>Join environment fail: </color>" + $"{e}");
+                    return true;
+                };
+
+                return p;
+            };
+
 
             keyboard.Hide();
         }
@@ -269,8 +283,8 @@ namespace umi3dVRBrowsersBase.connection
         static bool? _masterServerFound = null;
         protected bool ShouldDisplaySessionScreen = false;
 
-        protected PlayerPrefsManager.FavoriteServerData currentServer = new PlayerPrefsManager.FavoriteServerData();
-        protected System.Collections.Generic.List<PlayerPrefsManager.FavoriteServerData> savedServers = new System.Collections.Generic.List<PlayerPrefsManager.FavoriteServerData>();
+        protected PlayerPrefsManager.VirtualWorldData currentVirtualWorld = new PlayerPrefsManager.VirtualWorldData();
+        protected System.Collections.Generic.List<PlayerPrefsManager.VirtualWorldData> savedServers = new System.Collections.Generic.List<PlayerPrefsManager.VirtualWorldData>();
 
         protected umi3d.cdk.collaboration.LaucherOnMasterServer masterServer = new umi3d.cdk.collaboration.LaucherOnMasterServer();
 
@@ -304,7 +318,7 @@ namespace umi3dVRBrowsersBase.connection
         public async Task _Connect(string url, bool saveInfo = false)
         {
             homePanel.Hide();
-            currentServer.serverUrl = url;
+            currentVirtualWorld.worldUrl = url;
 
             if (onlyOneConnection)
             {
@@ -318,11 +332,12 @@ namespace umi3dVRBrowsersBase.connection
 
             WaitForError();
 
-            void StoreServer()
+            void SaveVirtualWorld()
             {
-                if (savedServers.Find((server) => server.serverName == currentServer.serverName) == null) savedServers.Add(currentServer);
+                if (currentVirtualWorld.isFavorite)
+                    if (savedServers.Find((data) => data.worldName == currentVirtualWorld.worldName) == null) savedServers.Add(currentVirtualWorld);
                 //ServerPreferences.StoreRegisteredServerData(savedServers);
-                PlayerPrefsManager.AddServerToFavorite(currentServer.serverUrl, currentServer.serverName);
+                PlayerPrefsManager.SaveVirtualWorld(currentVirtualWorld);
             }
 
             //1. Try to find a master server
@@ -336,10 +351,12 @@ namespace umi3dVRBrowsersBase.connection
                     if (mediaDtoFound) return;
                     masterServerFound = true;
 
-                    currentServer.serverName = name;
+                    currentVirtualWorld.worldName = name;
+                    currentVirtualWorld.isFavorite = saveInfo;
+                    currentVirtualWorld.dateLastConnection = DateTime.UtcNow.ToString();
                     //currentServer.serverIcon = icon;
                     //preferences.ServerPreferences.StoreUserData(currentServer);
-                    if (saveInfo) StoreServer();
+                    SaveVirtualWorld();
                 },
                 () =>
                 {
@@ -349,14 +366,14 @@ namespace umi3dVRBrowsersBase.connection
 
                 ShouldDisplaySessionScreen = true;
             },
-            currentServer.serverUrl,
+            currentVirtualWorld.worldUrl,
             () =>
             {
                 masterServerFound = false;
             });
 
             //2. try to get a mediaDto
-            var media = await Connecting.Instance.GetMedia(currentServer);
+            var media = await Connecting.Instance.GetMedia(currentVirtualWorld);
             if (media == null || masterServerFound)
             {
                 mediaDtoFound = false;
@@ -364,10 +381,12 @@ namespace umi3dVRBrowsersBase.connection
             }
             mediaDtoFound = true;
 
-            currentServer.serverName = media.name;
+            currentVirtualWorld.worldName = media.name;
+            currentVirtualWorld.isFavorite = saveInfo;
+            currentVirtualWorld.dateLastConnection = DateTime.UtcNow.ToString();
             //currentServer.serverIcon = media?.icon2D?.variants?.FirstOrDefault()?.url;
             //preferences.ServerPreferences.StoreUserData(currentServer);
-            if (saveInfo) StoreServer();
+            SaveVirtualWorld();
 
             currentConnectionData.environmentName = media.name;
             currentConnectionData.ip = media.url;

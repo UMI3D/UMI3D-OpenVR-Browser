@@ -116,7 +116,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #endregion lifecycle
 
         #region detectors
-
         /// <inheritdoc/>
         public override List<AbstractDetector<Selectable>> GetProximityDetectors()
         {
@@ -134,8 +133,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 l.Add(detector);
             return l;
         }
-
-        #endregion detectors
+        #endregion
 
         #region selection
 
@@ -149,8 +147,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <returns></returns>
         protected override bool CanSelect(Selectable uiToSelect)
         {
-            return uiToSelect != null
-                && uiToSelect.enabled
+            return uiToSelect != null 
+                && uiToSelect.enabled 
                 && uiToSelect.interactable;
         }
 

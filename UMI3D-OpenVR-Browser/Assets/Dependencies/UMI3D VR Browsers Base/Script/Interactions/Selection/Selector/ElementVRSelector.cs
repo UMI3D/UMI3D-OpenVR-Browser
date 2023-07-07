@@ -125,7 +125,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         #endregion lifecycle
 
         #region detectors
-
         /// <inheritdoc/>
         public override List<AbstractDetector<AbstractClientInteractableElement>> GetProximityDetectors()
         {
@@ -143,8 +142,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 l.Add(detector);
             return l;
         }
-
-        #endregion detectors
+        #endregion
 
         #region selection
 

@@ -502,7 +502,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6369408879098599446}
   - component: {fileID: 7217446619658254872}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: LaserCursor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -540,6 +540,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   laserObject: {fileID: 9190828823993865064}
   impactPoint: {fileID: 6369408880223590930}
+  _uiMask:
+    serializedVersion: 2
+    m_Bits: 64
   defaultMaterial: {fileID: 2100000, guid: 27b22803fda298c45a15fe4995274bf1, type: 2}
   selectionMaterial: {fileID: 2100000, guid: d3f0a2ffe7805cd4cad171a0d32da68f, type: 2}
 --- !u!1 &6369408880223590930
@@ -553,7 +556,7 @@ GameObject:
   - component: {fileID: 6369408880223590931}
   - component: {fileID: 8142815646023564726}
   - component: {fileID: 2087477415456393586}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ImpactPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -924,7 +927,7 @@ GameObject:
   - component: {fileID: 6369408879160501526}
   - component: {fileID: 5965202872744209909}
   - component: {fileID: 8166024197371415578}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: laser
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -15,6 +15,8 @@ limitations under the License.
 */
 
 using umi3d.cdk.interaction;
+using umi3dBrowsers.interaction.selection.cursor;
+using umi3dVRBrowsersBase.interactions.selection;
 using UnityEngine;
 
 namespace umi3dBrowsers.interaction.selection.feedback
@@ -30,29 +32,17 @@ namespace umi3dBrowsers.interaction.selection.feedback
         /// </summary>
         private TargetOutlineInfo targetInfo;
 
-        /// <summary>
-        /// Container for a target to outline data.
-        /// </summary>
         public class TargetOutlineInfo
         {
-            /// <summary>
-            /// Object to outline.
-            /// </summary>
             public GameObject targetObject;
-
-            /// <summary>
-            /// Initial <see cref="LayerMask"/> of the object before being outlined.
-            /// </summary>
             public LayerMask originalLayer;
-
-            /// <summary>
-            /// Renderer of the object reference.
-            /// </summary>
             public Renderer renderer;
         }
 
         [Tooltip("Layer associated with selection outline in URP settings")]
         public LayerMask selectionOutlineLayer;
+
+
 
         /// <inheritdoc/>
         public void Activate(AbstractSelectionData selectionData)

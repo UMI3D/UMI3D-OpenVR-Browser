@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8248474064171812590}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 5225349250490698050}
   - component: {fileID: 2914362973301327649}
   - component: {fileID: 33384055519275438}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: ParameterGear
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 5544921755173313911}
   - component: {fileID: 6063166307848967701}
   - component: {fileID: 6480873251595180750}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 2111447580891355182}
   - component: {fileID: 3242570341131962759}
   - component: {fileID: 7578047917363881229}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
