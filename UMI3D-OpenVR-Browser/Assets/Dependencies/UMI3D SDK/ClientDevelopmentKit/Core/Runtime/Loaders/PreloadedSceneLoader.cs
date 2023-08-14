@@ -46,11 +46,11 @@ namespace umi3d.cdk
 
             if (resourceScene != null)
             {
-                FileDto fileToLoad = UMI3DEnvironmentLoader.Parameters.ChooseVariant(resourceScene.variants);  // Peut etre ameliore
+                FileDto fileToLoad = UMI3DEnvironmentLoader.AbstractParameters.ChooseVariant(resourceScene.variants);  // Peut etre ameliore
 
                 string url = fileToLoad.url;
                 string ext = fileToLoad.extension;
-                IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(ext);
+                IResourcesLoader loader = UMI3DEnvironmentLoader.AbstractParameters.SelectLoader(ext);
                 if (loader != null)
                 {
                     var o = await UMI3DResourcesManager.LoadFile(UMI3DGlobalID.EnvironementId, fileToLoad, loader);
@@ -98,7 +98,7 @@ namespace umi3d.cdk
                         }
 
                         foreach (PreloadedSceneDto scene in scenesToLoad)
-                            await ReadUMI3DExtension(new ReadUMI3DExtensionData(scene, null));
+                            await ReadUMI3DExtension(new ReadUMI3DExtensionData(scene, null, value.tokens));
 
                         foreach (PreloadedSceneDto scene in scenesToUnload)
                             Unload(scene, null);
@@ -146,7 +146,7 @@ namespace umi3d.cdk
                         }
 
                         foreach (PreloadedSceneDto scene in scenesToLoad)
-                            await ReadUMI3DExtension(new ReadUMI3DExtensionData(scene, null));
+                            await ReadUMI3DExtension(new ReadUMI3DExtensionData(scene, value.tokens));
 
                         foreach (PreloadedSceneDto scene in scenesToUnload)
                             Unload(scene, null);
@@ -160,7 +160,7 @@ namespace umi3d.cdk
 
         private static void Unload(PreloadedSceneDto scenesdto, GameObject node)
         {
-            SceneManager.UnloadSceneAsync(UMI3DEnvironmentLoader.Parameters.ChooseVariant(scenesdto.scene.variants).pathIfInBundle);
+            SceneManager.UnloadSceneAsync(UMI3DEnvironmentLoader.AbstractParameters.ChooseVariant(scenesdto.scene.variants).pathIfInBundle);
         }
     }
 }

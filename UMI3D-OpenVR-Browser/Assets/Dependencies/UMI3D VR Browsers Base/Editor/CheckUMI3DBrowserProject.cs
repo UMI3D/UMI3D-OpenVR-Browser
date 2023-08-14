@@ -181,8 +181,8 @@ namespace umi3dVRBrowsersBase.editor
                 errors.Add("Not mandatory on this prefab but make sur you have an InteractionMapper in your scene.");
 
             //Check User Tracking
-            if (player.GetComponentInChildren<UMI3DClientUserTracking>() == null)
-                errors.Add("Prefab without UMI3DClientUserTracking.");
+            if (player.GetComponentInChildren<PersonalSkeleton>() == null)
+                errors.Add("Prefab without PersonalSkeleton.");
 
             //Check User DialogBox
             if (player.GetComponentInChildren<DialogBox>() == null)

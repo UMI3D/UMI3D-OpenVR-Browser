@@ -27,23 +27,23 @@ namespace umi3dVRBrowsersBase.ikManagement
     {
         protected Animator animator;
 
-        public bool leftIkActive = false;
-        public bool rightIkActive = false;
+        //public bool leftIkActive = false;
+        //public bool rightIkActive = false;
 
-        public bool controllerIkActive = false;
+        //public bool controllerIkActive = false;
         //public bool headIkActive = false;
         public bool feetIkActive = false;
 
         //public Transform lookObj = null;
 
         public float animationSpeed = 1f;
-        public VirtualObjectBodyInteraction LeftBodyRestPose;
-        public VirtualObjectBodyInteraction LeftBodyInteraction;
-        public VirtualObjectBodyInteraction RightBodyRestPose;
-        public VirtualObjectBodyInteraction RightBodyInteraction;
+        //public VirtualObjectBodyInteraction LeftBodyRestPose;
+        //public VirtualObjectBodyInteraction LeftBodyInteraction;
+        //public VirtualObjectBodyInteraction RightBodyRestPose;
+        //public VirtualObjectBodyInteraction RightBodyInteraction;
 
-        public VirtualObjectBodyInteraction LeftHand;
-        public VirtualObjectBodyInteraction RightHand;
+        //public VirtualObjectBodyInteraction LeftHand;
+        //public VirtualObjectBodyInteraction RightHand;
 
         public VirtualObjectBodyInteraction LeftFoot;
         public VirtualObjectBodyInteraction RightFoot;
@@ -232,21 +232,21 @@ namespace umi3dVRBrowsersBase.ikManagement
 
             //MouseAndKeyboardController.HoverExit.AddListener(() => rightIkActive = false);
 
-            rightRestPoseHelper = new BodyInteractionHelper(RightBodyRestPose, animator);
-            rightBodyInteractionHelper = new BodyInteractionHelper(RightBodyInteraction, animator);
+            //rightRestPoseHelper = new BodyInteractionHelper(RightBodyRestPose, animator);
+            //rightBodyInteractionHelper = new BodyInteractionHelper(RightBodyInteraction, animator);
             //rightRestPoseHelper.origin = RightBodyInteraction;
             //rightBodyInteractionHelper.origin = RightBodyRestPose;
-            rightRestPoseHelper.originalPoses = rightBodyInteractionHelper.poses;
-            rightBodyInteractionHelper.originalPoses = rightRestPoseHelper.poses;
-            rightAnimationDuration = Vector3.Distance(RightBodyRestPose.transform.position, RightBodyInteraction.transform.position) / animationSpeed;
+            //rightRestPoseHelper.originalPoses = rightBodyInteractionHelper.poses;
+            //rightBodyInteractionHelper.originalPoses = rightRestPoseHelper.poses;
+            //rightAnimationDuration = Vector3.Distance(RightBodyRestPose.transform.position, RightBodyInteraction.transform.position) / animationSpeed;
 
-            leftRestPoseHelper = new BodyInteractionHelper(LeftBodyRestPose, animator);
-            leftBodyInteractionHelper = new BodyInteractionHelper(LeftBodyInteraction, animator);
+            //leftRestPoseHelper = new BodyInteractionHelper(LeftBodyRestPose, animator);
+            //leftBodyInteractionHelper = new BodyInteractionHelper(LeftBodyInteraction, animator);
             //leftRestPoseHelper.origin = LeftBodyInteraction;
             //leftBodyInteractionHelper.origin = LeftBodyRestPose;
-            leftRestPoseHelper.originalPoses = leftBodyInteractionHelper.poses;
-            leftBodyInteractionHelper.originalPoses = leftRestPoseHelper.poses;
-            leftAnimationDuration = Vector3.Distance(LeftBodyRestPose.transform.position, LeftBodyInteraction.transform.position) / animationSpeed;
+            //leftRestPoseHelper.originalPoses = leftBodyInteractionHelper.poses;
+            //leftBodyInteractionHelper.originalPoses = leftRestPoseHelper.poses;
+            //leftAnimationDuration = Vector3.Distance(LeftBodyRestPose.transform.position, LeftBodyInteraction.transform.position) / animationSpeed;
         }
 
 
@@ -254,32 +254,32 @@ namespace umi3dVRBrowsersBase.ikManagement
         {
             if (animator)
             {
-                //if the IK is active, set the position and rotation directly to the goal. 
-                if (rightIkActive || rightAnimation > 0f)
-                {
-                    float rightDelta = Time.deltaTime / rightAnimationDuration;
+                ////if the IK is active, set the position and rotation directly to the goal. 
+                //if (rightIkActive || rightAnimation > 0f)
+                //{
+                //    float rightDelta = Time.deltaTime / rightAnimationDuration;
 
-                    if (!rightIkActive && rightAnimation > 0f)
-                        rightDelta *= -1f;
+                //    if (!rightIkActive && rightAnimation > 0f)
+                //        rightDelta *= -1f;
 
-                    rightAnimation += rightDelta;
-                    rightAnimation = Mathf.Clamp01(rightAnimation);
+                //    rightAnimation += rightDelta;
+                //    rightAnimation = Mathf.Clamp01(rightAnimation);
 
-                    // Set the look target position, if one has been assigned
+                //    // Set the look target position, if one has been assigned
 
-                    // other method depending on the grabbing hand
-                }
+                //    // other method depending on the grabbing hand
+                //}
 
-                if (leftIkActive || leftAnimation > 0f)
-                {
-                    float leftDelta = Time.deltaTime / leftAnimationDuration;
+                //if (leftIkActive || leftAnimation > 0f)
+                //{
+                //    float leftDelta = Time.deltaTime / leftAnimationDuration;
 
-                    if (!leftIkActive && leftAnimation > 0f)
-                        leftDelta *= -1f;
+                //    if (!leftIkActive && leftAnimation > 0f)
+                //        leftDelta *= -1f;
 
-                    leftAnimation += leftDelta;
-                    leftAnimation = Mathf.Clamp01(leftAnimation);
-                }
+                //    leftAnimation += leftDelta;
+                //    leftAnimation = Mathf.Clamp01(leftAnimation);
+                //}
 
                 //if (lookObj != null && lookObj)
                 //{
@@ -287,48 +287,48 @@ namespace umi3dVRBrowsersBase.ikManagement
                 //    animator.SetLookAtPosition(lookObj.position);
                 //}
 
-                if (rightIkActive)
-                {
-                    rightRestPoseHelper.UnsyncPoses(false);
-                    rightBodyInteractionHelper.SyncRightIk(rightAnimation);
-                }
-                else
-                {
-                    rightBodyInteractionHelper.UnsyncPoses(false);
-                    rightRestPoseHelper.SyncRightIk(1f - rightAnimation);
-                }
+                //if (rightIkActive)
+                //{
+                //    rightRestPoseHelper.UnsyncPoses(false);
+                //    rightBodyInteractionHelper.SyncRightIk(rightAnimation);
+                //}
+                //else
+                //{
+                //    rightBodyInteractionHelper.UnsyncPoses(false);
+                //    rightRestPoseHelper.SyncRightIk(1f - rightAnimation);
+                //}
 
 
-                if (leftIkActive)
-                {
-                    leftRestPoseHelper.UnsyncPoses(false);
-                    leftBodyInteractionHelper.SyncLeftIk(leftAnimation);
-                }
-                else
-                {
-                    leftBodyInteractionHelper.UnsyncPoses(false);
-                    leftRestPoseHelper.SyncLeftIk(1f - leftAnimation);
-                }
+                //if (leftIkActive)
+                //{
+                //    leftRestPoseHelper.UnsyncPoses(false);
+                //    leftBodyInteractionHelper.SyncLeftIk(leftAnimation);
+                //}
+                //else
+                //{
+                //    leftBodyInteractionHelper.UnsyncPoses(false);
+                //    leftRestPoseHelper.SyncLeftIk(1f - leftAnimation);
+                //}
 
-                if (controllerIkActive)
-                {
-                    animator.SetIKPositionWeight(LeftHand.goal, 1);
-                    animator.SetIKRotationWeight(LeftHand.goal, 1);
-                    animator.SetIKPosition(LeftHand.goal, LeftHand.transform.position);
-                    animator.SetIKRotation(LeftHand.goal, LeftHand.transform.rotation);
+                //if (controllerIkActive)
+                //{
+                //    animator.SetIKPositionWeight(LeftHand.goal, 1);
+                //    animator.SetIKRotationWeight(LeftHand.goal, 1);
+                //    animator.SetIKPosition(LeftHand.goal, LeftHand.transform.position);
+                //    animator.SetIKRotation(LeftHand.goal, LeftHand.transform.rotation);
 
-                    animator.SetIKPositionWeight(RightHand.goal, 1);
-                    animator.SetIKRotationWeight(RightHand.goal, 1);
-                    animator.SetIKPosition(RightHand.goal, RightHand.transform.position);
-                    animator.SetIKRotation(RightHand.goal, RightHand.transform.rotation);
-                }
-                else
-                {
-                    animator.SetIKPositionWeight(LeftHand.goal, 0);
-                    animator.SetIKRotationWeight(LeftHand.goal, 0);
-                    animator.SetIKPositionWeight(RightHand.goal, 0);
-                    animator.SetIKRotationWeight(RightHand.goal, 0);
-                }
+                //    animator.SetIKPositionWeight(RightHand.goal, 1);
+                //    animator.SetIKRotationWeight(RightHand.goal, 1);
+                //    animator.SetIKPosition(RightHand.goal, RightHand.transform.position);
+                //    animator.SetIKRotation(RightHand.goal, RightHand.transform.rotation);
+                //}
+                //else
+                //{
+                //    animator.SetIKPositionWeight(LeftHand.goal, 0);
+                //    animator.SetIKRotationWeight(LeftHand.goal, 0);
+                //    animator.SetIKPositionWeight(RightHand.goal, 0);
+                //    animator.SetIKRotationWeight(RightHand.goal, 0);
+                //}
 
                 if (feetIkActive)
                 {
@@ -352,39 +352,39 @@ namespace umi3dVRBrowsersBase.ikManagement
             }
         }
 
-        private void LateUpdate()
-        {
-            if (animator)
-            {
-                Transform leftKnee = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
-                Transform rightKnee = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
-                leftKnee.localRotation = rightKnee.localRotation;
-            }
+        //private void LateUpdate()
+        //{
+        //    if (animator)
+        //    {
+        //        Transform leftKnee = animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg);
+        //        Transform rightKnee = animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+        //        leftKnee.localRotation = rightKnee.localRotation;
+        //    }
 
-            if (animator)
-            {
-                if (rightIkActive)
-                {
-                    rightRestPoseHelper.UnsyncPoses(false);
-                    rightBodyInteractionHelper.SyncPoses(rightAnimation);
-                }
-                else
-                {
-                    rightBodyInteractionHelper.UnsyncPoses(false);
-                    rightRestPoseHelper.SyncPoses(1f - rightAnimation);
-                }
+        //    if (animator)
+        //    {
+        //        if (rightIkActive)
+        //        {
+        //            rightRestPoseHelper.UnsyncPoses(false);
+        //            rightBodyInteractionHelper.SyncPoses(rightAnimation);
+        //        }
+        //        else
+        //        {
+        //            rightBodyInteractionHelper.UnsyncPoses(false);
+        //            rightRestPoseHelper.SyncPoses(1f - rightAnimation);
+        //        }
 
-                if (leftIkActive)
-                {
-                    leftRestPoseHelper.UnsyncPoses(false);
-                    leftBodyInteractionHelper.SyncPoses(leftAnimation);
-                }
-                else
-                {
-                    leftBodyInteractionHelper.UnsyncPoses(false);
-                    leftRestPoseHelper.SyncPoses(1f - leftAnimation);
-                }
-            }
-        }
+        //        if (leftIkActive)
+        //        {
+        //            leftRestPoseHelper.UnsyncPoses(false);
+        //            leftBodyInteractionHelper.SyncPoses(leftAnimation);
+        //        }
+        //        else
+        //        {
+        //            leftBodyInteractionHelper.UnsyncPoses(false);
+        //            leftRestPoseHelper.SyncPoses(1f - leftAnimation);
+        //        }
+        //    }
+        //}
     }
 }

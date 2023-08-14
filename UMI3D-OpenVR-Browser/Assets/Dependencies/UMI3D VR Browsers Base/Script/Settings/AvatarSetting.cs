@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using umi3d.cdk.collaboration.userCapture;
 using umi3d.cdk.userCapture;
 
 namespace umi3dVRBrowsersBase.settings
@@ -48,10 +49,10 @@ namespace umi3dVRBrowsersBase.settings
             if (!EnvironmentSettings.Instance.IsEnvironmentLoaded)
                 return;
 
-            if (value != IsOn && UMI3DClientUserTracking.Exists)
+            if (value != IsOn && PersonalSkeletonManager.Exists)
             {
                 IsOn = value;
-                UMI3DClientUserTracking.Instance.SetTrackingSending(IsOn);
+                CollaborationSkeletonsManager.Instance.ShouldSendTracking = IsOn;
                 OnValueChanged?.Invoke(IsOn);
             }
         }

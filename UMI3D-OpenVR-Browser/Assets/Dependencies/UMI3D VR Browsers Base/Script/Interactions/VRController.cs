@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using umi3d.cdk.interaction;
 using umi3d.cdk.menu;
 using umi3d.cdk.menu.interaction;
-using umi3d.cdk.userCapture;
+using umi3d.cdk.userCapture.tracking;
 using umi3d.common.interaction;
 using umi3dVRBrowsersBase.interactions.input;
 using umi3dVRBrowsersBase.ui.playerMenu;
@@ -41,7 +41,7 @@ namespace umi3dVRBrowsersBase.interactions
         /// <summary>
         /// Asoociated bone.
         /// </summary>
-        public UMI3DClientUserTrackingBone bone;
+        public TrackedSubskeletonBoneController bone;
 
         #region Inputs Fields
 

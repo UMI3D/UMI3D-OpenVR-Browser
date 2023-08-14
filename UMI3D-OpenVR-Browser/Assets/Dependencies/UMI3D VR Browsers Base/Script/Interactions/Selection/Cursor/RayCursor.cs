@@ -179,9 +179,9 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                         hoveredObjectId = trackingInfo.targetContainer.Interactable.id,
                         boneType = controller.bone.boneType,
                         state = false,
-                        normal = Vector3.zero,
-                        position = Vector3.zero,
-                        direction = Vector3.zero
+                        normal = Vector3.zero.Dto(),
+                        position = Vector3.zero.Dto(),
+                        direction = Vector3.zero.Dto()
                     };
                     UMI3DClientServer.SendData(hoverDto, true);
                 }

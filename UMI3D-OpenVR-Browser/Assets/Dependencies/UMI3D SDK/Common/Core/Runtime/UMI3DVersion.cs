@@ -29,9 +29,9 @@ namespace umi3d
         /// </summary>
         public static string version => major + "." + minor + "." + status + "." + date;
         public static readonly string major = "2";
-        public static readonly string minor = "6";
-        public static readonly string status = "p";
-        public static readonly string date = "280323";
+        public static readonly string minor = "7";
+        public static readonly string status = "b";
+        public static readonly string date = "230808";
 
 
         public class Version
@@ -179,6 +179,33 @@ namespace umi3d
                 if(version.date < date_min || version.date > date_max) return false;
 
                 return true;
+            }
+
+            public override string ToString()
+            {
+                if (date_max == DateTime.MaxValue && major_max == int.MaxValue
+                    && date_min == DateTime.MinValue && major_min == int.MinValue)
+                    return "Any";
+
+                var maxString = "";
+                var minString = "";
+                if (major_max != int.MaxValue)
+                {
+                    maxString += string.Join(".", major_max, minor_max, status) + " > ";
+                    if (date_max != DateTime.MaxValue)
+                        maxString = string.Join(".", maxString, date_max);
+                    maxString += " >= ";
+                }
+                if (major_min != int.MinValue)
+                {
+                    minString += " >= ";
+                    minString += string.Join(".", major_min, minor_min, status);
+                    if (date_min != DateTime.MinValue)
+                        minString = string.Join(".", minString, date_min);
+
+                }
+
+                return maxString + "ver." + minString;
             }
 
         }

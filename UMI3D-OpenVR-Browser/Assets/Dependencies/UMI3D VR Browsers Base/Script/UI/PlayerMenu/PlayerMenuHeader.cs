@@ -83,7 +83,7 @@ namespace umi3dVRBrowsersBase.ui.playerMenu
                 m_participantCount.gameObject.SetActive(true);
                 m_startOfSession = DateTime.Now;
             });
-            UMI3DCollaborationEnvironmentLoader.OnUpdateUserList += UpdateParticipantsCount;
+            UMI3DCollaborationEnvironmentLoader.Instance.OnUpdateUserList += UpdateParticipantsCount;
         }
 
         /// <summary>

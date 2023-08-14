@@ -1,5 +1,6 @@
 ﻿/*
 Copyright 2019 - 2023 Inetum
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -165,7 +166,7 @@ namespace umi3d.cdk
             if (chain.IsByte)
                 await UMI3DClientServer.transactionDispatcher.PerformOperation(new ByteContainer(chain.byteOperation));
             else
-                await UMI3DClientServer.transactionDispatcher.PerformOperation(chain.operation);
+                await UMI3DClientServer.transactionDispatcher.PerformOperation(new DtoContainer(chain.operation));
         }
 
         /// <inheritdoc/>
@@ -207,7 +208,7 @@ namespace umi3d.cdk
         }
 
         /// <inheritdoc/>
-        public static Task<bool> ReadMyUMI3DProperty(ReadUMI3DPropertyData value)
+        public static Task<bool> ReadMyUMI3DProperty(ReadUMI3DPropertyData value) 
             => Task.FromResult(false);
 
         private bool UpdateChain(UMI3DNodeAnimationDto dto, SetEntityPropertyDto property)

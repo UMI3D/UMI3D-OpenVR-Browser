@@ -52,46 +52,46 @@ namespace umi3dVRBrowsersBase.interactions.input
             switch (dofs)
             {
                 case DofGroupEnum.ALL:
-                    res.translation = GetTranslation3Axis();
-                    res.rotation = GetRotation3Axis();
+                    res.translation = GetTranslation3Axis().Dto();
+                    res.rotation = GetRotation3Axis().Dto();
                     break;
                 case DofGroupEnum.X:
                 case DofGroupEnum.Y:
                 case DofGroupEnum.Z:
-                    res.translation = GetTranslation1Axis(dofs);
+                    res.translation = GetTranslation1Axis(dofs).Dto();
                     break;
                 case DofGroupEnum.XY:
                 case DofGroupEnum.XZ:
                 case DofGroupEnum.YZ:
-                    res.translation = GetTranslation2Axis(dofs);
+                    res.translation = GetTranslation2Axis(dofs).Dto();
                     break;
                 case DofGroupEnum.XYZ:
-                    res.translation = GetTranslation3Axis();
+                    res.translation = GetTranslation3Axis().Dto();
                     break;
                 case DofGroupEnum.RX:
                 case DofGroupEnum.RY:
                 case DofGroupEnum.RZ:
-                    res.rotation = GetRotation1Axis(dofs);
+                    res.rotation = GetRotation1Axis(dofs).Dto();
                     break;
                 case DofGroupEnum.RX_RY:
                 case DofGroupEnum.RX_RZ:
                 case DofGroupEnum.RY_RZ:
-                    res.rotation = GetRotation2Axis(dofs);
+                    res.rotation = GetRotation2Axis(dofs).Dto();
                     break;
                 case DofGroupEnum.RX_RY_RZ:
-                    res.rotation = GetRotation3Axis();
+                    res.rotation = GetRotation3Axis().Dto();
                     break;
                 case DofGroupEnum.X_RX:
-                    res.translation = GetTranslation1Axis(DofGroupEnum.X);
-                    res.rotation = GetRotation1Axis(DofGroupEnum.RX);
+                    res.translation = GetTranslation1Axis(DofGroupEnum.X).Dto();
+                    res.rotation = GetRotation1Axis(DofGroupEnum.RX).Dto();
                     break;
                 case DofGroupEnum.Y_RY:
-                    res.translation = GetTranslation1Axis(DofGroupEnum.Y);
-                    res.rotation = GetRotation1Axis(DofGroupEnum.RY);
+                    res.translation = GetTranslation1Axis(DofGroupEnum.Y).Dto();
+                    res.rotation = GetRotation1Axis(DofGroupEnum.RY).Dto();
                     break;
                 case DofGroupEnum.Z_RZ:
-                    res.translation = GetTranslation1Axis(DofGroupEnum.Z);
-                    res.rotation = GetRotation1Axis(DofGroupEnum.RZ);
+                    res.translation = GetTranslation1Axis(DofGroupEnum.Z).Dto();
+                    res.rotation = GetRotation1Axis(DofGroupEnum.RZ).Dto();
                     break;
                 default:
                     break;

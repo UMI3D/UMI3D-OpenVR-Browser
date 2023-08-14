@@ -1,5 +1,6 @@
 ﻿/*
 Copyright 2019 - 2023 Inetum
+
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -226,7 +227,7 @@ namespace umi3d.cdk
         /// </summary>
         public async void Destroy()
         {
-            await UMI3DEnvironmentLoader.DeleteEntity(dto.id);
+            await UMI3DEnvironmentLoader.DeleteEntity(dto.id, null);
         }
 
         /// <summary>

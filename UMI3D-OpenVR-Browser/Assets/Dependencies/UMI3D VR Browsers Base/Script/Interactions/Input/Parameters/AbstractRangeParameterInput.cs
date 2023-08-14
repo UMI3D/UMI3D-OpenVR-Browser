@@ -68,8 +68,8 @@ namespace umi3dVRBrowsersBase.interactions.input
                         {
                             id = param.id,
                             boneType = bone.boneType,
-                            bonePosition = bone.transform.position,
-                            boneRotation = bone.transform.rotation,
+                            bonePosition = bone.transform.position.Dto(),
+                            boneRotation = bone.transform.rotation.Dto(),
                             parameter = new ParameterType()
                             {
                                 description = param.description,

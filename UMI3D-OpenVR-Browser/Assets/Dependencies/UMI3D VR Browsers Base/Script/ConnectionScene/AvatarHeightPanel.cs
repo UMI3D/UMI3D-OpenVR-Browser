@@ -61,7 +61,7 @@ namespace umi3dVRBrowsersBase.connection
         [ContextMenu("Set Avatar Height")]
         void ValidateButtonClicked()
         {
-            SetUpAvatarHeight setUp = GameObject.FindObjectOfType<SetUpAvatarHeight>();
+            SetUpSkeleton setUp = GameObject.FindObjectOfType<SetUpSkeleton>();
             Debug.Assert(setUp != null, "No avatar found to set up height. Should not happen");
             setUp.objectsToActivate = objectsToActivate;
             StartCoroutine(setUp.SetUpAvatar());

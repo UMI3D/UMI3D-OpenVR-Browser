@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-using inetum.unityUtils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,9 +29,11 @@ using Path = inetum.unityUtils.Path;
 
 namespace umi3d.cdk
 {
-    public class UMI3DResourcesManager : inetum.unityUtils.PersistentSingleBehaviour<UMI3DResourcesManager>
+    public class UMI3DResourcesManager : inetum.unityUtils.PersistentSingleBehaviour<UMI3DResourcesManager>, IUMI3DResourcesManager
     {
         private const DebugScope scope = DebugScope.CDK | DebugScope.Core | DebugScope.Loading;
+
+        public Transform CacheTransform => gameObject.transform;
 
         #region const
         private const string dataFile = "data.json";
@@ -401,6 +402,8 @@ namespace umi3d.cdk
         private Dictionary<Library, KeyValuePair<DataFile, HashSet<ulong>>> libraries;
         public static List<DataFile> Libraries => Exists ? Instance.libraries.Values.Select(k => k.Key).ToList() : new List<DataFile>();
 
+        private Dictionary<string, SubmodelDataCollection> NsubModelsCache;
+
         #endregion
         #region setup
 
@@ -409,6 +412,7 @@ namespace umi3d.cdk
         /// <inheritdoc/>
         protected override void Awake()
         {
+            NsubModelsCache = new();
             base.Awake();
             ClearCache();
             deserializer = new ThreadDeserializer();
@@ -453,7 +457,7 @@ namespace umi3d.cdk
 
         public void ClearCache(List<Library> exceptLibraries = null)
         {
-            var NsubModelsCache = new Dictionary<string, SubmodelDataCollection>();
+            NsubModelsCache.Clear();
 
             if (subModelsCache == null)
                 subModelsCache = new Dictionary<string, SubmodelDataCollection>();
@@ -498,6 +502,7 @@ namespace umi3d.cdk
                 item.Destroy();
             }
             NsubModelsCache.Clear();
+
             Resources.UnloadUnusedAssets();
 
             StopAllCoroutines();
@@ -576,7 +581,7 @@ namespace umi3d.cdk
                     try
                     {
                         string extension = System.IO.Path.GetExtension(pair.url);
-                        IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(extension);
+                        IResourcesLoader loader = UMI3DEnvironmentLoader.AbstractParameters.SelectLoader(extension);
 
                         if (loader != null)
                         {
@@ -615,7 +620,7 @@ namespace umi3d.cdk
                     try
                     {
                         string extension = System.IO.Path.GetExtension(data.url);
-                        IResourcesLoader loader = UMI3DEnvironmentLoader.Parameters.SelectLoader(extension);
+                        IResourcesLoader loader = UMI3DEnvironmentLoader.AbstractParameters.SelectLoader(extension);
                         if (loader != null)
                         {
                             ulong? id = data.entityIds?.FirstOrDefault();
@@ -630,7 +635,6 @@ namespace umi3d.cdk
                             if (id == null)
                                 throw new Exception("id should never be null");
                             var obj = await LoadFile(id ?? 0, data, loader);
-                            Debug.Log("load " + data.libraryIds.ToString(l => l.id) + " " + data.url);
                         }
                         progress.AddComplete();
                     }
@@ -773,7 +777,7 @@ namespace umi3d.cdk
             return await _UrlToObject1(loader, url, extension, authorization, pathIfObjectInBundle, count + 1);
         }
 
-        private async Task<object> _LoadFile(ulong id, FileDto file, IResourcesLoader loader)
+        public async Task<object> _LoadFile(ulong id, FileDto file, IResourcesLoader loader)
         {
             string fileName = System.IO.Path.GetFileName(file.url);
             var library = Library.GetLibrary(file.libraryKey);
@@ -932,7 +936,7 @@ namespace umi3d.cdk
                     RemoveLibrary(lib);
                 }
 
-                UMI3DLocalAssetDirectory variant = UMI3DEnvironmentLoader.Parameters.ChooseVariant(assetLibrary);
+                UMI3DLocalAssetDirectoryDto variant = UMI3DEnvironmentLoader.AbstractParameters.ChooseVariant(assetLibrary);
 
                 var bytes = await UMI3DClientServer.GetFile(Path.Combine(assetLibrary.baseUrl, variant.path), false);
                 progress1.AddComplete();
@@ -1197,7 +1201,6 @@ namespace umi3d.cdk
                 {
                     GameObject.Destroy(data.transform.gameObject);
                 }
-                datas.Clear();
             }
 
             private class SubmodelData

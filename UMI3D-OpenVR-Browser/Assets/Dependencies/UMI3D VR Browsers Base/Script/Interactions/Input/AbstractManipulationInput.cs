@@ -277,8 +277,8 @@ namespace umi3dVRBrowsersBase.interactions.input
                     ManipulationRequestDto arg = ComputeManipulationArgument(associatedManipulationDof);
 
                     arg.boneType = boneType;
-                    arg.bonePosition = boneTransform.position;
-                    arg.boneRotation = boneTransform.rotation;
+                    arg.bonePosition = boneTransform.position.Dto();
+                    arg.boneRotation = boneTransform.rotation.Dto();
                     arg.id = associatedInteraction.id;
                     arg.toolId = toolId;
                     arg.hoveredObjectId = hoveredObjectId;

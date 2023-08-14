@@ -17,7 +17,7 @@ using inetum.unityUtils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using umi3d.baseBrowser.emotes;
+using umi3d.cdk.collaboration.emotes;
 using umi3dVRBrowsersBase.ui.watchMenu;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -133,9 +133,14 @@ namespace umi3dVRBrowsersBase.ui
             EmoteManager.Instance.EmotesLoaded -= EmoteConfigReceived;
         }
 
-        protected void EmoteConfigReceived(List<Emote> emotes)
+        protected void EmoteConfigReceived(IReadOnlyList<Emote> emotes)
         {
             UnityEngine.Debug.Log("<color=green>TODO: </color>" + $"emote received");
+            if (emotes == null)
+            {
+                UnityEngine.Debug.Log($"HACKS");
+                return; 
+            }
             foreach (var emote in emotes)
             {
                 if (emote.Label.StartsWith("Hi", StringComparison.CurrentCultureIgnoreCase)) EmoteButton1.Clicked += () => EmoteManager.Instance.PlayEmote(emote);
