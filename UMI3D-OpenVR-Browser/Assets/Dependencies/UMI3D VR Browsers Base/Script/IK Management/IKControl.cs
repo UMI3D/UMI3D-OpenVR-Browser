@@ -27,6 +27,8 @@ namespace umi3dVRBrowsersBase.ikManagement
     {
         protected Animator animator;
 
+        public bool usingTrackers = false;
+
         //public bool leftIkActive = false;
         //public bool rightIkActive = false;
 
@@ -330,7 +332,8 @@ namespace umi3dVRBrowsersBase.ikManagement
                 //    animator.SetIKRotationWeight(RightHand.goal, 0);
                 //}
 
-                if (feetIkActive)
+
+                if (!usingTrackers && feetIkActive)
                 {
                     animator.SetIKPositionWeight(LeftFoot.goal, 1);
                     animator.SetIKRotationWeight(LeftFoot.goal, 1);

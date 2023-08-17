@@ -20,6 +20,7 @@
     "com.unity.textmeshpro": "3.0.6",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.management": "4.2.0",
+    "com.unity.xr.openxr": "1.4.2",
     "com.unityfx.outline": "0.8.5",
     "com.unityfx.outline.urp": "0.5.0",
     "com.valvesoftware.unity.openvr": "file:../Assets/AssetStoreTools/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",

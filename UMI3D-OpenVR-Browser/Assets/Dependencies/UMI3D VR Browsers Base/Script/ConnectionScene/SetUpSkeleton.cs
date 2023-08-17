@@ -16,12 +16,14 @@ limitations under the License.
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using umi3d.cdk;
 using umi3d.cdk.collaboration;
 using umi3d.cdk.userCapture.tracking;
 using umi3d.common.userCapture;
 using umi3dVRBrowsersBase.ikManagement;
 using UnityEngine;
+using Valve.VR;
 
 namespace umi3dVRBrowsersBase.connection
 {
@@ -36,6 +38,11 @@ namespace umi3dVRBrowsersBase.connection
 
         public TrackedSubskeletonBoneController RightHand;
         public TrackedSubskeletonBoneController LeftHand;
+
+        //public TrackedSubskeletonBoneController RightFoot;
+        //public TrackedSubskeletonBoneController RightKnee;
+
+
 
         public SkinnedMeshRenderer Joint, Surface;
         public TrackedSubskeletonBone Viewpoint;
@@ -52,7 +59,7 @@ namespace umi3dVRBrowsersBase.connection
         public Transform skeletonContainer;
 
         /// <summary>
-        /// ?
+        /// Feet anchors in case of inverse kinematics
         /// </summary>
         public FootTargetBehavior FootTargetBehavior;
 
@@ -90,6 +97,11 @@ namespace umi3dVRBrowsersBase.connection
         /// List of <see cref="GameObject"/> to activate when avatar's height is set up.
         /// </summary>
         public List<GameObject> objectsToActivate;
+
+        /// <summary>
+        /// Optional Vive Trackers
+        /// </summary>
+        public List<SteamVR_Behaviour_Pose> Trackers = new();
 
         /// <summary>
         /// Is avatar's height set up ?
@@ -130,6 +142,71 @@ namespace umi3dVRBrowsersBase.connection
             });
         }
 
+        private bool AreTrackersActive()
+        {
+            if (Trackers.Count == 0)
+                return false;
+
+            foreach (var tracker in Trackers)
+            {
+                if (tracker.isActive)
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool AreFeetTracked()
+        {
+            if (Trackers.Count == 0)
+                return false;
+
+            return Trackers.Find(t => t.inputSource == SteamVR_Input_Sources.LeftFoot).isActive || Trackers.Find(t => t.inputSource == SteamVR_Input_Sources.RightFoot).isActive;
+        }
+
+        private uint SteamInputSourceToBonetype(SteamVR_Input_Sources input)
+        {
+            switch (input) 
+            {
+                case SteamVR_Input_Sources.LeftKnee:
+                    return BoneType.LeftKnee;
+
+                case SteamVR_Input_Sources.LeftFoot:
+                    return BoneType.LeftAnkle;
+
+                case SteamVR_Input_Sources.LeftElbow:
+                    return BoneType.LeftForearm;
+
+                case SteamVR_Input_Sources.LeftShoulder:
+                    return BoneType.LeftShoulder;
+
+                case SteamVR_Input_Sources.LeftHand:
+                    return BoneType.LeftHand;
+
+                case SteamVR_Input_Sources.RightKnee:
+                    return BoneType.RightKnee;
+
+                case SteamVR_Input_Sources.RightFoot:
+                    return BoneType.RightAnkle;
+
+                case SteamVR_Input_Sources.RightElbow:
+                    return BoneType.RightForearm;
+
+                case SteamVR_Input_Sources.RightShoulder:
+                    return BoneType.RightShoulder;
+
+                case SteamVR_Input_Sources.RightHand:
+                    return BoneType.RightHand;
+
+                case SteamVR_Input_Sources.Waist:
+                    return BoneType.Spine;
+
+                default:
+                    return BoneType.None;
+
+            }  
+        }
+
         /// <summary>
         /// Check user's height to change avatar size.
         /// </summary>
@@ -157,7 +234,7 @@ namespace umi3dVRBrowsersBase.connection
 
             if (sessionScaleFactor == default)
             {
-                sessionScaleFactor = Vector3.one * height * 1.15f; 
+                sessionScaleFactor = Vector3.one * height * 1.05f; 
             }
 
             skeletonContainer.localScale = sessionScaleFactor;
@@ -167,7 +244,8 @@ namespace umi3dVRBrowsersBase.connection
             startingVirtualNeckPosition = OVRAnchor.TransformPoint(neckOffset);
             diffY = startingVirtualNeckPosition.y - skeletonContainer.position.y;
 
-            FootTargetBehavior.SetFootTargets();
+            if (!AreFeetTracked())
+                FootTargetBehavior.SetFootTargets();
 
             foreach (GameObject obj in objectsToActivate)
                 obj.SetActive(true);
@@ -180,6 +258,21 @@ namespace umi3dVRBrowsersBase.connection
 
             trackedSkeleton.bones.Add(BoneType.Viewpoint, Viewpoint);
 
+            if (AreTrackersActive())
+            {
+                if (AreFeetTracked())
+                {
+                    leftFoot = Trackers.Find(t => t.inputSource == SteamVR_Input_Sources.LeftFoot)?.transform;
+                    rightFoot = Trackers.Find(t => t.inputSource == SteamVR_Input_Sources.RightFoot)?.transform;
+                }
+
+                foreach (var activeTracker in Trackers.Where(t => t.isActive))
+                {
+                    trackedSkeleton.bones[SteamInputSourceToBonetype(activeTracker.inputSource)] = activeTracker.GetComponent<TrackedSubskeletonBone>();
+                    trackedSkeleton.controllers.Add(new DistantController() { boneType = SteamInputSourceToBonetype(activeTracker.inputSource), isActif = true, position = activeTracker.transform.position, rotation = activeTracker.transform.rotation, isOverrider = true });
+                }
+            }
+
             isSetup = true;
         }
 
@@ -188,7 +281,9 @@ namespace umi3dVRBrowsersBase.connection
         /// </summary>
         private void LateUpdate()
         {
-            if (isSetup)
+            Vector3 virtualNeckPosition = OVRAnchor.TransformPoint(neckOffset);
+
+            if (isSetup && !AreTrackersActive())
             {
                 float diffAngle = Vector3.Angle(Vector3.ProjectOnPlane(OVRAnchor.forward, Vector3.up), this.transform.forward);
 
@@ -196,16 +291,22 @@ namespace umi3dVRBrowsersBase.connection
 
                 Neck.localRotation = Quaternion.Euler(Mathf.Clamp(rotX, -60, 60), 0, 0);
 
-                Vector3 virtualNeckPosition = OVRAnchor.TransformPoint(neckOffset);
-
                 transform.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
 
                 skeletonContainer.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z);
+            }
+            
+            if (isSetup)
+            {
 
+                skeletonContainer.position = new Vector3(virtualNeckPosition.x, virtualNeckPosition.y - diffY, virtualNeckPosition.z - 0.10f);
                 Vector3 anchorForwardProjected = Vector3.Cross(OVRAnchor.right, Vector3.up).normalized;
                 transform.rotation = Quaternion.LookRotation(anchorForwardProjected, Vector3.up);
             }
         }
+
+        private Transform rightFoot;
+        private Transform leftFoot;
 
         /// <summary>
         /// Smooth rotation of the avatar.
