@@ -6,7 +6,7 @@ namespace com.inetum.addonEulen.common
 
         public const string getTest = baseUrl + "test";
 
-        public const string postRecord = baseUrl + "post/record";
+        public const string postRecord = baseUrl + "post/record/:param";
 
         public const string getEndSession= baseUrl + "get/endSession";
     }

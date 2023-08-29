@@ -30,147 +30,24 @@ public class UserSettings : MonoBehaviour
     /// </summary>
     private UserSettingsDto userSettings = new UserSettingsDto();
 
-    private bool isDisplayed = true;
-
-    public SteamVR_Action_Boolean triggerAction;
-
-    private Action onSuccess;
-
-    #region UI
-
-    [SerializeField]
-    private GameObject panel = null;
-
-    [SerializeField]
-    private Transform sliderValueFeedback = null;
-
-    private float sliderValue = 0;
-
-    private float SliderValue
-    {
-        get => sliderValue;
-        set
-        {
-            sliderValue = Mathf.Clamp(value, 0, maxSliderValue);
-            sliderValueFeedback.localScale = new Vector3(sliderValueFeedback.localScale.x, sliderValue / maxSliderValue, sliderValueFeedback.localScale.z);
-        }
-    }
-
-    private float maxSliderValue = 100;
-
-    #endregion
-
     #endregion
 
     #region Methods
 
-    [ContextMenu("Display")]
-    public void DisplaySettings(Action onSuccess)
-    {
-        if (isDisplayed)
-            return;
-
-        isDisplayed = true;
-
-        panel.SetActive(true);
-
-        SliderValue = 0;
-
-        this.onSuccess = onSuccess;
-    }
-
-    [ContextMenu("Hide")]
-    public void HideSettings()
-    {
-        if (!isDisplayed)
-            return;
-
-        isDisplayed = false;
-
-        panel.SetActive(false);
-
-        this.onSuccess = null;
-    }
 
     #region Monobehavior callback
 
     private void Awake()
     {
         instance = this;
-    }
 
-    private void Start()
-    {
-        HideSettings();
-    }
-
-    private void Update()
-    {
-        if (isDisplayed)
+        foreach(var entry in Enum.GetValues(typeof(SteamVR_Input_Sources)))
         {
-            if (triggerAction.GetState(SteamVR_Input_Sources.Any))
-            {
-                SliderValue += 50f * Time.deltaTime;
-
-            }
-
-            if (Mathf.Abs(sliderValue - maxSliderValue) < 1f)
-            {
-                Init();
-            }
+            userSettings.boneOffsets[(int)entry] = 0.0f;
         }
     }
 
     #endregion
-
-    /// <summary>
-    /// Inits <see cref="userSettings"/>.
-    /// </summary>
-    private void Init()
-    {
-        Debug.Log("Init");
-
-        userSettings = new UserSettingsDto();
-
-        trackerToBoneRotations.Clear();
-
-        // 1. Compute rotations from tracker frame of reference to bone frame.
-        foreach (var entry in trackersToBones)
-        {
-            Quaternion offset = Quaternion.Inverse(entry.tracker.rotation) * entry.bone.rotation;
-            trackerToBoneRotations[entry.source] = offset;
-
-            Debug.Log(entry.source + " -> " + offset.eulerAngles);
-
-            if (entry.source == SteamVR_Input_Sources.Head)
-            {
-                userSettings.cameraHeight = entry.tracker.position.y;
-                Debug.Log("HEIGHT " + entry.tracker.position.y);
-            }
-            else if (entry.source == SteamVR_Input_Sources.RightFoot)
-            {
-                userSettings.offsetFromGround = entry.tracker.position.y;
-                Debug.Log("GROUND OFFSET " + userSettings.offsetFromGround);
-            }
-        }
-
-        var copy = new Dictionary<int, Vector4Dto>();
-        foreach (var item in trackerToBoneRotations)
-        {
-            copy[(int)item.Key] = item.Value.Dto();
-        }
-
-        userSettings.trackerToBoneRotations = copy;
-
-        // 2. Compute offsets
-        userSettings.boneOffsets = GetBoneOffsets();
-
-        userSettings.boneLenghts = GetBonesLenghts();
-
-        onSuccess?.Invoke();
-
-        HideSettings();
-    }
 
     /// <summary>
     /// Compute offsets between trackers and "real bone centers".

@@ -10,6 +10,8 @@ using System;
 using com.inetum.addonEulen.common.dtos;
 using com.inetum.addonEulen.common;
 using UnityEngine.Networking;
+using umi3d.cdk.collaboration;
+using umi3d.common;
 
 namespace com.inetum.eulen.recording.app
 {
@@ -44,15 +46,7 @@ namespace com.inetum.eulen.recording.app
 
         public List<SteamVR_Behaviour_Pose> Trackers;
 
-        RecordMode currentRecordMode;
-
         public bool IsRecording { get; private set; } = false;
-
-        string splitter = " | ";
-        string subSplitter = " ; ";
-
-        Coroutine recording;
-        StreamWriter sw;
 
         public Transform Box;
 
@@ -63,6 +57,8 @@ namespace com.inetum.eulen.recording.app
         private int currentRecordedMovementId = 0;
 
         private RecordDto recordDto;
+
+        private Coroutine recordCoroutine;
 
         #endregion
 
@@ -79,71 +75,11 @@ namespace com.inetum.eulen.recording.app
                 return;
             }
 
-            currentRecordMode = mode;
             IsRecording = true;
             currentRecordedMovementId = movementId;
 
-            switch (mode)
-            {
-                case RecordMode.Json:
-                    recording = StartCoroutine(RecordingJson());
-                    break;
-                case RecordMode.Text:
-                    recording = StartCoroutine(RecordingText());
-                    break;
-                default:
-                    break;
-            }
+            recordCoroutine = StartCoroutine(RecordingJson());
         }
-
-        private IEnumerator RecordingText()
-        {
-            var wait = new WaitForSecondsRealtime(1f / recordFps);
-
-            string dataPath = "./Assets/Project/Data/FullBodyCapture " + System.DateTime.Now.ToString("yyyy-MM-dd-hhmmss") + ".npmc";
-
-            Debug.Log(dataPath);
-
-            if (!File.Exists(dataPath))
-            {
-                var fs = File.Create(dataPath);
-                fs.Close();
-            }
-
-            sw = new StreamWriter(dataPath);
-
-            while (true)
-            {
-                string log = "";
-
-                log += "CAM : " + Camera.localPosition.ToString("F3") + subSplitter + Camera.localRotation.ToString("F3") + splitter;
-
-                foreach (SteamVR_Behaviour_Pose tracker in Trackers)
-                {
-                    log += AppendLog(tracker);
-                }
-
-                sw.WriteLine(log);
-                //Debug.Log(log);
-
-                yield return wait;
-            }
-
-        }
-
-        string AppendLog(SteamVR_Behaviour_Pose tracker)
-        {
-            string id = "" + tracker.inputSource.ToString()[0];
-
-            if (Regex.Split(tracker.inputSource.ToString(), @"(?<!^)(?=[A-Z])").Length == 2)
-                id += Regex.Split(tracker.inputSource.ToString(), @"(?<!^)(?=[A-Z])")[1][0];
-
-            else
-                id += char.ToUpper(tracker.inputSource.ToString()[1]);
-
-            return id + " : " + tracker.transform.localPosition.ToString("F3") + subSplitter + tracker.transform.localRotation.ToString("F3") + splitter;
-        }
-
 
         private IEnumerator RecordingJson()
         {
@@ -192,35 +128,22 @@ namespace com.inetum.eulen.recording.app
         {
             if (IsRecording)
             {
-                switch (currentRecordMode)
+                try
                 {
-                    case RecordMode.Json:
-                        try
-                        {
-                            StopCoroutine(recording);
+                    StopCoroutine(recordCoroutine);
 
-                            IsRecording = false;
-                            Debug.Log("Records saved  : " + recordDto.frames.Count + " frames.");
+                    IsRecording = false;
+                    Debug.Log("Records saved  : " + recordDto.frames.Count + " frames.");
 
-                            StartCoroutine(SendDataRecordedToServer());
+                    StartCoroutine(SendDataRecordedToServer());
 
-                            return recordDto.frames.Count;
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-                    case RecordMode.Text:
-                        StopCoroutine(recording);
-                        sw.Close();
-                        IsRecording = false;
-                        Debug.Log("Records saved !");
-                        break;
-                    default:
-                        break;
+                    return recordDto.frames.Count;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
                 }
 
-                return 0;
             }
             return -1;
         }
@@ -232,7 +155,9 @@ namespace com.inetum.eulen.recording.app
                 Formatting.Indented,
                 new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None }));
 
-            using (UnityWebRequest request = new UnityWebRequest("localhost:50043" + EulenEndPoint.postRecord + "?movementId=" + currentRecordedMovementId, UnityWebRequest.kHttpVerbPOST))
+            string url = Regex.Replace(UMI3DCollaborationClientServer.Instance.environementHttpUrl + EulenEndPoint.postRecord, ":param", currentRecordedMovementId.ToString());
+
+            using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
             {
                 var uploadHandler = new UploadHandlerRaw(bytes);
                 uploadHandler.contentType = "application/json";
@@ -249,37 +174,9 @@ namespace com.inetum.eulen.recording.app
                 }
                 else
                 {
-                    Debug.Log("Record upload complete!");
+                    Debug.Log("Record upload complete ! " + request.uri);
                 }
             }
-        }
-
-        private RecordDto GenerateFakeData()
-        {
-            RecordDto record = new RecordDto()
-            {
-                recordFps = 60,
-                userSettings = new UserSettingsDto
-                {
-                    trackerToBoneRotations = new() { { 0, Quaternion.Euler(1, 2, 3).Dto() }, { 1, Quaternion.Euler(4, 5, 6).Dto() } },
-                    boneOffsets = new() { { 0, 0f } },
-                    boneLenghts = new() { { 0, 1f } }
-                },
-                frames = new()
-                    {
-                        new RecordKeyFrameDto(new List<RecordKeyEntryDto>
-                        {
-                            new RecordKeyEntryDto(0,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                            new RecordKeyEntryDto(1,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                            new RecordKeyEntryDto(2,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                            new RecordKeyEntryDto(3,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                            new RecordKeyEntryDto(4,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                            new RecordKeyEntryDto(5,Vector3.zero.Dto(), Quaternion.Euler(1, 2, 3).Dto()),
-                        })
-                    }
-            };
-
-            return record;
         }
     }
 }
