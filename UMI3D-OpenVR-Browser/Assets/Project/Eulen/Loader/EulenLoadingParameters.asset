@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e4b04d24520ba34a92fdfd2ff2de981, type: 3}
+  m_Name: EulenLoadingParameters
+  m_EditorClassIdentifier: 
+  supportedformats:
+  - gltf
+  - obj
+  - png
+  - jpg
+  - unity_standalone_urp
+  maximumResolution: 0
+  notificationLoader: {fileID: 11400000, guid: 0547a6e5311adf04b9592ef5488099fb, type: 2}
+  _skyboxMaterial: {fileID: 2100000, guid: 570bb4f4500a62a4a9ab2c867ebb73eb, type: 2}
+  defaultMat: {fileID: -3033667219593020291, guid: 1dd8f1c234ac0bf4382f3fdf7b5f88a3,
+    type: 3}
+  _skyboxEquirectangularMaterial: {fileID: 2100000, guid: 550ddc5eab91acd47adeb9d3fd1b2ff8,
+    type: 2}
+  skeletonHierarchyDefinition: {fileID: 11400000, guid: e4facea53a30b4c40aa447fc608d5c8a,
+    type: 2}
+  clientPoses: []
+  collaborationUserCaptureActivated: 1
+  collabTrackedSkeleton: {fileID: 3328692698567505491, guid: ab6aa0a6a7023a149a67b281f2e62d88,
+    type: 3}
+  areEmotesSupported: 1
+  defaultEmoteIcon: {fileID: 21300000, guid: 14de301757e29b947925e81f8ba04e25, type: 3}
