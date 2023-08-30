@@ -34,6 +34,10 @@ public class EulenCollaborationLoadingParameters : UMI3DCollabLoadingParameters
 
                 FullBodyRecording.instance.StopRecording();
                 return Task.CompletedTask;
+            case EulenPropertyKeys.stopReplay:
+                DrawAvatar.Instance.StopReplay();
+                DrawAvatar.Instance.HideReplay();
+                return Task.CompletedTask;
             default:
                 break;
         }

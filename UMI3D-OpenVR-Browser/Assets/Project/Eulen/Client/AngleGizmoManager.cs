@@ -67,8 +67,6 @@ public class AngleGizmoManager : MonoBehaviour
     [SerializeField, Tooltip("Material to draw a surface error")]
     private Material errorAngleInsideMaterial;
 
-    [SerializeField]
-    private Camera cam;
 
     /// <summary>
     /// List of all gizmos to display.
@@ -101,9 +99,6 @@ public class AngleGizmoManager : MonoBehaviour
     /// <param name="camera"></param>
     private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
     {
-        /*if (camera != cam)
-            return;*/
-
         foreach (var gizmo in angleGizmos)
         {
             GL.Begin(GL.LINES);
@@ -118,6 +113,7 @@ public class AngleGizmoManager : MonoBehaviour
                 angleMaterial.SetPass(0);
                 GL.MultMatrix(Matrix4x4.identity);
             }
+
             Vector3 startAngle = gizmo.startAngle.normalized * gizmo.size;
             Vector3 endAngle = Quaternion.AngleAxis(gizmo.angle, gizmo.rotationAxis) * startAngle;
             Vector3 center = gizmo.center;

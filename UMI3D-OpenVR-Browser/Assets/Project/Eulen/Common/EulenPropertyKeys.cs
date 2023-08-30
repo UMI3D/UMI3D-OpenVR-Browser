@@ -7,5 +7,7 @@ namespace com.inetum.addonEulen.common
         public const uint stopRecord = 200001;
         
         public const uint startRecord = 200002; 
+
+        public const uint stopReplay = 200003; 
     }
 }

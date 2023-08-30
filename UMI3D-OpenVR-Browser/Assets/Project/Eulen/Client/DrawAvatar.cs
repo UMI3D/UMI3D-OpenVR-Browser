@@ -69,12 +69,12 @@ namespace com.inetum.eulen.recording.app
         public float headOffset = 0.05f;
 
         [Header("Angle Tags")]
-        public GameObject angKneeR;
-        public GameObject angKneeL;
-        public GameObject angElbowR;
-        public GameObject angElbowL;
-        public GameObject angHips;
-        public GameObject angWaist;
+        public AngleTag angKneeR;
+        public AngleTag angKneeL;
+        public AngleTag angElbowR;
+        public AngleTag angElbowL;
+        public AngleTag angHips;
+        public AngleTag angWaist;
         public GameObject auxWaist;
 
 
@@ -106,11 +106,6 @@ namespace com.inetum.eulen.recording.app
 
         #region Display options
 
-        /// <summary>
-        /// Are tracking spheres displayed ?
-        /// </summary>
-        private bool areSphereDisplayed = false;
-
         private bool displayWireBody = false;
 
         /// <summary>
@@ -126,9 +121,6 @@ namespace com.inetum.eulen.recording.app
                 DisplayTrackerSpheres();
             }
         }
-
-        [HideInInspector]
-        public bool shouldDisplayHipsAngle, shouldDisplayRightKneeAngle, shouldDisplayLeftKneeAngle, shouldDisplayRightElbowAngle, shouldDisplayLeftElbowAngle, shouldDisplayWaistAngle;    //W
 
         #endregion
 
@@ -166,13 +158,6 @@ namespace com.inetum.eulen.recording.app
 
         private void Start()
         {
-            shouldDisplayHipsAngle = true;
-            shouldDisplayRightKneeAngle = true;
-            shouldDisplayLeftKneeAngle = true;
-            shouldDisplayRightElbowAngle = true;
-            shouldDisplayLeftElbowAngle = true;
-            shouldDisplayWaistAngle = true; //W
-
             foreach (var tracker in trackers)
             {
                 trackersDico[tracker.source] = tracker.trans;
@@ -300,8 +285,13 @@ namespace com.inetum.eulen.recording.app
                 if (replayCoroutine != null)
                     StopCoroutine(replayCoroutine);
 
+                displayAvatar = !displayAvatar;
+
                 avatar.SetActive(displayAvatar);
+                BoxReplay.gameObject.SetActive(true);
                 DisplayWireBody = !displayAvatar;
+
+                rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = !displayAvatar;
 
                 replayNum = PanelController.selectedNumPosition;
                 replayCoroutine = StartCoroutine(ReplayCoroutine(data, offset));
@@ -368,8 +358,6 @@ namespace com.inetum.eulen.recording.app
         public bool SetFramePose(RecordKeyFrameDto frame, UserSettingsDto userSettings, int i)
         {
             SetAvatarHeight(userSettings.cameraHeight, userSettings.boneLenghts);
-
-            DisplayTrackerSpheres();
 
             // 1. Sets wire body
             Vector3 _rightFoot = Vector3.zero, _rightKnee = Vector3.zero;
@@ -536,10 +524,16 @@ namespace com.inetum.eulen.recording.app
             {
                 var rightHand = bonesDico[SteamVR_Input_Sources.RightHand];
                 var leftHand = bonesDico[SteamVR_Input_Sources.LeftHand];
-                rightHand.rotation = trackersDico[SteamVR_Input_Sources.RightHand].rotation * trackersToBones[(int)SteamVR_Input_Sources.RightHand].Quaternion();
-                rightHand.Rotate(rightHandOffset);
-                leftHand.rotation = trackersDico[SteamVR_Input_Sources.LeftHand].rotation * trackersToBones[(int)SteamVR_Input_Sources.LeftHand].Quaternion();
-                leftHand.Rotate(leftHandOffset);
+                if (trackersToBones.ContainsKey((int)SteamVR_Input_Sources.RightHand))
+                {
+                    rightHand.rotation = trackersDico[SteamVR_Input_Sources.RightHand].rotation * trackersToBones[(int)SteamVR_Input_Sources.RightHand].Quaternion();
+                    rightHand.Rotate(rightHandOffset);
+                }
+                if (trackersToBones.ContainsKey((int)SteamVR_Input_Sources.LeftHand))
+                {
+                    leftHand.rotation = trackersDico[SteamVR_Input_Sources.LeftHand].rotation * trackersToBones[(int)SteamVR_Input_Sources.LeftHand].Quaternion();
+                    leftHand.Rotate(leftHandOffset);
+                }
                 isRotationSetup = true;
             }
 
@@ -588,13 +582,6 @@ namespace com.inetum.eulen.recording.app
         /// </summary>
         private void UpdateGizmos(int i)
         {
-            rightKneeGizmo.Enabled = shouldDisplayRightKneeAngle;
-            leftKneeGizmo.Enabled = shouldDisplayLeftKneeAngle;
-            hipsGizmo.Enabled = shouldDisplayHipsAngle;
-            leftElbowGizmo.Enabled = shouldDisplayLeftElbowAngle;
-            rightElbowGizmo.Enabled = shouldDisplayRightElbowAngle;
-            waistGizmo.Enabled = shouldDisplayRightElbowAngle;
-
             // Right Knee Gizmo
             rightKneeGizmo.center = rightKneeTracker.position;
             Vector3 startAngle = waistTracker.position - rightKneeTracker.position;
@@ -680,15 +667,15 @@ namespace com.inetum.eulen.recording.app
             leftElbowGizmo.angle = Vector3.Angle(startAngle, endAngle);
 
             // Angle Tags
-            Debug.Log("TODO");
-            /*angKneeR.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, rightKneeGizmo.angle);
-            angKneeL.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, leftKneeGizmo.angle);
-            angElbowR.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, rightElbowGizmo.angle);
-            angElbowL.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, leftElbowGizmo.angle);
-            angHips.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, hipsGizmo.angle);
-            angWaist.GetComponent<FollowGizmo>().UpdateTagPosition(cameraHead.transform, waistGizmo.angle);
+            angKneeR.UpdateTag(rightKneeGizmo);
+            angKneeL.UpdateTag(leftKneeGizmo);
+            angElbowR.UpdateTag(rightElbowGizmo);
+            angElbowL.UpdateTag(leftElbowGizmo);
+            angHips.UpdateTag(hipsGizmo);
+            angWaist.UpdateTag(waistGizmo);
 
-            auxWaist.GetComponent<FollowGizmo>().UpdateAuxPosition();*/
+            Debug.Log("TODO");
+            /*auxWaist.GetComponent<FollowGizmo>().UpdateAuxPosition();*/
 
             // Box  (Used to compare the box position with the previous frame to check if the box has moved, so if the box has moved means the user has picked up)
             if (i != 0 && BoxReplay.position != boxPosAux) boxAttached = true;
@@ -729,6 +716,15 @@ namespace com.inetum.eulen.recording.app
                         break;
                 }
             }
+        }
+
+        public void HideReplay()
+        {
+            DisplayWireBody = false;
+            avatar.SetActive(false);
+            BoxReplay.gameObject.SetActive(false);
+
+            rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = false;
         }
 
         #endregion
@@ -780,27 +776,19 @@ namespace com.inetum.eulen.recording.app
 
         private void DisplayTrackerSpheres()
         {
-            if (DisplayWireBody && !areSphereDisplayed)
+            if (DisplayWireBody)
             {
                 foreach (var tracker in trackers)
                 {
-                    if (tracker.source == SteamVR_Input_Sources.Camera || tracker.source == SteamVR_Input_Sources.Treadmill)
-                        continue;
-
-                    areSphereDisplayed = true;
-                    tracker.trans.gameObject.SetActive(true);
+                    tracker.trans.gameObject.SetActive(false);
                 }
 
                 neck.SetActive(true);
             }
-            else if (!DisplayWireBody && areSphereDisplayed)
+            else
             {
                 foreach (var tracker in trackers)
                 {
-                    if (tracker.source == SteamVR_Input_Sources.Camera || tracker.source == SteamVR_Input_Sources.Treadmill)
-                        continue;
-
-                    areSphereDisplayed = false;
                     tracker.trans.gameObject.SetActive(false);
                 }
 
