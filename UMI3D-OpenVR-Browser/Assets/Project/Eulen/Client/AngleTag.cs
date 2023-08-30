@@ -21,7 +21,7 @@ public class AngleTag : MonoBehaviour
             transform.position = gizmo.center;
             label.text = gizmo.angle.ToString("F0") + " °";
 
-            transform.rotation = Quaternion.LookRotation(cam.transform.position - transform.position);
+            transform.rotation = Quaternion.LookRotation(transform.position - cam.transform.position);
         }
 
         gameObject.SetActive(gizmo.Enabled);

@@ -285,8 +285,6 @@ namespace com.inetum.eulen.recording.app
                 if (replayCoroutine != null)
                     StopCoroutine(replayCoroutine);
 
-                displayAvatar = !displayAvatar;
-
                 avatar.SetActive(displayAvatar);
                 BoxReplay.gameObject.SetActive(true);
                 DisplayWireBody = !displayAvatar;
@@ -450,20 +448,24 @@ namespace com.inetum.eulen.recording.app
             // 2.0. Waist
             var hips = bonesDico[SteamVR_Input_Sources.Waist];
             hips.position = waistTracker.position;
-            hips.rotation = Quaternion.LookRotation(neck.transform.position - waistTracker.position, -waistTracker.transform.forward);
+            if (Vector3.zero != neck.transform.position - waistTracker.position)
+                hips.rotation = Quaternion.LookRotation(neck.transform.position - waistTracker.position, -waistTracker.transform.forward);
             hips.Rotate(hipsOffset);
 
             // 2.1. Legs
-            rightUpLegBone.transform.rotation = Quaternion.LookRotation(rightKneeTracker.position - waistTracker.transform.position, -rightKneeTracker.forward);
+            if (Vector3.zero != rightKneeTracker.position - waistTracker.transform.position)
+                rightUpLegBone.transform.rotation = Quaternion.LookRotation(rightKneeTracker.position - waistTracker.transform.position, -rightKneeTracker.forward);
             rightUpLegBone.transform.Rotate(upLegOffset);
-            leftUpLegBone.transform.rotation = Quaternion.LookRotation(leftKneeTracker.position - waistTracker.transform.position, -leftKneeTracker.forward);
+            if (Vector3.zero != leftKneeTracker.position - waistTracker.transform.position)
+                leftUpLegBone.transform.rotation = Quaternion.LookRotation(leftKneeTracker.position - waistTracker.transform.position, -leftKneeTracker.forward);
             leftUpLegBone.transform.Rotate(upLegOffset);
 
             // 2.2. Knees
-            rightKneeBone.transform.rotation = Quaternion.LookRotation(rightFootTracker.position - rightKneeTracker.position, -rightFootTracker.forward);
+            if (Vector3.zero != rightFootTracker.position - rightKneeTracker.position)
+                rightKneeBone.transform.rotation = Quaternion.LookRotation(rightFootTracker.position - rightKneeTracker.position, -rightFootTracker.forward);
             rightKneeBone.transform.Rotate(rightKneeOffset);
-
-            leftKneeBone.transform.rotation = Quaternion.LookRotation(leftFootTracker.position - leftKneeTracker.position, -leftFootTracker.forward);
+            if (Vector3.zero != leftFootTracker.position - leftKneeTracker.position)
+                leftKneeBone.transform.rotation = Quaternion.LookRotation(leftFootTracker.position - leftKneeTracker.position, -leftFootTracker.forward);
             leftKneeBone.transform.Rotate(leftKneeOffset);
 
             // Move spin for a better movement if neccessay 
@@ -487,30 +489,35 @@ namespace com.inetum.eulen.recording.app
 
             // 2.5. Shoulders
 
-            rightShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position,
+            if (Vector3.zero != trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position)
+                rightShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position,
                 trackersDico[SteamVR_Input_Sources.RightElbow].up);
             rightShoulderBone.transform.Rotate(rightShoulderOffset);
 
-            leftShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position,
+            if (Vector3.zero != trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position)
+                leftShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position,
                 trackersDico[SteamVR_Input_Sources.LeftElbow].up);
             leftShoulderBone.transform.Rotate(leftShoulderOffset);
 
 
             // 2.6. Elbow
             var rightElbowBone = bonesDico[SteamVR_Input_Sources.RightElbow];
-            rightElbowBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightHand].position - trackersDico[SteamVR_Input_Sources.RightElbow].position,
+            if (Vector3.zero != trackersDico[SteamVR_Input_Sources.RightHand].position - trackersDico[SteamVR_Input_Sources.RightElbow].position)
+                rightElbowBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightHand].position - trackersDico[SteamVR_Input_Sources.RightElbow].position,
                 trackersDico[SteamVR_Input_Sources.RightHand].up);
             rightElbowBone.transform.Rotate(rightElbowOffset);
 
             var leftElbowBone = bonesDico[SteamVR_Input_Sources.LeftElbow];
-            leftElbowBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftHand].position - trackersDico[SteamVR_Input_Sources.LeftElbow].position,
+            if (Vector3.zero != trackersDico[SteamVR_Input_Sources.LeftHand].position - trackersDico[SteamVR_Input_Sources.LeftElbow].position)
+                leftElbowBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftHand].position - trackersDico[SteamVR_Input_Sources.LeftElbow].position,
                 trackersDico[SteamVR_Input_Sources.LeftHand].up);
             leftElbowBone.transform.Rotate(leftElbowOffset);
 
 
             // 7. Head
             var head = bonesDico[SteamVR_Input_Sources.Head];
-            head.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.Head].position - neck.transform.position, trackersDico[SteamVR_Input_Sources.Head].forward);
+            if (Vector3.zero != trackersDico[SteamVR_Input_Sources.Head].position - neck.transform.position)
+                head.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.Head].position - neck.transform.position, trackersDico[SteamVR_Input_Sources.Head].forward);
             head.transform.Rotate(headRotationOffset);
 
             // 2.3.Foot an hands
@@ -614,7 +621,7 @@ namespace com.inetum.eulen.recording.app
             // endAngle = trackersDico[SteamVR_Input_Sources.Waist].forward + new Vector3(-177.636f, 3.838013f, 60.44f);
             //endAngle = trackersDico[SteamVR_Input_Sources.LeftFoot].position - trackersDico[SteamVR_Input_Sources.RightFoot].position;
 
-            Debug.Log("TODO");
+            //Debug.Log("TODO");
             /*endAngle = trackersDico[SteamVR_Input_Sources.Waist].position - auxWaist.GetComponent<FollowGizmo>().GetChild().position;
             rotationAxis = Vector3.Cross(startAngle, endAngle);
             hipsGizmo.startAngle = startAngle;*/
@@ -674,7 +681,7 @@ namespace com.inetum.eulen.recording.app
             angHips.UpdateTag(hipsGizmo);
             angWaist.UpdateTag(waistGizmo);
 
-            Debug.Log("TODO");
+            //Debug.Log("TODO");
             /*auxWaist.GetComponent<FollowGizmo>().UpdateAuxPosition();*/
 
             // Box  (Used to compare the box position with the previous frame to check if the box has moved, so if the box has moved means the user has picked up)
