@@ -27,7 +27,7 @@ public class EulenCollaborationLoadingParameters : UMI3DCollabLoadingParameters
                 Debug.Log("Start record " + movementId);
                 DrawAvatar.Instance.StopReplay();
 
-                FullBodyRecording.instance.StartRecording(FullBodyRecording.RecordMode.Json, movementId);
+                FullBodyRecording.instance.StartRecording(movementId);
                 return Task.CompletedTask;
             case EulenPropertyKeys.stopRecord:
                 Debug.Log("Stop record " + UMI3DSerializer.Read<int>(container));

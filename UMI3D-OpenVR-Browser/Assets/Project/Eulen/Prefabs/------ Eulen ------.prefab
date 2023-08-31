@@ -2275,6 +2275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 8981767338266000170}
+  cam: {fileID: 0}
 --- !u!1 &2393278352488119484
 GameObject:
   m_ObjectHideFlags: 0
@@ -2375,6 +2376,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 5471492616123912971}
+  cam: {fileID: 0}
 --- !u!1 &2561141229168649039
 GameObject:
   m_ObjectHideFlags: 0
@@ -3208,6 +3210,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 5331649104895740233}
+  cam: {fileID: 0}
 --- !u!1 &6314921959740804730
 GameObject:
   m_ObjectHideFlags: 0
@@ -3336,6 +3339,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 7582157378778147052}
+  cam: {fileID: 0}
 --- !u!1 &7214389458140817345
 GameObject:
   m_ObjectHideFlags: 0
@@ -3388,6 +3392,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 3607470174636090926}
+  cam: {fileID: 0}
 --- !u!1 &7505551066951014076
 GameObject:
   m_ObjectHideFlags: 0
@@ -3603,6 +3608,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   label: {fileID: 7701003883558155419}
+  cam: {fileID: 0}
 --- !u!1001 &273189352746678092
 PrefabInstance:
   m_ObjectHideFlags: 0

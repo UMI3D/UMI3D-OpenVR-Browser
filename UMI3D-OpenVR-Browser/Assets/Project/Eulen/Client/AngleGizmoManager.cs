@@ -71,7 +71,7 @@ public class AngleGizmoManager : MonoBehaviour
     /// <summary>
     /// List of all gizmos to display.
     /// </summary>
-    private HashSet<AngleGizmo> angleGizmos = new HashSet<AngleGizmo>();
+    public HashSet<AngleGizmo> angleGizmos = new HashSet<AngleGizmo>();
 
     #endregion
 
@@ -84,12 +84,12 @@ public class AngleGizmoManager : MonoBehaviour
 
     void OnEnable()
     {
-        RenderPipelineManager.endCameraRendering += OnEndCameraRendering;    //
+        //RenderPipelineManager.endCameraRendering += OnEndCameraRendering;    //
     }
 
     void OnDisable()
     {
-        RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;    //
+        //RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;    //
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ public class AngleGizmoManager : MonoBehaviour
     /// </summary>
     /// <param name="context"></param>
     /// <param name="camera"></param>
-    private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+    public void OnEndCameraRendering()
     {
         foreach (var gizmo in angleGizmos)
         {
@@ -111,7 +111,6 @@ public class AngleGizmoManager : MonoBehaviour
             else
             {
                 angleMaterial.SetPass(0);
-                GL.MultMatrix(Matrix4x4.identity);
             }
 
             Vector3 startAngle = gizmo.startAngle.normalized * gizmo.size;
@@ -175,15 +174,6 @@ public class AngleGizmoManager : MonoBehaviour
                 GL.Begin(GL.LINES);
             }
 
-            // Label
-
-            /*Vector3 labelCenter = Quaternion.AngleAxis(gizmo.angle / 2f, rotationAxis) * startAngle * .5f;
-            Vector3 labelViewportCenter = cam.WorldToViewportPoint(center + labelCenter);
-
-            gizmo.label.style.left = labelViewportCenter.x * Screen.width;
-            gizmo.label.style.top = (1 - labelViewportCenter.y) * Screen.height;
-            gizmo.label.text = Mathf.Round(gizmo.angle).ToString() + " °";*/
-
             GL.End();
 
             // Error
@@ -219,8 +209,6 @@ public class AngleGizmoManager : MonoBehaviour
 
                 GL.End();
             }
-
-
         }
     }
 

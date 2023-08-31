@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
 using System.Text.RegularExpressions;
-using System.IO;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System;
 using com.inetum.addonEulen.common.dtos;
 using com.inetum.addonEulen.common;
 using UnityEngine.Networking;
 using umi3d.cdk.collaboration;
-using umi3d.common;
+using System.Linq;
 
 namespace com.inetum.eulen.recording.app
 {
@@ -24,15 +22,6 @@ namespace com.inetum.eulen.recording.app
         /// File extension for recorded data.
         /// </summary>
         public const string recordFileExtension = "npmc";
-
-        /// <summary>
-        /// Mode used to record data.
-        /// </summary>
-        public enum RecordMode
-        {
-            Json,
-            Text
-        }
 
         public static FullBodyRecording instance;
 
@@ -48,7 +37,7 @@ namespace com.inetum.eulen.recording.app
 
         public bool IsRecording { get; private set; } = false;
 
-        public Transform Box;
+        private Transform box;
 
         #endregion
 
@@ -67,7 +56,30 @@ namespace com.inetum.eulen.recording.app
             instance = this;
         }
 
-        public void StartRecording(RecordMode mode, int movementId)
+        private void OnEnable()
+        {
+            UMI3DEnvironmentClient.EnvironementLoaded.AddListener(OnEnvironmentLoaded);      
+        }
+
+        private void OnDisable()
+        {
+            UMI3DEnvironmentClient.EnvironementLoaded.RemoveListener(OnEnvironmentLoaded);
+            box = null;
+        }
+
+        private void OnEnvironmentLoaded()
+        {
+            System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
+
+            watch.Start();
+            box = Resources.FindObjectsOfTypeAll<Transform>().Where(o => o.name == "BoxTraining")?.FirstOrDefault();
+            watch.Stop();
+
+            // About 3 ms
+            Debug.Log("BOX FOUND " + (box != null) + " " + watch.ElapsedMilliseconds);
+        }
+
+        public void StartRecording(int movementId)
         {
             if (IsRecording)
             {
@@ -79,12 +91,15 @@ namespace com.inetum.eulen.recording.app
             currentRecordedMovementId = movementId;
 
             recordCoroutine = StartCoroutine(RecordingJson());
+
+            Debug.Assert(box != null, "Box should not be null");
         }
 
         private IEnumerator RecordingJson()
         {
             var wait = new WaitForSecondsRealtime(1f / recordFps);
 
+            // As we only replay with a wireframe avatar for now, user settings are empty.
             recordDto = new RecordDto { recordFps = recordFps, userSettings = UserSettings.instance.GetUserSettingsData() };
 
             List<RecordKeyEntryDto> entries = new List<RecordKeyEntryDto>();
@@ -113,9 +128,9 @@ namespace com.inetum.eulen.recording.app
                     }
 
                 }
-                // For Box do something like entries
-                // Debug.Log(SteamVR_Input_Sources.Treadmill);
-                entries.Add(new RecordKeyEntryDto((int)SteamVR_Input_Sources.Treadmill, Box.position.Dto(), Box.rotation.Dto()));
+
+                if (box != null)
+                    entries.Add(new RecordKeyEntryDto((int)SteamVR_Input_Sources.Treadmill, box.position.Dto(), box.rotation.Dto()));
 
                 recordDto.frames.Add(new RecordKeyFrameDto(entries));
 

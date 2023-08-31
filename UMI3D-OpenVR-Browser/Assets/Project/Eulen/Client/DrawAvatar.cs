@@ -190,17 +190,16 @@ namespace com.inetum.eulen.recording.app
 
         void OnEnable()
         {
-            RenderPipelineManager.endCameraRendering += RenderPipelineManager_endCameraRendering;
+            RenderPipelineManager.endCameraRendering += OnEndCameraRendering;
         }
 
         void OnDisable()
         {
-            RenderPipelineManager.endCameraRendering -= RenderPipelineManager_endCameraRendering;
+            RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;
         }
 
-        private void RenderPipelineManager_endCameraRendering(ScriptableRenderContext context, Camera camera)
+        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
         {
-            // Debug.Log("On Post Render " + camera.name + " " + camera.GetInstanceID());
             OnPostRender();
         }
 
@@ -219,6 +218,7 @@ namespace com.inetum.eulen.recording.app
             }
 
             GL.PushMatrix();
+
             lineMat.SetPass(0);
             GL.MultMatrix(Matrix4x4.identity);
 
@@ -263,6 +263,9 @@ namespace com.inetum.eulen.recording.app
 
             GL.End();
 
+            AngleGizmoManager.instance.OnEndCameraRendering();
+
+
             GL.PopMatrix();
         }
 
@@ -284,6 +287,8 @@ namespace com.inetum.eulen.recording.app
             {
                 if (replayCoroutine != null)
                     StopCoroutine(replayCoroutine);
+
+                displayAvatar = !displayAvatar;
 
                 avatar.SetActive(displayAvatar);
                 BoxReplay.gameObject.SetActive(true);
