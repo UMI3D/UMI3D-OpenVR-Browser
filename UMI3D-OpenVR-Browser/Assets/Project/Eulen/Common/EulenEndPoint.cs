@@ -8,6 +8,8 @@ namespace com.inetum.addonEulen.common
 
         public const string postRecord = baseUrl + "post/record/:param";
 
+        public const string postValidation = baseUrl + "post/validation";
+
         public const string getEndSession= baseUrl + "get/endSession";
     }
 }

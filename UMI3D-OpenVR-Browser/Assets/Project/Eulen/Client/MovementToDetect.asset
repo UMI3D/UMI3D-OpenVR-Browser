@@ -1,0 +1,152 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91a4cb45fb9b8b345a2d3202a99cfec4, type: 3}
+  m_Name: MovementToDetect
+  m_EditorClassIdentifier: 
+  conditions:
+  - ruleName: HipsTwisting
+    errorLog: Corregir la torsion de la espalda
+    isBoxGrabbed: 1
+    checkFeetPosition: 0
+    xDistanceToBox: 0
+    preConditions: []
+    postConditions:
+    - type: 2
+      test: 6
+      angle: 20
+      smallAngle: -20
+      isPreCondition: 0
+  - ruleName: Back Pose
+    errorLog: 
+    isBoxGrabbed: 0
+    checkFeetPosition: 0
+    xDistanceToBox: 0
+    preConditions:
+    - type: 0
+      test: 2
+      angle: 135
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 1
+      test: 0
+      angle: 135
+      smallAngle: 0
+      isPreCondition: 0
+    postConditions:
+    - type: 3
+      test: 2
+      angle: 130
+      smallAngle: 0
+      isPreCondition: 0
+  - ruleName: Carry the box
+    errorLog: Corregir los brazos
+    isBoxGrabbed: 1
+    checkFeetPosition: 0
+    xDistanceToBox: 0
+    preConditions:
+    - type: 0
+      test: 0
+      angle: 155
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 1
+      test: 0
+      angle: 155
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 3
+      test: 2
+      angle: 160
+      smallAngle: 0
+      isPreCondition: 0
+    postConditions:
+    - type: 4
+      test: 6
+      angle: 105
+      smallAngle: 70
+      isPreCondition: 0
+    - type: 5
+      test: 6
+      angle: 105
+      smallAngle: 70
+      isPreCondition: 0
+  - ruleName: Lift the box 1
+    errorLog: Corregir la postura al levantar la caja
+    isBoxGrabbed: 0
+    checkFeetPosition: 0
+    xDistanceToBox: 0.27
+    preConditions:
+    - type: 0
+      test: 4
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 1
+      test: 4
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    postConditions:
+    - type: 3
+      test: 2
+      angle: 120
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 4
+      test: 2
+      angle: 130
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 5
+      test: 2
+      angle: 130
+      smallAngle: 0
+      isPreCondition: 0
+  - ruleName: Lift the box 2
+    errorLog: Corregir la posicion de los pies
+    isBoxGrabbed: 0
+    checkFeetPosition: 1
+    xDistanceToBox: 0.2
+    preConditions:
+    - type: 0
+      test: 4
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 1
+      test: 0
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    postConditions:
+    - type: 3
+      test: 2
+      angle: 0
+      smallAngle: 0
+      isPreCondition: 0
+  - ruleName: 'Lift the box 2 '
+    errorLog: Corregir la posicion de los pies
+    isBoxGrabbed: 0
+    checkFeetPosition: 1
+    xDistanceToBox: 0.27
+    preConditions:
+    - type: 0
+      test: 4
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    - type: 1
+      test: 4
+      angle: 110
+      smallAngle: 0
+      isPreCondition: 0
+    postConditions: []

@@ -81,8 +81,6 @@ namespace com.inetum.eulen.recording.app
         [Header("")]
         public Transform BoxReplay;
         [SerializeField] private LogsManager logsManager;
-        [SerializeField] private GameObject screenResults;
-        [SerializeField] private Text[] res;
 
         /// <summary>
         /// Save the box position to compare as previous frame
@@ -93,7 +91,6 @@ namespace com.inetum.eulen.recording.app
         /// </summary>
         private bool boxAttached = false;
 
-        int replayNum = 0;
         private bool isRotationSetup = false;
 
         /// <summary>
@@ -265,7 +262,6 @@ namespace com.inetum.eulen.recording.app
 
             AngleGizmoManager.instance.OnEndCameraRendering();
 
-
             GL.PopMatrix();
         }
 
@@ -288,15 +284,12 @@ namespace com.inetum.eulen.recording.app
                 if (replayCoroutine != null)
                     StopCoroutine(replayCoroutine);
 
-                displayAvatar = !displayAvatar;
-
                 avatar.SetActive(displayAvatar);
                 BoxReplay.gameObject.SetActive(true);
                 DisplayWireBody = !displayAvatar;
 
                 rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = !displayAvatar;
 
-                replayNum = PanelController.selectedNumPosition;
                 replayCoroutine = StartCoroutine(ReplayCoroutine(data, offset));
             }
         }
@@ -329,26 +322,6 @@ namespace com.inetum.eulen.recording.app
                 }
 
                 StopReplay();
-
-                if (replayNum == 1 || replayNum == 3 || replayNum == 5)
-                {
-                    if (screenResults.GetComponent<Text>().text.Length > 1) screenResults.GetComponent<Text>().text = screenResults.GetComponent<Text>().text.Trim();   // Trim the last line break
-                    else screenResults.GetComponent<Text>().text = "Ejercicio realizado correctamente";
-
-                    logsManager.UpdateResultLogs(replayNum, screenResults.GetComponent<Text>().text);           // Save the log in the corresponding history
-                    UpdateResultScreen();
-                }
-            }
-        }
-
-        private void UpdateResultScreen()
-        {
-            switch (replayNum)
-            {
-                case 1: res[0].text = logsManager.IsWellDone[0] ? "1. Correcto" : "1. Incorrecto"; break;
-                case 3: res[1].text = logsManager.IsWellDone[1] ? "2. Correcto" : "2. Incorrecto"; break;
-                case 5: res[2].text = logsManager.IsWellDone[2] ? "3. Correcto" : "3. Incorrecto"; break;
-                default: break;
             }
         }
 
@@ -358,7 +331,7 @@ namespace com.inetum.eulen.recording.app
         /// <param name="frame"></param>
         /// <param name="trackersToBones"></param>
         /// <param name="i"></param>
-        public bool SetFramePose(RecordKeyFrameDto frame, UserSettingsDto userSettings, int i)
+        public bool SetFramePose(RecordKeyFrameDto frame, UserSettingsDto userSettings, int i, MovementValidationDto validationDto = null)
         {
             SetAvatarHeight(userSettings.cameraHeight, userSettings.boneLenghts);
 
@@ -380,17 +353,17 @@ namespace com.inetum.eulen.recording.app
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.Waist)
                 {
-                    // trackersDico[entry.source].position -= trackersDico[entry.source].forward * userSettings.boneOffsets[entry.source];
-                    if (replayNum == 0 || replayNum == 2 || replayNum == 4) trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].forward * userSettings.boneOffsets[entry.source];
-                    else trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].forward * waistOffset;
+                    trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].forward * userSettings.boneOffsets[entry.source];
+                    /*if (replayNum == 0 || replayNum == 2 || replayNum == 4) trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].forward * userSettings.boneOffsets[entry.source];
+                    else trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].forward * waistOffset;*/
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.LeftKnee)//
                 {
-                    if (replayNum == 1 || replayNum == 3 || replayNum == 5) trackersDico[(SteamVR_Input_Sources)entry.source].position += trackersDico[(SteamVR_Input_Sources)entry.source].right * kneeOffset;
+                    /*if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/ trackersDico[(SteamVR_Input_Sources)entry.source].position += trackersDico[(SteamVR_Input_Sources)entry.source].right * kneeOffset;
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.RightKnee)//
                 {
-                    if (replayNum == 1 || replayNum == 3 || replayNum == 5) trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].up * kneeOffset;
+                    /* if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/ trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].up * kneeOffset;
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.Treadmill)
                 {
@@ -429,10 +402,12 @@ namespace com.inetum.eulen.recording.app
             UpdateGizmos(i);
 
             OnFrameChanged?.Invoke(i + 1);
+
             // USER Replays needs to validate, PRL no need it
-            if (replayNum == 1 || replayNum == 3 || replayNum == 5) return validator.Validate(rightKneeGizmo, leftKneeGizmo, hipsGizmo, waistGizmo, leftElbowGizmo, rightElbowGizmo, boxAttached, screenResults, trackersDico[SteamVR_Input_Sources.LeftFoot], trackersDico[SteamVR_Input_Sources.RightFoot]);
-            else return true;
-            // return true;
+            if (DisplayWireBody || validationDto != null)
+                return validator.Validate(rightKneeGizmo, leftKneeGizmo, hipsGizmo, waistGizmo, leftElbowGizmo, rightElbowGizmo, boxAttached, trackersDico[SteamVR_Input_Sources.LeftFoot], trackersDico[SteamVR_Input_Sources.RightFoot], validationDto);
+            else
+                return true;
         }
 
         /// <summary>
@@ -627,12 +602,8 @@ namespace com.inetum.eulen.recording.app
             //endAngle = trackersDico[SteamVR_Input_Sources.LeftFoot].position - trackersDico[SteamVR_Input_Sources.RightFoot].position;
 
             //Debug.Log("TODO");
-            /*endAngle = trackersDico[SteamVR_Input_Sources.Waist].position - auxWaist.GetComponent<FollowGizmo>().GetChild().position;
-            rotationAxis = Vector3.Cross(startAngle, endAngle);
-            hipsGizmo.startAngle = startAngle;*/
-
-
-            //hipsGizmo.rotationAxis = rotationAxis;
+            endAngle = trackersDico[SteamVR_Input_Sources.Waist].position - waistGizmo.center;
+            hipsGizmo.startAngle = startAngle;
             hipsGizmo.rotationAxis = Vector3.up;
             hipsGizmo.angle = Vector3.SignedAngle(startAngle, endAngle, Vector3.up);
 
@@ -709,10 +680,10 @@ namespace com.inetum.eulen.recording.app
                 IsPlaying = false;
 
                 // Mark the excercise as viewed
-                PanelController.visualized[PanelController.exViewing] = true;
+                //PanelController.visualized[PanelController.exViewing] = true;
                 // Log for each time you COMPLETLY watch the exercise
 
-                Debug.Log("TODO");
+                Debug.Log("TODO LOGS : make the exercice as viewed");
                 return;
 
                 switch (PanelController.exViewing)
@@ -737,6 +708,22 @@ namespace com.inetum.eulen.recording.app
             BoxReplay.gameObject.SetActive(false);
 
             rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = false;
+        }
+
+
+        public void ValidateCompleteMovement(RecordDto data, int movementId)
+        {
+            MovementValidationDto validationDto = new() { movementId = movementId, isValid = true};
+
+            for (int i = 0; i < data.frames.Count; i++)
+            {
+                SetFramePose(data.frames[i], data.userSettings, i, validationDto);
+            }
+
+            if (validationDto.isValid)
+                validationDto.logMessages = new List<string> { "Ha realizado correctamente el ejercicio" };
+
+            EulenMessagesSender.Instance.SendMovementValidation(validationDto, movementId);
         }
 
         #endregion

@@ -82,15 +82,6 @@ public class AngleGizmoManager : MonoBehaviour
         instance = this;
     }
 
-    void OnEnable()
-    {
-        //RenderPipelineManager.endCameraRendering += OnEndCameraRendering;    //
-    }
-
-    void OnDisable()
-    {
-        //RenderPipelineManager.endCameraRendering -= OnEndCameraRendering;    //
-    }
 
     /// <summary>
     /// Draws gizmos.

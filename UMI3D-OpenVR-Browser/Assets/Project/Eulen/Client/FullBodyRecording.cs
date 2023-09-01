@@ -150,7 +150,8 @@ namespace com.inetum.eulen.recording.app
                     IsRecording = false;
                     Debug.Log("Records saved  : " + recordDto.frames.Count + " frames.");
 
-                    StartCoroutine(SendDataRecordedToServer());
+                    EulenMessagesSender.Instance.SendDataRecordedToServer(recordDto, currentRecordedMovementId);
+                    DrawAvatar.Instance.ValidateCompleteMovement(recordDto, currentRecordedMovementId);
 
                     return recordDto.frames.Count;
                 }
@@ -163,35 +164,6 @@ namespace com.inetum.eulen.recording.app
             return -1;
         }
 
-        IEnumerator SendDataRecordedToServer()
-        {
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(
-                JsonConvert.SerializeObject(recordDto,
-                Formatting.Indented,
-                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None }));
-
-            string url = Regex.Replace(UMI3DCollaborationClientServer.Instance.environementHttpUrl + EulenEndPoint.postRecord, ":param", currentRecordedMovementId.ToString());
-
-            using (UnityWebRequest request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST))
-            {
-                var uploadHandler = new UploadHandlerRaw(bytes);
-                uploadHandler.contentType = "application/json";
-
-                request.uploadHandler = uploadHandler;
-
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                yield return request.SendWebRequest();
-
-                if (request.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.Log(request.error + " " + request.url);
-                }
-                else
-                {
-                    Debug.Log("Record upload complete ! " + request.uri);
-                }
-            }
-        }
+       
     }
 }
