@@ -9,5 +9,7 @@ namespace com.inetum.addonEulen.common
         public const uint startRecord = 200002; 
 
         public const uint stopReplay = 200003; 
+
+        public const uint sendSummary = 200004; 
     }
 }

@@ -123,12 +123,15 @@ namespace com.inetum.eulen
                     {
                         postConditionTest = false;
 
-                        if (validationDto != null && validationDto.isValid)
+                        if (validationDto != null)
                         {
-                            validationDto.isValid = false;
+                            if (validationDto.isValid)
+                            {
+                                validationDto.isValid = false;
+                            }
+                            if (!validationDto.logMessages.Contains(errorLog))
+                                validationDto.logMessages.Add(errorLog);
                         }
-                        if (!validationDto.logMessages.Contains(errorLog))
-                            validationDto.logMessages.Add(errorLog);
                     }
                 }
 

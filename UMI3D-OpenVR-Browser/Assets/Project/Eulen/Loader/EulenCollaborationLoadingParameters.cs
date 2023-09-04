@@ -38,6 +38,17 @@ public class EulenCollaborationLoadingParameters : UMI3DCollabLoadingParameters
                 DrawAvatar.Instance.StopReplay();
                 DrawAvatar.Instance.HideReplay();
                 return Task.CompletedTask;
+            case EulenPropertyKeys.sendSummary:
+                try
+                {
+                    SummaryGenerator.Generate(container);
+
+                } catch (System.Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+
+                return Task.CompletedTask;
             default:
                 break;
         }
