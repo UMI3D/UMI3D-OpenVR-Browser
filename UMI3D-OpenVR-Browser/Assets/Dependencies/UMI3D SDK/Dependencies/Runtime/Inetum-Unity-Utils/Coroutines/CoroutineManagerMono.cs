@@ -24,7 +24,7 @@ namespace inetum.unityUtils
     /// <summary>
     /// Singleton monobehaviour that runs coroutines. Prefer to use <see cref="CoroutineManagerMono"/>
     /// </summary>
-    internal class CoroutineManagerMono : PersistentSingleBehaviour<CoroutineManagerMono>, ICoroutineService, ILateRoutineService
+    internal class CoroutineManagerMono : SingleBehaviour<CoroutineManagerMono>, ICoroutineService, ILateRoutineService
     {
         private List<IEnumerator> routines = new();
         private Queue<IEnumerator> routinesToRemove = new();
@@ -35,7 +35,7 @@ namespace inetum.unityUtils
         /// </summary>
         /// <param name="coroutine"></param>
         /// <returns></returns>
-        public Coroutine AttachCoroutine(IEnumerator coroutine)
+        public Coroutine AttachCoroutine(IEnumerator coroutine, bool isPersistent = false)
         {
             return StartCoroutine(coroutine);
         }
@@ -45,18 +45,18 @@ namespace inetum.unityUtils
         /// </summary>
         /// <param name="coroutine"></param>
         /// <returns></returns>
-        public void DettachCoroutine(Coroutine coroutine)
+        public void DetachCoroutine(Coroutine coroutine)
         {
             StopCoroutine(coroutine);
         }
 
-        public IEnumerator AttachLateRoutine(IEnumerator routine)
+        public IEnumerator AttachLateRoutine(IEnumerator routine, bool isPersistent = false)
         {
             routinesToAdd.Enqueue(routine);
             return routine;
         }
 
-        public void DettachLateRoutine(IEnumerator routine)
+        public void DetachLateRoutine(IEnumerator routine)
         {
             routinesToRemove.Enqueue(routine);
         }

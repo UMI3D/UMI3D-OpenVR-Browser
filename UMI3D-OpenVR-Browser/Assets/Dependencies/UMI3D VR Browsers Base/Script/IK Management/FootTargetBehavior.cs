@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using umi3d.cdk.userCapture.tracking;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.ikManagement
@@ -28,7 +29,16 @@ namespace umi3dVRBrowsersBase.ikManagement
         public VirtualObjectBodyInteraction LeftTarget;
         public VirtualObjectBodyInteraction RightTarget;
 
-        public IKControl IKControl;
+        public Tracker LeftTracker;
+        public Tracker RightTracker;
+
+        private void Start()
+        {
+            LeftTracker = LeftTracker ?? LeftTarget.GetComponent<Tracker>();
+            RightTracker = RightTracker ?? RightTarget.GetComponent<Tracker>();
+            LeftTracker.isActif = false;
+            RightTracker.isActif = false;
+        }
 
         private void Update()
         {
@@ -40,11 +50,8 @@ namespace umi3dVRBrowsersBase.ikManagement
         {
             LeftTarget.transform.position = SkeletonAnimator.GetBoneTransform(HumanBodyBones.LeftFoot).position;
             RightTarget.transform.position = SkeletonAnimator.GetBoneTransform(HumanBodyBones.RightFoot).position;
-
-            IKControl.LeftFoot = LeftTarget;
-            IKControl.RightFoot = RightTarget;
-
-            IKControl.feetIkActive = true;
+            LeftTracker.isActif = true;
+            RightTracker.isActif = true;
         }
     }
 }

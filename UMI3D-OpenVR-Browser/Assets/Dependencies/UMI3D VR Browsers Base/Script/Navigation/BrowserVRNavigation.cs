@@ -17,7 +17,6 @@ limitations under the License.
 
 using umi3d.cdk;
 using umi3d.common;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
 
 namespace umi3dVRBrowsersBase.navigation
@@ -109,6 +108,21 @@ namespace umi3dVRBrowsersBase.navigation
         {
             this.transform.SetParent(UMI3DLoadingHandler.Instance.transform, true);
             DontDestroyOnLoad(UMI3DNavigation.Instance);
+        }
+
+
+        Vector3 position = Vector3.zero;
+        public override (Vector3Dto speed, bool jumping, bool crouching) GetNaviagtionData()
+        {
+            var newPos = GetPostion();
+            var delta = newPos - position;
+            position = newPos;
+            return (delta.Dto(), false, false);
+        }
+
+        protected virtual Vector3 GetPostion()
+        {
+            return transform.position;
         }
     }
 }

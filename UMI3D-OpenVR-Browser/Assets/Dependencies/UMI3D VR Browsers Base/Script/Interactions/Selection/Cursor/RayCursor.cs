@@ -140,7 +140,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     return;
 
                 trackingInfo.targetContainer.Interactable.HoverEnter(
-                    controller.bone.boneType,
+                    controller.bone.Bonetype,
                     controller.bone.transform.position,
                     new Vector4(controller.bone.transform.rotation.x, controller.bone.transform.rotation.y, controller.bone.transform.rotation.z, controller.bone.transform.rotation.w),
                     trackingInfo.targetContainer.Interactable.id,
@@ -150,7 +150,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                 if (trackingInfo.target.dto.HoverEnterAnimationId != 0)
                 {
-                    changelastBone.Invoke(controller.bone.boneType);
+                    changelastBone.Invoke(controller.bone.Bonetype);
                     StartAnim(trackingInfo.target.dto.HoverEnterAnimationId);
                 }
             });
@@ -163,7 +163,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                 if (!IsNullOrDestroyed(trackingInfo.targetContainer))
                 {
                     trackingInfo.targetContainer.Interactable.HoverExit(
-                        controller.bone.boneType,
+                        controller.bone.Bonetype,
                         controller.bone.transform.position,
                         new Vector4(controller.bone.transform.rotation.x, controller.bone.transform.rotation.y, controller.bone.transform.rotation.z, controller.bone.transform.rotation.w),
                         trackingInfo.targetContainer.Interactable.id,
@@ -177,7 +177,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     {
                         toolId = trackingInfo.targetContainer.Interactable.id,
                         hoveredObjectId = trackingInfo.targetContainer.Interactable.id,
-                        boneType = controller.bone.boneType,
+                        boneType = controller.bone.Bonetype,
                         state = false,
                         normal = Vector3.zero.Dto(),
                         position = Vector3.zero.Dto(),
@@ -188,7 +188,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
 
                 if (trackingInfo.target.dto.HoverExitAnimationId != 0)
                 {
-                    changelastBone.Invoke(controller.bone.boneType);
+                    changelastBone.Invoke(controller.bone.Bonetype);
                     StartAnim(trackingInfo.target.dto.HoverExitAnimationId);
                 }
             });
@@ -199,7 +199,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.cursor
                     return;
 
                 trackingInfo.targetContainer.Interactable.Hovered(
-                    controller.bone.boneType,
+                    controller.bone.Bonetype,
                     controller.bone.transform.position,
                     new Vector4(controller.bone.transform.rotation.x, controller.bone.transform.rotation.y, controller.bone.transform.rotation.z, controller.bone.transform.rotation.w),
                     trackingInfo.targetContainer.Interactable.id,

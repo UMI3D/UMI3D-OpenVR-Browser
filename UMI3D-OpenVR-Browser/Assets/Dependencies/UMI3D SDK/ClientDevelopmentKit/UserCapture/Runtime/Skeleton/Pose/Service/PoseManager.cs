@@ -114,7 +114,7 @@ namespace umi3d.cdk.userCapture.pose
             {
                 if (pose.Index == poseOverrider.PoseIndexInPoseManager)
                 {
-                    skeletonManager.PersonalSkeleton.PoseSubskeleton.StartPose(pose);
+                    //skeletonManager.PersonalSkeleton.PoseSubskeleton.StartPose(pose);
                     return;
                 }
             }
@@ -130,7 +130,7 @@ namespace umi3d.cdk.userCapture.pose
             {
                 if (pose.Index == poseOverrider.PoseIndexInPoseManager)
                 {
-                    skeletonManager.PersonalSkeleton.PoseSubskeleton.StopPose(pose);
+                    //skeletonManager.PersonalSkeleton.PoseSubskeleton.StopPose(pose);
                     return;
                 }
             }
@@ -139,7 +139,7 @@ namespace umi3d.cdk.userCapture.pose
         /// <inheritdoc/>
         public void StopAllPoses()
         {
-            skeletonManager.PersonalSkeleton.PoseSubskeleton.StopAllPoses();
+            //skeletonManager.PersonalSkeleton.PoseSubskeleton.StopAllPoses();
         }
     }
 }

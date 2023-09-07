@@ -133,20 +133,3 @@ MonoBehaviour:
       angle: 0
       smallAngle: 0
       isPreCondition: 0
-  - ruleName: 'Lift the box 2 '
-    errorLog: Corregir la posicion de los pies
-    isBoxGrabbed: 0
-    checkFeetPosition: 1
-    xDistanceToBox: 0.27
-    preConditions:
-    - type: 0
-      test: 4
-      angle: 110
-      smallAngle: 0
-      isPreCondition: 0
-    - type: 1
-      test: 4
-      angle: 110
-      smallAngle: 0
-      isPreCondition: 0
-    postConditions: []

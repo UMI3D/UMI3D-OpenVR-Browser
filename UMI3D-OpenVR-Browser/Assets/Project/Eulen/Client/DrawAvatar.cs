@@ -75,8 +75,6 @@ namespace com.inetum.eulen.recording.app
         public AngleTag angElbowL;
         public AngleTag angHips;
         public AngleTag angWaist;
-        public GameObject auxWaist;
-
 
         [Header("")]
         public Transform BoxReplay;
@@ -598,11 +596,7 @@ namespace com.inetum.eulen.recording.app
             // Hips Gizmo (Back Twisting)
             hipsGizmo.center = (neck.transform.position + waistTracker.position) / 2f;
             startAngle = trackersDico[SteamVR_Input_Sources.LeftShoulder].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position;
-            // endAngle = trackersDico[SteamVR_Input_Sources.Waist].forward + new Vector3(-177.636f, 3.838013f, 60.44f);
-            //endAngle = trackersDico[SteamVR_Input_Sources.LeftFoot].position - trackersDico[SteamVR_Input_Sources.RightFoot].position;
-
-            //Debug.Log("TODO");
-            endAngle = trackersDico[SteamVR_Input_Sources.Waist].position - waistGizmo.center;
+            endAngle = trackersDico[SteamVR_Input_Sources.Waist].right;
             hipsGizmo.startAngle = startAngle;
             hipsGizmo.rotationAxis = Vector3.up;
             hipsGizmo.angle = Vector3.SignedAngle(startAngle, endAngle, Vector3.up);
@@ -678,26 +672,6 @@ namespace com.inetum.eulen.recording.app
 
                 replayCoroutine = null;
                 IsPlaying = false;
-
-                // Mark the excercise as viewed
-                //PanelController.visualized[PanelController.exViewing] = true;
-                // Log for each time you COMPLETLY watch the exercise
-
-                Debug.Log("TODO LOGS : make the exercice as viewed");
-                return;
-
-                switch (PanelController.exViewing)
-                {
-                    case 0:
-                        logsManager.LogViewsAll[0]++;
-                        break;
-                    case 1:
-                        logsManager.LogViewsAll[1]++;
-                        break;
-                    case 2:
-                        logsManager.LogViewsAll[2]++;
-                        break;
-                }
             }
         }
 
