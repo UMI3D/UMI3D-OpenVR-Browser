@@ -81,7 +81,7 @@ namespace umi3d.cdk.binding
         {
             if (SyncPosition && SyncRotation)
             {
-                Quaternion rotation = parentTransform.rotation * OffSetRotation * originalRotationOffset;
+                Quaternion rotation = parentTransform.rotation * OffSetRotation /** originalRotationOffset*/;
                 Vector3 position = parentTransform.position + AnchorPosition + parentTransform.rotation * (OffSetPosition - AnchorPosition);
                 boundTransform.SetPositionAndRotation(position, rotation);
             }
@@ -91,7 +91,7 @@ namespace umi3d.cdk.binding
             }
             else if (SyncRotation)
             {
-                boundTransform.rotation = parentTransform.rotation * OffSetRotation * originalRotationOffset;
+                boundTransform.rotation = parentTransform.rotation * OffSetRotation /** originalRotationOffset*/;
             }
             if (SyncScale)
                 boundTransform.localScale = Vector3.Scale(parentTransform.scale, OffSetScale);

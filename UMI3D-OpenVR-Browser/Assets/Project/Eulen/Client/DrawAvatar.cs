@@ -287,13 +287,13 @@ namespace com.inetum.eulen.recording.app
                 DisplayWireBody = !displayAvatar;
 
                 rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = !displayAvatar;
-
                 replayCoroutine = StartCoroutine(ReplayCoroutine(data, offset));
             }
         }
 
         private IEnumerator ReplayCoroutine(RecordDto data, int offset = 0)
         {
+            Debug.Log("4");
             if (offset >= data.frames.Count && offset >= 0)
             {
                 Debug.LogError("Offset too high for this data : " + offset + ", there are only " + data.frames.Count + " frames");
@@ -311,6 +311,7 @@ namespace com.inetum.eulen.recording.app
 
                 for (int i = offset; i < data.frames.Count; i++)
                 {
+                    Debug.Log("Replay");
                     SetFramePose(data.frames[i], data.userSettings, i);                             // A: Replay the whole exercise in the same speed (even with errors)
                     /*if (!SetFramePose(data.frames[i], data.userSettings, i))                      // B: Replay the exercise and stops if there found any error
                         break;*/
@@ -671,8 +672,8 @@ namespace com.inetum.eulen.recording.app
                     StopCoroutine(replayCoroutine);
 
                 replayCoroutine = null;
-                IsPlaying = false;
             }
+            IsPlaying = false;
         }
 
         public void HideReplay()
@@ -696,6 +697,8 @@ namespace com.inetum.eulen.recording.app
 
             if (validationDto.isValid)
                 validationDto.logMessages = new List<string> { "Ha realizado correctamente el ejercicio" };
+
+            Debug.Log("Send validation " + validationDto.isValid);
 
             EulenMessagesSender.Instance.SendMovementValidation(validationDto, movementId);
         }
