@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,7 +79,7 @@ namespace umi3d.cdk.userCapture.binding
                             UMI3DLogger.LogWarning($"Impossible to bind on bone {riggedBoneBinding.boneType} - {BoneTypeHelper.GetBoneName(riggedBoneBinding.boneType)}. Rig \"{riggedBoneBinding.rigName}\" does not exist on bound node.", DEBUG_SCOPE);
                             return null;
                         }
-                        return new RigBoneBinding(riggedBoneBinding, rig, personnalSkeletonService.PersonalSkeleton);
+                        return new RigBoneBinding(riggedBoneBinding, rig, personnalSkeletonService.PersonalSkeleton, boundNode.transform);
                     }
                 case BoneBindingDataDto boneBindingDataDto:
                     {

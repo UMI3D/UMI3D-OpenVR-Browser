@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -40,6 +40,7 @@ namespace umi3d.common.userCapture.binding
 
             readable &= UMI3DSerializer.TryRead(container, out ulong userId);
             readable &= UMI3DSerializer.TryRead(container, out uint bonetype);
+            readable &= UMI3DSerializer.TryRead(container, out bool bindToController);
 
             result = readable ?
                 new BoneBindingDataDto()
@@ -54,7 +55,8 @@ namespace umi3d.common.userCapture.binding
                     userId = userId,
                     boneType = bonetype,
                     partialFit = partialFit,
-                    priority = priority
+                    priority = priority,
+                    bindToController = bindToController
                 }
                 : default;
 
@@ -78,7 +80,8 @@ namespace umi3d.common.userCapture.binding
                         + UMI3DSerializer.Write(simpleBoneBindingDto.anchorPosition)
 
                         + UMI3DSerializer.Write(simpleBoneBindingDto.userId)
-                        + UMI3DSerializer.Write(simpleBoneBindingDto.boneType);
+                        + UMI3DSerializer.Write(simpleBoneBindingDto.boneType)
+                        + UMI3DSerializer.Write(simpleBoneBindingDto.bindToController);
         }
     }
 }

@@ -66,7 +66,7 @@ namespace umi3d.cdk.binding
 
         #endregion DTO access
 
-        private Quaternion originalRotationOffset;
+        public Quaternion originalRotationOffset;
 
         public AbstractSimpleBinding(AbstractSimpleBindingDataDto dto, Transform boundTransform) : base(boundTransform, dto)
         {

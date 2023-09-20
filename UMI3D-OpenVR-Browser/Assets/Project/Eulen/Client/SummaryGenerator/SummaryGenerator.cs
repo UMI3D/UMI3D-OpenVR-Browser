@@ -23,6 +23,7 @@ public static class SummaryGenerator
             int[] mediaSeen = UMI3DSerializer.ReadArray<int>(container);
             int[] examplesSeen = UMI3DSerializer.ReadArray<int>(container);
             bool[] success = UMI3DSerializer.ReadArray<bool>(container);
+            int[] tryDone = UMI3DSerializer.ReadArray<int>(container);
             string[] logs = UMI3DSerializer.ReadArray<string>(container);
 
             generator.SetVariables(new Dictionary<string, object>()
@@ -35,9 +36,17 @@ public static class SummaryGenerator
                 {"numberMedia1Seen", mediaSeen[0] },
                 {"numberMedia2Seen", mediaSeen[1] },
                 {"numberMedia3Seen", mediaSeen[2] },
-                {"numberExample1", examplesSeen[0] },
-                {"numberExample2", examplesSeen[1] },
-                {"numberExample3", examplesSeen[2] },
+                {"nbProSeen1", examplesSeen[0] },
+                {"nbProSeen2", examplesSeen[1] },
+                {"nbProSeen3", examplesSeen[2] },
+                {"nbProSeenTotal", examplesSeen[0] + examplesSeen[1] + examplesSeen[2]},
+                {"nbTryTotal", tryDone[0] + tryDone[1] + tryDone[2] },
+                {"nbTry1", tryDone[0] },
+                {"nbTry2", tryDone[1] },
+                {"nbTry3", tryDone[2] },
+                {"success1", success[0] ? "Si" : "No" },
+                {"success2", success[1] ? "Si" : "No" },
+                {"success3", success[2] ? "Si" : "No" },
             }).SetIncludes(new()
             {
                 {"logsEx1", logs[0] },
