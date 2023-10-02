@@ -25,9 +25,11 @@ namespace umi3d.cdk.userCapture
     /// <summary>
     /// Skeleton of the browser's main user.
     /// </summary>
-    public class PersonalSkeleton : AbstractSkeleton
+    public class PersonalSkeleton : AbstractSkeleton, IPersonalSkeleton
     {
         public IDictionary<uint, float> BonesAsyncFPS => TrackedSubskeleton.BonesAsyncFPS;
+
+        public Transform Transform => transform;
 
         /// <summary>
         /// Size of the skeleton.
@@ -38,14 +40,15 @@ namespace umi3d.cdk.userCapture
         {
             PoseSubskeleton = new PoseSubskeleton();
 
+            //Init(trackedSkeleton, PoseSubskeleton);
+        }
+
+        public void SelfInit()
+        {
             Init(trackedSkeleton, PoseSubskeleton);
         }
 
-        /// <summary>
-        /// Write a tracking frame from all <see cref="IWritableSubskeleton"/>.
-        /// </summary>
-        /// <param name="option"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public UserTrackingFrameDto GetFrame(TrackingOption option)
         {
             var frame = new UserTrackingFrameDto()
@@ -54,19 +57,21 @@ namespace umi3d.cdk.userCapture
                 rotation = transform.rotation.Dto(),
             };
 
-            foreach (ISubskeleton skeleton in Subskeletons)
-            {
-                if (skeleton is IWritableSubskeleton writableSkeleton)
-                    writableSkeleton.WriteTrackingFrame(frame, option);
-            }
+            lock (SubskeletonsLock)
+                foreach (ISubskeleton skeleton in Subskeletons)
+                {
+                    if (skeleton is IWritableSubskeleton writableSkeleton)
+                        writableSkeleton.WriteTrackingFrame(frame, option);
+                }
 
+            lastFrame = frame;
             return frame;
         }
 
         /// <inheritdoc/>
         public override void UpdateBones(UserTrackingFrameDto frame)
         {
-            if (Subskeletons != null)
+            lock (SubskeletonsLock)
             {
                 foreach (ISubskeleton skeleton in Subskeletons)
                 {
@@ -74,6 +79,8 @@ namespace umi3d.cdk.userCapture
                         writableSkeleton.UpdateBones(frame);
                 }
             }
+
+            lastFrame = frame;
         }
     }
 }

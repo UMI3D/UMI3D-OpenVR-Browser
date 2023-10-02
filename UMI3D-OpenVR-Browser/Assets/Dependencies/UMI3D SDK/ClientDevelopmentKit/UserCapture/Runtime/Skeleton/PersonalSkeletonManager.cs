@@ -31,7 +31,7 @@ namespace umi3d.cdk.userCapture
         private const DebugScope scope = DebugScope.CDK | DebugScope.UserCapture;
 
         /// <inheritdoc/>
-        public PersonalSkeleton PersonalSkeleton
+        public IPersonalSkeleton PersonalSkeleton
         {
             get
             {
@@ -43,7 +43,7 @@ namespace umi3d.cdk.userCapture
                 else
                     return _skeleton;
             }
-            protected set => _skeleton = value;
+            protected set => _skeleton = (PersonalSkeleton)value;
         }
 
         /// <inheritdoc/>
@@ -72,15 +72,10 @@ namespace umi3d.cdk.userCapture
         private readonly ILoadingManager environmentLoaderService;
         private readonly ILateRoutineService lateRoutineService;
 
-        public PersonalSkeletonManager()
-        {
-            environmentManager = UMI3DEnvironmentLoader.Instance;
-            environmentLoaderService = UMI3DEnvironmentLoader.Instance;
-            lateRoutineService = CoroutineManager.Instance;
-            Init();
-        }
+        public PersonalSkeletonManager() : this(UMI3DEnvironmentLoader.Instance, UMI3DEnvironmentLoader.Instance, CoroutineManager.Instance)
+        { }
 
-        public PersonalSkeletonManager(IEnvironmentManager environmentManager, ILoadingManager environmentLoaderService, ILateRoutineService lateRoutineService)
+        public PersonalSkeletonManager(IEnvironmentManager environmentManager, ILoadingManager environmentLoaderService, ILateRoutineService lateRoutineService) : base()
         {
             this.environmentManager = environmentManager;
             this.environmentLoaderService = environmentLoaderService;
@@ -100,6 +95,7 @@ namespace umi3d.cdk.userCapture
 
         private void InitPersonalSkeleton()
         {
+            computeRoutine = null;
             if (environmentManager == null || environmentManager.gameObject == null || environmentManager.gameObject.GetComponentInChildren<PersonalSkeleton>() == null)
             {
                 lateRoutineService.AttachLateRoutine(WhileUntilTheHanlderExist());
@@ -107,7 +103,8 @@ namespace umi3d.cdk.userCapture
             }
 
             PersonalSkeleton = environmentManager.gameObject.GetComponentInChildren<PersonalSkeleton>();
-            PersonalSkeleton.SkeletonHierarchy = StandardHierarchy;
+            _skeleton.SkeletonHierarchy = StandardHierarchy;
+            PersonalSkeleton.SelfInit();
             computeRoutine ??= lateRoutineService.AttachLateRoutine(ComputeCoroutine());
         }
 
@@ -128,7 +125,7 @@ namespace umi3d.cdk.userCapture
                 PersonalSkeleton.Compute();
                 yield return null;
             }
-            lateRoutineService.DettachLateRoutine(computeRoutine);
+            lateRoutineService.DetachLateRoutine(computeRoutine);
             computeRoutine = null;
         }
     }

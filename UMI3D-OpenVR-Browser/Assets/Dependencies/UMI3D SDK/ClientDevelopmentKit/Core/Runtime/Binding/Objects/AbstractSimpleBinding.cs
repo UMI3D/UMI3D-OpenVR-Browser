@@ -66,7 +66,7 @@ namespace umi3d.cdk.binding
 
         #endregion DTO access
 
-        private Quaternion originalRotationOffset;
+        protected Quaternion originalRotationOffset;
 
         public AbstractSimpleBinding(AbstractSimpleBindingDataDto dto, Transform boundTransform) : base(boundTransform, dto)
         {
@@ -81,8 +81,8 @@ namespace umi3d.cdk.binding
         {
             if (SyncPosition && SyncRotation)
             {
-                Quaternion rotation = parentTransform.rotation * OffSetRotation * originalRotationOffset;
-                Vector3 position = parentTransform.position + AnchorPosition + rotation * (OffSetPosition - AnchorPosition);
+                Quaternion rotation = parentTransform.rotation * /*originalRotationOffset **/ OffSetRotation;
+                Vector3 position = parentTransform.position + AnchorPosition + parentTransform.rotation * (OffSetPosition - AnchorPosition);
                 boundTransform.SetPositionAndRotation(position, rotation);
             }
             else if (SyncPosition)
@@ -91,7 +91,7 @@ namespace umi3d.cdk.binding
             }
             else if (SyncRotation)
             {
-                boundTransform.rotation = parentTransform.rotation * OffSetRotation * originalRotationOffset;
+                boundTransform.rotation = parentTransform.rotation * originalRotationOffset * OffSetRotation;
             }
             if (SyncScale)
                 boundTransform.localScale = Vector3.Scale(parentTransform.scale, OffSetScale);

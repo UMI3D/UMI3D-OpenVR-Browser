@@ -188,7 +188,7 @@ namespace umi3d.cdk
 
             if (animator == null)
             {
-                UMI3DLogger.LogError($"No animator on node {node}", DebugScope.CDK | DebugScope.Animation);
+                UMI3DLogger.LogWarning($"No animator on node {node}. Animation paused.", DebugScope.CDK | DebugScope.Animation);
                 IsPaused = true;
                 return;
             }
@@ -206,7 +206,7 @@ namespace umi3d.cdk
             lastPauseTime = GetProgress() * Duration;
             IsPaused = true;
             if (trackingAnimationCoroutine != null)
-                coroutineService.DettachCoroutine(trackingAnimationCoroutine);
+                coroutineService.DetachCoroutine(trackingAnimationCoroutine);
             trackingAnimationCoroutine = null;
             animator.Play(dto.stateName, layer: 0, normalizedTime: 1);
         }
@@ -225,7 +225,7 @@ namespace umi3d.cdk
             
             if (trackingAnimationCoroutine != null)
             {
-                coroutineService.DettachCoroutine(trackingAnimationCoroutine);
+                coroutineService.DetachCoroutine(trackingAnimationCoroutine);
                 trackingAnimationCoroutine = null;
             }
                 
@@ -252,7 +252,7 @@ namespace umi3d.cdk
         private void StopTracking()
         {
             if (trackingAnimationCoroutine is not null)
-                coroutineService.DettachCoroutine(trackingAnimationCoroutine);
+                coroutineService.DetachCoroutine(trackingAnimationCoroutine);
             UMI3DClientServer.Instance.OnLeavingEnvironment.RemoveListener(StopTracking);
         }
 
@@ -385,7 +385,6 @@ namespace umi3d.cdk
             unityMainThreadDispatcher.Enqueue(() =>
             {
                 UMI3DAnimatorParameterType type = (UMI3DAnimatorParameterType)parameterDto.type;
-
                 switch (type)
                 {
                     case UMI3DAnimatorParameterType.Bool:
@@ -424,7 +423,36 @@ namespace umi3d.cdk
                     animator = node.gameObject.GetComponentInChildren<Animator>();
                 if (animator != null && dto.playing)
                     Start();
+
+                MainThreadDispatcher.UnityMainThreadDispatcher.Instance().Enqueue(debugClip);
+
             });
+        }
+
+        async void debugClip()
+        {
+            string name = null;
+            while (true)
+            {
+                await UMI3DAsyncManager.Yield();
+                try
+                {
+                    var m_CurrentClipInfo = animator.GetCurrentAnimatorClipInfo(0);
+                    //Access the current length of the clip
+                    if (m_CurrentClipInfo != null && m_CurrentClipInfo.Count() > 0)
+                    {
+                        var m_CurrentClipLength = m_CurrentClipInfo[0].clip.length;
+                        //Access the Animation clip name
+                        var m_ClipName = m_CurrentClipInfo[0].clip.name;
+
+                        if (name != m_ClipName)
+                        {
+                            name = m_ClipName;
+                        }
+                    }
+                }
+                catch { }
+            }
         }
 
         #endregion Setter
