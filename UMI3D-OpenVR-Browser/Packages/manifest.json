@@ -6,9 +6,18 @@
       "scopes": [
         "com.unityfx"
       ]
+    },
+    {
+      "name": "Voltstro UPM",
+      "url": "https://upm-pkgs.voltstro.dev",
+      "scopes": [
+        "dev.voltstro",
+        "org.nuget"
+      ]
     }
   ],
   "dependencies": {
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.addressables": "1.19.19",
     "com.unity.ide.rider": "3.0.15",
@@ -24,6 +33,8 @@
     "com.unityfx.outline": "0.8.5",
     "com.unityfx.outline.urp": "0.5.0",
     "com.valvesoftware.unity.openvr": "file:../Assets/AssetStoreTools/SteamVR/OpenVRUnityXRPackage/Editor/com.valvesoftware.unity.openvr-1.1.4.tgz",
+    "dev.voltstro.unitywebbrowser": "2.0.2",
+    "dev.voltstro.unitywebbrowser.engine.cef.win.x64": "2.0.2-113.3.1",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

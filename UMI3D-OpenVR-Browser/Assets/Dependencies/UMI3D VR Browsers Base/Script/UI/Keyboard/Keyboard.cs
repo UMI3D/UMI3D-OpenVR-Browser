@@ -110,8 +110,11 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         [Tooltip("Confirmation key")]
         private KeyboardKey enterKey;
 
+        [Serializable]
         public class StringEvent : UnityEvent<String>
         { }
+
+        [Space]
 
         /// <summary>
         /// Event triggered when edited text changes.
@@ -145,6 +148,27 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
         #endregion Fields
 
+        #region Event
+
+        [Space]
+
+        /// <summary>
+        /// Event sent each time a key is entered.
+        /// </summary>
+        public StringEvent onCharacterEntered = new();
+
+        /// <summary>
+        /// Delete key is pressed.
+        /// </summary>
+        public UnityEvent onDeleteCharacter = new();
+
+        /// <summary>
+        /// Enter key is pressed.
+        /// </summary>
+        public UnityEvent onEnterCharacter = new();
+
+        #endregion
+
         #region Methods
 
         private void Awake()
@@ -160,6 +184,8 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 {
                     OnCharacterAdded(isUpperCase ? letter.symbol.ToUpper() : letter.symbol.ToLower());
                     letter.button.OnPointerUp(new PointerEventData(EventSystem.current));
+
+
                 });
                 letter.onHoverEnter.AddListener(() => hoverSource.Play());
             }
@@ -168,7 +194,9 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             letterToSymbolKey.onPressed.AddListener(SwitchToSymbols);
             symbolToLetterKey.onPressed.AddListener(SwitchToLetters);
             deleteKey.onPressed.AddListener(Delete);
+            deleteKey.onPressed.AddListener(() => onDeleteCharacter?.Invoke());
             enterKey.onPressed.AddListener(ClosePopUp);
+            enterKey.onPressed.AddListener(() => onEnterCharacter?.Invoke());
             SwitchToLetters();
 
             SetPreviousInputField();
@@ -277,6 +305,8 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             }
 
             pressSource.Play();
+
+            onCharacterEntered?.Invoke(character);
         }
 
         /// <summary>
@@ -345,6 +375,23 @@ namespace umi3dVRBrowsersBase.ui.keyboard
 
             this.onEditFinished = onEditFinished;
             this.onEditCanceled = onEditCanceled;
+
+            IsOpen = true;
+        }
+
+        /// <summary>
+        /// Open the keyboard simply, just to listen to key inputs.
+        /// </summary>
+        public void OpenKeyboard()
+        {
+            if (WasClosedLastFrame) return;
+
+            root.SetActive(true);
+
+            previewField.text = string.Empty;
+
+            this.onEditFinished = null;
+            this.onEditCanceled = null;
 
             IsOpen = true;
         }

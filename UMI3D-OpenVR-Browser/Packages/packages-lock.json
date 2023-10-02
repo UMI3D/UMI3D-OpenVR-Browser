@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.cysharp.unitask": {
+      "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "cfe509a55602ba5be6df7fa0468b10298b8a053d"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
@@ -78,8 +85,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.newtonsoft-json": {
-      "version": "3.0.2",
-      "depth": 0,
+      "version": "3.2.1",
+      "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -226,6 +233,104 @@
         "com.unity.ugui": "1.0.0",
         "com.unity.xr.legacyinputhelpers": "2.1.4"
       }
+    },
+    "dev.voltstro.nativearrayspanextensions": {
+      "version": "1.0.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "dev.voltstro.unitywebbrowser": {
+      "version": "2.0.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "dev.voltstro.nativearrayspanextensions": "1.0.0",
+        "com.unity.nuget.newtonsoft-json": "3.2.1",
+        "com.cysharp.unitask": "2.3.3",
+        "org.nuget.voltrpc": "3.1.0",
+        "org.nuget.voltrpc.extension.memory": "1.1.0",
+        "org.nuget.voltrpc.extension.vectors": "1.1.0"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "dev.voltstro.unitywebbrowser.engine.cef": {
+      "version": "2.0.2-113.3.1",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "dev.voltstro.unitywebbrowser": "2.0.2"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "dev.voltstro.unitywebbrowser.engine.cef.win.x64": {
+      "version": "2.0.2-113.3.1",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "dev.voltstro.unitywebbrowser.engine.cef": "2.0.2-113.3.1"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.system.buffers": {
+      "version": "4.5.1",
+      "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.system.memory": {
+      "version": "4.5.4",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {
+        "org.nuget.system.buffers": "4.5.1",
+        "org.nuget.system.numerics.vectors": "4.4.0",
+        "org.nuget.system.runtime.compilerservices.unsafe": "4.5.3"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.system.numerics.vectors": {
+      "version": "4.5.0",
+      "depth": 2,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.system.runtime.compilerservices.unsafe": {
+      "version": "4.5.3",
+      "depth": 3,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.voltrpc": {
+      "version": "3.1.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.voltrpc.extension.memory": {
+      "version": "1.1.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "org.nuget.voltrpc": "3.0.0",
+        "org.nuget.system.memory": "4.5.4"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
+    },
+    "org.nuget.voltrpc.extension.vectors": {
+      "version": "1.1.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "org.nuget.voltrpc": "3.0.0",
+        "org.nuget.system.numerics.vectors": "4.5.0"
+      },
+      "url": "https://upm-pkgs.voltstro.dev"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

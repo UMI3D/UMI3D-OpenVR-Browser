@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.intentdetector;
 using umi3dBrowsers.interaction.selection.projector;
+using umi3dBrowsers.interaction.selection.zoneselection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -38,11 +39,20 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         [SerializeField, Tooltip("Selection Intent Detector for virtual hand (grab). In order of decreasing priority.")]
         private List<AbstractGrabSelectableDetector> proximityDetectors;
 
+        /// <summary>
+        /// Helper to raycast selectable.
+        /// </summary>
+        private RaySelectionZone<Selectable> raycastHelper = new(Vector3.zero, Vector3.zero);
+
+        private PointerEventData hoverEventData;
+
         #region constructors
 
         private SelectableVRSelector() : base()
         {
             projector = new SelectableProjector();
+
+            hoverEventData = new PointerEventData(EventSystem.current) { clickCount = 1 };
         }
 
         /// <summary>
@@ -71,13 +81,26 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     LockedSelector = true;
                 }
             }
-            if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
+            else if (AbstractControllerInputManager.Instance.GetButtonUp(controller.type, ActionType.Trigger))
             {
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
                     OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1 });
                     LockedSelector = false;
+                }
+            }
+            else if (activated && LastSelected != null)
+            {
+                raycastHelper.origin = controller.transform.position;
+                raycastHelper.direction = controller.transform.forward;
+
+                var closestAndRaycastHit = raycastHelper.GetClosestAndRaycastHit();
+
+                if (closestAndRaycastHit.obj != null)
+                {
+                    hoverEventData.pointerCurrentRaycast = new RaycastResult { worldPosition = closestAndRaycastHit.raycastHit.point };
+                    ExecuteEvents.Execute(LastSelected.selectedObject.gameObject, hoverEventData, ExecuteEvents.pointerMoveHandler);
                 }
             }
         }
@@ -133,6 +156,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 l.Add(detector);
             return l;
         }
+
         #endregion
 
         #region selection
@@ -147,8 +171,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <returns></returns>
         protected override bool CanSelect(Selectable uiToSelect)
         {
-            return uiToSelect != null 
-                && uiToSelect.enabled 
+            return uiToSelect != null
+                && uiToSelect.enabled
                 && uiToSelect.interactable;
         }
 

@@ -44,7 +44,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             if (selectable != null) //protects against cases when UI element is destroyed but not deselected
             {
                 selectable.OnPointerExit(pointerEventData);
-                if(!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
+                if (!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
         }
@@ -91,6 +91,10 @@ namespace umi3dBrowsers.interaction.selection.projector
                 case Slider slider:
                     slider.Click(controller.transform);
                     break;
+
+                default:
+                    SendDefaultSelectableEvent(selectable, controller, eventData, false);
+                    break;
             }
         }
 
@@ -107,7 +111,30 @@ namespace umi3dBrowsers.interaction.selection.projector
                     button.PressDown(eventData);
                     currentlyPressedButton = button;
                     break;
+
+                default:
+                    SendDefaultSelectableEvent(selectable, controller, eventData, true);
+                    break;
             }
+        }
+
+        /// <summary>
+        /// Triggers the UI actions associated to the selectable when selectable was not handled by other methods.
+        /// </summary>
+        /// <param name="selectable"></param>
+        /// <param name="controller"></param>
+        /// <param name="eventData"></param>
+        private void SendDefaultSelectableEvent(Selectable selectable, AbstractController controller, PointerEventData eventData, bool down)
+        {
+            RaySelectionZone<Selectable> raycastHelper = new RaySelectionZone<Selectable>(controller.transform);
+            var closestAndRaycastHit = raycastHelper.GetClosestAndRaycastHit();
+
+            eventData.pointerCurrentRaycast = new RaycastResult { worldPosition = closestAndRaycastHit.raycastHit.point };
+
+            if (down)
+                ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerDownHandler);
+            else
+                ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerUpHandler);
         }
 
         /// <summary>
@@ -304,5 +331,19 @@ namespace umi3dBrowsers.interaction.selection.projector
         }
 
         #endregion Slider
+
+        #region RawImage
+
+        /// <summary>
+        /// Simulates a click on a <see cref="RawImage"/>.
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="pointerEventData"></param>
+        public static void Click(this RawImage image, PointerEventData pointerEventData)
+        {
+            ExecuteEvents.Execute(image.gameObject, pointerEventData, ExecuteEvents.pointerDownHandler);
+        }
+
+        #endregion RawImage
     }
 }
