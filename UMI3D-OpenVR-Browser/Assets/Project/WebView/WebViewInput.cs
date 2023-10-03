@@ -66,6 +66,8 @@ namespace OpenVRBrowser.WebView
         /// </summary>
         private const int clickTime = 200;
 
+        private bool isProcessing = false;
+
         #endregion
 
         #endregion
@@ -84,6 +86,8 @@ namespace OpenVRBrowser.WebView
 
         public async void OnPointerDown(Vector3 worldHitPoint)
         {
+            Debug.Log("OnPointerDown");
+
             rawImageRectTransform.GetWorldCorners(coordinates);
 
             up = (coordinates[1] - coordinates[0]);
@@ -95,7 +99,9 @@ namespace OpenVRBrowser.WebView
 
             if (simulateClick)
             {
+                isProcessing = true;
                 await Task.Delay(clickTime);
+
 
                 if (Time.time - lastUp < clickTime / 1000f)
                 {
@@ -107,6 +113,7 @@ namespace OpenVRBrowser.WebView
                 {
                     webView.OnClick(localPosition, VoltstroStudios.UnityWebBrowser.Shared.Events.MouseEventType.Down);
                 }
+                isProcessing = false;
             }
             else
             {
@@ -131,17 +138,22 @@ namespace OpenVRBrowser.WebView
 
         public override void OnPointerUp(PointerEventData eventData)
         {
+            Debug.Log("OnPointerUp");
             OnPointerUp(eventData.pointerCurrentRaycast.worldPosition);
         }
 
         public void OnPointerUp(Vector3 worldHitPoint)
         {
+
+            lastUp = Time.time;
+
+            if (isProcessing)
+                return;
+
             Vector3 localPosition = WorldToLocal(worldHitPoint);
             webView.OnClick(localPosition, VoltstroStudios.UnityWebBrowser.Shared.Events.MouseEventType.Up);
 
             onPointerUp.Invoke(localPosition);
-
-            lastUp = Time.time;
         }
 
         private Vector3 WorldToLocal(Vector3 worldPosition)
