@@ -22,6 +22,7 @@ using umi3d.common.interaction;
 using umi3dVRBrowsersBase.ui.keyboard;
 using UnityEngine;
 using UnityEngine.UI;
+using VoltstroStudios.UnityWebBrowser.Shared.Events;
 
 namespace OpenVRBrowser.WebView
 {
@@ -60,6 +61,9 @@ namespace OpenVRBrowser.WebView
         private string previousUrl;
 
         private bool useSearchInput = false;
+
+        public float width { get; private set; }
+        public float height { get; private set; }
 
         /// <summary>
         /// Regex to check if a string is an url or not.
@@ -143,6 +147,9 @@ namespace OpenVRBrowser.WebView
 
         protected override async void OnTextureSizeChanged(Vector2 size)
         {
+            width = size.x;
+            height = size.y;
+
             while (!browser.browserClient.ReadySignalReceived && !browser.browserClient.IsConnected)
             {
                 await UMI3DAsyncManager.Yield();
@@ -229,6 +236,17 @@ namespace OpenVRBrowser.WebView
                 browser.browserClient.LoadUrl("http://" + searchField.text);
             else
                 browser.browserClient.LoadUrl("https://www.google.com/search?q=" + searchField.text);
+        }
+
+        public void OnPointerMove(Vector2 localPos)
+        {
+            browser.browserClient.SendMouseMove(localPos);
+        }
+
+        public void OnClick(Vector2 localPos, MouseEventType type)
+        {
+            Debug.Log("click " + localPos + " " + type);
+            browser.browserClient.SendMouseClick(localPos, 1, MouseClickType.Right, type);
         }
 
         #endregion

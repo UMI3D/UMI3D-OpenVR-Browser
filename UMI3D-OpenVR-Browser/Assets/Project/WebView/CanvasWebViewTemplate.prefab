@@ -458,7 +458,7 @@ MonoBehaviour:
   topBarContainer: {fileID: 6337826998314626362}
   canvas: {fileID: 8766402507213825605}
   searchField: {fileID: 6629036575940039079}
-  keyboard: {fileID: 0}
+  keyboard: {fileID: 3613186591755159744}
 --- !u!1 &3895100867010004555
 GameObject:
   m_ObjectHideFlags: 0
@@ -680,6 +680,8 @@ GameObject:
   - component: {fileID: 6014895076021958858}
   - component: {fileID: 4800966178531253002}
   - component: {fileID: 9124266607259074861}
+  - component: {fileID: 2248247488344347672}
+  - component: {fileID: 9068428544750968406}
   m_Layer: 5
   m_Name: RawImage
   m_TagString: Untagged
@@ -755,11 +757,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   browserClient:
-    engine: {fileID: 0}
-    initialUrl: https://voltstro.dev
+    engine: {fileID: 11400000, guid: 649ce3cfdf00ca615abcf2bb62227f5c, type: 2}
+    initialUrl: https://github.com/UMI3D/UMI3D-SDK
     resolution:
-      Width: 1920
-      Height: 1080
+      Width: 1280
+      Height: 720
     backgroundColor:
       serializedVersion: 2
       rgba: 4294967295
@@ -780,6 +782,69 @@ MonoBehaviour:
   inputHandler: {fileID: 11400000, guid: 776a2236bf720e5cbb6ca38016918dd0, type: 2}
   disableMouseInputs: 0
   disableKeyboardInputs: 0
+--- !u!65 &2248247488344347672
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055744786056512765}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 1, z: 0.01}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9068428544750968406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4055744786056512765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84304896daa36844f9ec9ee1749b7e21, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 4800966178531253002}
+  rawImageRectTransform: {fileID: 425891015107117840}
+  webView: {fileID: 1231370109508302981}
+  simulateClick: 1
+  onPointerDown:
+    m_PersistentCalls:
+      m_Calls: []
+  onPointerUp:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4271601034541432960
 GameObject:
   m_ObjectHideFlags: 0
@@ -4291,6 +4356,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 407f5219942420c4087287ea92a2bb02, type: 3}
+--- !u!114 &3613186591755159744 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4777341156007831422, guid: 407f5219942420c4087287ea92a2bb02,
+    type: 3}
+  m_PrefabInstance: {fileID: 8099750831394795454}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 072e9c5ddf7a54e44bb38a044ea95a7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &8505025194149743650 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 463856664420623260, guid: 407f5219942420c4087287ea92a2bb02,
