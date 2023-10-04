@@ -1,4 +1,4 @@
-/*
+ /*
 Copyright 2019 - 2023 Inetum
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@ using umi3d.common.interaction;
 using umi3dVRBrowsersBase.ui.keyboard;
 using UnityEngine;
 using UnityEngine.UI;
+using VoltstroStudios.UnityWebBrowser.Shared;
 using VoltstroStudios.UnityWebBrowser.Shared.Events;
 
 namespace OpenVRBrowser.WebView
@@ -84,8 +85,6 @@ namespace OpenVRBrowser.WebView
 
             searchField.SetKeyboard(keyboard);
 
-            keyboard.Hide();
-
             browser.browserClient.OnUrlChanged += (url) =>
             {
                 if (url == previousUrl)
@@ -95,7 +94,7 @@ namespace OpenVRBrowser.WebView
 
                 previousUrl = url;
 
-                searchField.text = url;
+                searchField.SetTextWithoutNotify(url);
 
                 var request = new WebViewUrlChangedRequestDto
                 {
@@ -196,29 +195,40 @@ namespace OpenVRBrowser.WebView
         public void EnterText(string text)
         {
             if (!useSearchInput)
-                Debug.Log("TODO");
+            {
+                browser.browserClient.SendKeyboardControls(new WindowsKey[0], new WindowsKey[0], text.ToCharArray());
+            }
         }
 
         public void DeleteCharacter()
         {
             if (!useSearchInput)
-                Debug.Log("TODO");
+            {
+                browser.browserClient.SendKeyboardControls(new WindowsKey[1] { WindowsKey.Back }, new WindowsKey[0], new char[0]);
+            }
         }
 
-        public void EnterCharacter()
+        public async void EnterCharacter()
         {
             if (!useSearchInput)
-                Debug.Log("TODO");
+            {
+                browser.browserClient.SendKeyboardControls(new WindowsKey[1] { WindowsKey.Enter }, new WindowsKey[0], new char[0]);
+                await UMI3DAsyncManager.Delay(40);
+                browser.browserClient.SendKeyboardControls(new WindowsKey[0], new WindowsKey[1] { WindowsKey.Enter }, new char[0]);
+            } else
+            {
+                Search();
+            }
         }
 
         public void GoBack()
         {
-            browser.browserClient.GoBack();
+            browser.GoBack();
         }
 
         public void GoForward()
         {
-            browser.browserClient.GoForward();
+            browser.GoForward();
         }
 
         public void GoHome()
@@ -245,8 +255,14 @@ namespace OpenVRBrowser.WebView
 
         public void OnClick(Vector2 localPos, MouseEventType type)
         {
-            Debug.Log("click " + localPos + " " + type);
-            browser.browserClient.SendMouseClick(localPos, 1, MouseClickType.Right, type);
+            keyboard.ResetPreviewField();
+            useSearchInput = false;
+            browser.browserClient.SendMouseClick(localPos, 1, MouseClickType.Left, type);
+        }
+
+        public void Scroll(Vector2 localPos, int scroll)
+        {
+            browser.browserClient.SendMouseScroll(localPos, scroll);
         }
 
         #endregion

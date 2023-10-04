@@ -68,6 +68,10 @@ namespace OpenVRBrowser.WebView
 
         private bool isProcessing = false;
 
+        private bool isDownForLongTime = false;
+
+        Vector2 previousMousePosition;
+
         #endregion
 
         #endregion
@@ -86,8 +90,6 @@ namespace OpenVRBrowser.WebView
 
         public async void OnPointerDown(Vector3 worldHitPoint)
         {
-            Debug.Log("OnPointerDown");
-
             rawImageRectTransform.GetWorldCorners(coordinates);
 
             up = (coordinates[1] - coordinates[0]);
@@ -102,7 +104,6 @@ namespace OpenVRBrowser.WebView
                 isProcessing = true;
                 await Task.Delay(clickTime);
 
-
                 if (Time.time - lastUp < clickTime / 1000f)
                 {
                     webView.OnClick(localPosition, VoltstroStudios.UnityWebBrowser.Shared.Events.MouseEventType.Down);
@@ -111,6 +112,8 @@ namespace OpenVRBrowser.WebView
                 }
                 else
                 {
+                    isDownForLongTime = true;
+
                     webView.OnClick(localPosition, VoltstroStudios.UnityWebBrowser.Shared.Events.MouseEventType.Down);
                 }
                 isProcessing = false;
@@ -134,17 +137,23 @@ namespace OpenVRBrowser.WebView
             Vector3 localPosition = WorldToLocal(worldHitPoint);
 
             webView.OnPointerMove(localPosition);
+
+            if (isDownForLongTime)
+            {
+                if (previousMousePosition != default)
+                    webView.Scroll(localPosition, (int) (localPosition.y - previousMousePosition.y));
+            }
+
+            previousMousePosition = localPosition;
         }
 
         public override void OnPointerUp(PointerEventData eventData)
         {
-            Debug.Log("OnPointerUp");
             OnPointerUp(eventData.pointerCurrentRaycast.worldPosition);
         }
 
         public void OnPointerUp(Vector3 worldHitPoint)
         {
-
             lastUp = Time.time;
 
             if (isProcessing)
@@ -154,6 +163,8 @@ namespace OpenVRBrowser.WebView
             webView.OnClick(localPosition, VoltstroStudios.UnityWebBrowser.Shared.Events.MouseEventType.Up);
 
             onPointerUp.Invoke(localPosition);
+
+            isDownForLongTime = false;
         }
 
         private Vector3 WorldToLocal(Vector3 worldPosition)

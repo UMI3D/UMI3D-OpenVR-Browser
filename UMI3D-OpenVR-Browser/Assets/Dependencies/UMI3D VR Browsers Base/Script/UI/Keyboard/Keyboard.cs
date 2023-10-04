@@ -20,6 +20,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace umi3dVRBrowsersBase.ui.keyboard
@@ -110,6 +111,10 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         [Tooltip("Confirmation key")]
         private KeyboardKey enterKey;
 
+        [SerializeField]
+        [Tooltip("Close keyboard when enter key is pressed")]
+        private bool closeWhenEnterKey = true;
+
         [Serializable]
         public class StringEvent : UnityEvent<String>
         { }
@@ -183,9 +188,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                 letter.onPressed.AddListener(() =>
                 {
                     OnCharacterAdded(isUpperCase ? letter.symbol.ToUpper() : letter.symbol.ToLower());
-                    letter.button.OnPointerUp(new PointerEventData(EventSystem.current));
-
-
+                    letter.button.OnPointerUp(new PointerEventData(EventSystem.current)); 
                 });
                 letter.onHoverEnter.AddListener(() => hoverSource.Play());
             }
@@ -194,9 +197,7 @@ namespace umi3dVRBrowsersBase.ui.keyboard
             letterToSymbolKey.onPressed.AddListener(SwitchToSymbols);
             symbolToLetterKey.onPressed.AddListener(SwitchToLetters);
             deleteKey.onPressed.AddListener(Delete);
-            deleteKey.onPressed.AddListener(() => onDeleteCharacter?.Invoke());
-            enterKey.onPressed.AddListener(ClosePopUp);
-            enterKey.onPressed.AddListener(() => onEnterCharacter?.Invoke());
+            enterKey.onPressed.AddListener(OnEnterKey);
             SwitchToLetters();
 
             SetPreviousInputField();
@@ -345,6 +346,10 @@ namespace umi3dVRBrowsersBase.ui.keyboard
                     editedField.ForceLabelUpdate();
                 }
             }
+
+            deleteKey.button.OnPointerUp(new PointerEventData(EventSystem.current));
+
+            onDeleteCharacter?.Invoke();
         }
 
         /// <summary>
@@ -443,10 +448,15 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <summary>
         /// Closes the keyboard.
         /// </summary>
-        private void ClosePopUp()
+        private void OnEnterKey()
         {
-            Hide();
+            if (closeWhenEnterKey)
+                Hide();
+
+            deleteKey.button.OnPointerUp(new PointerEventData(EventSystem.current));
+
             onEditFinished?.Invoke(previewField.text);
+            onEnterCharacter?.Invoke();
         }
 
         /// <summary>
@@ -491,6 +501,13 @@ namespace umi3dVRBrowsersBase.ui.keyboard
         /// <returns></returns>
         private bool IsTextFullySelected() => previewField.selectionAnchorPosition == previewField.text.Length && previewField.selectionFocusPosition == 0;
 
+        /// <summary>
+        /// Sets preview field to empty text
+        /// </summary>
+        public void ResetPreviewField()
+        {
+            previewField.text = string.Empty;
+        }
         #endregion Methods
     }
 }

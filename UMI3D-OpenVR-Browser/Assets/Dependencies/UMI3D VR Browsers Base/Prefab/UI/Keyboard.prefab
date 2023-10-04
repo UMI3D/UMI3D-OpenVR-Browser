@@ -18856,6 +18856,19 @@ MonoBehaviour:
   symbolToLetterKey: {fileID: 5119993223223288800}
   deleteKey: {fileID: 6039295904576640699}
   enterKey: {fileID: 704726721247749029}
+  closeWhenEnterKey: 1
+  OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onCharacterEntered:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeleteCharacter:
+    m_PersistentCalls:
+      m_Calls: []
+  onEnterCharacter:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!82 &4898738965059931392
 AudioSource:
   m_ObjectHideFlags: 0

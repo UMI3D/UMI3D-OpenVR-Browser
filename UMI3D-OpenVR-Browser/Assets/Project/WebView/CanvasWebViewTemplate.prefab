@@ -421,7 +421,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!114 &6411633321121793821
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -549,8 +549,8 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 0}
-  m_TextComponent: {fileID: 0}
-  m_Placeholder: {fileID: 0}
+  m_TextComponent: {fileID: 1003245650838822879}
+  m_Placeholder: {fileID: 7799740175488984679}
   m_ContentType: 0
   m_InputType: 0
   m_AsteriskChar: 42
@@ -1272,7 +1272,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7414301072448820483}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
@@ -1378,7 +1378,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Test
+  m_Text: 
 --- !u!1 &9007997744296691113
 GameObject:
   m_ObjectHideFlags: 0
@@ -3076,6 +3076,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4777341156007831422, guid: 407f5219942420c4087287ea92a2bb02,
         type: 3}
+      propertyPath: closeWhenEnterKey
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4777341156007831422, guid: 407f5219942420c4087287ea92a2bb02,
+        type: 3}
       propertyPath: onEnterCharacter.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -3102,7 +3107,7 @@ PrefabInstance:
     - target: {fileID: 4777341156007831422, guid: 407f5219942420c4087287ea92a2bb02,
         type: 3}
       propertyPath: onCharacterEntered.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4777341156007831422, guid: 407f5219942420c4087287ea92a2bb02,
         type: 3}
