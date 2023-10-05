@@ -2352,9 +2352,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9edb0acd53bdf3b40ac1170968a73e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordFps: 60
+  recordFps: 30
   Camera: {fileID: 0}
-  Trackers: []
+  Trackers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &2456335938982671909
 GameObject:
   m_ObjectHideFlags: 0

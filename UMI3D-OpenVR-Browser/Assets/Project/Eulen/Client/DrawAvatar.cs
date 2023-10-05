@@ -311,7 +311,6 @@ namespace com.inetum.eulen.recording.app
 
                 for (int i = offset; i < data.frames.Count; i++)
                 {
-                    Debug.Log("Replay");
                     SetFramePose(data.frames[i], data.userSettings, i);                             // A: Replay the whole exercise in the same speed (even with errors)
                     /*if (!SetFramePose(data.frames[i], data.userSettings, i))                      // B: Replay the exercise and stops if there found any error
                         break;*/
