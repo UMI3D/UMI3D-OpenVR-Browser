@@ -16,6 +16,8 @@ limitations under the License.
 
 using inetum.unityUtils;
 using System.Collections.Generic;
+using System.Linq;
+
 using umi3d.common;
 using umi3d.common.userCapture.pose;
 
@@ -39,30 +41,48 @@ namespace umi3d.cdk.userCapture.pose
         /// <summary>
         /// All pose condition processors indexed by related node id.
         /// </summary>
-        public Dictionary<ulong, PoseOverridersContainerProcessor> poseOverridersContainerProcessors = new Dictionary<ulong, PoseOverridersContainerProcessor>();
+        protected readonly Dictionary<ulong, IPoseOverridersContainerProcessor> poseOverridersContainerProcessors = new Dictionary<ulong, IPoseOverridersContainerProcessor>();
+
+        private readonly List<PoseOverridersContainer> containers = new();
 
         #region Dependency Injection
 
         private readonly ISkeletonManager skeletonManager;
         private readonly ILoadingManager loadingManager;
+        private readonly IUMI3DClientServer clientServerService;
 
-        public PoseManager()
-        {
-            skeletonManager = PersonalSkeletonManager.Instance;
-            loadingManager = UMI3DEnvironmentLoader.Instance;
-        }
+        public PoseManager() : this(PersonalSkeletonManager.Instance, UMI3DEnvironmentLoader.Instance, UMI3DClientServer.Instance)
+        { }
 
-        public PoseManager(ISkeletonManager skeletonManager, ILoadingManager loadingManager)
+        public PoseManager(ISkeletonManager skeletonManager, ILoadingManager loadingManager, IUMI3DClientServer clientServerService)
         {
             this.skeletonManager = skeletonManager;
             this.loadingManager = loadingManager;
+            this.clientServerService = clientServerService;
+            
+            Init();
         }
 
         #endregion Dependency Injection
 
+        private void Init()
+        {
+            Poses.Add(UMI3DGlobalID.EnvironementId, new List<SkeletonPose>());
+            clientServerService.OnLeaving.AddListener(Reset);
+            clientServerService.OnRedirection.AddListener(Reset);
+        }
+
+        private void Reset()
+        {
+            StopAllPoses();
+            containers.ToArray().ForEach(x => RemovePoseOverriders(x));
+            Poses.Clear();
+            Poses.Add(UMI3DGlobalID.EnvironementId, new List<SkeletonPose>());
+        }
+
         public void InitLocalPoses()
         {
-            List<UMI3DPose_so> clientPoses = (loadingManager.AbstractLoadingParameters as IUMI3DUserCaptureLoadingParameters).ClientPoses;
+            var clientPoses = (loadingManager.AbstractLoadingParameters as IUMI3DUserCaptureLoadingParameters).ClientPoses;
             localPoses = new PoseDto[clientPoses.Count];
             for (int i = 0; i < clientPoses.Count; i++)
             {
@@ -75,10 +95,18 @@ namespace umi3d.cdk.userCapture.pose
         /// <inheritdoc/>
         public void AddPoseOverriders(PoseOverridersContainer container)
         {
+            if (container == null)
+                throw new System.ArgumentNullException(nameof(container));
+
+            if (containers.Contains(container))
+                return;
+
             if (poseOverridersContainerProcessors.ContainsKey(container.NodeId))
                 return;
 
-            PoseOverridersContainerProcessor unit = new PoseOverridersContainerProcessor(container);
+            containers.Add(container);
+
+            PoseOverridersContainerProcessor unit = new (container);
             unit.ConditionsValidated += ApplyPoseOverride;
             unit.ConditionsInvalided += StopPoseOverride;
             poseOverridersContainerProcessors.Add(container.NodeId, unit);
@@ -87,34 +115,40 @@ namespace umi3d.cdk.userCapture.pose
         /// <inheritdoc/>
         public void RemovePoseOverriders(PoseOverridersContainer container)
         {
-            if (poseOverridersContainerProcessors.TryGetValue(container.NodeId, out PoseOverridersContainerProcessor unit))
-            {
-                unit.ConditionsValidated -= ApplyPoseOverride;
-                unit.StopWatchNonInteractionalConditions();
-                poseOverridersContainerProcessors.Remove(container.NodeId);
-            }
+            if (container == null)
+                throw new System.ArgumentNullException(nameof(container));
+
+            if (!containers.Contains(container)
+                || !poseOverridersContainerProcessors.TryGetValue(container.NodeId, out IPoseOverridersContainerProcessor unit))
+                return;
+            
+            unit.ConditionsValidated -= ApplyPoseOverride;
+            unit.ConditionsInvalided -= StopPoseOverride;
+            unit.StopWatchActivationConditions();
+            poseOverridersContainerProcessors.Remove(container.NodeId);
+            containers.Remove(container);
         }
 
         /// <inheritdoc/>
-        public void TryActivatePoseOverriders(ulong id, PoseActivationMode poseActivationMode)
+        public bool TryActivatePoseOverriders(ulong nodeId, PoseActivationMode poseActivationMode)
         {
-            if (poseOverridersContainerProcessors.TryGetValue(id, out PoseOverridersContainerProcessor unit))
-            {
-                unit.TryActivate(poseActivationMode);
-            }
+            if (!poseOverridersContainerProcessors.TryGetValue(nodeId, out IPoseOverridersContainerProcessor unit))
+                return false;
+
+            return unit.TryActivate(poseActivationMode);
         }
 
         /// <inheritdoc/>
         public void ApplyPoseOverride(PoseOverrider poseOverrider)
         {
             if (poseOverrider == null)
-                return;
+                throw new System.ArgumentNullException(nameof(poseOverrider));
 
             foreach (SkeletonPose pose in Poses[UMI3DGlobalID.EnvironementId])
             {
                 if (pose.Index == poseOverrider.PoseIndexInPoseManager)
                 {
-                    //skeletonManager.PersonalSkeleton.PoseSubskeleton.StartPose(pose);
+                    skeletonManager.PersonalSkeleton.PoseSubskeleton.StartPose(pose);
                     return;
                 }
             }
@@ -124,13 +158,13 @@ namespace umi3d.cdk.userCapture.pose
         public void StopPoseOverride(PoseOverrider poseOverrider)
         {
             if (poseOverrider == null)
-                return;
+                throw new System.ArgumentNullException(nameof(poseOverrider));
 
             foreach (SkeletonPose pose in Poses[UMI3DGlobalID.EnvironementId])
             {
                 if (pose.Index == poseOverrider.PoseIndexInPoseManager)
                 {
-                    //skeletonManager.PersonalSkeleton.PoseSubskeleton.StopPose(pose);
+                    skeletonManager.PersonalSkeleton.PoseSubskeleton.StopPose(pose);
                     return;
                 }
             }
@@ -139,7 +173,7 @@ namespace umi3d.cdk.userCapture.pose
         /// <inheritdoc/>
         public void StopAllPoses()
         {
-            //skeletonManager.PersonalSkeleton.PoseSubskeleton.StopAllPoses();
+            skeletonManager.PersonalSkeleton.PoseSubskeleton.StopAllPoses();
         }
     }
 }

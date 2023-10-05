@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using inetum.unityUtils;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using umi3d.cdk.userCapture.animation;
@@ -23,8 +24,9 @@ using umi3d.cdk.userCapture.tracking;
 using umi3d.common;
 using umi3d.common.userCapture;
 using umi3d.common.userCapture.description;
+using umi3d.common.userCapture.pose;
 using umi3d.common.userCapture.tracking;
-
+using umi3d.common.utils;
 using UnityEngine;
 
 namespace umi3d.cdk.userCapture
@@ -37,10 +39,14 @@ namespace umi3d.cdk.userCapture
     {
         protected const DebugScope scope = DebugScope.CDK | DebugScope.UserCapture;
 
+        #region Fields
+
         /// <inheritdoc/>
         public virtual IDictionary<uint, ISkeleton.Transformation> Bones { get; protected set; } = new Dictionary<uint, ISkeleton.Transformation>();
 
-
+        /// <summary>
+        /// Lock for concurrent access to <see cref="Subskeletons"/> collection.
+        /// </summary>
         public object SubskeletonsLock { get; } = new();
 
         /// <inheritdoc/>
@@ -74,7 +80,8 @@ namespace umi3d.cdk.userCapture
         /// <summary>
         /// Subskeleton updated from tracked controllers.
         /// </summary>
-        public ITrackedSubskeleton TrackedSubskeleton => trackedSkeleton;
+        public ITrackedSubskeleton TrackedSubskeleton => _trackedSkeleton;
+        protected ITrackedSubskeleton _trackedSkeleton;
 
         [SerializeField]
         protected TrackedSubskeleton trackedSkeleton;
@@ -94,13 +101,39 @@ namespace umi3d.cdk.userCapture
         [SerializeField, Tooltip("Anchor of the skeleton hierarchy.")]
         protected Transform hipsAnchor;
 
-        public void Init(TrackedSubskeleton trackedSkeleton, IPoseSubskeleton poseSkeleton)
+        #endregion Fields
+
+        public void Init(ITrackedSubskeleton trackedSkeleton, IPoseSubskeleton poseSkeleton)
         {
-            this.trackedSkeleton = trackedSkeleton;
+            this._trackedSkeleton = trackedSkeleton;
             HipsAnchor = TrackedSubskeleton.Hips;
-            //PoseSubskeleton = poseSkeleton;
+            PoseSubskeleton = poseSkeleton;
             subskeletons = new List<ISubskeleton> { TrackedSubskeleton };
-            //subskeletons.AddSorted(PoseSubskeleton);
+
+            // init bones to prevent from early bindings arrival
+            foreach (var boneType in SkeletonHierarchy.Relations.Keys)
+            {
+                Bones[boneType] = new ISkeleton.Transformation()
+                {
+                    Position = Vector3.zero,
+                    Rotation = Quaternion.identity,
+                    LocalRotation = Quaternion.identity,
+                };
+            }
+            Bones[BoneType.Hips].Position = HipsAnchor != null ? HipsAnchor.position : Vector3.zero;
+            Bones[BoneType.Hips].Rotation = HipsAnchor != null ? HipsAnchor.rotation : Quaternion.identity;
+
+            StartCoroutine(InitPoseSubskeleton());
+        }
+
+        private IEnumerator InitPoseSubskeleton()
+        {
+            while (this.lastFrame == null)
+            {
+                yield return new WaitForEndOfFrame();
+            }
+
+            subskeletons.AddSorted(PoseSubskeleton);
         }
 
         /// <inheritdoc/>
@@ -110,7 +143,6 @@ namespace umi3d.cdk.userCapture
                 return this;
 
             RetrieveBonesRotation(SkeletonHierarchy);
-
             if (!Bones.ContainsKey(BoneType.Hips))
                 return this;
 
@@ -120,7 +152,7 @@ namespace umi3d.cdk.userCapture
             //very naive : for now, we consider the tracked hips as the computer hips
             Bones[BoneType.Hips].Position = HipsAnchor != null ? HipsAnchor.position : Vector3.zero;
             Bones[BoneType.Hips].Rotation = HipsAnchor != null ? HipsAnchor.rotation : Quaternion.identity;
-                
+
             alreadyComputedBonesCache[BoneType.Hips] = true;
 
             // better use normal recusive computations then.
@@ -140,14 +172,6 @@ namespace umi3d.cdk.userCapture
         private Dictionary<uint, bool> alreadyComputedBonesCache = new();
 
         /// <summary>
-        /// Containing id of the bones set by the TrackedSkeleton in <see cref="RetrieveBonesRotation(UMI3DSkeletonHierarchy)"/> method.
-        /// Preventing from the application of the Hips rotation to these bones in <see cref="ComputeBonePosition(uint)"/> method.
-        /// </summary>
-        private HashSet<uint> bonesSetByTrackedSkeleton = new();
-
-        private HashSet<uint> bonesSetByAnySkeleton = new();
-
-        /// <summary>
         /// Compute the final position of each bone, and their parents recursively if not already computed
         /// </summary>
         /// <param name="boneType"></param>
@@ -162,15 +186,7 @@ namespace umi3d.cdk.userCapture
 
                 Matrix4x4 m = Matrix4x4.TRS(Bones[boneRelation.boneTypeParent].Position, Bones[boneRelation.boneTypeParent].Rotation, transform.localScale * 0.5f);
                 Bones[boneType].Position = m.MultiplyPoint3x4(boneRelation.relativePosition); //Bones[boneRelation.boneTypeParent].Position + Bones[boneRelation.boneTypeParent].Rotation * boneRelation.relativePosition;
-
-                if (!bonesSetByAnySkeleton.Contains(boneType))
-                {
-                    Bones[boneType].Rotation = Bones[boneRelation.boneTypeParent].Rotation;
-                }
-
-                else if (!bonesSetByTrackedSkeleton.Contains(boneType))
-                    Bones[boneType].Rotation = Bones[BoneType.Hips].Rotation * Bones[boneType].Rotation; // all global bones rotations should be turned the same way as the anchor
-
+                Bones[boneType].Rotation = (Bones[boneRelation.boneTypeParent].Rotation * Bones[boneType].LocalRotation).normalized;
                 alreadyComputedBonesCache[boneType] = true;
             }
         }
@@ -186,21 +202,19 @@ namespace umi3d.cdk.userCapture
             foreach (var bone in hierarchy.Relations.Keys)
             {
                 if (Bones.ContainsKey(bone))
-                    Bones[bone].Rotation = Quaternion.identity;
+                {
+                    Bones[bone].LocalRotation = Quaternion.identity;
+                }
                 else
-                    Bones[bone] = new ISkeleton.Transformation() { Rotation = Quaternion.identity };
+                    Bones[bone] = new ISkeleton.Transformation() { Rotation = Quaternion.identity, LocalRotation = Quaternion.identity };
             }
 
-            bonesSetByTrackedSkeleton.Clear();
-            bonesSetByAnySkeleton.Clear();
-
-            List<string> deb = new();
-            // for each subskeleton, in descending order (lastest has lowest priority),
+            // for each subskeleton, in ascending order (last has highest priority),
             // get the relative orientation of all available bones
             lock (SubskeletonsLock)
                 foreach (var skeleton in Subskeletons)
                 {
-                    List<BoneDto> bones = skeleton.GetPose()?.bones;
+                    List<SubSkeletonBoneDto> bones = skeleton.GetPose(hierarchy)?.bones;
 
                     if (bones is null) // if bones are null, sub skeleton should not have any effect. e.g. pose skeleton with no current pose.
                         continue;
@@ -208,37 +222,13 @@ namespace umi3d.cdk.userCapture
                     foreach (var b in bones.Where(c => c.boneType != BoneType.Hips))
                     {
                         // if a bone rotation has already been registered, erase it
-                        if(b.boneType == BoneType.LeftHip)
-                        {
-                            deb.Add(skeleton.GetType().Name);
-                        }
 
                         if (Bones.ContainsKey(b.boneType))
-                            Bones[b.boneType].Rotation = b.rotation.Quaternion();
+                            Bones[b.boneType].LocalRotation = b.localRotation.Quaternion();
                         else
-                            Bones.Add(b.boneType, new ISkeleton.Transformation() { Rotation = b.rotation.Quaternion() });
-                    }
-#pragma warning disable CS0252
-                    if (skeleton == trackedSkeleton) //the TrackedSkeleton is the first SubSkeleton
-#pragma warning restore CS0252
-                    {
-                        foreach (var b in bones)
-                        {
-                            bonesSetByTrackedSkeleton.Add(b.boneType);
-                            bonesSetByAnySkeleton.Add(b.boneType);
-                        }
-                    }
-                    else
-                    {
-                        foreach (var b in bones)
-                        {
-                            bonesSetByTrackedSkeleton.Remove(b.boneType);
-                            bonesSetByAnySkeleton.Add(b.boneType);
-                        }
+                            Bones.Add(b.boneType, new ISkeleton.Transformation() { LocalRotation = b.localRotation.Quaternion() });
                     }
                 }
-
-            //deb.Debug();
         }
 
         /// <inheritdoc/>
@@ -263,27 +253,27 @@ namespace umi3d.cdk.userCapture
         }
 
 
-        public void AddSubskeleton(ISubskeleton subskeleton)
+        public void AddSubskeleton(IAnimatedSubskeleton animatedSubskeleton)
         {
-            if (subskeleton is not AnimatedSubskeleton animatedSubskeleton)
+            if (animatedSubskeleton == null)
                 return;
 
             lock (SubskeletonsLock) // loader can start parallel async tasks, required to load concurrently
             {
-                subskeletons.AddSorted(animatedSubskeleton);
+                UnityMainThreadDispatcherManager.Instance.Enqueue(() => { lock (SubskeletonsLock) { subskeletons.AddSorted(animatedSubskeleton); } });
 
                 // if some animator parameters should be updated by the browsers itself, start listening to them
-                if (animatedSubskeleton.SelfUpdatedAnimatorParameters.Length > 0)
+                if (animatedSubskeleton.SelfUpdatedAnimatorParameters.Count > 0)
                     animatedSubskeleton.StartParameterSelfUpdate(this);
             }
         }
 
-        public void RemoveSubskeleton(ISubskeleton subskeleton)
+        public void RemoveSubskeleton(IAnimatedSubskeleton animatedSubskeleton)
         {
-            if (subskeleton is not AnimatedSubskeleton animatedSubskeleton)
+            if (animatedSubskeleton == null)
                 return;
 
-            if (animatedSubskeleton.SelfUpdatedAnimatorParameters.Length > 0)
+            if (animatedSubskeleton.SelfUpdatedAnimatorParameters.Count > 0)
                 animatedSubskeleton.StopParameterSelfUpdate();
 
             if (subskeletons.Contains(animatedSubskeleton))
