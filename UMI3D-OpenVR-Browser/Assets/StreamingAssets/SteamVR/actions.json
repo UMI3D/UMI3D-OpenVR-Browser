@@ -84,6 +84,11 @@
       "requirement": "mandatory"
     },
     {
+      "name": "/actions/UMI3D/in/UMI3DPose",
+      "type": "pose",
+      "requirement": "suggested"
+    },
+    {
       "name": "/actions/UMI3D/out/Haptic",
       "type": "vibration"
     }
@@ -150,11 +155,44 @@
     {
       "controller_type": "vive_tracker_camera",
       "binding_url": "binding_vive_tracker_camera.json"
+    },
+    {
+      "controller_type": "vive_tracker_left_elbow",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_left_elbow.json"
+    },
+    {
+      "controller_type": "vive_tracker_left_knee",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_left_knee.json"
+    },
+    {
+      "controller_type": "vive_tracker_left_shoulder",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_left_shoulder.json"
+    },
+    {
+      "controller_type": "vive_tracker_right_elbow",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_right_elbow.json"
+    },
+    {
+      "controller_type": "vive_tracker_right_foot",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_right_foot.json"
+    },
+    {
+      "controller_type": "vive_tracker_right_knee",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_right_knee.json"
+    },
+    {
+      "controller_type": "vive_tracker_right_shoulder",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_right_shoulder.json"
+    },
+    {
+      "controller_type": "vive_tracker_waist",
+      "binding_url": "application_generated_unity_umi3d_exe_binding_vive_tracker_waist.json"
     }
   ],
   "localization": [
     {
       "language_tag": "en_US",
+      "/actions/UMI3D/in/UMI3DPose": "UMI3DPose",
       "/actions/default/in/GrabGrip": "Grab Grip",
       "/actions/default/in/GrabPinch": "Grab Pinch",
       "/actions/default/in/HeadsetOnHead": "Headset on head (proximity sensor)",
@@ -162,10 +200,10 @@
       "/actions/default/in/Pose": "Pose",
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
-      "/actions/default/in/Teleport": "Teleport",
-      "/actions/default/out/Haptic": "Haptic",
       "/actions/default/in/SnapTurnLeft": "Snap Turn (Left)",
-      "/actions/default/in/SnapTurnRight": "Snap Turn (Right)"
+      "/actions/default/in/SnapTurnRight": "Snap Turn (Right)",
+      "/actions/default/in/Teleport": "Teleport",
+      "/actions/default/out/Haptic": "Haptic"
     }
   ]
 }

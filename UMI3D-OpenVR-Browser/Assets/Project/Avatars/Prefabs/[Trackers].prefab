@@ -361,8 +361,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 3
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -559,8 +559,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 4
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -863,8 +863,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 5
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -1603,8 +1603,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 7
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -1988,8 +1988,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 16
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -2101,8 +2101,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 17
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -2673,8 +2673,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 6
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -3559,8 +3559,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 15
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:
@@ -4554,8 +4554,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   poseAction:
-    actionPath: /actions/default/in/Pose
-    needsReinit: 1
+    actionPath: /actions/UMI3D/in/UMI3DPose
+    needsReinit: 0
   inputSource: 14
   origin: {fileID: 6914291452116066502}
   onTransformUpdated:

@@ -5,7 +5,7 @@
       "app_key": "application.generated.unity.umi3d.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "C:\\Users\\usuario\\source\\repos\\UMI3D-OpenVR-Browser\\UMI3D-OpenVR-Browser\\Assets\\StreamingAssets\\SteamVR\\actions.json",
+      "action_manifest_path": "D:\\Repos\\UMI3D\\UMI3D-OpenVR-Browser\\UMI3D-OpenVR-Browser\\Assets\\StreamingAssets\\SteamVR\\actions.json",
       "strings": {
         "en_us": {
           "name": "UMI3D [Testing]"
