@@ -10,6 +10,8 @@ using com.inetum.addonEulen.common;
 using UnityEngine.Networking;
 using umi3d.cdk.collaboration;
 using System.Linq;
+using umi3d.cdk;
+using System.Threading.Tasks;
 
 namespace com.inetum.eulen.recording.app
 {
@@ -38,6 +40,8 @@ namespace com.inetum.eulen.recording.app
         public bool IsRecording { get; private set; } = false;
 
         private Transform box;
+
+        public Transform boxReplay;
 
         #endregion
 
@@ -72,11 +76,12 @@ namespace com.inetum.eulen.recording.app
             System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
 
             watch.Start();
-            box = Resources.FindObjectsOfTypeAll<Transform>().Where(o => o.name == "BoxTraining")?.FirstOrDefault();
+            Debug.Log("Resources box 0: " + Resources.FindObjectsOfTypeAll<Transform>().Where(o => o.name == "BoxTraining").Count());
+            box = Resources.FindObjectsOfTypeAll<Transform>().Where(o => o.name == "BoxTraining" && o.parent != UMI3DResourcesManager.Instance.transform && o != boxReplay)?.FirstOrDefault();
             watch.Stop();
 
             // About 3 ms
-            Debug.Log("BOX FOUND " + (box != null) + " " + watch.ElapsedMilliseconds);
+            Debug.Log("BOX FOUND " + (box != null) + " " + watch.ElapsedMilliseconds + " Parent: " + box?.parent.name);
         }
 
         public void StartRecording(int movementId)
@@ -130,8 +135,9 @@ namespace com.inetum.eulen.recording.app
                 }
 
                 if (box != null)
+                {
                     entries.Add(new RecordKeyEntryDto((int)SteamVR_Input_Sources.Treadmill, box.position.Dto(), box.rotation.Dto()));
-
+                }
                 recordDto.frames.Add(new RecordKeyFrameDto(entries));
 
                 yield return wait;
@@ -139,7 +145,7 @@ namespace com.inetum.eulen.recording.app
 
         }
 
-        public int StopRecording()
+        public async Task<int> StopRecording()
         {
             if (IsRecording)
             {
@@ -151,6 +157,7 @@ namespace com.inetum.eulen.recording.app
                     Debug.Log("Records saved  : " + recordDto.frames.Count + " frames.");
 
                     EulenMessagesSender.Instance.SendDataRecordedToServer(recordDto, currentRecordedMovementId);
+                    await UMI3DAsyncManager.Delay(3000);
                     DrawAvatar.Instance.ValidateCompleteMovement(recordDto, currentRecordedMovementId);
 
                     return recordDto.frames.Count;

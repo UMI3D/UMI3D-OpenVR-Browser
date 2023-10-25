@@ -1571,8 +1571,8 @@ MonoBehaviour:
     tracker: {fileID: 0}
     bone: {fileID: 6224489070020643016}
   - source: 5
-    tracker: {fileID: 368475183662606788}
-    bone: {fileID: 0}
+    tracker: {fileID: 0}
+    bone: {fileID: 368475183662606788}
   - source: 6
     tracker: {fileID: 0}
     bone: {fileID: 455704055382300757}
@@ -2366,6 +2366,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  boxReplay: {fileID: 4182929543527922462}
 --- !u!1 &2456335938982671909
 GameObject:
   m_ObjectHideFlags: 0

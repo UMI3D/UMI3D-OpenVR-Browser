@@ -115,7 +115,7 @@ MonoBehaviour:
     errorLog: Corregir la posicion de los pies
     isBoxGrabbed: 0
     checkFeetPosition: 1
-    xDistanceToBox: 0.2
+    xDistanceToBox: 0.15
     preConditions:
     - type: 0
       test: 4
