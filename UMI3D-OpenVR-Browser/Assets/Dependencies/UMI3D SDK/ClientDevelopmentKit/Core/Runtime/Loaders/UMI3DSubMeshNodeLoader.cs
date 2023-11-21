@@ -48,7 +48,7 @@ namespace umi3d.cdk
                 throw (new Umi3dException("nodeDto should not be null"));
             }
 
-            var e = await UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(nodeDto.modelId,data.tokens);
+            var e = await UMI3DEnvironmentLoader.WaitForAnEntityToBeLoaded(nodeDto.modelId, data.tokens);
             LoadSubModel(e, data.node, nodeDto);
         }
 
@@ -60,7 +60,7 @@ namespace umi3d.cdk
                 var modelDto = (GlTFNodeDto)modelNodeInstance.dto;
                 UMI3DNodeInstance nodeInstance = UMI3DEnvironmentLoader.GetNode(subDto.id);
 
-                string modelInCache = UMI3DEnvironmentLoader.AbstractParameters.ChooseVariant(((UMI3DMeshNodeDto)modelDto.extensions.umi3d).mesh.variants).url;
+                FileDto file = UMI3DEnvironmentLoader.AbstractParameters.ChooseVariant(((UMI3DMeshNodeDto)modelDto.extensions.umi3d).mesh.variants);
 
                 var rootDto = (UMI3DMeshNodeDto)modelDto.extensions.umi3d;
                 GameObject instance = null;
@@ -69,7 +69,7 @@ namespace umi3d.cdk
                 {
                     string sub = subDto.subModelName;
 
-                    UMI3DResourcesManager.Instance.GetSubModel(modelInCache, sub, subDto.subModelHierachyIndexes, subDto.subModelHierachyNames, (o) =>
+                    UMI3DResourcesManager.Instance.GetSubModel(file.url, file.libraryKey, sub, subDto.subModelHierachyIndexes, subDto.subModelHierachyNames, (o) =>
                     {
                         instance = GameObject.Instantiate((GameObject)o, node.gameObject.transform, false);
 
@@ -142,9 +142,14 @@ namespace umi3d.cdk
 
             for (int i = 0; i < renderersInfo.Length; i++)
             {
-                if (renderersInfo[i].renderer.gameObject == o)
+                var renderer = renderersInfo[i];
+
+                if (renderer.renderer == null)
+                    continue;
+
+                if (renderer.renderer.gameObject == o)
                 {
-                    renderersInfo[i].renderer = renderers.FirstOrDefault();
+                    renderer.renderer = renderers.FirstOrDefault();
                     break;
                 }
             }
