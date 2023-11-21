@@ -29,8 +29,8 @@ namespace umi3d.cdk.userCapture.binding
     {
         public RigBoneBinding(RigBoneBindingDataDto dto, Transform rigBoundTransform, ISkeleton skeleton, Transform rootObject) : base(dto, rigBoundTransform, skeleton)
         {
-            this.rootObject = rootObject;
-            this.originalRotationOffset = Quaternion.Inverse(rootObject.rotation) * boundTransform.rotation;
+            this.rootObject = rootObject;      
+            this.originalRotationOffset = ApplyOriginalRotation ? Quaternion.Inverse(rootObject.rotation) * boundTransform.rotation : Quaternion.identity;
         }
 
         #region DTO Access
@@ -43,6 +43,12 @@ namespace umi3d.cdk.userCapture.binding
         /// See <see cref="RigBoneBindingDataDto.rigName"/>.
         /// </summary>
         public string RigName => RigBoneBindingDataDto.rigName;
+
+        /// <summary>
+        /// See <see cref="RigBoneBindingDataDto.applyOriginalRotation"/>.
+        /// </summary>
+        public bool ApplyOriginalRotation => RigBoneBindingDataDto.applyOriginalRotation;
+
 
         #endregion DTO Access
 
@@ -73,7 +79,7 @@ namespace umi3d.cdk.userCapture.binding
             
             if (parentBone is null)
             {
-                UMI3DLogger.LogError($"Bone transform from bone {BoneType} is null. It may have been deleted without removing the binding first.", DebugScope.CDK | DebugScope.Core);
+                UMI3DLogger.LogWarning($"Bone transform from bone {BoneType} is null. It may have been deleted without removing the binding first.", DebugScope.CDK | DebugScope.Core);
                 success = false;
                 return;
             }
