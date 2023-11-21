@@ -14,6 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+using inetum.unityUtils;
+using MathNet.Numerics;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +26,7 @@ using umi3dVRBrowsersBase.ui.playerMenu;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using WebSocketSharp;
 
 namespace umi3dVRBrowsersBase.ui
 {
@@ -92,6 +96,10 @@ namespace umi3dVRBrowsersBase.ui
         [SerializeField]
         [Tooltip("Background for press feedback")]
         private Sprite pressSprite;
+
+        [SerializeField]
+        [Tooltip("player needed for distance.")]
+        private Transform player;
 
         /// <summary>
         /// Name of the shader property which enable or disable Z-depth test.
@@ -183,6 +191,8 @@ namespace umi3dVRBrowsersBase.ui
         /// <param name="normal">World normal of the gear</param>
         public void Display(Interactable interactable, Vector3 position, Vector3 normal, Vector2 rayDirection)
         {
+            isInteractableSelected = true;
+
             gameObject.SetActive(true);
 
             this.CurrentAssociatedInteractable = interactable;
@@ -199,6 +209,8 @@ namespace umi3dVRBrowsersBase.ui
         /// <param name="lookAtPoint">World position of the point the object is looked at.</param>
         public void Display(InteractableContainer interactableContainer, Vector3 lookAtPoint)
         {
+            isInteractableSelected = true;
+
             Vector3 rootPosition;
             Vector3 normal;
             Vector3 rayDirection;
@@ -211,9 +223,9 @@ namespace umi3dVRBrowsersBase.ui
             else
             {
                 Ray ray = new Ray(lookAtPoint, interactableContainer.transform.position - lookAtPoint);
-                var hits = new List<RaycastHit>(Physics.RaycastAll(ray));
+                (RaycastHit[] hits, int hitCount) hitsInfo = umi3d.common.Physics.RaycastAll(ray);
 
-                if (hits.Count == 0) // happens is the center of the object is outside of the mesh
+                if (hitsInfo.hitCount == 0) // happens is the center of the object is outside of the mesh
                 {
                     rootPosition = interactableContainer.transform.position;
                     rayDirection = (rootPosition - lookAtPoint).normalized;
@@ -225,8 +237,9 @@ namespace umi3dVRBrowsersBase.ui
                     try
                     {
                         Collider icCollider = interactableContainer.GetComponentInChildren<Collider>();
+                        RaycastHit[] hits = hitsInfo.hits.SubArray(0, hitsInfo.hitCount);
                         float closestDist = hits.Where(x => x.collider == icCollider).Min(x => x.distance);
-                        RaycastHit closest = hits.Find(x => x.distance == closestDist);
+                        RaycastHit closest = Array.Find(hits, x => x.distance == closestDist);
                         rootPosition = closest.point;
                         normal = closest.normal;
                     }
@@ -250,21 +263,67 @@ namespace umi3dVRBrowsersBase.ui
         {
             gameObject.SetActive(false);
             this.CurrentAssociatedInteractable = null;
+            isInteractableSelected = false;
+        }
+
+        public float delayBeforeHiding = 1f;
+        public bool isInteractableSelected;
+
+        public void HideWithDelay()
+        {
+            isInteractableSelected = false;
+            float time = 0f;
+            IEnumerator HideCoroutine()
+            {
+                while (time < delayBeforeHiding)
+                {
+                    time += Time.deltaTime;
+                    yield return null;
+                }
+
+                if (!isInteractableSelected)
+                {
+                    Hide();
+                }
+            }
+
+            CoroutineManager.Instance.AttachCoroutine(HideCoroutine());
+            //StartCoroutine(HideCoroutine());
         }
 
         public override void Select(VRController controller)
         {
+            isSelected = true;
         }
 
         public override void Deselect(VRController controller)
         {
+            isSelected = false;
         }
+
+        [Tooltip("Used for gear scale.")]
+        public float minDistance = 2f;
+        [Tooltip("Used for gear scale.")]
+        public float maxDistance = 6f;
+        [Tooltip("Used for gear scale.")]
+        public float minScale = 0.15f;
+        [Tooltip("Used for gear scale.")]
+        public float maxScale = .5f;
+
+        
 
         private void Update()
         {
             if (container == null && gameObject.activeInHierarchy)
             {
                 Hide();
+            }
+
+            if (IsDisplayed)
+            {
+                var distance = Vector3.Distance(transform.position, player.position);
+                var scale = Mathf.Lerp(minScale, maxScale, Mathf.InverseLerp(minDistance, maxDistance, distance));
+                transform.localScale = new Vector3(scale, scale, scale);
             }
         }
 

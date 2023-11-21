@@ -41,7 +41,7 @@ namespace umi3dVRBrowsersBase.interactions
         /// <summary>
         /// Asoociated bone.
         /// </summary>
-        public TrackedSubskeletonBoneController bone;
+        public Tracker bone;
 
         #region Inputs Fields
 
@@ -103,6 +103,8 @@ namespace umi3dVRBrowsersBase.interactions
             if (currentTool == tool) // It means projection succedded
             {
                 PlayerMenuManager.Instance.MenuHeader.DisplayControllerButton(true, type, tool.name);
+
+                tool.onProjected(bone.Bonetype);
             }
         }
 
@@ -277,7 +279,7 @@ namespace umi3dVRBrowsersBase.interactions
         public override void Release(AbstractTool tool, InteractionMappingReason reason)
         {
             base.Release(tool, reason);
-            tool.onReleased(bone.boneType);
+            tool.onReleased(bone.Bonetype);
 
             PlayerMenuManager.Instance.CtrlToolMenu.ClearBindingList(type);
             PlayerMenuManager.Instance.MenuHeader.DisplayControllerButton(false, type, string.Empty);

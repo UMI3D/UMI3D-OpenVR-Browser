@@ -57,16 +57,20 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// <inheritdoc/>
         public override List<T> GetObjectsInZone()
         {
-            var rayCastHits = umi3d.common.Physics.RaycastAll(origin, direction);
+            (RaycastHit[] hits, int hitCount) hitsInfo = umi3d.common.Physics.RaycastAll(origin, direction);
             var objectsOnRay = new List<T>();
-
-            foreach (var hit in rayCastHits)
+            for (int i = 0; i < hitsInfo.hitCount; i++)
             {
+                var hit = hitsInfo.hits[i];
                 var interContainer = hit.transform.GetComponent<T>();
                 if (interContainer == null)
+                {
                     interContainer = hit.transform.GetComponentInParent<T>();
+                }
                 if (interContainer != null)
+                {
                     objectsOnRay.Add(interContainer);
+                }
             }
 
             return objectsOnRay;
@@ -150,22 +154,34 @@ namespace umi3dBrowsers.interaction.selection.zoneselection
         /// <returns></returns>
         public Dictionary<T, RaycastHit> GetObjectsOnRayWithRayCastHits()
         {
-            var rayCastHits = umi3d.common.Physics.RaycastAll(origin, direction);
-            var objectsOnRay = new Dictionary<T, RaycastHit>();
-            foreach (var hit in rayCastHits)
+            (RaycastHit[] hits, int hitCount) hitsInfo = umi3d.common.Physics.RaycastAll(origin, direction);
+            Dictionary<T, RaycastHit> objectsOnRay = new();
+            
+            for (int i = 0; i < hitsInfo.hitCount; i++)
             {
+                var hit = hitsInfo.hits[i];
+                if (hit.transform == null)
+                {
+                    continue;
+                }
                 var obj = hit.transform.GetComponent<T>();
                 if (obj == null) //looking for a componenent in parent
+                {
                     obj = hit.transform.GetComponentInParent<T>();
+                }
                 if (obj != null)
                 {
                     if (objectsOnRay.ContainsKey(obj))
                     {
                         if (objectsOnRay[obj].distance > hit.distance) //only consider the first hit if there are several
+                        {
                             objectsOnRay[obj] = hit;
+                        }
                     }
                     else
+                    {
                         objectsOnRay.Add(obj, hit);
+                    }
                 }
             }
 

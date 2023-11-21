@@ -236,11 +236,13 @@ namespace umi3dVRBrowsersBase.interactions
 
         #region Unity Callback
 
+        Array ControllerTypes = Enum.GetValues(typeof(ControllerType));
+
         protected override void Awake()
         {
             base.Awake();
 
-            foreach (ControllerType ctrl in Enum.GetValues(typeof(ControllerType)))
+            foreach (ControllerType ctrl in ControllerTypes)
             {
                 isJoystick.Add(ctrl, false);
                 isJoystickDown.Add(ctrl, false);
@@ -250,7 +252,7 @@ namespace umi3dVRBrowsersBase.interactions
 
         private void Update()
         {
-            foreach (ControllerType ctrl in Enum.GetValues(typeof(ControllerType)))
+            foreach (ControllerType ctrl in ControllerTypes)
             {
                 Vector2 axis = GetJoystickAxis(ctrl);
 

@@ -112,12 +112,17 @@ namespace umi3dVRBrowsersBase.navigation
 
 
         Vector3 position = Vector3.zero;
-        public override (Vector3Dto speed, bool jumping, bool crouching) GetNaviagtionData()
+        public override NavigationData GetNavigationData()
         {
             var newPos = GetPostion();
             var delta = newPos - position;
             position = newPos;
-            return (delta.Dto(), false, false);
+            return new NavigationData
+            {
+                speed = delta.Dto(),
+                jumping = false,
+                crouching = false
+            };
         }
 
         protected virtual Vector3 GetPostion()

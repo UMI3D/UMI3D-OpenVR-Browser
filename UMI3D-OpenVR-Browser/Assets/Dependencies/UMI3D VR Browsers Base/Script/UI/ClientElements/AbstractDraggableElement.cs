@@ -15,10 +15,12 @@ limitations under the License.
 */
 
 using System;
+using System.Drawing;
 using System.Linq;
 using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 using UnityEngine.Events;
+using WebSocketSharp;
 
 namespace umi3dVRBrowsersBase.ui
 {
@@ -124,10 +126,12 @@ namespace umi3dVRBrowsersBase.ui
                 origin = usedController.transform.position
             };
 
-            var closestHit = Physics.RaycastAll(ray)
-                        .Where(hit => hit.collider == this.colliderRaycast)
-                        .OrderBy(hit => hit.distance)
-                        .FirstOrDefault();
+            (RaycastHit[] hits, int hitCount) hitsInfo = umi3d.common.Physics.RaycastAll(ray);
+            var closestHit = hitsInfo.hits
+                .SubArray(0, hitsInfo.hitCount)
+                .Where(hit => !hit.Equals(default) && hit.collider == this.colliderRaycast)
+                .OrderBy(hit => hit.distance)
+                .FirstOrDefault();
             startDistanceFromObject = closestHit.distance;
 
             isBeingDragged = true;

@@ -14,6 +14,7 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using umi3d.cdk.interaction;
+using umi3d.cdk.userCapture.pose;
 using umi3dBrowsers.interaction.selection;
 using umi3dBrowsers.interaction.selection.intentdetector;
 using umi3dBrowsers.interaction.selection.projector;
@@ -247,7 +248,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 selectionInfo.hasBeenSelected = true;
                 LastSelected = selectionInfo;
                 isSelecting = true;
-                selectionEvent.Invoke(selectionInfo);
+                selectionEvent?.Invoke(selectionInfo);
                 foreach (var detector in pointingDetectors)
                     detector.Reinit();
                 foreach (var detector in proximityDetectors)

@@ -407,7 +407,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
             selectionInfo.hasBeenSelected = true;
             LastSelected = selectionInfo;
             isSelecting = true;
-            selectionEvent.Invoke(selectionInfo);
+            selectionEvent?.Invoke(selectionInfo);
             foreach (var detector in PointingDetectors)
                 detector.Reinit();
             foreach (var detector in ProximityDetectors)
