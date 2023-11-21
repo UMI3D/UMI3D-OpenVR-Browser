@@ -76,7 +76,11 @@ namespace umi3dBrowsers.interaction.selection.feedback
                 renderer = renderer,
                 originalLayer = ic.gameObject.layer
             };
-            renderer.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
+            if (renderer != null && renderer.gameObject != null)
+            {
+                renderer.gameObject.layer = (int)Mathf.Log(selectionOutlineLayer, 2); // strange but necessary to convert
+            }
+            
         }
 
         /// <summary>

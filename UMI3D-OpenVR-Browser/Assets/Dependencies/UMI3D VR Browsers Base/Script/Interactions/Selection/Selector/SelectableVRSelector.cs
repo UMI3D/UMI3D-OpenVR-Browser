@@ -89,8 +89,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                     OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1 });
                     LockedSelector = false;
                 }
-            }
-            else if (activated && LastSelected != null)
+            } else if (activated && LastSelected != null)
             {
                 raycastHelper.origin = controller.transform.position;
                 raycastHelper.direction = controller.transform.forward;
@@ -156,7 +155,6 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 l.Add(detector);
             return l;
         }
-
         #endregion
 
         #region selection
@@ -171,8 +169,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <returns></returns>
         protected override bool CanSelect(Selectable uiToSelect)
         {
-            return uiToSelect != null
-                && uiToSelect.enabled
+            return uiToSelect != null 
+                && uiToSelect.enabled 
                 && uiToSelect.interactable;
         }
 

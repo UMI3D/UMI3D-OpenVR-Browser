@@ -44,7 +44,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             if (selectable != null) //protects against cases when UI element is destroyed but not deselected
             {
                 selectable.OnPointerExit(pointerEventData);
-                if (!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
+                if(!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
         }
@@ -93,6 +93,7 @@ namespace umi3dBrowsers.interaction.selection.projector
                     break;
 
                 default:
+
                     SendDefaultSelectableEvent(selectable, controller, eventData, false);
                     break;
             }
@@ -132,7 +133,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             eventData.pointerCurrentRaycast = new RaycastResult { worldPosition = closestAndRaycastHit.raycastHit.point };
 
             if (down)
-                ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(selectable.gameObject, eventData,ExecuteEvents.pointerDownHandler);
             else
                 ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerUpHandler);
         }
@@ -334,11 +335,6 @@ namespace umi3dBrowsers.interaction.selection.projector
 
         #region RawImage
 
-        /// <summary>
-        /// Simulates a click on a <see cref="RawImage"/>.
-        /// </summary>
-        /// <param name="image"></param>
-        /// <param name="pointerEventData"></param>
         public static void Click(this RawImage image, PointerEventData pointerEventData)
         {
             ExecuteEvents.Execute(image.gameObject, pointerEventData, ExecuteEvents.pointerDownHandler);

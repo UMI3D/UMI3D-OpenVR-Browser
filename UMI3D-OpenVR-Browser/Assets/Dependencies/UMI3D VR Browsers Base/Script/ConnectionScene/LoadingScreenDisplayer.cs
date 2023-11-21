@@ -72,9 +72,9 @@ namespace umi3dVRBrowsersBase.connection
         {
             if (_progress != null)
             {
-                _progress.OnCompleteUpdated.RemoveListener(OnCompleteUpdated);
-                _progress.OnFailedUpdated.RemoveListener(OnFailedUpdated);
-                _progress.OnStatusUpdated.RemoveListener(OnStatusUpdated);
+                _progress.OnCompleteUpdated -= OnCompleteUpdated;
+                _progress.OnFailedUpdated -= OnFailedUpdated;
+                _progress.OnStatusUpdated -= OnStatusUpdated;
             }
             _progress = progress;
 
@@ -82,9 +82,9 @@ namespace umi3dVRBrowsersBase.connection
             void OnFailedUpdated(float i) { }
             void OnStatusUpdated(string i) { LoadingText.text = _progress.currentState; }
 
-            _progress.OnCompleteUpdated.AddListener(OnCompleteUpdated);
-            _progress.OnFailedUpdated.AddListener(OnFailedUpdated);
-            _progress.OnStatusUpdated.AddListener(OnStatusUpdated);
+            _progress.OnCompleteUpdated += OnCompleteUpdated;
+            _progress.OnFailedUpdated += OnFailedUpdated;
+            _progress.OnStatusUpdated += OnStatusUpdated;
 
             OnProgressChange(_progress.progressPercent / 100f);
             LoadingText.text = _progress.currentState;

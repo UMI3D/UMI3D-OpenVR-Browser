@@ -40,7 +40,7 @@ namespace umi3dBrowsers.interaction.selection.projector
         public void Project(InteractableContainer interactable, AbstractController controller)
         {
             var interactionTool = AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id);
-            Project(interactionTool, interactable.Interactable.dto.id, controller);
+            Project(interactionTool, interactable.Interactable.dto.nodeId, controller);
 
             // display the parameter gear if it is required to access the interactions
             if (interactable.Interactable.interactions.FindAll(i => i.Result is AbstractParameterDto).Count > 0)
@@ -69,12 +69,16 @@ namespace umi3dBrowsers.interaction.selection.projector
         public void Release(AbstractTool interactionTool, AbstractController controller)
         {
             controller.Release(interactionTool, new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+
+            PlayerMenuManager.Instance.parameterGear.HideWithDelay();
         }
 
         /// <inheritdoc/>
         public void Release(InteractableContainer interactable, AbstractController controller)
         {
             controller.Release(AbstractInteractionMapper.Instance.GetTool(interactable.Interactable.dto.id), new RequestedUsingSelector<AbstractSelector>() { controller = controller });
+
+            PlayerMenuManager.Instance.parameterGear.HideWithDelay();
         }
     }
 }

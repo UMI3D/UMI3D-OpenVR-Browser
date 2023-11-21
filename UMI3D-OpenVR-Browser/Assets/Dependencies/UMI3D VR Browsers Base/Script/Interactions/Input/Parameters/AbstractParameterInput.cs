@@ -47,7 +47,7 @@ namespace umi3dVRBrowsersBase.interactions.input
         /// <summary>
         /// Avatar bone linked to this input.
         /// </summary>
-        public TrackedSubskeletonBoneController bone;
+        public Tracker bone;
 
         /// <summary>
         /// Interaction currently associated to this input.
@@ -115,7 +115,7 @@ namespace umi3dVRBrowsersBase.interactions.input
 
                     UMI3DClientServer.SendData(new ParameterSettingRequestDto()
                     {
-                        boneType = bone.boneType,
+                        boneType = bone.Bonetype,
                         bonePosition = bone.transform.position.Dto(),
                         boneRotation = bone.transform.rotation.Dto(),
                         toolId = toolId,
