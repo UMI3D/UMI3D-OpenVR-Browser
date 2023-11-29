@@ -157,7 +157,7 @@ namespace umi3dVRBrowsersBase.connection
 
             if (sessionScaleFactor == default)
             {
-                sessionScaleFactor = Vector3.one * height * 1.05f;
+                sessionScaleFactor = Vector3.one * height * 1.10f;
             }
 
             skeletonContainer.localScale = sessionScaleFactor;
@@ -173,7 +173,7 @@ namespace umi3dVRBrowsersBase.connection
                 obj.SetActive(true);
 
             trackers.ForEach(x => trackedSkeleton.controllers.Add(x.distantController));
-            trackedSkeleton.bones.Add(BoneType.Viewpoint, Viewpoint);
+            //trackedSkeleton.bones.Add(BoneType.Viewpoint, Viewpoint);
 
             isSetup = true;
         }
