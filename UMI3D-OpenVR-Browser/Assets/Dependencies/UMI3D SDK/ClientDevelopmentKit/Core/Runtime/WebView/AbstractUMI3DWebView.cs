@@ -57,7 +57,7 @@ namespace umi3d.cdk
                 {
                     _url = value;
 
-                    if(!string.IsNullOrEmpty(_url))
+                    if (!string.IsNullOrEmpty(_url))
                         OnUrlChanged(value);
                 }
             }
@@ -119,6 +119,7 @@ namespace umi3d.cdk
 
         public virtual void Init(UMI3DWebViewDto dto)
         {
+            canUrlBeForced = dto.canUrlBeForced;
             url = dto.url;
             size = dto.size.Struct();
             textureSize = dto.textureSize.Struct();

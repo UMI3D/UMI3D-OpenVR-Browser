@@ -77,7 +77,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerDown(new PointerEventData(EventSystem.current) { clickCount = 1 });
+                    OnPointerDown(new PointerEventData(EventSystem.current) { clickCount = 1, pointerId = (int)controller.type });
                     LockedSelector = true;
                 }
             }
@@ -86,10 +86,11 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 if (activated)
                 {
                     VRInteractionMapper.lastControllerUsedToClick = controller.type;
-                    OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1 });
+                    OnPointerUp(new PointerEventData(EventSystem.current) { clickCount = 1, pointerId = (int)controller.type });
                     LockedSelector = false;
                 }
-            } else if (activated && LastSelected != null)
+            }
+            else if (activated && LastSelected != null)
             {
                 raycastHelper.origin = controller.transform.position;
                 raycastHelper.direction = controller.transform.forward;
@@ -99,6 +100,7 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
                 if (closestAndRaycastHit.obj != null)
                 {
                     hoverEventData.pointerCurrentRaycast = new RaycastResult { worldPosition = closestAndRaycastHit.raycastHit.point };
+                    hoverEventData.pointerId = (int)controller.type;
                     ExecuteEvents.Execute(LastSelected.selectedObject.gameObject, hoverEventData, ExecuteEvents.pointerMoveHandler);
                 }
             }
@@ -169,8 +171,8 @@ namespace umi3dVRBrowsersBase.interactions.selection.selector
         /// <returns></returns>
         protected override bool CanSelect(Selectable uiToSelect)
         {
-            return uiToSelect != null 
-                && uiToSelect.enabled 
+            return uiToSelect != null
+                && uiToSelect.enabled
                 && uiToSelect.interactable;
         }
 

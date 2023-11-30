@@ -14,6 +14,7 @@ limitations under the License.
 using TMPro;
 using umi3d.cdk.interaction;
 using umi3dBrowsers.interaction.selection.zoneselection;
+using umi3dVRBrowsersBase.interactions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -30,7 +31,7 @@ namespace umi3dBrowsers.interaction.selection.projector
         /// <inheritdoc/>
         public void Project(Selectable selectable, AbstractController controller)
         {
-            var pointerEventData = new PointerEventData(EventSystem.current) { clickCount = 1 };
+            var pointerEventData = new PointerEventData(EventSystem.current) { clickCount = 1, pointerId = (int)(controller as VRController).type };
             selectable.OnPointerEnter(pointerEventData);
         }
 
@@ -44,7 +45,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             if (selectable != null) //protects against cases when UI element is destroyed but not deselected
             {
                 selectable.OnPointerExit(pointerEventData);
-                if(!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
+                if (!(selectable is InputField || selectable is TMP_InputField)) //keep keyboard focus on input fields
                     selectable.OnDeselect(pointerEventData);
             }
         }
@@ -133,7 +134,7 @@ namespace umi3dBrowsers.interaction.selection.projector
             eventData.pointerCurrentRaycast = new RaycastResult { worldPosition = closestAndRaycastHit.raycastHit.point };
 
             if (down)
-                ExecuteEvents.Execute(selectable.gameObject, eventData,ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerDownHandler);
             else
                 ExecuteEvents.Execute(selectable.gameObject, eventData, ExecuteEvents.pointerUpHandler);
         }
