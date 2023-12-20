@@ -119,7 +119,7 @@ namespace umi3dVRBrowsersBase.navigation
             position = newPos;
             return new NavigationData
             {
-                speed = delta.Dto(),
+                speed = Vector3Dto.zero,
                 jumping = false,
                 crouching = false
             };
