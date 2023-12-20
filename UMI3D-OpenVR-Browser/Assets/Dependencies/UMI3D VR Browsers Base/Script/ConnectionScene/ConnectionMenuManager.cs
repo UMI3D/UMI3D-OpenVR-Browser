@@ -117,6 +117,8 @@ namespace umi3dVRBrowsersBase.connection
                 p.ResumeAfterFail = async (e) =>
                 {
                     UnityEngine.Debug.Log("<color=Orange>Join environment fail: </color>" + $"{e}");
+                    await Task.Delay(10000);
+                    Debug.Log("RETRY");
                     return true;
                 };
 

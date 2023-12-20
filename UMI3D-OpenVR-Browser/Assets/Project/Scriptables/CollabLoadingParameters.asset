@@ -15,10 +15,10 @@ MonoBehaviour:
   supportedformats:
   - gltf
   - obj
+  - fbx
   - png
   - jpg
   - unity_standalone_urp
-  - fbx
   maximumResolution: 0
   notificationLoader: {fileID: 11400000, guid: 0547a6e5311adf04b9592ef5488099fb, type: 2}
   _skyboxMaterial: {fileID: 2100000, guid: 570bb4f4500a62a4a9ab2c867ebb73eb, type: 2}
