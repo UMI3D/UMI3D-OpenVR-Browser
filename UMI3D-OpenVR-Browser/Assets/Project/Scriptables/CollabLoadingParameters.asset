@@ -18,6 +18,7 @@ MonoBehaviour:
   - png
   - jpg
   - unity_standalone_urp
+  - fbx
   maximumResolution: 0
   notificationLoader: {fileID: 11400000, guid: 0547a6e5311adf04b9592ef5488099fb, type: 2}
   _skyboxMaterial: {fileID: 2100000, guid: 570bb4f4500a62a4a9ab2c867ebb73eb, type: 2}
@@ -25,7 +26,7 @@ MonoBehaviour:
     type: 3}
   _skyboxEquirectangularMaterial: {fileID: 2100000, guid: 550ddc5eab91acd47adeb9d3fd1b2ff8,
     type: 2}
-  hasImmersiveDevice: 1
+  hasImmersiveDevice: 0
   hasHeadMountedDisplay: 1
   skeletonHierarchyDefinition: {fileID: 11400000, guid: e4facea53a30b4c40aa447fc608d5c8a,
     type: 2}
