@@ -1,8 +1,10 @@
 using com.inetum.addonEulen.common.dtos;
 using com.inetum.eulen.recording.app;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 namespace com.inetum.eulen
 {
@@ -72,7 +74,7 @@ namespace com.inetum.eulen
         /// </summary>
         public float xDistanceToBox;
 
-        [Header("")]
+        [Space(16f)]
         /// <summary>
         /// Conditions to check if <see cref="postConditions"/> are checked.
         /// </summary>
@@ -115,21 +117,25 @@ namespace com.inetum.eulen
             {
                 bool postConditionTest = true;
 
-                Debug.Log("<color=#77ffaa>Rule: " + ruleName + "</color>");
+                Debug.Log($"<color=#77ffaa>Rule: {ruleName}</color>");
                 foreach (var condition in postConditions)
                 {
+                    // If it's the 3rd movement don't take care of the feet position
+                    if (validationDto.movementId == 2) checkFeetPosition = false;
                     condition.SetDistanceToBox(checkFeetPosition, xDistanceToBox);
+
                     if (!condition.Validate(rightKneeGizmo, leftKneeGizmo, hipsGizmo, backGizmo, leftElbowGizmo, rightElbowGizmo, true, footL, footR, validationDto))
                     {
                         postConditionTest = false;
 
                         if (validationDto != null)
                         {
-                            if (validationDto.isValid)
+                            // Check if the error is performed for 60 frames (errorUser), if it is, the validation is wrong and add the respective log
+                            if (validationDto.isValid && DrawAvatar.errorUser)
                             {
                                 validationDto.isValid = false;
                             }
-                            if (!validationDto.logMessages.Contains(errorLog))
+                            if (!validationDto.logMessages.Contains(errorLog) && DrawAvatar.errorUser)
                                 validationDto.logMessages.Add(errorLog);
                         }
                     }
@@ -175,6 +181,11 @@ namespace com.inetum.eulen
         [HideInInspector]
         public bool isPreCondition = false;
 
+        private AngleGizmo[] wrongGizmos = new AngleGizmo[6];
+
+        public static int[] wrongGizmosAux = new int[6];
+        private AngleGizmo[] gizmosAux = new AngleGizmo[6];
+        //public static bool[] areWrong = new bool[6];
 
         /// <summary>
         /// <inheritdoc/>
@@ -184,6 +195,15 @@ namespace com.inetum.eulen
             AngleGizmo gizmoToCheck = null;
             bool feetOk = true;
             int aux = 0;
+
+            // Test
+            gizmosAux[0] = rightKneeGizmo;
+            gizmosAux[1] = leftKneeGizmo;
+            gizmosAux[2] = leftElbowGizmo;
+            gizmosAux[3] = rightElbowGizmo;
+            gizmosAux[4] = backGizmo;
+            gizmosAux[5] = hipsGizmo;
+            //
 
             switch (type)
             {
@@ -208,7 +228,6 @@ namespace com.inetum.eulen
                 default:
                     return false;
             }
-            // Pensar como mostrar y validar la posicion de los pies
 
             bool res = false;
 
@@ -248,17 +267,71 @@ namespace com.inetum.eulen
                 if (res && aux != 3) feetOk = false;
             }
 
+            // In case the postconditions are wrong
             if (!isPreCondition && (!res || !feetOk))
             {
-                // In case we are validating the angles
+                // In case we are validating the angles (The angle will change their color to red)
                 if (!res)
                 {
                     if (test != TestKeyword.Between) Debug.Log(this + " Current value " + gizmoToCheck.angle);
                     else Debug.Log($"<color=#ff9933>[MovementCondition]</color> Check if {type} angle is {test} {angle} and {smallAngle}. <color=#ffbbbb>Current value: </color>" + gizmoToCheck.angle);
                     gizmoToCheck.isError = true;
+
+                    switch (gizmoToCheck.name)
+                    {
+                        case "RK":
+                            wrongGizmosAux[0]++;
+                            break;
+                        case "LK":
+                            wrongGizmosAux[1]++;
+                            break;
+                        case "LE":
+                            wrongGizmosAux[2]++;
+                            break;
+                        case "RE":
+                            wrongGizmosAux[3]++;
+                            break;
+                        case "W":
+                            wrongGizmosAux[4]++;
+                            break;
+                        case "H":
+                            wrongGizmosAux[5]++;
+                            break;
+                        default: break;
+                    }
+
+                    /*if (DrawAvatar.errorUser)
+                    {
+                        int posAux = 0;
+                        bool exit = false;
+
+                        do
+                        {
+                            if (wrongGizmos[posAux] != null && wrongGizmos[posAux].name == gizmoToCheck.name)
+                            {
+                                exit = true;
+                                Debug.Log($"<color=#fdfd96>Already tracking!</color> {wrongGizmos[posAux].name == gizmoToCheck.name}");
+                            }
+                            else if (wrongGizmos[posAux] == null)
+                            {
+                                wrongGizmos[posAux] = gizmoToCheck;
+                                exit = true;
+                                Debug.Log($"Saving wrong gizmo {wrongGizmos[posAux].name}");
+                            }
+                            posAux++;
+
+                        } while (!exit && posAux <= wrongGizmos.Length);
+                        Debug.Log("<color=#eeeebb>Wrong Gizmos</color>");
+                        foreach (var item in wrongGizmos)
+                        {
+                            if (item == null) Debug.Log("Wrong Gizmos: " + item);
+                            else Debug.Log("Wrong Gizmos: " + item.name);
+                        }
+                    }*/
+
                 }
 
-                // In case we are validating the feet position
+                // In case we are validating the feet position (There are no visual feedback on the wireframe just on the "Screen Results")
                 if (checkFeetPosition && !feetOk)
                 {
                     if (aux <= 1) Debug.Log($"<color=#ff9933>[MovementCondition]</color> Check if the <color=#33cccc>feet</color> are on the right X position, current value ->" +
@@ -268,7 +341,53 @@ namespace com.inetum.eulen
                         $" Left: {footL.position.z} Expected Between: {footR.position.z + 0.07f} - {footR.position.z - 0.07f}");
                 }
             }
-            else gizmoToCheck.isError = false;
+            // In case the postconditions are ok
+            else
+            {
+
+                switch (gizmoToCheck.name)
+                {
+                    case "RK":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[0] = 0;
+                        break;
+                    case "LK":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[1] = 0;
+                        break;
+                    case "LE":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[2] = 0;
+                        break;
+                    case "RE":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[3] = 0;
+                        break;
+                    case "W":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[4] = 0;
+                        break;
+                    case "H":
+                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[5] = 0;
+                        break;
+                    default: break;
+                }
+
+                if (!DrawAvatar.isExtraTime)
+                {
+                    Debug.Log($"No es tiempo extra");
+
+                    for(int i = 0; i < gizmosAux.Length; i++)
+                    {
+                        gizmosAux[i].isError = false;
+                    }
+
+                }
+                else
+                {
+                    Debug.Log($"Es tiempo extra");
+
+                    for (int i = 0; i < wrongGizmosAux.Length; i++)
+                    {
+                        if (wrongGizmosAux[i] >= 60) { gizmosAux[i].isError = true; Debug.Log($"Gizmo extra time: {gizmosAux[i].name}"); }
+                    }
+                }
+            }
 
             if (!feetOk) res = false;
 
@@ -293,13 +412,17 @@ namespace com.inetum.eulen
             float offsetB = 0.1f;
             int res = 0;
 
-            if (xDistBox - 0.04f < rFoot.position.x && lFoot.position.x < xDistBox + 0.04f && -xDistBox - 0.04f < lFoot.position.x && lFoot.position.x < -xDistBox + 0.04f) res++;
+            // Each foot between the "offsets" (First two conditions are so that the Right foot must remain in that interval, the other two for the left)
+            if (xDistBox - 0.04f < rFoot.position.x && rFoot.position.x < xDistBox + 0.04f && -xDistBox - 0.04f < lFoot.position.x && lFoot.position.x < -xDistBox + 0.04f) res++;
 
+            // Not sure what are we trying to validate here ?????
             if (rFoot.position.x > xDistBox && lFoot.position.x < -xDistBox)
             {
                 if (-rFoot.position.x - offsetB < lFoot.position.x && lFoot.position.x < -rFoot.position.x + offset) res++;
             }
+            //
 
+            // Aligned feet (Foot ahead or behind the other)
             if (rFoot.position.z + offset > lFoot.position.z && lFoot.position.z > rFoot.position.z - offset) res += 2;
 
             return res;

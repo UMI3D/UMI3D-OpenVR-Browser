@@ -15,9 +15,10 @@ namespace com.inetum.eulen.recording.app
         #region Fields
 
         /// <summary>
-        /// Avtar to model/
+        /// Avatar to model.
         /// </summary>
-        public GameObject avatar;
+        public GameObject[] avatar;
+        private char genre;
 
         [SerializeField] private GameObject cameraHead;
 
@@ -39,7 +40,7 @@ namespace com.inetum.eulen.recording.app
         public GameObject leftUpLegSphere;
         public GameObject neck;
 
-        [Header("Bones")]
+        [Header("Bones Male")]
         public GameObject leftShoulderBone;
         public GameObject rightShoulderBone;
         public GameObject rightUpLegBone;
@@ -51,6 +52,19 @@ namespace com.inetum.eulen.recording.app
         public GameObject spine;
         public GameObject spine1;
         public GameObject neckBone;
+
+        [Header("Bones Female")]
+        public GameObject leftShoulderBoneF;
+        public GameObject rightShoulderBoneF;
+        public GameObject rightUpLegBoneF;
+        public GameObject leftUpLegBoneF;
+        public GameObject leftElbowBoneF;
+        public GameObject leftHandBoneF;
+        public GameObject rightElbowBoneF;
+        public GameObject rightHandBoneF;
+        public GameObject spineF;
+        public GameObject spine1F;
+        public GameObject neckBoneF;
 
         [Header("Rotation offsets")]
         public Vector3 hipsOffset;
@@ -76,7 +90,7 @@ namespace com.inetum.eulen.recording.app
         public AngleTag angHips;
         public AngleTag angWaist;
 
-        [Header("")]
+        [Space(16f)]
         public Transform BoxReplay;
         [SerializeField] private LogsManager logsManager;
 
@@ -158,21 +172,21 @@ namespace com.inetum.eulen.recording.app
                 trackersDico[tracker.source] = tracker.trans;
             }
 
-            foreach (var tracker in UserSettings.instance.trackersToBones)
+            /*foreach (var tracker in UserSettings.instance.trackersToBones)
             {
                 bonesDico[tracker.source] = tracker.bone;
-            }
+            }*/
 
             waistTracker = trackersDico[SteamVR_Input_Sources.Waist];
             rightKneeTracker = trackersDico[SteamVR_Input_Sources.RightKnee];
             leftKneeTracker = trackersDico[SteamVR_Input_Sources.LeftKnee];
 
-            rightKneeGizmo = new AngleGizmo { size = .1f };
-            leftKneeGizmo = new AngleGizmo { size = .1f };
-            leftElbowGizmo = new AngleGizmo { size = .1f };
-            rightElbowGizmo = new AngleGizmo { size = .1f };
-            waistGizmo = new AngleGizmo { size = .1f };
-            hipsGizmo = new AngleGizmo { size = .1f, displayTotalCircle = true };
+            rightKneeGizmo = new AngleGizmo { size = .1f, name = "RK" };
+            leftKneeGizmo = new AngleGizmo { size = .1f, name = "LK" };
+            leftElbowGizmo = new AngleGizmo { size = .1f, name = "LE" };
+            rightElbowGizmo = new AngleGizmo { size = .1f, name = "RE" };
+            waistGizmo = new AngleGizmo { size = .1f, name = "W" };
+            hipsGizmo = new AngleGizmo { size = .1f, displayTotalCircle = true, name = "H" };
             rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = false; //W
 
             AngleGizmoManager.AddGizmo(rightKneeGizmo);
@@ -272,7 +286,7 @@ namespace com.inetum.eulen.recording.app
         /// </summary>
         /// <param name="data"></param>
         /// <param name="offset"></param>
-        public void Replay(RecordDto data, bool displayAvatar, int offset = 0)
+        public void Replay(RecordDto data, bool displayAvatar, char genre, int offset = 0)
         {
             if (IsPlaying)
                 StopReplay();
@@ -282,7 +296,20 @@ namespace com.inetum.eulen.recording.app
                 if (replayCoroutine != null)
                     StopCoroutine(replayCoroutine);
 
-                avatar.SetActive(displayAvatar);
+                this.genre = genre;
+                if (genre == 'm')
+                {
+                    avatar[0].SetActive(displayAvatar);
+                    avatar[1].SetActive(false);
+                    foreach (var tracker in UserSettings.instance.trackersToBones) bonesDico[tracker.source] = tracker.bone;
+                }
+                else
+                {
+                    avatar[1].SetActive(displayAvatar);
+                    avatar[0].SetActive(false);
+                    foreach (var tracker in UserSettings.instance.trackersToBones) bonesDico[tracker.source] = tracker.boneF;
+                }
+
                 BoxReplay.gameObject.SetActive(true);
                 DisplayWireBody = !displayAvatar;
 
@@ -291,9 +318,16 @@ namespace com.inetum.eulen.recording.app
             }
         }
 
+        private bool coroutineRunning;
+
+        /// <summary>
+        /// Replays the exercise (PRL - USER)
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
         private IEnumerator ReplayCoroutine(RecordDto data, int offset = 0)
         {
-            Debug.Log("4");
             if (offset >= data.frames.Count && offset >= 0)
             {
                 Debug.LogError("Offset too high for this data : " + offset + ", there are only " + data.frames.Count + " frames");
@@ -306,16 +340,46 @@ namespace com.inetum.eulen.recording.app
 
                 Debug.Log("Start playing " + data.frames.Count + " frames at " + offset + " frame");
 
-                var wait = new WaitForSeconds(1f / data.recordFps); // 1f Normal fps replay
-                // var hold = new WaitForSeconds(4f / data.recordFps); // Less fps replay
+                var wait = new WaitForSeconds(1f / data.recordFps); // 1 sec -> 22-30 Frames
+                bool rightPerform;
+                bool wasError = false;
+                int auxWrongCounterFrame = 0;
 
+                Debug.Log($"FPS: {data.recordFps}");
                 for (int i = offset; i < data.frames.Count; i++)
                 {
-                    SetFramePose(data.frames[i], data.userSettings, i);                             // A: Replay the whole exercise in the same speed (even with errors)
-                    /*if (!SetFramePose(data.frames[i], data.userSettings, i))                      // B: Replay the exercise and stops if there found any error
-                        break;*/
-                    /*if (!SetFramePose(data.frames[i], data.userSettings, i)) yield return hold;   // C: Replay the exercise normal and, if there are errors, replay that segments more slowly
-                    else yield return wait;*/
+                    // If it's PRL, replay will be true
+                    rightPerform = SetFramePose(data.frames[i], data.userSettings, i); // Replay the whole exercise
+                    Debug.Log($"Frame: {i} RightPerform: {rightPerform}");
+
+                    if (!rightPerform) { auxWrongCounterFrame++; }
+                    else auxWrongCounterFrame = 0;
+
+
+                    if (auxWrongCounterFrame >= 60)
+                    {
+                        errorUser = true;
+                        Debug.Log("Error user :)");
+                    }
+                    else
+                    {
+                        if (errorUser) wasError = true;
+                        errorUser = false;
+                    }
+
+                    // Check if it was an error to show the error few seconds more
+
+                    if (!errorUser && wasError)
+                    {
+                        Debug.Log($"<color=#77ffaa> Wrong movement detected! </color>");
+                        if (!IsInvoking("ShowErrorMoreTime"))
+                        {
+                            StartCoroutine(ShowErrorMoreTime());
+                        }
+                        
+                        wasError = false;
+                    }
+
                     yield return wait;
                 }
 
@@ -338,7 +402,7 @@ namespace com.inetum.eulen.recording.app
 
             foreach (var entry in frame.entries)
             {
-                trackersDico[(SteamVR_Input_Sources) entry.source].position = entry.position.Struct();
+                trackersDico[(SteamVR_Input_Sources)entry.source].position = entry.position.Struct();
                 trackersDico[(SteamVR_Input_Sources)entry.source].rotation = entry.rotation.Quaternion();
 
                 if (userSettings.boneOffsets.ContainsKey(entry.source))
@@ -357,11 +421,13 @@ namespace com.inetum.eulen.recording.app
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.LeftKnee)//
                 {
-                    /*if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/ trackersDico[(SteamVR_Input_Sources)entry.source].position += trackersDico[(SteamVR_Input_Sources)entry.source].right * kneeOffset;
+                    /*if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/
+                    trackersDico[(SteamVR_Input_Sources)entry.source].position += trackersDico[(SteamVR_Input_Sources)entry.source].right * kneeOffset;
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.RightKnee)//
                 {
-                    /* if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/ trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].up * kneeOffset;
+                    /* if (replayNum == 1 || replayNum == 3 || replayNum == 5)*/
+                    trackersDico[(SteamVR_Input_Sources)entry.source].position -= trackersDico[(SteamVR_Input_Sources)entry.source].up * kneeOffset;
                 }
                 else if ((SteamVR_Input_Sources)entry.source == SteamVR_Input_Sources.Treadmill)
                 {
@@ -403,9 +469,11 @@ namespace com.inetum.eulen.recording.app
 
             // USER Replays needs to validate, PRL no need it
             if (DisplayWireBody || validationDto != null)
+            {
+                validationDto ??= validDtoAux;
                 return validator.Validate(rightKneeGizmo, leftKneeGizmo, hipsGizmo, waistGizmo, leftElbowGizmo, rightElbowGizmo, boxAttached, trackersDico[SteamVR_Input_Sources.LeftFoot], trackersDico[SteamVR_Input_Sources.RightFoot], validationDto);
-            else
-                return true;
+            }
+            else return true;
         }
 
         /// <summary>
@@ -432,11 +500,27 @@ namespace com.inetum.eulen.recording.app
 
             // 2.1. Legs
             if (Vector3.zero != rightKneeTracker.position - waistTracker.transform.position)
-                rightUpLegBone.transform.rotation = Quaternion.LookRotation(rightKneeTracker.position - waistTracker.transform.position, -rightKneeTracker.forward);
-            rightUpLegBone.transform.Rotate(upLegOffset);
+                if (genre == 'm')
+                {
+                    rightUpLegBone.transform.rotation = Quaternion.LookRotation(rightKneeTracker.position - waistTracker.transform.position, -rightKneeTracker.forward);
+                    rightUpLegBone.transform.Rotate(upLegOffset);
+                }
+                else
+                {
+                    rightUpLegBoneF.transform.rotation = Quaternion.LookRotation(rightKneeTracker.position - waistTracker.transform.position, -rightKneeTracker.forward);
+                    rightUpLegBoneF.transform.Rotate(upLegOffset);
+                }
             if (Vector3.zero != leftKneeTracker.position - waistTracker.transform.position)
-                leftUpLegBone.transform.rotation = Quaternion.LookRotation(leftKneeTracker.position - waistTracker.transform.position, -leftKneeTracker.forward);
-            leftUpLegBone.transform.Rotate(upLegOffset);
+                if (genre == 'm')
+                {
+                    leftUpLegBone.transform.rotation = Quaternion.LookRotation(leftKneeTracker.position - waistTracker.transform.position, -leftKneeTracker.forward);
+                    leftUpLegBone.transform.Rotate(upLegOffset);
+                }
+                else
+                {
+                    leftUpLegBoneF.transform.rotation = Quaternion.LookRotation(leftKneeTracker.position - waistTracker.transform.position, -leftKneeTracker.forward);
+                    leftUpLegBoneF.transform.Rotate(upLegOffset);
+                }
 
             // 2.2. Knees
             if (Vector3.zero != rightFootTracker.position - rightKneeTracker.position)
@@ -447,35 +531,70 @@ namespace com.inetum.eulen.recording.app
             leftKneeBone.transform.Rotate(leftKneeOffset);
 
             // Move spin for a better movement if neccessay 
-
-            spine.transform.localRotation = Quaternion.identity;
-            spine1.transform.localRotation = Quaternion.identity;
-
+            if (genre == 'm')
+            {
+                spine.transform.localRotation = Quaternion.identity;
+                spine1.transform.localRotation = Quaternion.identity;
+            }
+            else
+            {
+                spineF.transform.localRotation = Quaternion.identity;
+                spine1F.transform.localRotation = Quaternion.identity;
+            }
             Vector3 backBone = neck.transform.position - waistTracker.position;
             var bendAngle = Vector3.SignedAngle(Vector3.up, backBone, trackersDico[SteamVR_Input_Sources.RightShoulder].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position);
-            float spineTorsionAngle = Vector3.Angle(trackersDico[SteamVR_Input_Sources.RightShoulder].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position,
-                spine.transform.right);
+            float spineTorsionAngle;
 
-            spine.transform.Rotate(0, -0.2f * spineTorsionAngle, 0);
-            spine1.transform.Rotate(0, -0.6f * spineTorsionAngle, 0);
-
+            if (genre == 'm')
+            {
+                spineTorsionAngle = Vector3.Angle(trackersDico[SteamVR_Input_Sources.RightShoulder].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position, spine.transform.right);
+                spine.transform.Rotate(0, -0.2f * spineTorsionAngle, 0);
+                spine1.transform.Rotate(0, -0.6f * spineTorsionAngle, 0);
+            }
+            else
+            {
+                spineTorsionAngle = Vector3.Angle(trackersDico[SteamVR_Input_Sources.RightShoulder].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position, spineF.transform.right);
+                spineF.transform.Rotate(0, -0.2f * spineTorsionAngle, 0);
+                spine1F.transform.Rotate(0, -0.6f * spineTorsionAngle, 0);
+            }
             float bendingFactor = bendAngle > 0 ? Mathf.Sqrt(bendAngle / 90f) : 0;
 
             // 1 Code qui fonctionne
             hips.Translate(0, -.2f * bendingFactor, 0);
-            spine.transform.Rotate(30 * bendingFactor, 0, 0);
+            if (genre == 'm')
+            {
+                spine.transform.Rotate(30 * bendingFactor, 0, 0);
+            }
+            else
+            {
+                spineF.transform.Rotate(30 * bendingFactor, 0, 0);
+            }
 
             // 2.5. Shoulders
 
             if (Vector3.zero != trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position)
-                rightShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position,
-                trackersDico[SteamVR_Input_Sources.RightElbow].up);
-            rightShoulderBone.transform.Rotate(rightShoulderOffset);
+                if (genre == 'm')
+                {
+                    rightShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position, trackersDico[SteamVR_Input_Sources.RightElbow].up);
+                    rightShoulderBone.transform.Rotate(rightShoulderOffset);
+                }
+                else
+                {
+                    rightShoulderBoneF.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.RightElbow].position - trackersDico[SteamVR_Input_Sources.RightShoulder].position, trackersDico[SteamVR_Input_Sources.RightElbow].up);
+                    rightShoulderBoneF.transform.Rotate(rightShoulderOffset);
+                }
 
             if (Vector3.zero != trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position)
-                leftShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position,
-                trackersDico[SteamVR_Input_Sources.LeftElbow].up);
-            leftShoulderBone.transform.Rotate(leftShoulderOffset);
+                if (genre == 'm')
+                {
+                    leftShoulderBone.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position, trackersDico[SteamVR_Input_Sources.LeftElbow].up);
+                    leftShoulderBone.transform.Rotate(leftShoulderOffset);
+                }
+                else
+                {
+                    leftShoulderBoneF.transform.rotation = Quaternion.LookRotation(trackersDico[SteamVR_Input_Sources.LeftElbow].position - trackersDico[SteamVR_Input_Sources.LeftShoulder].position, trackersDico[SteamVR_Input_Sources.LeftElbow].up);
+                    leftShoulderBoneF.transform.Rotate(leftShoulderOffset);
+                }
 
 
             // 2.6. Elbow
@@ -538,8 +657,19 @@ namespace com.inetum.eulen.recording.app
             rightFootBone.rotation = Quaternion.LookRotation(Vector3.up, rightKneeTracker.forward) * Quaternion.Euler(-25, 0, 0);
             leftFootBone.rotation = Quaternion.LookRotation(Vector3.up, rightKneeTracker.forward) * Quaternion.Euler(-25, 0, 0);
 
-            float d1 = Vector3.Distance(hips.position, spine.transform.position);
-            float d2 = Vector3.Distance(spine.transform.position, neckBone.transform.position);
+            float d1;
+            float d2;
+
+            if (genre == 'm')
+            {
+                d1 = Vector3.Distance(hips.position, spine.transform.position);
+                d2 = Vector3.Distance(spine.transform.position, neckBone.transform.position);
+            }
+            else
+            {
+                d1 = Vector3.Distance(hips.position, spineF.transform.position);
+                d2 = Vector3.Distance(spineF.transform.position, neckBoneF.transform.position);
+            }
             float d4 = Vector3.Distance(hips.position, neck.transform.position);
 
 
@@ -678,20 +808,48 @@ namespace com.inetum.eulen.recording.app
         public void HideReplay()
         {
             DisplayWireBody = false;
-            avatar.SetActive(false);
+            if (genre == 'm') avatar[0].SetActive(false);
+            else avatar[1].SetActive(false);
             BoxReplay.gameObject.SetActive(false);
 
             rightKneeGizmo.Enabled = leftKneeGizmo.Enabled = hipsGizmo.Enabled = leftElbowGizmo.Enabled = rightElbowGizmo.Enabled = waistGizmo.Enabled = false;
         }
 
+        #region Validations
 
+        [HideInInspector] public static bool errorUser = false;
+        private MovementValidationDto validDtoAux;
+        // En esta variable guardo el angulo que dio error y ahora queda mostrar este gizmo en rojo un tiempo extra cuando el error se confirme :)
+        // [HideInInspector] public static AngleGizmo gizmoError;
+        [HideInInspector] public static bool isExtraTime = false;
+
+        /// <summary>
+        /// Once the exercise is completed immediately validates the movement
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="movementId"></param>
         public void ValidateCompleteMovement(RecordDto data, int movementId)
         {
-            MovementValidationDto validationDto = new() { movementId = movementId, isValid = true};
+            bool rightPerform;
+            MovementValidationDto validationDto = new() { movementId = movementId, isValid = true };
+            validDtoAux = validationDto;
+            int auxWrongCounterFrame = 0;
 
             for (int i = 0; i < data.frames.Count; i++)
             {
-                SetFramePose(data.frames[i], data.userSettings, i, validationDto);
+                rightPerform = SetFramePose(data.frames[i], data.userSettings, i, validationDto);
+                Debug.Log($"Frame: {i} RightPerform: {rightPerform}");
+
+                if (!rightPerform) { auxWrongCounterFrame++; Debug.Log($"Wrong Frames: {auxWrongCounterFrame}"); }
+                else auxWrongCounterFrame = 0;
+
+                if (auxWrongCounterFrame >= 60)
+                {
+                    errorUser = true;
+                    Debug.Log("Error user :)");
+                }
+                else errorUser = false;
+
             }
 
             if (validationDto.isValid)
@@ -702,6 +860,26 @@ namespace com.inetum.eulen.recording.app
             EulenMessagesSender.Instance.SendMovementValidation(validationDto, movementId);
         }
 
+        /// <summary>
+        /// Displays the error for an additional time 
+        /// </summary>
+        /// <param name="gizmo"></param>
+        /// <returns></returns>
+        private IEnumerator ShowErrorMoreTime()
+        {
+            int extraTime = 3;
+
+            isExtraTime = true;
+            Debug.Log($"Erroooooor csmr");
+            yield return new WaitForSeconds(extraTime);
+
+            isExtraTime = false;
+
+            for (int i = 0; i <= MovementCondition.wrongGizmosAux.Length; i++) MovementCondition.wrongGizmosAux[0] = 0;
+            Debug.Log("Ya no hay error :v");
+        }
+        #endregion
+
         #endregion
 
         /// <summary>
@@ -711,7 +889,8 @@ namespace com.inetum.eulen.recording.app
         /// <param name="boneLenghts"></param>
         private void SetAvatarHeight(float cameraHeight, Dictionary<int, float> boneLenghts)
         {
-            avatar.transform.localScale = Vector3.one * (1 / 1.87f) * cameraHeight * 1.06f;
+            if (genre == 'm') avatar[0].transform.localScale = Vector3.one * (1 / 1.87f) * cameraHeight * 1.06f;
+            else avatar[1].transform.localScale = Vector3.one * (1 / 1.87f) * cameraHeight * 1.06f;
 
             float lenght, factor;
 
@@ -720,28 +899,68 @@ namespace com.inetum.eulen.recording.app
                 switch (bone)
                 {
                     case (int)SteamVR_Input_Sources.LeftShoulder:
-                        leftShoulderBone.transform.localScale = Vector3.one;
-                        lenght = Vector3.Distance(leftShoulderBone.transform.position, leftElbowBone.transform.position);
-                        factor = (boneLenghts[bone]) / lenght;
-                        leftShoulderBone.transform.localScale = new Vector3(1, factor, 1);
+                        if (genre == 'm')
+                        {
+                            leftShoulderBone.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(leftShoulderBone.transform.position, leftElbowBone.transform.position);
+                            factor = (boneLenghts[bone]) / lenght;
+                            leftShoulderBone.transform.localScale = new Vector3(1, factor, 1);
+                        }
+                        else
+                        {
+                            leftShoulderBoneF.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(leftShoulderBoneF.transform.position, leftElbowBoneF.transform.position);
+                            factor = (boneLenghts[bone]) / lenght;
+                            leftShoulderBoneF.transform.localScale = new Vector3(1, factor, 1);
+                        }
                         break;
                     case (int)SteamVR_Input_Sources.RightShoulder:
-                        rightShoulderBone.transform.localScale = Vector3.one;
-                        lenght = Vector3.Distance(rightShoulderBone.transform.position, rightElbowBone.transform.position);
-                        factor = (boneLenghts[bone]) / lenght;
-                        rightShoulderBone.transform.localScale = new Vector3(1, factor, 1);
+                        if (genre == 'm')
+                        {
+                            rightShoulderBone.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(rightShoulderBone.transform.position, rightElbowBone.transform.position);
+                            factor = (boneLenghts[bone]) / lenght;
+                            rightShoulderBone.transform.localScale = new Vector3(1, factor, 1);
+                        }
+                        else
+                        {
+                            rightShoulderBoneF.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(rightShoulderBoneF.transform.position, rightElbowBoneF.transform.position);
+                            factor = (boneLenghts[bone]) / lenght;
+                            rightShoulderBoneF.transform.localScale = new Vector3(1, factor, 1);
+                        }
                         break;
                     case (int)SteamVR_Input_Sources.LeftElbow:
-                        leftElbowBone.transform.localScale = Vector3.one;
-                        lenght = Vector3.Distance(leftElbowBone.transform.position, leftHandBone.transform.position);
-                        factor = boneLenghts[bone] / lenght;
-                        leftElbowBone.transform.localScale = new Vector3(1, factor, 1);
+                        if (genre == 'm')
+                        {
+                            leftElbowBone.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(leftElbowBone.transform.position, leftHandBone.transform.position);
+                            factor = boneLenghts[bone] / lenght;
+                            leftElbowBone.transform.localScale = new Vector3(1, factor, 1);
+                        }
+                        else
+                        {
+                            leftElbowBoneF.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(leftElbowBoneF.transform.position, leftHandBoneF.transform.position);
+                            factor = boneLenghts[bone] / lenght;
+                            leftElbowBoneF.transform.localScale = new Vector3(1, factor, 1);
+                        }
                         break;
                     case (int)SteamVR_Input_Sources.RightElbow:
-                        rightElbowBone.transform.localScale = Vector3.one;
-                        lenght = Vector3.Distance(rightElbowBone.transform.position, rightHandBone.transform.position);
-                        factor = boneLenghts[bone] / lenght;
-                        rightElbowBone.transform.localScale = new Vector3(1, factor, 1);
+                        if (genre == 'm')
+                        {
+                            rightElbowBone.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(rightElbowBone.transform.position, rightHandBone.transform.position);
+                            factor = boneLenghts[bone] / lenght;
+                            rightElbowBone.transform.localScale = new Vector3(1, factor, 1);
+                        }
+                        else
+                        {
+                            rightElbowBoneF.transform.localScale = Vector3.one;
+                            lenght = Vector3.Distance(rightElbowBoneF.transform.position, rightHandBoneF.transform.position);
+                            factor = boneLenghts[bone] / lenght;
+                            rightElbowBoneF.transform.localScale = new Vector3(1, factor, 1);
+                        }
                         break;
                     default:
                         break;
@@ -769,6 +988,16 @@ namespace com.inetum.eulen.recording.app
 
                 neck.SetActive(false);
             }
+        }
+        // Hide angle tags
+        public void HideAngleTags()
+        {
+            angKneeR.gameObject.SetActive(false);
+            angKneeL.gameObject.SetActive(false);
+            angElbowR.gameObject.SetActive(false);
+            angElbowL.gameObject.SetActive(false);
+            angHips.gameObject.SetActive(false);
+            angWaist.gameObject.SetActive(false);
         }
 
         [System.Serializable]

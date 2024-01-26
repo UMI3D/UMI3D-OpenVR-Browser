@@ -3,6 +3,11 @@ using UnityEngine;
 public class AngleGizmo
 {
     /// <summary>
+    /// Gizmo's name
+    /// </summary>
+    public string name;
+
+    /// <summary>
     /// World center of gizmo
     /// </summary>
     public Vector3 center = Vector3.zero;

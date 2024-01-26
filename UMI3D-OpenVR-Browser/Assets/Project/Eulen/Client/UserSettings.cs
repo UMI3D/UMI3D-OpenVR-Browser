@@ -167,4 +167,6 @@ public class TrackerToBone
     public Transform tracker;
 
     public Transform bone;
+    // Female bones
+    public Transform boneF;
 }

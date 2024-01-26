@@ -14,11 +14,12 @@ public class EulenCollaborationLoadingParameters : UMI3DCollabLoadingParameters
         switch (operationId)
         {
             case EulenPropertyKeys.playRecord:
+                char genre = UMI3DSerializer.Read<char>(container);
                 bool displayAvatar = UMI3DSerializer.Read<bool>(container);
                 RecordDto record = UMI3DSerializer.Read<RecordDto>(container);
                 Debug.Log(displayAvatar + " " + record);
 
-                DrawAvatar.Instance.Replay(record, displayAvatar);
+                DrawAvatar.Instance.Replay(record, displayAvatar, genre);
 
                 return Task.CompletedTask;
             case EulenPropertyKeys.startRecord:

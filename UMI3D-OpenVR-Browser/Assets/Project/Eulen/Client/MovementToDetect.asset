@@ -35,7 +35,7 @@ MonoBehaviour:
       test: 2
       angle: 135
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     - type: 1
       test: 0
       angle: 135
@@ -57,17 +57,17 @@ MonoBehaviour:
       test: 0
       angle: 155
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     - type: 1
       test: 0
       angle: 155
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     - type: 3
       test: 2
       angle: 160
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     postConditions:
     - type: 4
       test: 6
@@ -89,12 +89,12 @@ MonoBehaviour:
       test: 4
       angle: 110
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     - type: 1
       test: 4
       angle: 110
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     postConditions:
     - type: 3
       test: 2
@@ -114,22 +114,22 @@ MonoBehaviour:
   - ruleName: Lift the box 2
     errorLog: Corregir la posicion de los pies
     isBoxGrabbed: 0
-    checkFeetPosition: 1
-    xDistanceToBox: 0.15
+    checkFeetPosition: 0
+    xDistanceToBox: 0.1
     preConditions:
     - type: 0
       test: 4
       angle: 110
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     - type: 1
       test: 0
       angle: 110
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     postConditions:
     - type: 3
-      test: 2
+      test: 3
       angle: 0
       smallAngle: 0
       isPreCondition: 0

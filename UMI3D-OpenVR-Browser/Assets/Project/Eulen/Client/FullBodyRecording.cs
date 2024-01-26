@@ -95,6 +95,8 @@ namespace com.inetum.eulen.recording.app
             IsRecording = true;
             currentRecordedMovementId = movementId;
 
+            // Hide angle tags on record
+            DrawAvatar.Instance.HideAngleTags();
             recordCoroutine = StartCoroutine(RecordingJson());
 
             Debug.Assert(box != null, "Box should not be null");
