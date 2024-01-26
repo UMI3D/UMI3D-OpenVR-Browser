@@ -117,7 +117,7 @@ namespace com.inetum.eulen
             {
                 bool postConditionTest = true;
 
-                Debug.Log($"<color=#77ffaa>Rule: {ruleName}</color>");
+                // Debug.Log($"<color=#77ffaa>Rule: {ruleName}</color>");
                 foreach (var condition in postConditions)
                 {
                     // If it's the 3rd movement don't take care of the feet position
@@ -181,11 +181,8 @@ namespace com.inetum.eulen
         [HideInInspector]
         public bool isPreCondition = false;
 
-        private AngleGizmo[] wrongGizmos = new AngleGizmo[6];
-
-        public static int[] wrongGizmosAux = new int[6];
-        private AngleGizmo[] gizmosAux = new AngleGizmo[6];
-        //public static bool[] areWrong = new bool[6];
+        public static int[] wrongGizmos = new int[6];
+        public static AngleGizmo[] gizmosAux = new AngleGizmo[6];
 
         /// <summary>
         /// <inheritdoc/>
@@ -280,54 +277,26 @@ namespace com.inetum.eulen
                     switch (gizmoToCheck.name)
                     {
                         case "RK":
-                            wrongGizmosAux[0]++;
+                            wrongGizmos[0]++;
                             break;
                         case "LK":
-                            wrongGizmosAux[1]++;
+                            wrongGizmos[1]++;
                             break;
                         case "LE":
-                            wrongGizmosAux[2]++;
+                            wrongGizmos[2]++;
                             break;
                         case "RE":
-                            wrongGizmosAux[3]++;
+                            wrongGizmos[3]++;
                             break;
                         case "W":
-                            wrongGizmosAux[4]++;
+                            wrongGizmos[4]++;
                             break;
                         case "H":
-                            wrongGizmosAux[5]++;
+                            wrongGizmos[5]++;
                             break;
                         default: break;
                     }
 
-                    /*if (DrawAvatar.errorUser)
-                    {
-                        int posAux = 0;
-                        bool exit = false;
-
-                        do
-                        {
-                            if (wrongGizmos[posAux] != null && wrongGizmos[posAux].name == gizmoToCheck.name)
-                            {
-                                exit = true;
-                                Debug.Log($"<color=#fdfd96>Already tracking!</color> {wrongGizmos[posAux].name == gizmoToCheck.name}");
-                            }
-                            else if (wrongGizmos[posAux] == null)
-                            {
-                                wrongGizmos[posAux] = gizmoToCheck;
-                                exit = true;
-                                Debug.Log($"Saving wrong gizmo {wrongGizmos[posAux].name}");
-                            }
-                            posAux++;
-
-                        } while (!exit && posAux <= wrongGizmos.Length);
-                        Debug.Log("<color=#eeeebb>Wrong Gizmos</color>");
-                        foreach (var item in wrongGizmos)
-                        {
-                            if (item == null) Debug.Log("Wrong Gizmos: " + item);
-                            else Debug.Log("Wrong Gizmos: " + item.name);
-                        }
-                    }*/
 
                 }
 
@@ -344,31 +313,51 @@ namespace com.inetum.eulen
             // In case the postconditions are ok
             else
             {
-
                 switch (gizmoToCheck.name)
                 {
                     case "RK":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[0] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[0] = 0;
+                        wrongGizmos[0] = 0;
                         break;
                     case "LK":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[1] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[1] = 0;
+                        wrongGizmos[1] = 0;
                         break;
                     case "LE":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[2] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[2] = 0;
+                        wrongGizmos[2] = 0;
                         break;
                     case "RE":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[3] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[3] = 0;
+                        wrongGizmos[3] = 0;
                         break;
                     case "W":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[4] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[4] = 0;
+                        wrongGizmos[4] = 0;
                         break;
                     case "H":
-                        if (!(wrongGizmosAux[0] >= 60)) wrongGizmosAux[5] = 0;
+                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[5] = 0;
+                        wrongGizmos[5] = 0;
                         break;
                     default: break;
                 }
 
-                if (!DrawAvatar.isExtraTime)
+                if (DrawAvatar.isExtraTime)
+                {
+                    Debug.Log("Nothing to do");
+
+                    for (int i = 0; i < DrawAvatar.isGizmoErrorExtraTime.Length; i++)
+                    {
+                        if (DrawAvatar.isGizmoErrorExtraTime[i]) gizmosAux[i].isError = true;
+                    }
+                }
+                else
+                {
+                    gizmoToCheck.isError = false;
+                }
+
+                //
+                /*if (!DrawAvatar.isExtraTime)
                 {
                     Debug.Log($"No es tiempo extra");
 
@@ -382,11 +371,12 @@ namespace com.inetum.eulen
                 {
                     Debug.Log($"Es tiempo extra");
 
-                    for (int i = 0; i < wrongGizmosAux.Length; i++)
+                    for (int i = 0; i < wrongGizmos.Length; i++)
                     {
-                        if (wrongGizmosAux[i] >= 60) { gizmosAux[i].isError = true; Debug.Log($"Gizmo extra time: {gizmosAux[i].name}"); }
+                        if (wrongGizmos[i] >= 60) { gizmosAux[i].isError = true; Debug.Log($"Gizmo extra time: {gizmosAux[i].name}"); }
                     }
-                }
+                }*/
+                //
             }
 
             if (!feetOk) res = false;

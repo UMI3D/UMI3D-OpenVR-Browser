@@ -26,7 +26,7 @@ MonoBehaviour:
       smallAngle: -20
       isPreCondition: 0
   - ruleName: Back Pose
-    errorLog: 
+    errorLog: "Corregir la inclinaci\xF3n de la espalda"
     isBoxGrabbed: 0
     checkFeetPosition: 0
     xDistanceToBox: 0
@@ -40,7 +40,7 @@ MonoBehaviour:
       test: 0
       angle: 135
       smallAngle: 0
-      isPreCondition: 0
+      isPreCondition: 1
     postConditions:
     - type: 3
       test: 2

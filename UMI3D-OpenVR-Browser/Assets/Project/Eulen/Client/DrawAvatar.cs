@@ -318,7 +318,7 @@ namespace com.inetum.eulen.recording.app
             }
         }
 
-        private bool coroutineRunning;
+        private int errorFrames = 30; // 30 frames = 1 seg
 
         /// <summary>
         /// Replays the exercise (PRL - USER)
@@ -340,44 +340,41 @@ namespace com.inetum.eulen.recording.app
 
                 Debug.Log("Start playing " + data.frames.Count + " frames at " + offset + " frame");
 
-                var wait = new WaitForSeconds(1f / data.recordFps); // 1 sec -> 22-30 Frames
+                var wait = new WaitForSeconds(1f / data.recordFps); // 1 sec -> 30 Frames
                 bool rightPerform;
                 bool wasError = false;
-                int auxWrongCounterFrame = 0;
 
                 Debug.Log($"FPS: {data.recordFps}");
                 for (int i = offset; i < data.frames.Count; i++)
                 {
                     // If it's PRL, replay will be true
                     rightPerform = SetFramePose(data.frames[i], data.userSettings, i); // Replay the whole exercise
-                    Debug.Log($"Frame: {i} RightPerform: {rightPerform}");
 
-                    if (!rightPerform) { auxWrongCounterFrame++; }
-                    else auxWrongCounterFrame = 0;
-
-
-                    if (auxWrongCounterFrame >= 60)
+                    // Test
+                    for (int j = 0; j < MovementCondition.wrongGizmos.Length; j++)
                     {
-                        errorUser = true;
-                        Debug.Log("Error user :)");
-                    }
-                    else
-                    {
-                        if (errorUser) wasError = true;
-                        errorUser = false;
-                    }
-
-                    // Check if it was an error to show the error few seconds more
-
-                    if (!errorUser && wasError)
-                    {
-                        Debug.Log($"<color=#77ffaa> Wrong movement detected! </color>");
-                        if (!IsInvoking("ShowErrorMoreTime"))
+                        if (MovementCondition.wrongGizmos[j] >= errorFrames)
                         {
-                            StartCoroutine(ShowErrorMoreTime());
+                            errorUser = true;
+                            errorUserAux[j] = true;
+                            if (MovementCondition.wrongGizmos[j] == errorFrames) Debug.Log($"<color=#77ffaa> Error on gizmo: {MovementCondition.gizmosAux[j].name} detected :) \nFrame: {i} </color>");
                         }
-                        
-                        wasError = false;
+                        else
+                        {
+                            if (errorUserAux[j]) { wasError = true; Debug.Log($"Gizmo now ok: {MovementCondition.gizmosAux[j].name} :) \nFrame: {i}"); }
+
+                            errorUser = false;
+                            errorUserAux[j] = false;
+                        }
+
+                        // Check if it was an error to show the error few seconds more
+                        if ((!errorUser && !errorUserAux[j]) && wasError)
+                        {
+                            Debug.Log("Displaying the error an additional time...");
+                            StartCoroutine(ShowErrorMoreTime(j));
+
+                            wasError = false;
+                        }
                     }
 
                     yield return wait;
@@ -819,9 +816,10 @@ namespace com.inetum.eulen.recording.app
 
         [HideInInspector] public static bool errorUser = false;
         private MovementValidationDto validDtoAux;
-        // En esta variable guardo el angulo que dio error y ahora queda mostrar este gizmo en rojo un tiempo extra cuando el error se confirme :)
-        // [HideInInspector] public static AngleGizmo gizmoError;
+
+        [HideInInspector] public static bool[] errorUserAux = new bool[6];
         [HideInInspector] public static bool isExtraTime = false;
+        [HideInInspector] public static bool[] isGizmoErrorExtraTime = new bool[6];
 
         /// <summary>
         /// Once the exercise is completed immediately validates the movement
@@ -843,7 +841,7 @@ namespace com.inetum.eulen.recording.app
                 if (!rightPerform) { auxWrongCounterFrame++; Debug.Log($"Wrong Frames: {auxWrongCounterFrame}"); }
                 else auxWrongCounterFrame = 0;
 
-                if (auxWrongCounterFrame >= 60)
+                if (auxWrongCounterFrame >= errorFrames)
                 {
                     errorUser = true;
                     Debug.Log("Error user :)");
@@ -865,17 +863,20 @@ namespace com.inetum.eulen.recording.app
         /// </summary>
         /// <param name="gizmo"></param>
         /// <returns></returns>
-        private IEnumerator ShowErrorMoreTime()
+        private IEnumerator ShowErrorMoreTime(int gizmoPos)
         {
-            int extraTime = 3;
+            int extraTime = 4;
 
             isExtraTime = true;
-            Debug.Log($"Erroooooor csmr");
+            Debug.Log($"Error gizmo: {MovementCondition.gizmosAux[gizmoPos].name}");
+
+            isGizmoErrorExtraTime[gizmoPos] = true;
+
             yield return new WaitForSeconds(extraTime);
 
             isExtraTime = false;
 
-            for (int i = 0; i <= MovementCondition.wrongGizmosAux.Length; i++) MovementCondition.wrongGizmosAux[0] = 0;
+            isGizmoErrorExtraTime[gizmoPos] = false;
             Debug.Log("Ya no hay error :v");
         }
         #endregion
