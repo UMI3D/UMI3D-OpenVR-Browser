@@ -90,6 +90,8 @@ namespace com.inetum.eulen.recording.app
         public AngleTag angHips;
         public AngleTag angWaist;
 
+        [SerializeField] private Image[] bgAngleTags = new Image[6];
+
         [Space(16f)]
         public Transform BoxReplay;
         [SerializeField] private LogsManager logsManager;
@@ -104,6 +106,7 @@ namespace com.inetum.eulen.recording.app
         private bool boxAttached = false;
 
         private bool isRotationSetup = false;
+        private bool isRotationSetupF = false;
 
         /// <summary>
         /// Is replay playing
@@ -228,6 +231,7 @@ namespace com.inetum.eulen.recording.app
 
             GL.PushMatrix();
 
+            lineMat.SetFloat("_LineWidth", 5);
             lineMat.SetPass(0);
             GL.MultMatrix(Matrix4x4.identity);
 
@@ -318,7 +322,7 @@ namespace com.inetum.eulen.recording.app
             }
         }
 
-        private int errorFrames = 30; // 30 frames = 1 seg
+        private readonly int errorFrames = 30; // 30 frames = 1 seg
 
         /// <summary>
         /// Replays the exercise (PRL - USER)
@@ -341,14 +345,18 @@ namespace com.inetum.eulen.recording.app
                 Debug.Log("Start playing " + data.frames.Count + " frames at " + offset + " frame");
 
                 var wait = new WaitForSeconds(1f / data.recordFps); // 1 sec -> 30 Frames
-                bool rightPerform;
                 bool wasError = false;
+
+                foreach (var item in bgAngleTags)
+                {
+                    item.color = new Color(0.55f, 0.55f, 0.55f);
+                }
 
                 Debug.Log($"FPS: {data.recordFps}");
                 for (int i = offset; i < data.frames.Count; i++)
                 {
                     // If it's PRL, replay will be true
-                    rightPerform = SetFramePose(data.frames[i], data.userSettings, i); // Replay the whole exercise
+                    SetFramePose(data.frames[i], data.userSettings, i); // Replay the whole exercise
 
                     // Test
                     for (int j = 0; j < MovementCondition.wrongGizmos.Length; j++)
@@ -357,11 +365,20 @@ namespace com.inetum.eulen.recording.app
                         {
                             errorUser = true;
                             errorUserAux[j] = true;
-                            if (MovementCondition.wrongGizmos[j] == errorFrames) Debug.Log($"<color=#77ffaa> Error on gizmo: {MovementCondition.gizmosAux[j].name} detected :) \nFrame: {i} </color>");
+                            if (MovementCondition.wrongGizmos[j] == errorFrames)
+                            {
+                                Debug.Log($"<color=#77ffaa> Error on gizmo: {MovementCondition.gizmosAux[j].name} detected :) \nFrame: {i} </color>");
+                                bgAngleTags[j].color = new Color(.86f, .08f, .08f);
+                            }
                         }
                         else
                         {
-                            if (errorUserAux[j]) { wasError = true; Debug.Log($"Gizmo now ok: {MovementCondition.gizmosAux[j].name} :) \nFrame: {i}"); }
+                            if (errorUserAux[j])
+                            {
+                                Debug.Log($"Gizmo now ok: {MovementCondition.gizmosAux[j].name} :) \nFrame: {i}");
+                                // bgAngleTags[j].color = new Color(.55f, .55f, .55f);
+                                wasError = true;
+                            }
 
                             errorUser = false;
                             errorUserAux[j] = false;
@@ -621,7 +638,7 @@ namespace com.inetum.eulen.recording.app
             // var leftHand = bonesDico[SteamVR_Input_Sources.LeftHand];
             // leftHand.rotation = trackersDico[SteamVR_Input_Sources.LeftHand].rotation * trackersToBones[SteamVR_Input_Sources.LeftHand];
             // leftHand.Rotate(leftHandOffset);
-            if (!isRotationSetup)
+            if ((!isRotationSetup && genre == 'm') || (!isRotationSetupF && genre != 'm'))
             {
                 var rightHand = bonesDico[SteamVR_Input_Sources.RightHand];
                 var leftHand = bonesDico[SteamVR_Input_Sources.LeftHand];
@@ -635,7 +652,8 @@ namespace com.inetum.eulen.recording.app
                     leftHand.rotation = trackersDico[SteamVR_Input_Sources.LeftHand].rotation * trackersToBones[(int)SteamVR_Input_Sources.LeftHand].Quaternion();
                     leftHand.Rotate(leftHandOffset);
                 }
-                isRotationSetup = true;
+                if (genre == 'm') isRotationSetup = true;
+                else isRotationSetupF = true;
             }
 
 
@@ -871,12 +889,14 @@ namespace com.inetum.eulen.recording.app
             Debug.Log($"Error gizmo: {MovementCondition.gizmosAux[gizmoPos].name}");
 
             isGizmoErrorExtraTime[gizmoPos] = true;
+            bgAngleTags[gizmoPos].color = new Color(.86f, .08f, .08f);
 
             yield return new WaitForSeconds(extraTime);
 
             isExtraTime = false;
 
             isGizmoErrorExtraTime[gizmoPos] = false;
+            bgAngleTags[gizmoPos].color = new Color(.55f, .55f, .55f);
             Debug.Log("Ya no hay error :v");
         }
         #endregion

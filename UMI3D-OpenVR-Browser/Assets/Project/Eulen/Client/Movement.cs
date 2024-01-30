@@ -316,27 +316,21 @@ namespace com.inetum.eulen
                 switch (gizmoToCheck.name)
                 {
                     case "RK":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[0] = 0;
                         wrongGizmos[0] = 0;
                         break;
                     case "LK":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[1] = 0;
                         wrongGizmos[1] = 0;
                         break;
                     case "LE":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[2] = 0;
                         wrongGizmos[2] = 0;
                         break;
                     case "RE":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[3] = 0;
                         wrongGizmos[3] = 0;
                         break;
                     case "W":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[4] = 0;
                         wrongGizmos[4] = 0;
                         break;
                     case "H":
-                        // if (!(wrongGizmos[0] >= 60)) wrongGizmos[5] = 0;
                         wrongGizmos[5] = 0;
                         break;
                     default: break;
@@ -344,7 +338,7 @@ namespace com.inetum.eulen
 
                 if (DrawAvatar.isExtraTime)
                 {
-                    Debug.Log("Nothing to do");
+                    // Debug.Log("Nothing to do");
 
                     for (int i = 0; i < DrawAvatar.isGizmoErrorExtraTime.Length; i++)
                     {
