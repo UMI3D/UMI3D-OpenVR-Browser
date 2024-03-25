@@ -167,7 +167,7 @@ namespace umi3dVRBrowsersBase.connection
             startingVirtualNeckPosition = OVRAnchor.TransformPoint(neckOffset);
             diffY = startingVirtualNeckPosition.y - skeletonContainer.position.y;
 
-            FootTargetBehavior.SetFootTargets();
+            //FootTargetBehavior.SetFootTargets();
 
             foreach (GameObject obj in objectsToActivate)
                 obj.SetActive(true);

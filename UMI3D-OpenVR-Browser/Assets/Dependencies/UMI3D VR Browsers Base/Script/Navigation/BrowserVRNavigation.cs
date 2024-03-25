@@ -119,7 +119,12 @@ namespace umi3dVRBrowsersBase.navigation
             position = newPos;
             return new NavigationData
             {
-                speed = Vector3Dto.zero,
+                speed = new Vector3Dto()
+                {
+                    X = delta.x / Time.deltaTime,
+                    Y = 0,
+                    Z = delta.z / Time.deltaTime
+                },
                 jumping = false,
                 crouching = false
             };
@@ -127,7 +132,7 @@ namespace umi3dVRBrowsersBase.navigation
 
         protected virtual Vector3 GetPostion()
         {
-            return transform.position;
+            return cameraTransform.position;
         }
     }
 }

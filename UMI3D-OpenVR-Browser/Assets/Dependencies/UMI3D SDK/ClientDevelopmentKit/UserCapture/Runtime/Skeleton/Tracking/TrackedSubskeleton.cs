@@ -63,7 +63,7 @@ namespace umi3d.cdk.userCapture.tracking
                 frame = skeleton.LastFrame;
 
             if (frame != null && frame.trackedBones.Exists(c => (c.boneType == BoneType.RightHand || c.boneType == BoneType.LeftHand)))
-                return 101;
+                return 0;
 
             return 0;
         }
