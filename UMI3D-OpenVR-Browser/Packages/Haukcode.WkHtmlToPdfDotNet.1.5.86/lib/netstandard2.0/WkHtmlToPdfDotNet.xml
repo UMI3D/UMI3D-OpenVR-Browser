@@ -1,0 +1,392 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WkHtmlToPdfDotNet</name>
+    </assembly>
+    <members>
+        <member name="M:WkHtmlToPdfDotNet.Contracts.IConverter.Convert(WkHtmlToPdfDotNet.Contracts.IDocument)">
+            <summary>
+             Converts document based on given settings
+            </summary>
+            <param name="document">Document to convert</param>
+            <returns>Returns converted document in bytes</returns>
+        </member>
+        <member name="M:WkHtmlToPdfDotNet.Contracts.ITools.Load">
+            <summary>
+            Load library and initialize wkhtmltopdf 
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.Contracts.ITools.IsLoaded">
+            <summary>
+            Is set to true if library is loaded and wkhtmltopdf is initialized successfully
+            </summary>
+        </member>
+        <member name="M:WkHtmlToPdfDotNet.Contracts.ITools.CreateGlobalSettings">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.FontSize">
+            <summary>
+            The font size to use for the footer. Default = 12
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.FontName">
+            <summary>
+            The name of the font to use for the footer. Default = "Ariel"
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.Left">
+            <summary>
+            The string to print in the left part of the footer, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.Center">
+            <summary>
+            The text to print in the right part of the footer, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.Right">
+            <summary>
+            The text to print in the right part of the footer, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.Line">
+            <summary>
+            Whether a line should be printed above the footer. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.Spacing">
+            <summary>
+            The amount of space to put between the footer and the content, e.g. "1.8". Be aware that if this is too large the footer will be printed outside the pdf document. This can be corrected with the margin.bottom setting. Default = 0.00
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.FooterSettings.HtmlUrl">
+            <summary>
+            Url for a HTML document to use for the footer. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.Orientation">
+            <summary>
+            The orientation of the output document, must be either "Landscape" or "Portrait". Default = "portrait"
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.ColorMode">
+            <summary>
+            Should the output be printed in color or gray scale, must be either "Color" or "Grayscale". Default = "color"
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.UseCompression">
+            <summary>
+            Should we use loss less compression when creating the pdf file. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.DPI">
+            <summary>
+            What dpi should we use when printing. Default = 96
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.PageOffset">
+            <summary>
+            A number that is added to all page numbers when printing headers, footers and table of content. Default = 0
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.Copies">
+            <summary>
+            How many copies should we print. Default = 1
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.Collate">
+            <summary>
+            Should the copies be collated. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.Outline">
+            <summary>
+            Should a outline (table of content in the sidebar) be generated and put into the PDF. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.OutlineDepth">
+            <summary>
+            The maximal depth of the outline. Default = 4
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.DumpOutline">
+            <summary>
+            If not set to the empty string a XML representation of the outline is dumped to this file. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.Out">
+            <summary>
+            The path of the output file, if "-" output is sent to stdout, if empty the output is stored in a buffer. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.DocumentTitle">
+            <summary>
+            The title of the PDF document. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.ImageDPI">
+            <summary>
+            The maximal DPI to use for images in the pdf document. Default = 600
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.ImageQuality">
+            <summary>
+            The jpeg compression factor to use when producing the pdf document. Default = 94
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.CookieJar">
+            <summary>
+            Path of file used to load and store cookies. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.PaperSize">
+            <summary>
+            Size of output paper
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.PaperHeight">
+            <summary>
+            The height of the output document
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.PaperWidth">
+            <summary>
+            The width of the output document
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.MarginLeft">
+            <summary>
+            Size of the left margin
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.MarginRight">
+            <summary>
+            Size of the right margin
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.MarginTop">
+            <summary>
+            Size of the top margin
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.MarginBottom">
+            <summary>
+            Size of the bottom margin
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.GlobalSettings.ViewportSize">
+            <summary>
+            Set viewport size. Not supported in wkhtmltopdf API since v0.12.2.4
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.FontSize">
+            <summary>
+            The font size to use for the header. Default = 12
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.FontName">
+            <summary>
+            The name of the font to use for the header. Default = "Ariel"
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.Left">
+            <summary>
+            The string to print in the left part of the header, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.Center">
+            <summary>
+            The text to print in the right part of the header, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.Right">
+            <summary>
+            The text to print in the right part of the header, note that some sequences are replaced in this string, see the wkhtmltopdf manual. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.Line">
+            <summary>
+            Whether a line should be printed under the header. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.Spacing">
+            <summary>
+            The amount of space to put between the header and the content, e.g. "1.8". Be aware that if this is too large the header will be printed outside the pdf document. This can be corrected with the margin.top setting. Default = 0.00
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.HeaderSettings.HtmlUrl">
+            <summary>
+            Url for a HTML document to use for the header. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.Username">
+            <summary>
+            The user name to use when loging into a website. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.Password">
+            <summary>
+            The password to used when logging into a website. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.JSDelay">
+            <summary>
+            The mount of time in milliseconds to wait after a page has done loading until it is actually printed. E.g. "1200". We will wait this amount of time or until, javascript calls window.print(). Default = 200
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.ZoomFactor">
+            <summary>
+            How much should we zoom in on the content. Default = 1.0
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.BlockLocalFileAccess">
+            <summary>
+            Disallow local and piped files to access other local files. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.StopSlowScript">
+            <summary>
+            Stop slow running javascript. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.DebugJavascript">
+            <summary>
+            Forward javascript warnings and errors to the warning callback. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.LoadErrorHandling">
+            <summary>
+            How should we handle obejcts that fail to load. Default = Abort
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.Proxy">
+            <summary>
+            String describing what proxy to use when loading the object. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.CustomHeaders">
+            <summary>
+            Custom headers used when requesting page. Defaulty = empty
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.RepeatCustomHeaders">
+            <summary>
+            Should the custom headers be sent all elements loaded instead of only the main page. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.Cookies">
+            <summary>
+            Cookies used when requesting page. Default = empty
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.LoadSettings.Post">
+            <summary>
+            Post items
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.Page">
+            <summary>
+            The URL or path of the web page to convert, if "-" input is read from stdin. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.UseExternalLinks">
+            <summary>
+            Should external links in the HTML document be converted into external pdf links. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.UseLocalLinks">
+            <summary>
+            Should internal links in the HTML document be converted into pdf references. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.ProduceForms">
+            <summary>
+            Should we turn HTML forms into PDF forms. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.IncludeInOutline">
+            <summary>
+            Should the sections from this document be included in the outline and table of content. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.ObjectSettings.PagesCount">
+            <summary>
+            Should we count the pages of this document, in the counter used for TOC, headers and footers. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.TableOfContentsSettings.IsTableOfContent">
+            <summary>
+            Should we create a table of contents
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.TableOfContentsSettings.CaptionText">
+            <summary>
+            Name/Headline of the TOC
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.TableOfContentsSettings.UseDottedLines">
+            <summary>
+            Should we print dots between the name and the page number?
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.Background">
+            <summary>
+            Should we print the background. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.LoadImages">
+            <summary>
+            Should we load images. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.EnableJavascript">
+            <summary>
+            Should we enable javascript. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.EnableIntelligentShrinking">
+            <summary>
+            Should we enable intelligent shrinkng to fit more content on one page. Has no effect for wkhtmltoimage. Default = true
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.MinimumFontSize">
+            <summary>
+            The minimum font size allowed. Default = -1
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.PrintMediaType">
+            <summary>
+            Should the content be printed using the print media type instead of the screen media type. Default = false
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.DefaultEncoding">
+            <summary>
+            What encoding should we guess content is using if they do not specify it properly. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.UserStyleSheet">
+            <summary>
+            Url or path to a user specified style sheet. Default = ""
+            </summary>
+        </member>
+        <member name="P:WkHtmlToPdfDotNet.WebSettings.enablePlugins">
+            <summary>
+            Should we enable NS plugins. Enabling this will have limited success. Default = false
+            </summary>
+        </member>
+        <member name="T:WkHtmlToPdfDotNet.CustomUnmanagedType">
+            <summary>
+            This enum "extends" UnmanagedType enum from System.Runtime.InteropServices v4.1.0 which doesn't have LPUTF8Str (enum value is 48) enumartion defined
+            </summary>
+        </member>
+        <member name="T:WkHtmlToPdfDotNet.PaperKind">
+            <summary>
+            Enumaration of paper kinds from  http://msdn.microsoft.com/en-us/library/system.drawing.printing.paperkind.aspx
+            Implemented here because Syste.Drawing.Printing is not ported to NET Core
+            </summary>
+        </member>
+    </members>
+</doc>

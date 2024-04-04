@@ -66,11 +66,19 @@ public static class SummaryGenerator
                 System.IO.Directory.CreateDirectory(path);
             }
 
+            string htmlDoc = generator.Generate();
+
+            // HTML
             string summaryPath = path + "/eulen-summary-" + System.DateTime.Now.ToString("dd-MM-yyyy--hh-mm-ss") + ".html";
-
-            System.IO.File.WriteAllText(summaryPath, generator.Generate());
-
+            System.IO.File.WriteAllText(summaryPath, htmlDoc);
             Application.OpenURL("file:///" + summaryPath);
+
+            // PDF
+            string summaryPathPDF = path + "/eulen-summary-" + System.DateTime.Now.ToString("dd-MM-yyyy--hh-mm-ss") + ".pdf";
+            PDFConverterManager.ConvertToPDF(summaryPathPDF, htmlDoc);
+
+            Application.OpenURL("file:///" + summaryPathPDF);
+
         } catch (Exception ex)
         {
             Debug.LogException(ex);
