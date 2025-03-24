@@ -1,3 +1,11 @@
+# ⚠️ Archived Repository ⚠️
+
+This repository is no longer maintained and has been **archived**.
+
+The project has moved to a new repository. You can find the latest version and updates here: [UMI3D-BROWSER](https://github.com/UMI3D/UMI3D-BROWSER).
+
+Please visit the new repository for the most up-to-date code and information.
+
 # UMI3D-OpenVR-Browser
 UMI3D is a web protocol that enables the creation of 3D media in which users of any AR/VR device can collaborate in real time. The 3D media is created once and hosted on a server or on a local computer. Any AR/VR device can display and interact with it remotely thanks to a dedicated UMI3D browser.
 
